@@ -1,6 +1,0 @@
-[submodule "DebugTool"]
-	path = DebugTool
-	url = git@github.com:SunriseDigital/cs-sdx-DebugTool.git
-[submodule "Db"]
-	path = Db
-	url = git@github.com:SunriseDigital/cs-sdx-Db.git
