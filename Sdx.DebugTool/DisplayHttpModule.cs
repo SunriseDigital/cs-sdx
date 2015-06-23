@@ -35,7 +35,8 @@ namespace Sdx.DebugTool
         return;
       }
 
-      var debugString = "<div class=\"sdx-debug-wrapper\">";
+      var debugString = "";
+      debugString += "<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both;\">";
       Int64 prevElapsed = -1;
       foreach (Dictionary<String, Object> dic in Debug.Logs)
       {
@@ -64,11 +65,11 @@ namespace Sdx.DebugTool
     {
       DateTime now = DateTime.Now;
       return
-        "<div class=\"sdx-debug-item\">" +
-          "<div class=\"sdx-debug-title\">" +
+        "<div style=\"background-color: #ebebeb; border-radius: 5px; padding: 0;margin-bottom: 20px;\">" +
+          "<div style=\"    background-color: #808080; color: #fff; font-weight: bold; border-radius: 5px 5px 0 0; padding: 5px 10px;\">" +
             "[" + currentElapsed / 1000.0 + "/" + totalElapsed / 1000.0 + "]" + title +
           "</div>" +
-          "<pre class=\"sdx-debug-value\">" + value + "</pre>" +
+          "<pre style=\"padding: 10px; margin: 0;\">" + value + "</pre>" +
         "</div>";
     }
   }
