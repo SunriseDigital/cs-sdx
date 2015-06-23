@@ -11,8 +11,8 @@ namespace Sdx.DebugTool
   public class Debug
   {
     private static String logKey = "SDX.DEBUG_TOOL.DEBUG.LOGS_KEY";
-    private static String requestTimerKey = "SDX.DEBUG_TOOL.DEBUG.RequestTimerKey";
-    public static List<Dictionary<String, Object>> Logs
+    private static String requestTimerKey = "SDX.DEBUG_TOOL.DEBUG.REQUEST_TIMER_KEY";
+    internal static List<Dictionary<String, Object>> Logs
     {
       get
       {
@@ -30,7 +30,7 @@ namespace Sdx.DebugTool
       }
     }
 
-    public static Stopwatch RequestTimer
+    private static Stopwatch RequestTimer
     {
       get
       {
@@ -53,7 +53,7 @@ namespace Sdx.DebugTool
       return Dump(value, "");
     }
 
-    public static String Dump(Object value, String indent)
+    private static String Dump(Object value, String indent)
     {
       //文字列だったら即返す
       if (value is String)
