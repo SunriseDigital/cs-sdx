@@ -40,11 +40,11 @@ namespace Sdx.DebugTool
 
     public static void Log(Object value, String title = "")
     {
-      Int64 msec = Debug.RequestTimer.ElapsedMilliseconds;
+      Int64 ticks = Debug.RequestTimer.ElapsedTicks;
       Dictionary<String, Object> dic = new Dictionary<String, Object>();
       dic.Add("title", title);
       dic.Add("value", value);
-      dic.Add("elapsedMsec", msec);
+      dic.Add("elapsedTicks", ticks);
       Logs.Add(dic);
     }
 

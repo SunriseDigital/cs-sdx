@@ -40,7 +40,7 @@ namespace Sdx.DebugTool
       Int64 prevElapsed = -1;
       foreach (Dictionary<String, Object> dic in Debug.Logs)
       {
-        var totalElapsed = (Int64)dic["elapsedMsec"];
+        var totalElapsed = (Int64)dic["elapsedTicks"];
         Int64 currentElapsed = 0;
         if (prevElapsed != -1)
         {
@@ -67,10 +67,20 @@ namespace Sdx.DebugTool
       return
         "<div style=\"background-color: #ebebeb; border-radius: 5px; padding: 0;margin-bottom: 20px;\">" +
           "<div style=\"    background-color: #808080; color: #fff; font-weight: bold; border-radius: 5px 5px 0 0; padding: 5px 10px;\">" +
-            "[" + currentElapsed / 1000.0 + "/" + totalElapsed / 1000.0 + "]" + title +
+            "[" + formatTicks(currentElapsed) + "/" + formatTicks(totalElapsed) + "]" + title +
           "</div>" +
           "<pre style=\"padding: 10px; margin: 0;\">" + value + "</pre>" +
         "</div>";
+    }
+
+    private String formatTicks(long ticks)
+    {
+      double result = (double)ticks / Stopwatch.Frequency;
+      if(result == 0.0){
+        return "0";
+      }else {
+        return result.ToString("N8");
+      }
     }
   }
 }
