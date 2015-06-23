@@ -17,7 +17,6 @@ IIS6以前（クラシック）
       <add name="DisplayHttpModule" type="Sdx.DebugTool.DisplayHttpModule"/>
     </httpModules>
   </system.web>
-  ...
 </configuration>
 ```
 
