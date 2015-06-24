@@ -12,7 +12,7 @@ namespace UnitTest
     public class DebugTool
     {
       [Fact]
-      public void TestDumpString()
+      public void DumpString()
       {
         Assert.Equal("aaaa", Debug.Dump("aaaa"));
         Assert.Equal("日本語", Debug.Dump("日本語"));
@@ -20,7 +20,7 @@ namespace UnitTest
       }
 
       [Fact]
-      public void TestDumpArray()
+      public void DumpArray()
       {
         Assert.Equal(
           "System.String[]" + Environment.NewLine +
@@ -58,7 +58,7 @@ namespace UnitTest
       }
 
       [Fact]
-      public void TestDumpDictionary()
+      public void DumpDictionary()
       {
         Dictionary<String, String> dic = new Dictionary<string, string>();
         dic.Add("foo", "bar");
