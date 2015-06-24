@@ -10,6 +10,11 @@ namespace Sdx.Db
 {
   public class Util
   {
+    /// <summary>
+    /// デバッグやロギング用です。サニタイズしませんので注意してください。
+    /// </summary>
+    /// <param name="command"></param>
+    /// <returns></returns>
     public static String SqlCommandToSql(SqlCommand command)
     {
       DbType[] quotedParameterTypes = new DbType[] {
@@ -35,6 +40,34 @@ namespace Sdx.Db
       }
 
       return query;
+    }
+
+    /// <summary>
+    /// カラム名が同じだと上書きされるので注意してください。
+    /// asで別名を付ければ取得可能です。
+    /// </summary>
+    /// <param name="reader"></param>
+    /// <returns></returns>
+    public static List<Dictionary<string, string>> CreateDictinaryList(SqlDataReader reader)
+    {
+      DataTable schemaTable = reader.GetSchemaTable();
+
+      List<Dictionary<string, string>> list = new List<Dictionary<string, string>>();
+      foreach (IDataRecord record in reader)
+      {
+        int key = 0;
+        Dictionary<string, string> keyValue = new Dictionary<string, string>();
+        list.Add(keyValue);
+
+        //{カラム名 => 値}のDictionaryを作成
+        //同じカラムネームだと上書きされるので注意。
+        foreach (DataRow row in schemaTable.Rows)
+        {
+          keyValue[row["ColumnName"].ToString()] = record.GetValue(key++).ToString();
+        }
+      }
+
+      return list;
     }
   }
 }

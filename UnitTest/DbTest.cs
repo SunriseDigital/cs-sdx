@@ -27,7 +27,7 @@ namespace UnitTest
     }
 
     [Fact]
-    public void Where()
+    public void WhereSimple()
     {
       Sdx.Db.Where where = new Sdx.Db.Where();
 

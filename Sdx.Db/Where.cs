@@ -33,13 +33,27 @@ namespace Sdx.Db
           if(obj is Dictionary<String, Object>)
           {
             Dictionary<String, Object> dic = obj as Dictionary<String, Object>;
-            command.CommandText += String.Format(
-              "{0} = {1}",
-              builder.QuoteIdentifier(dic["column"] as String),
-              "@"+dic["column"]
-            );
+            String placeHolder = "@" + dic["table"] + "@" + dic["column"]; ;
+            if (dic["table"] != null)
+            {
+              command.CommandText += String.Format(
+                "{0}.{1} = {2}",
+                builder.QuoteIdentifier(dic["table"] as String),
+                builder.QuoteIdentifier(dic["column"] as String),
+                placeHolder
+              );
+            }
+            else
+            {
+              command.CommandText += String.Format(
+                "{0} = {1}",
+                builder.QuoteIdentifier(dic["column"] as String),
+                placeHolder
+              );
+            }
 
-            command.Parameters.AddWithValue("@" + dic["column"], dic["value"].ToString());
+
+            command.Parameters.AddWithValue(placeHolder, dic["value"].ToString());
           }
           else if (obj is Where)
           {

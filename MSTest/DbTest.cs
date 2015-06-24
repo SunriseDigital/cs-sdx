@@ -1,13 +1,18 @@
-﻿#if DEBUG
+﻿//MSTestはtravis.ciでテストが動かないのでデバッグモード時にのみコンパイルします。
+#if DEBUG
 using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
 using System.Text;
 using System.Data.Common;
+using System.Data;
 using Sdx.Db;
+
 using Assert = Xunit.Assert;
+using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 
 namespace MSTest
 {
@@ -52,7 +57,7 @@ namespace MSTest
       return new SqlConnection(connectionString);
     }
 
-    [TestMethod]
+    [Fact]
     public void TestMethod1()
     {
 
@@ -64,33 +69,31 @@ namespace MSTest
         
 
         SqlCommand command = new SqlCommand();
-        command.CommandText = "SELECT "
-          + commandBuilder.QuoteIdentifier("name")
-          + " FROM shop WHERE "
-          + commandBuilder.QuoteIdentifier("id")
-          + " = 1"
+        command.CommandText = "SELECT [shop].[name] as name@shop, [category].[name] as name@category FROM [shop]"
+          + " INNER JOIN [category] ON [category].[id] = [shop].[category_id]"
+          + " WHERE [shop].[id] = @shop@id"
           ;
+
+        command.Parameters.AddWithValue("@shop@id", "1");
+
         command.Connection = connection;
 
         SqlDataReader reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-          //Console.WriteLine(reader.GetString(0));
-        }
+        List<Dictionary<string, string>> list = Sdx.Db.Util.CreateDictinaryList(reader);
+        Console.WriteLine(Sdx.DebugTool.Debug.Dump(list));
       }
     }
 
-    [TestMethod]
-    public void WhereAnd()
+    [Fact]
+    public void WhereWithTable()
     {
       Sdx.Db.Where where = new Sdx.Db.Where();
+      where.add("id", "1", "shop");
 
-      where.add("id", "1");
+      Assert.Equal("[shop].[id] = '1'", Sdx.Db.Util.SqlCommandToSql(where.build()));
 
-      Assert.Equal("[id] = '1'", Sdx.Db.Util.SqlCommandToSql(where.build()));
-
-      where.add("type", 2);
-      Assert.Equal("[id] = '1' AND [type] = '2'", Sdx.Db.Util.SqlCommandToSql(where.build()));
+      where.add("type", 2, "category");
+      Assert.Equal("[shop].[id] = '1' AND [category].[type] = '2'", Sdx.Db.Util.SqlCommandToSql(where.build()));
     }
   }
 }
