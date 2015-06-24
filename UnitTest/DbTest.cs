@@ -25,5 +25,18 @@ namespace UnitTest
       cmd.Parameters.AddWithValue("@CityCode", "tokyo");
       Assert.Equal("SELECT * FROM user WHERE city = '東京' AND city_code = 'tokyo'", Sdx.Db.Util.SqlCommandToSql(cmd));
     }
+
+    [Fact]
+    public void Where()
+    {
+      Sdx.Db.Where where = new Sdx.Db.Where();
+
+      where.add("id", "1");
+
+      Assert.Equal("[id] = '1'", Sdx.Db.Util.SqlCommandToSql(where.build()));
+
+      where.add("type", 2);
+      Assert.Equal("[id] = '1' AND [type] = '2'", Sdx.Db.Util.SqlCommandToSql(where.build()));
+    }
   }
 }

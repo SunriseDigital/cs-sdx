@@ -9,9 +9,9 @@ namespace Sdx.Db
     {
       private List<Object> wheres = new List<object>();
 
-      public Where add(String column, String value, String table = null)
+      public Where add(String column, Object value, String table = null)
       {
-        wheres.Add(new Dictionary<String, String> {
+        wheres.Add(new Dictionary<String, Object> {
           {"column", column},
           {"table", table},
           {"value", value}
@@ -21,20 +21,25 @@ namespace Sdx.Db
 
       public SqlCommand build()
       {
-        var result = this.Connection.CreateCommand();
+        var command = new SqlCommand();
         DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
         DbCommandBuilder builder = factory.CreateCommandBuilder();
         wheres.ForEach(obj => {
-          if(obj is Dictionary<String, String>)
+          if(command.CommandText.Length > 0)
           {
-            Dictionary<String, String> dic = obj as Dictionary<String, String>;
-            result.CommandText = String.Format(
+            command.CommandText += " AND ";
+          }
+
+          if(obj is Dictionary<String, Object>)
+          {
+            Dictionary<String, Object> dic = obj as Dictionary<String, Object>;
+            command.CommandText += String.Format(
               "{0} = {1}",
-              builder.QuoteIdentifier(dic["column"]),
+              builder.QuoteIdentifier(dic["column"] as String),
               "@"+dic["column"]
             );
 
-            result.Parameters.AddWithValue("@" + dic["column"], dic["value"]);
+            command.Parameters.AddWithValue("@" + dic["column"], dic["value"].ToString());
           }
           else if (obj is Where)
           {
@@ -42,9 +47,7 @@ namespace Sdx.Db
           }
         });
 
-        return result;
+        return command;
       }
-
-      public SqlConnection Connection { get; set; }
     }
 }

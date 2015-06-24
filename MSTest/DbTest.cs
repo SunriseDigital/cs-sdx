@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if DEBUG
+using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System.Data.SqlClient;
@@ -6,7 +7,6 @@ using System.IO;
 using System.Text;
 using System.Data.Common;
 using Sdx.Db;
-
 using Assert = Xunit.Assert;
 
 namespace MSTest
@@ -81,18 +81,17 @@ namespace MSTest
     }
 
     [TestMethod]
-    public void Where()
+    public void WhereAnd()
     {
-      using (SqlConnection connection = CreateConnection())
-      {
-        Sdx.Db.Where where = new Sdx.Db.Where();
-        where.Connection = connection;
+      Sdx.Db.Where where = new Sdx.Db.Where();
 
-        where.add("id", "1");
+      where.add("id", "1");
 
-        SqlCommand command = where.build();
-        Assert.Equal("[id] = '1'", Sdx.Db.Util.SqlCommandToSql(command));
-      }
+      Assert.Equal("[id] = '1'", Sdx.Db.Util.SqlCommandToSql(where.build()));
+
+      where.add("type", 2);
+      Assert.Equal("[id] = '1' AND [type] = '2'", Sdx.Db.Util.SqlCommandToSql(where.build()));
     }
   }
 }
+#endif

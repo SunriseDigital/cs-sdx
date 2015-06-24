@@ -68,6 +68,10 @@
       <Project>{ed1e6ba0-37f0-46cf-a86a-231a6cd2178c}</Project>
       <Name>Sdx.Db</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Sdx.DebugTool\Sdx.DebugTool.csproj">
+      <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
+      <Name>Sdx.DebugTool</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
