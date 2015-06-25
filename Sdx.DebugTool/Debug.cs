@@ -12,6 +12,15 @@ namespace Sdx.DebugTool
   {
     private static String logKey = "SDX.DEBUG_TOOL.DEBUG.LOGS_KEY";
     private static String requestTimerKey = "SDX.DEBUG_TOOL.DEBUG.REQUEST_TIMER_KEY";
+
+    public static String DumpIndent
+    {
+      get
+      {
+        return "  ";
+      }
+    }
+
     internal static List<Dictionary<String, Object>> Logs
     {
       get
@@ -58,39 +67,62 @@ namespace Sdx.DebugTool
       //文字列だったら即返す
       if (value is String)
       {
-        return indent + value as String;
+        String strVal = value as String;
+        return indent + "String(" + strVal.Length + ") " + strVal;
       }
 
       //それ以外のクラスはTypeNameを付与
       Type type = value.GetType();
-      String result = indent + type.Namespace + "." + type.Name + Environment.NewLine;
+      String result = indent + type.Namespace + "." + type.Name;
 
       if (value is IDictionary)
       {
         var dic = value as IDictionary;
+
+        //タイトル部分
+        result += "("+dic.Count+")" + Environment.NewLine;
+
         foreach (var key in dic.Keys)
         {
-          result += indent + " " + key + " :" + Dump(dic[key], " ") + Environment.NewLine;
+          // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
+          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ") + Environment.NewLine;
         }
 
         //改行を取り除く
         result = result.TrimEnd('\r', '\n');
+      }
+      else if (value is IList)
+      {
+        IList list = value as IList;
+        //タイトル部分
+        result += "("+list.Count+")" + Environment.NewLine;
+        result = appendEnumerableDump(result, value as IEnumerable, indent);
       }
       else if (value is IEnumerable)
       {
-        foreach (Object obj in value as IEnumerable)
-        {
-          result += Dump(obj, indent + " ") + Environment.NewLine;
-        }
-
-        //改行を取り除く
-        result = result.TrimEnd('\r', '\n');
+        //タイトル部分
+        result += Environment.NewLine;
+        result = appendEnumerableDump(result, value as IEnumerable, indent);
       }
       else
       {
+        //タイトル部分
+        result += Environment.NewLine;
         result += value.ToString();
       }
 
+      return result;
+    }
+
+    private static String appendEnumerableDump(String result, IEnumerable values, String indent)
+    { 
+      foreach (Object obj in values as IEnumerable)
+      {
+        result += Dump(obj, indent + DumpIndent) + Environment.NewLine;
+      }
+
+      //改行を取り除く
+      result = result.TrimEnd('\r', '\n');
       return result;
     }
 
