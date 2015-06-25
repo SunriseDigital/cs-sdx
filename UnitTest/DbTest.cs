@@ -15,10 +15,14 @@ using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAtt
 
 namespace UnitTest
 {
+  #if DEBUG
   [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+  #endif
   public class DbTest
   {
+    #if DEBUG
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitialize]
+     #endif
     public void setup()
     {
       using (StreamReader stream = new StreamReader("setup.sql", Encoding.GetEncoding("UTF-8")))
@@ -125,7 +129,6 @@ namespace UnitTest
       DbProviderFactory factory = DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
       where.CommandBuilder = factory.CreateCommandBuilder();
       Assert.Equal("`id` = '1' AND `type` = '2'", Sdx.Db.Util.SqlCommandToSql(where.build()));
-
     }
   }
 }
