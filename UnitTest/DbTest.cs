@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,7 +9,7 @@ using System.Diagnostics;
 
 using Xunit;
 
-#if DEBUG
+#if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 #endif
 
@@ -19,14 +17,14 @@ using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAtt
 
 namespace UnitTest
 {
-  #if DEBUG
+#if ON_VISUAL_STUDIO
   [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
-  #endif
+#endif
   public class DbTest
   {
-    #if DEBUG
+#if ON_VISUAL_STUDIO
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitialize]
-    #endif
+#endif
     public void setup()
     {
       using (StreamReader stream = new StreamReader("setup.sql", Encoding.GetEncoding("UTF-8")))
@@ -71,7 +69,7 @@ namespace UnitTest
       ExecuteSqlSample();
     }
 
-    [Conditional("DEBUG")]
+    [Conditional("ON_VISUAL_STUDIO")]
     private void ExecuteSqlSample()
     {
       using (SqlConnection connection = CreateConnection())

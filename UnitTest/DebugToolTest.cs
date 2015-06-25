@@ -7,15 +7,15 @@ using System.Threading.Tasks;
 using Xunit;
 using Sdx.DebugTool;
 
-#if DEBUG
+#if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 #endif
 
 namespace UnitTest
 {
-  #if DEBUG
+#if ON_VISUAL_STUDIO
   [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
-  #endif
+#endif
   public class DebugToolTest
   {
     [Fact]
