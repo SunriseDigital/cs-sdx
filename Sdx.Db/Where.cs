@@ -9,6 +9,10 @@ namespace Sdx.Db
     {
       private List<Object> wheres = new List<object>();
 
+      private static string defaultProviderName = "System.Data.SqlClient";
+
+      private string providerName;
+
       public Where add(String column, Object value, String table = null)
       {
         wheres.Add(new Dictionary<String, Object> {
@@ -19,10 +23,39 @@ namespace Sdx.Db
         return this;
       }
 
+      public static string DefaultProviderName
+      {
+        get
+        {
+          return defaultProviderName;
+        }
+        set
+        {
+          defaultProviderName = value;
+        }
+      }
+
+      public string ProviderName
+      {
+        get
+        {
+          if(this.providerName != null)
+          {
+            return this.providerName;
+          }
+
+          return DefaultProviderName;
+        }
+        set
+        {
+          this.providerName = value;
+        }
+      }
+
       public SqlCommand build()
       {
         var command = new SqlCommand();
-        DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
+        DbProviderFactory factory = DbProviderFactories.GetFactory(ProviderName);
         DbCommandBuilder builder = factory.CreateCommandBuilder();
         wheres.ForEach(obj => {
           if(command.CommandText.Length > 0)
