@@ -65,6 +65,8 @@
     <Compile Include="DbTest.cs" />
     <Compile Include="DebugToolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestClassAttribute.cs" />
+    <Compile Include="TestTemplate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

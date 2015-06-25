@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sdx.DebugTool;
 
 using Xunit;
-using Sdx.DebugTool;
+using UnitTest.Attibute;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
 #endif
 
 namespace UnitTest
 {
-#if ON_VISUAL_STUDIO
-  [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
-#endif
+  [TestClass]
   public class DebugToolTest
   {
     [Fact]

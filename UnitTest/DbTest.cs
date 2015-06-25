@@ -8,24 +8,25 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 
 using Xunit;
+using UnitTest.Attibute;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
 #endif
-
-
 
 namespace UnitTest
 {
-#if ON_VISUAL_STUDIO
-  [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
-#endif
+  [TestClass]
   public class DbTest
   {
-#if ON_VISUAL_STUDIO
-    [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitialize]
-#endif
-    public void setup()
+    public DbTest()
+    {
+      ResetDatabase();
+    }
+
+    [Conditional("ON_VISUAL_STUDIO")]
+    public void ResetDatabase()
     {
       using (StreamReader stream = new StreamReader("setup.sql", Encoding.GetEncoding("UTF-8")))
       {
@@ -54,6 +55,8 @@ namespace UnitTest
           }
         }
       }
+
+      Console.WriteLine("ResetDatabase");
     }
 
     private SqlConnection CreateConnection()
