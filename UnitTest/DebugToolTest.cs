@@ -7,8 +7,13 @@ using System.Threading.Tasks;
 using Xunit;
 using Sdx.DebugTool;
 
+#if DEBUG
+using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+#endif
+
 namespace UnitTest
 {
+  [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
   public class DebugToolTest
   {
     [Fact]

@@ -9,9 +9,9 @@ namespace Sdx.Db
     {
       private List<Object> wheres = new List<object>();
 
-      private static string defaultProviderName = "System.Data.SqlClient";
+      private static DbCommandBuilder defaultCommandBuilder;
 
-      private string providerName;
+      private DbCommandBuilder commandBuilder;
 
       public Where add(String column, Object value, String table = null)
       {
@@ -23,40 +23,45 @@ namespace Sdx.Db
         return this;
       }
 
-      public static string DefaultProviderName
+      public static DbCommandBuilder DefaultCommandBuilder
       {
         get
         {
-          return defaultProviderName;
+          if(defaultCommandBuilder == null)
+          {
+            DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
+            defaultCommandBuilder = factory.CreateCommandBuilder();
+          }
+
+          return defaultCommandBuilder;
         }
         set
         {
-          defaultProviderName = value;
+          defaultCommandBuilder = value;
         }
       }
 
-      public string ProviderName
+      public DbCommandBuilder CommandBuilder
       {
         get
         {
-          if(this.providerName != null)
+          if(this.commandBuilder != null)
           {
-            return this.providerName;
+            return this.commandBuilder;
           }
 
-          return DefaultProviderName;
+          return DefaultCommandBuilder;
         }
         set
         {
-          this.providerName = value;
+          this.commandBuilder = value;
         }
       }
 
       public SqlCommand build()
       {
         var command = new SqlCommand();
-        DbProviderFactory factory = DbProviderFactories.GetFactory(ProviderName);
-        DbCommandBuilder builder = factory.CreateCommandBuilder();
+        
         wheres.ForEach(obj => {
           if(command.CommandText.Length > 0)
           {
@@ -71,8 +76,8 @@ namespace Sdx.Db
             {
               command.CommandText += String.Format(
                 "{0}.{1} = {2}",
-                builder.QuoteIdentifier(dic["table"] as String),
-                builder.QuoteIdentifier(dic["column"] as String),
+                this.CommandBuilder.QuoteIdentifier(dic["table"] as String),
+                this.CommandBuilder.QuoteIdentifier(dic["column"] as String),
                 placeHolder
               );
             }
@@ -80,7 +85,7 @@ namespace Sdx.Db
             {
               command.CommandText += String.Format(
                 "{0} = {1}",
-                builder.QuoteIdentifier(dic["column"] as String),
+                this.CommandBuilder.QuoteIdentifier(dic["column"] as String),
                 placeHolder
               );
             }
