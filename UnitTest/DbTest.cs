@@ -60,8 +60,7 @@ namespace UnitTest
       return new SqlConnection(connectionString);
     }
 
-    [Conditional("DEBUG")]
-    [Fact]
+    [Fact, Conditional("DEBUG")]
     public void SqlSample()
     {
       using (SqlConnection connection = CreateConnection())
