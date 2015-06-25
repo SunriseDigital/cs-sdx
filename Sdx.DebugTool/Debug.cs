@@ -12,6 +12,15 @@ namespace Sdx.DebugTool
   {
     private static String logKey = "SDX.DEBUG_TOOL.DEBUG.LOGS_KEY";
     private static String requestTimerKey = "SDX.DEBUG_TOOL.DEBUG.REQUEST_TIMER_KEY";
+
+    public static String DumpIndent
+    {
+      get
+      {
+        return "  ";
+      }
+    }
+
     internal static List<Dictionary<String, Object>> Logs
     {
       get
@@ -75,7 +84,8 @@ namespace Sdx.DebugTool
 
         foreach (var key in dic.Keys)
         {
-          result += indent + " " + key + " :" + Dump(dic[key], " ") + Environment.NewLine;
+          // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
+          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ") + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -108,7 +118,7 @@ namespace Sdx.DebugTool
     { 
       foreach (Object obj in values as IEnumerable)
       {
-        result += Dump(obj, indent + " ") + Environment.NewLine;
+        result += Dump(obj, indent + DumpIndent) + Environment.NewLine;
       }
 
       //改行を取り除く

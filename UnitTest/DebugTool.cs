@@ -24,32 +24,32 @@ namespace UnitTest
     {
       Assert.Equal(
         "System.String[](1)" + Environment.NewLine +
-        " String(4) aaaa",
+        Debug.DumpIndent + "String(4) aaaa",
         Debug.Dump(new String[] { "aaaa" })
       );
 
       Assert.Equal(
         "System.String[](2)" + Environment.NewLine +
-        " String(4) aaaa" + Environment.NewLine +
-        " String(3) 日本語",
+        Debug.DumpIndent + "String(4) aaaa" + Environment.NewLine +
+        Debug.DumpIndent + "String(3) 日本語",
         Debug.Dump(new String[] { "aaaa", "日本語" })
       );
 
       Assert.Equal(
         "System.String[](3)" + Environment.NewLine +
-        " String(4) aaaa" + Environment.NewLine +
-        " String(3) 日本語" + Environment.NewLine +
-        " String(0) ",
+        Debug.DumpIndent + "String(4) aaaa" + Environment.NewLine +
+        Debug.DumpIndent + "String(3) 日本語" + Environment.NewLine +
+        Debug.DumpIndent + "String(0) ",
         Debug.Dump(new String[] { "aaaa", "日本語", "" })
       );
 
       Assert.Equal(
         "System.Array[](2)" + Environment.NewLine +
-        " System.String[](1)" + Environment.NewLine +
-        "  String(3) bbb" + Environment.NewLine +
-        " System.String[](2)" + Environment.NewLine +
-        "  String(3) aaa" + Environment.NewLine +
-        "  String(3) ccc",
+        Debug.DumpIndent + "System.String[](1)" + Environment.NewLine +
+        Debug.DumpIndent + Debug.DumpIndent + "String(3) bbb" + Environment.NewLine +
+        Debug.DumpIndent + "System.String[](2)" + Environment.NewLine +
+        Debug.DumpIndent + Debug.DumpIndent + "String(3) aaa" + Environment.NewLine +
+        Debug.DumpIndent + Debug.DumpIndent + "String(3) ccc",
         Debug.Dump(new Array[] {
           new String[] { "bbb" },
           new String[] { "aaa", "ccc" },
@@ -64,7 +64,7 @@ namespace UnitTest
       dic.Add("foo", "bar");
       Assert.Equal(
         "System.Collections.Generic.Dictionary`2(1)" + Environment.NewLine +
-        " foo : String(3) bar",
+        Debug.DumpIndent + "foo : String(3) bar",
         Debug.Dump(dic)
       );
     }
