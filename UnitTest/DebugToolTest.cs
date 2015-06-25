@@ -13,7 +13,9 @@ using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAtt
 
 namespace UnitTest
 {
+  #if DEBUG
   [Microsoft.VisualStudio.TestTools.UnitTesting.TestClass]
+  #endif
   public class DebugToolTest
   {
     [Fact]

@@ -22,7 +22,7 @@ namespace UnitTest
   {
     #if DEBUG
     [Microsoft.VisualStudio.TestTools.UnitTesting.TestInitialize]
-     #endif
+    #endif
     public void setup()
     {
       using (StreamReader stream = new StreamReader("setup.sql", Encoding.GetEncoding("UTF-8")))
