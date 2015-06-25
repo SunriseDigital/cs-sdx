@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +14,8 @@ using Xunit;
 #if DEBUG
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 #endif
+
+
 
 namespace UnitTest
 {
@@ -60,8 +64,15 @@ namespace UnitTest
       return new SqlConnection(connectionString);
     }
 
-    [Fact, Conditional("DEBUG")]
+    
+    [Fact]
     public void SqlSample()
+    {
+      ExecuteSqlSample();
+    }
+
+    [Conditional("DEBUG")]
+    private void ExecuteSqlSample()
     {
       using (SqlConnection connection = CreateConnection())
       {
