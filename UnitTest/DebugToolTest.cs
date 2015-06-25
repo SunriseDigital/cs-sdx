@@ -9,7 +9,7 @@ using Sdx.DebugTool;
 
 namespace UnitTest
 {
-  public class DebugTool
+  public class DebugToolTest
   {
     [Fact]
     public void DumpString()
