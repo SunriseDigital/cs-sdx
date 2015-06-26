@@ -21,12 +21,6 @@ namespace UnitTest
   [TestClass]
   public class DbTest
   {
-    public DbTest()
-    {
-      ResetSqlDatabase();
-      ResetMysqlDatabase();
-    }
-
     public void ResetMysqlDatabase()
     {
       var masterDb = new Sdx.Db.MySqlAdapter();
@@ -54,7 +48,13 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
       }
 
       var db = this.CreateMySqlConnection();
-      this.SetupTebles(db, "setup.mysql.sql");
+      using(db)
+      {
+        db.Open();
+        this.ExecuteSqlFile(db, "setup.mysql.sql");
+        this.ExecuteSqlFile(db, "insert.sql");
+      }
+
       Console.WriteLine("ResetMySqlDatabase");
     }
 
@@ -111,39 +111,39 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       }
 
       var db = CreateSqlConnection();
-      this.SetupTebles(db, "setup.sqlserver.sql");
-      
+      using(db)
+      {
+        db.Open();
+        this.ExecuteSqlFile(db, "setup.sqlserver.sql");
+        this.ExecuteSqlFile(db, "insert.sql");
+      }
 
       Console.WriteLine("ResetSqlServerDatabase");
     }
 
-    private void SetupTebles(Sdx.Db.Adapter db, string dataFilePath)
+    private void ExecuteSqlFile(Sdx.Db.Adapter db, string dataFilePath)
     {
       //setup.sqlを流し込みます。
       using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
-        using (db)
+        DbTransaction sqlTran = db.BeginTransaction();
+        DbCommand command = db.CreateCommand();
+        command.Transaction = sqlTran;
+
+        try
         {
-          db.Open();
-          DbTransaction sqlTran = db.BeginTransaction();
-          DbCommand command = db.CreateCommand();
-          command.Transaction = sqlTran;
+          // Execute two separate commands.
+          command.CommandText = setupSql;
+          command.ExecuteNonQuery();
 
-          try
-          {
-            // Execute two separate commands.
-            command.CommandText = setupSql;
-            command.ExecuteNonQuery();
-
-            // Commit the transaction.
-            sqlTran.Commit();
-          }
-          catch (Exception ex)
-          {
-            sqlTran.Rollback();
-            throw ex;
-          }
+          // Commit the transaction.
+          sqlTran.Commit();
+        }
+        catch (Exception ex)
+        {
+          sqlTran.Rollback();
+          throw ex;
         }
       }
     }
@@ -164,16 +164,21 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     
     [Fact]
-    public void SqlSample()
+    public void AdapterSimpleRetrieve()
     {
-      ExecuteSqlSample();
+      ExecuteSqlRetrieve();
     }
 
     [Conditional("ON_VISUAL_STUDIO")]
-    private void ExecuteSqlSample()
+    private void ExecuteSqlRetrieve()
     {
-      
-      using (var db = this.CreateSqlConnection())
+      ResetSqlDatabase();
+      ExecuteRetrieve(this.CreateSqlConnection());
+    }
+
+    private void ExecuteRetrieve(Sdx.Db.Adapter db)
+    {
+      using (db)
       {
         DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
         DbCommandBuilder commandBuilder = factory.CreateCommandBuilder();
@@ -191,6 +196,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         DbDataReader reader = command.ExecuteReader();
         List<Dictionary<string, string>> list = Sdx.Db.Util.CreateDictinaryList(reader);
         Console.WriteLine(Sdx.DebugTool.Debug.Dump(list));
+
+        Assert.Equal(1, list.Count());
+        Assert.Equal("天祥", list[0]["name@shop"]);
+        Assert.Equal("中華", list[0]["name@category"]);
       }
     }
 
