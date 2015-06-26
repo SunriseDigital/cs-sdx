@@ -24,6 +24,38 @@ namespace UnitTest
     public DbTest()
     {
       ResetSqlDatabase();
+      ResetMysqlDatabase();
+    }
+
+    public void ResetMysqlDatabase()
+    {
+      var masterDb = new Sdx.Db.MySqlAdapter();
+      masterDb.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=";
+      using (masterDb)
+      {
+        masterDb.Open();
+
+        //drop and create db
+        try
+        {
+          var dropSql = masterDb.CreateCommand();
+          dropSql.CommandText = @"
+DROP DATABASE IF EXISTS `sdxtest` ;
+CREATE DATABASE `sdxtest` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
+";
+          dropSql.ExecuteNonQuery();
+        }
+        catch (DbException e)
+        {
+          Console.WriteLine(e.Message);
+          //do nothing
+        }
+      }
+
+      var db = this.CreateMySqlConnection();
+      this.SetupTebles(db, "setup.mysql.sql");
+      Console.WriteLine("ResetMySqlDatabase");
     }
 
     [Conditional("ON_VISUAL_STUDIO")]
@@ -42,8 +74,8 @@ namespace UnitTest
         {
           var dropSql = masterDb.CreateCommand();
           dropSql.CommandText = @"
-ALTER DATABASE SdxTest SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-DROP DATABASE [SdxTest]
+ALTER DATABASE sdxtest SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+DROP DATABASE [sdxtest]
 ";
           dropSql.ExecuteNonQuery();
         }
@@ -56,7 +88,7 @@ DROP DATABASE [SdxTest]
         try
         {
           var dropUserSql = masterDb.CreateCommand();
-          dropUserSql.CommandText = "DROP LOGIN sdxtest";
+          dropUserSql.CommandText = "DROP LOGIN sdxuser";
           dropUserSql.ExecuteNonQuery();
         }
         catch (DbException e)
@@ -66,23 +98,32 @@ DROP DATABASE [SdxTest]
 
         //create db
         var createSql = masterDb.CreateCommand();
-        createSql.CommandText = "CREATE DATABASE SdxTest";
+        createSql.CommandText = "CREATE DATABASE sdxtest";
         createSql.ExecuteNonQuery();
 
         //create user
         var createUserSql = masterDb.CreateCommand();
         createUserSql.CommandText = @"
-CREATE LOGIN sdxtest WITH PASSWORD = 'sdx5963';
-ALTER AUTHORIZATION ON DATABASE::SdxTest TO sdxtest;
+CREATE LOGIN sdxuser WITH PASSWORD = 'sdx5963';
+ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 ";
         createUserSql.ExecuteNonQuery();
       }
 
+      var db = CreateSqlConnection();
+      this.SetupTebles(db, "setup.sqlserver.sql");
+      
+
+      Console.WriteLine("ResetSqlServerDatabase");
+    }
+
+    private void SetupTebles(Sdx.Db.Adapter db, string dataFilePath)
+    {
       //setup.sqlを流し込みます。
-      using (StreamReader stream = new StreamReader("setup.sql", Encoding.GetEncoding("UTF-8")))
+      using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
-        using (var db = CreateSqlConnection())
+        using (db)
         {
           db.Open();
           DbTransaction sqlTran = db.BeginTransaction();
@@ -105,14 +146,19 @@ ALTER AUTHORIZATION ON DATABASE::SdxTest TO sdxtest;
           }
         }
       }
-
-      Console.WriteLine("ResetDatabase");
     }
 
     private Sdx.Db.Adapter CreateSqlConnection()
     {
       var db = new Sdx.Db.SqlAdapter();
-      db.ConnectionString = "Server=.\\SQLEXPRESS;Database=SdxTest;User Id=sdxtest;Password=sdx5963;";
+      db.ConnectionString = "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;";
+      return db;
+    }
+
+    private Sdx.Db.Adapter CreateMySqlConnection()
+    {
+      var db = new Sdx.Db.MySqlAdapter();
+      db.ConnectionString = "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963";
       return db;
     }
 
