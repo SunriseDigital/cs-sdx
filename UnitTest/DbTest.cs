@@ -31,12 +31,11 @@ namespace UnitTest
       using (StreamReader stream = new StreamReader("setup.sql", Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
-        var db = CreateConnection();
-        using (DbConnection connection = db.Connection)
+        using (var db = CreateSqlConnection())
         {
-          connection.Open();
-          DbTransaction sqlTran = connection.BeginTransaction();
-          DbCommand command = connection.CreateCommand();
+          db.Open();
+          DbTransaction sqlTran = db.BeginTransaction();
+          DbCommand command = db.CreateCommand();
           command.Transaction = sqlTran;
 
           try
@@ -60,7 +59,7 @@ namespace UnitTest
       Console.WriteLine("ResetDatabase");
     }
 
-    private Sdx.Db.Adapter CreateConnection()
+    private Sdx.Db.Adapter CreateSqlConnection()
     {
       var db = new Sdx.Db.SqlAdapter();
       db.ConnectionString = "Server=.\\SQLEXPRESS;Database=SdxTest;User Id=sdxtest;Password=sdx5963;";
@@ -77,23 +76,21 @@ namespace UnitTest
     [Conditional("ON_VISUAL_STUDIO")]
     private void ExecuteSqlSample()
     {
-      Sdx.Db.Adapter db = this.CreateConnection();
-      using (DbConnection connection = db.Connection)
+      
+      using (var db = this.CreateSqlConnection())
       {
         DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
         DbCommandBuilder commandBuilder = factory.CreateCommandBuilder();
-        connection.Open();
+        db.Open();
 
 
-        DbCommand command = connection.CreateCommand();
+        DbCommand command = db.CreateCommand();
         command.CommandText = "SELECT [shop].[name] as name@shop, [category].[name] as name@category FROM [shop]"
           + " INNER JOIN [category] ON [category].[id] = [shop].[category_id]"
           + " WHERE [shop].[id] = @shop@id"
           ;
 
         command.Parameters.Add(db.CreateParameter("@shop@id", "1"));
-
-        command.Connection = connection;
 
         DbDataReader reader = command.ExecuteReader();
         List<Dictionary<string, string>> list = Sdx.Db.Util.CreateDictinaryList(reader);
@@ -154,7 +151,7 @@ namespace UnitTest
       //mysql
       db = new Sdx.Db.MySqlAdapter();
 
-      command = db.Connection.CreateCommand();
+      command = db.CreateCommand();
 
       command.CommandText = "SELECT * FROM shop WHERE id = @id";
       command.Parameters.Add(db.CreateParameter("@id", "1"));
@@ -167,7 +164,7 @@ namespace UnitTest
       //sqlserver
       db = new Sdx.Db.SqlAdapter();
 
-      command = db.Connection.CreateCommand();
+      command = db.CreateCommand();
 
       command.CommandText = "SELECT * FROM shop WHERE id = @id";
       command.Parameters.Add(db.CreateParameter("@id", "1"));

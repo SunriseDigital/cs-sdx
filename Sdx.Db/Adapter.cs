@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace Sdx.Db
 {
-  public abstract class Adapter
+  public abstract class Adapter : IDisposable
   {
     private DbConnection connection;
 
@@ -27,12 +27,9 @@ namespace Sdx.Db
 
     protected abstract DbConnection CreateDbConection();
 
-    public DbConnection Connection
+    public void Open()
     {
-      get
-      {
-        return this.connection;
-      }
+      this.connection.Open();
     }
 
     public DbParameter CreateParameter(string key, string value)
@@ -41,5 +38,20 @@ namespace Sdx.Db
     }
 
     protected abstract DbParameter CreateDbParameter(string key, string value);
+
+    public DbTransaction BeginTransaction()
+    {
+      return this.connection.BeginTransaction();
+    }
+
+    public DbCommand CreateCommand()
+    {
+      return this.connection.CreateCommand();
+    }
+
+    public void Dispose()
+    {
+      this.connection.Dispose();
+    }
   }
 }
