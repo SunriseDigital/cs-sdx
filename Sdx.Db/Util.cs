@@ -48,7 +48,7 @@ namespace Sdx.Db
     /// </summary>
     /// <param name="reader"></param>
     /// <returns></returns>
-    public static List<Dictionary<string, string>> CreateDictinaryList(SqlDataReader reader)
+    public static List<Dictionary<string, string>> CreateDictinaryList(DbDataReader reader)
     {
       DataTable schemaTable = reader.GetSchemaTable();
 

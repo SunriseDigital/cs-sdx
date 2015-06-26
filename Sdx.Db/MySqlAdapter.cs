@@ -6,7 +6,7 @@ namespace Sdx.Db
 {
   public class MySqlAdapter : Adapter
   {
-    override protected DbConnection createDbConection()
+    override protected DbConnection CreateDbConection()
     {
       return new MySqlConnection();
     }

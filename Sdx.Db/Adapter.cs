@@ -9,14 +9,30 @@ namespace Sdx.Db
 
     public Adapter()
     {
-      this.connection = this.createDbConection();
+      this.connection = this.CreateDbConection();
     }
 
-    protected abstract DbConnection createDbConection();
-
-    public DbCommand CreateCommand()
+    public String ConnectionString
     {
-      return this.connection.CreateCommand();
+      get
+      {
+        return this.connection.ConnectionString;
+      }
+
+      set
+      {
+        this.connection.ConnectionString = value;
+      }
+    }
+
+    protected abstract DbConnection CreateDbConection();
+
+    public DbConnection Connection
+    {
+      get
+      {
+        return this.connection;
+      }
     }
 
     public DbParameter CreateParameter(string key, string value)

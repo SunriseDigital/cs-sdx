@@ -6,7 +6,7 @@ namespace Sdx.Db
 {
   public class SqlAdapter : Adapter
   {
-    override protected DbConnection createDbConection()
+    override protected DbConnection CreateDbConection()
     {
       return new SqlConnection();
     }
