@@ -6,6 +6,7 @@ using System.IO;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.Configuration;
 
 using Xunit;
 using UnitTest.Attibute;
@@ -22,12 +23,62 @@ namespace UnitTest
   {
     public DbTest()
     {
-      ResetDatabase();
+      ResetSqlDatabase();
     }
 
     [Conditional("ON_VISUAL_STUDIO")]
-    public void ResetDatabase()
+    public void ResetSqlDatabase()
     {
+      String pwd = ConfigurationManager.AppSettings["SqlServerSaPwd"];
+      //SdxTestデータベースをDROPします
+      var masterDb = new Sdx.Db.SqlAdapter();
+      masterDb.ConnectionString = "Server=.\\SQLEXPRESS;Database=master;User Id=sa;Password=" + pwd;
+      using (masterDb)
+      {
+        masterDb.Open();
+
+        //drop db
+        try
+        {
+          var dropSql = masterDb.CreateCommand();
+          dropSql.CommandText = @"
+ALTER DATABASE SdxTest SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+DROP DATABASE [SdxTest]
+";
+          dropSql.ExecuteNonQuery();
+        }
+        catch(DbException e)
+        {
+          //do nothing
+        }
+
+        //drop user
+        try
+        {
+          var dropUserSql = masterDb.CreateCommand();
+          dropUserSql.CommandText = "DROP LOGIN sdxtest";
+          dropUserSql.ExecuteNonQuery();
+        }
+        catch (DbException e)
+        {
+          //do nothing
+        }
+
+        //create db
+        var createSql = masterDb.CreateCommand();
+        createSql.CommandText = "CREATE DATABASE SdxTest";
+        createSql.ExecuteNonQuery();
+
+        //create user
+        var createUserSql = masterDb.CreateCommand();
+        createUserSql.CommandText = @"
+CREATE LOGIN sdxtest WITH PASSWORD = 'sdx5963';
+ALTER AUTHORIZATION ON DATABASE::SdxTest TO sdxtest;
+";
+        createUserSql.ExecuteNonQuery();
+      }
+
+      //setup.sqlを流し込みます。
       using (StreamReader stream = new StreamReader("setup.sql", Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
@@ -46,7 +97,6 @@ namespace UnitTest
 
             // Commit the transaction.
             sqlTran.Commit();
-            Console.WriteLine("Executed");
           }
           catch (Exception ex)
           {

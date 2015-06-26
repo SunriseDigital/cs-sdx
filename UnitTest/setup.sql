@@ -1,13 +1,9 @@
-﻿IF object_id('dbo.shop') IS NOT NULL DROP TABLE shop;
-
-CREATE TABLE shop (
+﻿CREATE TABLE shop (
   id int IDENTITY ,
   name nvarchar(100),
   category_id int NOT NULL,
   CONSTRAINT pk_shop PRIMARY KEY CLUSTERED (id)
 );
-
-IF object_id('dbo.category') IS NOT NULL DROP TABLE category;
 
 CREATE TABLE category (
   id int IDENTITY ,
