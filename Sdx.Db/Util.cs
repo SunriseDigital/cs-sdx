@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using System.Data.SqlClient;
+using System.Data.Common;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace Sdx.Db
 {
@@ -15,7 +16,7 @@ namespace Sdx.Db
     /// </summary>
     /// <param name="command"></param>
     /// <returns></returns>
-    public static String SqlCommandToSql(SqlCommand command)
+    public static String CommandToSql(DbCommand command)
     {
       DbType[] quotedParameterTypes = new DbType[] {
           DbType.AnsiString, DbType.Date,
@@ -24,11 +25,10 @@ namespace Sdx.Db
       };
       string query = command.CommandText;
 
-      var clonedParams = new SqlParameter[command.Parameters.Count];
+      var clonedParams = new DbParameter[command.Parameters.Count];
       command.Parameters.CopyTo(clonedParams, 0);
 
-
-      foreach (SqlParameter param in clonedParams.OrderByDescending(p => p.ParameterName.Length))
+      foreach (DbParameter param in clonedParams.OrderByDescending(p => p.ParameterName.Length))
       {
         string value = param.Value.ToString();
         if (quotedParameterTypes.Contains(param.DbType))
