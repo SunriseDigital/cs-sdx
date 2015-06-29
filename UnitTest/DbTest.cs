@@ -21,7 +21,7 @@ namespace UnitTest
   [TestClass]
   public class DbTest
   {
-    public void ResetMysqlDatabase()
+    public void ResetMySqlDatabase()
     {
       var masterDb = new Sdx.Db.MySqlAdapter();
       masterDb.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=";
@@ -167,6 +167,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     public void AdapterSimpleRetrieve()
     {
       ExecuteSqlRetrieve();
+      ExecuteMySqlRetrieve();
     }
 
     [Conditional("ON_VISUAL_STUDIO")]
@@ -174,6 +175,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       ResetSqlDatabase();
       ExecuteRetrieve(this.CreateSqlConnection());
+    }
+
+    private void ExecuteMySqlRetrieve()
+    {
+      ResetMySqlDatabase();
+      ExecuteRetrieve(this.CreateMySqlConnection());
     }
 
     private void ExecuteRetrieve(Sdx.Db.Adapter db)
@@ -186,9 +193,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
 
         DbCommand command = db.CreateCommand();
-        command.CommandText = "SELECT [shop].[name] as name@shop, [category].[name] as name@category FROM [shop]"
-          + " INNER JOIN [category] ON [category].[id] = [shop].[category_id]"
-          + " WHERE [shop].[id] = @shop@id"
+        command.CommandText = "SELECT shop.name as name_shop, category.name as name_category FROM shop"
+          + " INNER JOIN category ON category.id = shop.category_id"
+          + " WHERE shop.id = @shop@id"
           ;
 
         command.Parameters.Add(db.CreateParameter("@shop@id", "1"));
@@ -198,8 +205,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         Console.WriteLine(Sdx.DebugTool.Debug.Dump(list));
 
         Assert.Equal(1, list.Count());
-        Assert.Equal("天祥", list[0]["name@shop"]);
-        Assert.Equal("中華", list[0]["name@category"]);
+        Assert.Equal("天祥", list[0]["name_shop"]);
+        Assert.Equal("中華", list[0]["name_category"]);
       }
     }
 
