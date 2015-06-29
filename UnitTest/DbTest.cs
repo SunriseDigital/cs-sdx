@@ -162,13 +162,6 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       return db;
     }
 
-    
-    [Fact]
-    public void AdapterSimpleRetrieve()
-    {
-      ExecuteSqlRetrieve();
-      ExecuteMySqlRetrieve();
-    }
 
     [Conditional("ON_VISUAL_STUDIO")]
     private void ExecuteSqlRetrieve()
@@ -211,7 +204,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void WhereWithTable()
+    public void TestAdapterSimpleRetrieve()
+    {
+      ExecuteSqlRetrieve();
+      ExecuteMySqlRetrieve();
+    }
+
+    [Fact]
+    public void TestWhereWithTable()
     {
       Sdx.Db.Where where = new Sdx.Db.Where();
       where.add("id", "1", "shop");
@@ -223,7 +223,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void UtilCommandToSql()
+    public void TestUtilCommandToSql()
     {
       SqlCommand cmd;
 
@@ -238,7 +238,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void WhereSimple()
+    public void TestWhereSimple()
     {
       Sdx.Db.Where where = new Sdx.Db.Where();
 
@@ -255,7 +255,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void AdapterCreate()
+    public void TestAdapterCreate()
     {
       Sdx.Db.Adapter db;
       DbCommand command;
