@@ -175,8 +175,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     private void RunFactorySimpleRetrieveForMySql()
     {
       ResetMySqlDatabase();
-      var factory = new Sdx.Db.SqlServerFactory();
-      factory.ConnectionString = this.SqlServerConnectionString;
+      var factory = new Sdx.Db.MySqlFactory();
+      factory.ConnectionString = this.MySqlConnectionString;
       RunFactorySimpleRetrieve(factory);
     }
 
