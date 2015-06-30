@@ -33,9 +33,29 @@ namespace Sdx.Db
     {
       DbCommand command = this.factory.CreateCommand();
 
-      command.CommandText = "SELECT " + this.from.BuildColumsString()+ " FROM " +this.from.BuildTableString();
+      command.CommandText = "SELECT " 
+        + this.from.BuildColumsString()
+        + " FROM " +this.from.BuildTableString();
 
       return command;
+    }
+
+    public From Table(string name)
+    {
+      if(this.from.Name == name)
+      {
+        return this.from;
+      }
+
+      foreach(From from in this.joins)
+      {
+        if(from.Name == name)
+        {
+          return from;
+        }
+      }
+
+      throw new Exception("Missing " + name + " table current context.");
     }
   }
 }

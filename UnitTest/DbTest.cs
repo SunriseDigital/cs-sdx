@@ -282,11 +282,29 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       Sdx.Db.Factory factory = new Sdx.Db.SqlServerFactory();
       Sdx.Db.Select select = factory.CreateSelect();
+
       select.From("shop");
+      Assert.Equal("SELECT [shop].* FROM [shop]", select.build().CommandText);
 
-      DbCommand command = select.build();
+      select.From("shop", "s");
+      Assert.Equal("SELECT [s].* FROM [shop] AS [s]", select.build().CommandText);
 
-      Assert.Equal("SELECT [shop].* FROM [shop]", command.CommandText);
+      select.From("shop");
+      select.Table("shop").Columns.Add("id");
+      Assert.Equal("SELECT [shop].[id] FROM [shop]", select.build().CommandText);
+
+      select.Table("shop").Columns.Clear();
+      Assert.Equal("SELECT [shop].* FROM [shop]", select.build().CommandText);
+
+      select.Table("shop").SetColumns(new String[]{"id"});
+      Assert.Equal("SELECT [shop].[id] FROM [shop]", select.build().CommandText);
+
+      select.Table("shop").SetColumns("id");
+      Assert.Equal("SELECT [shop].[id] FROM [shop]", select.build().CommandText);
+
+      select.Table("shop").AddColumn("name");
+      Assert.Equal("SELECT [shop].[id], [shop].[name] FROM [shop]", select.build().CommandText);
+
     }
   }
 }
