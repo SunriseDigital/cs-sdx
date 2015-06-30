@@ -21,18 +21,30 @@ namespace UnitTest
   [TestClass]
   public class DbTest
   {
-    public void ResetMySqlDatabase()
+    private String MySqlConnectionString
     {
-      var masterDb = new Sdx.Db.MySqlAdapter();
-      masterDb.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=";
-      using (masterDb)
+      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963"; }
+    }
+
+    private String SqlServerConnectionString
+    {
+      get { return "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;"; }
+    }
+
+    private void ResetMySqlDatabase()
+    {
+      Sdx.Db.Factory factory = new Sdx.Db.MySqlFactory();
+
+      var masterCon = factory.CreateConnection();
+      masterCon.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=";
+      using (masterCon)
       {
-        masterDb.Open();
+        masterCon.Open();
 
         //drop and create db
         try
         {
-          var dropSql = masterDb.CreateCommand();
+          var dropSql = masterCon.CreateCommand();
           dropSql.CommandText = @"
 DROP DATABASE IF EXISTS `sdxtest` ;
 CREATE DATABASE `sdxtest` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -47,32 +59,34 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         }
       }
 
-      var db = this.CreateMySqlConnection();
-      using(db)
+      factory.ConnectionString = this.MySqlConnectionString;
+      var con = factory.CreateConnection();
+      using(con)
       {
-        db.Open();
-        this.ExecuteSqlFile(db, "setup.mysql.sql");
-        this.ExecuteSqlFile(db, "insert.sql");
+        con.Open();
+        this.ExecuteSqlFile(con, "setup.mysql.sql");
+        this.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetMySqlDatabase");
     }
 
     [Conditional("ON_VISUAL_STUDIO")]
-    public void ResetSqlDatabase()
+    private void ResetSqlServerDatabase()
     {
-      String pwd = ConfigurationManager.AppSettings["SqlServerSaPwd"];
       //SdxTestデータベースをDROPします
-      var masterDb = new Sdx.Db.SqlAdapter();
-      masterDb.ConnectionString = "Server=.\\SQLEXPRESS;Database=master;User Id=sa;Password=" + pwd;
-      using (masterDb)
+      Sdx.Db.Factory factory = new Sdx.Db.SqlServerFactory();
+      var masterCon = factory.CreateConnection();
+      String pwd = ConfigurationManager.AppSettings["SqlServerSaPwd"];
+      masterCon.ConnectionString = "Server=.\\SQLEXPRESS;Database=master;User Id=sa;Password=" + pwd;
+      using (masterCon)
       {
-        masterDb.Open();
+        masterCon.Open();
 
         //drop db
         try
         {
-          var dropSql = masterDb.CreateCommand();
+          var dropSql = masterCon.CreateCommand();
           dropSql.CommandText = @"
 ALTER DATABASE sdxtest SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 DROP DATABASE [sdxtest]
@@ -87,7 +101,7 @@ DROP DATABASE [sdxtest]
         //drop user
         try
         {
-          var dropUserSql = masterDb.CreateCommand();
+          var dropUserSql = masterCon.CreateCommand();
           dropUserSql.CommandText = "DROP LOGIN sdxuser";
           dropUserSql.ExecuteNonQuery();
         }
@@ -97,12 +111,12 @@ DROP DATABASE [sdxtest]
         }
 
         //create db
-        var createSql = masterDb.CreateCommand();
+        var createSql = masterCon.CreateCommand();
         createSql.CommandText = "CREATE DATABASE sdxtest";
         createSql.ExecuteNonQuery();
 
         //create user
-        var createUserSql = masterDb.CreateCommand();
+        var createUserSql = masterCon.CreateCommand();
         createUserSql.CommandText = @"
 CREATE LOGIN sdxuser WITH PASSWORD = 'sdx5963';
 ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
@@ -110,25 +124,26 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         createUserSql.ExecuteNonQuery();
       }
 
-      var db = CreateSqlConnection();
-      using(db)
+      factory.ConnectionString = this.SqlServerConnectionString;
+      var con = factory.CreateConnection();
+      using(con)
       {
-        db.Open();
-        this.ExecuteSqlFile(db, "setup.sqlserver.sql");
-        this.ExecuteSqlFile(db, "insert.sql");
+        con.Open();
+        this.ExecuteSqlFile(con, "setup.sqlserver.sql");
+        this.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetSqlServerDatabase");
     }
 
-    private void ExecuteSqlFile(Sdx.Db.Adapter db, string dataFilePath)
+    private void ExecuteSqlFile(DbConnection con, string dataFilePath)
     {
       //setup.sqlを流し込みます。
       using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
-        DbTransaction sqlTran = db.BeginTransaction();
-        DbCommand command = db.CreateCommand();
+        DbTransaction sqlTran = con.BeginTransaction();
+        DbCommand command = con.CreateCommand();
         command.Transaction = sqlTran;
 
         try
@@ -148,50 +163,38 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       }
     }
 
-    private Sdx.Db.Adapter CreateSqlConnection()
-    {
-      var db = new Sdx.Db.SqlAdapter();
-      db.ConnectionString = "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;";
-      return db;
-    }
-
-    private Sdx.Db.Adapter CreateMySqlConnection()
-    {
-      var db = new Sdx.Db.MySqlAdapter();
-      db.ConnectionString = "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963";
-      return db;
-    }
-
-
     [Conditional("ON_VISUAL_STUDIO")]
-    private void ExecuteSqlRetrieve()
+    private void RunFactorySimpleRetrieveForSqlServer()
     {
-      ResetSqlDatabase();
-      ExecuteRetrieve(this.CreateSqlConnection());
+      ResetSqlServerDatabase();
+      var factory = new Sdx.Db.SqlServerFactory();
+      factory.ConnectionString = this.SqlServerConnectionString;
+      RunFactorySimpleRetrieve(factory);
     }
 
-    private void ExecuteMySqlRetrieve()
+    private void RunFactorySimpleRetrieveForMySql()
     {
       ResetMySqlDatabase();
-      ExecuteRetrieve(this.CreateMySqlConnection());
+      var factory = new Sdx.Db.SqlServerFactory();
+      factory.ConnectionString = this.SqlServerConnectionString;
+      RunFactorySimpleRetrieve(factory);
     }
 
-    private void ExecuteRetrieve(Sdx.Db.Adapter db)
+    private void RunFactorySimpleRetrieve(Sdx.Db.Factory factory)
     {
-      using (db)
+      var con = factory.CreateConnection();
+      using (con)
       {
-        DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
-        DbCommandBuilder commandBuilder = factory.CreateCommandBuilder();
-        db.Open();
+        con.Open();
 
 
-        DbCommand command = db.CreateCommand();
+        DbCommand command = con.CreateCommand();
         command.CommandText = "SELECT shop.name as name_shop, category.name as name_category FROM shop"
           + " INNER JOIN category ON category.id = shop.category_id"
           + " WHERE shop.id = @shop@id"
           ;
 
-        command.Parameters.Add(db.CreateParameter("@shop@id", "1"));
+        command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
 
         DbDataReader reader = command.ExecuteReader();
         List<Dictionary<string, string>> list = Sdx.Db.Util.CreateDictinaryList(reader);
@@ -204,16 +207,17 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestAdapterSimpleRetrieve()
+    public void TestFactorySimpleRetrieve()
     {
-      ExecuteSqlRetrieve();
-      ExecuteMySqlRetrieve();
+      RunFactorySimpleRetrieveForSqlServer();
+      RunFactorySimpleRetrieveForMySql();
     }
 
     [Fact]
     public void TestWhereWithTable()
     {
-      Sdx.Db.Where where = new Sdx.Db.Where();
+      var factory = new Sdx.Db.SqlServerFactory();
+      Sdx.Db.Where where = factory.CreateWhere();
       where.add("id", "1", "shop");
 
       Assert.Equal("[shop].[id] = '1'", Sdx.Db.Util.CommandToSql(where.build()));
@@ -240,7 +244,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void TestWhereSimple()
     {
-      Sdx.Db.Where where = new Sdx.Db.Where();
+      this.RunWhereSimpleForSqlServer(new Sdx.Db.SqlServerFactory());
+      this.RunWhereSimpleForMySql(new Sdx.Db.MySqlFactory());
+    }
+
+    private void RunWhereSimpleForSqlServer(Sdx.Db.Factory factory)
+    {
+      Sdx.Db.Where where = factory.CreateWhere();
 
       where.add("id", "1");
 
@@ -248,30 +258,18 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       where.add("type", 2);
       Assert.Equal("[id] = '1' AND [type] = '2'", Sdx.Db.Util.CommandToSql(where.build()));
+    }
 
-      DbProviderFactory factory = DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
-      where.CommandBuilder = factory.CreateCommandBuilder();
+    private void RunWhereSimpleForMySql(Sdx.Db.Factory factory)
+    {
+      Sdx.Db.Where where = factory.CreateWhere();
+
+      where.add("id", "1");
+
+      Assert.Equal("`id` = '1'", Sdx.Db.Util.CommandToSql(where.build()));
+
+      where.add("type", 2);
       Assert.Equal("`id` = '1' AND `type` = '2'", Sdx.Db.Util.CommandToSql(where.build()));
-    }
-
-    [Fact]
-    public void TestAdapterCreate()
-    {
-      this.RunAdapterCreate(new Sdx.Db.MySqlAdapter());
-      this.RunAdapterCreate(new Sdx.Db.SqlAdapter());
-    }
-
-    public void RunAdapterCreate(Sdx.Db.Adapter db)
-    {
-      DbCommand command = db.CreateCommand();
-
-      command.CommandText = "SELECT * FROM shop WHERE id = @id";
-      command.Parameters.Add(db.CreateParameter("@id", "1"));
-
-      Assert.Equal(
-        "SELECT * FROM shop WHERE id = '1'",
-        Sdx.Db.Util.CommandToSql(command)
-      );
     }
   }
 }

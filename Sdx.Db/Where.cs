@@ -8,10 +8,12 @@ namespace Sdx.Db
     public class Where
     {
       private List<Object> wheres = new List<object>();
+      private Factory factory;
 
-      private static DbCommandBuilder defaultCommandBuilder;
-
-      private DbCommandBuilder commandBuilder;
+      public Where(Factory factory)
+      {
+        this.factory = factory;
+      }
 
       public Where add(String column, Object value, String table = null)
       {
@@ -23,44 +25,10 @@ namespace Sdx.Db
         return this;
       }
 
-      public static DbCommandBuilder DefaultCommandBuilder
+      public DbCommand build()
       {
-        get
-        {
-          if(defaultCommandBuilder == null)
-          {
-            DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
-            defaultCommandBuilder = factory.CreateCommandBuilder();
-          }
-
-          return defaultCommandBuilder;
-        }
-        set
-        {
-          defaultCommandBuilder = value;
-        }
-      }
-
-      public DbCommandBuilder CommandBuilder
-      {
-        get
-        {
-          if(this.commandBuilder != null)
-          {
-            return this.commandBuilder;
-          }
-
-          return DefaultCommandBuilder;
-        }
-        set
-        {
-          this.commandBuilder = value;
-        }
-      }
-
-      public SqlCommand build()
-      {
-        var command = new SqlCommand();
+        var command = this.factory.CreateDbCommand();
+        var builder = this.factory.CreateCommandBuilder();
         
         wheres.ForEach(obj => {
           if(command.CommandText.Length > 0)
@@ -76,8 +44,8 @@ namespace Sdx.Db
             {
               command.CommandText += String.Format(
                 "{0}.{1} = {2}",
-                this.CommandBuilder.QuoteIdentifier(dic["table"] as String),
-                this.CommandBuilder.QuoteIdentifier(dic["column"] as String),
+                builder.QuoteIdentifier(dic["table"] as String),
+                builder.QuoteIdentifier(dic["column"] as String),
                 placeHolder
               );
             }
@@ -85,13 +53,12 @@ namespace Sdx.Db
             {
               command.CommandText += String.Format(
                 "{0} = {1}",
-                this.CommandBuilder.QuoteIdentifier(dic["column"] as String),
+                builder.QuoteIdentifier(dic["column"] as String),
                 placeHolder
               );
             }
 
-
-            command.Parameters.AddWithValue(placeHolder, dic["value"].ToString());
+            command.Parameters.Add(this.factory.CreateParameter(placeHolder, dic["value"].ToString()));
           }
           else if (obj is Where)
           {

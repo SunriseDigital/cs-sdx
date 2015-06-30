@@ -53,9 +53,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Adapter.cs" />
-    <Compile Include="MySqlAdapter.cs" />
-    <Compile Include="SqlAdapter.cs" />
+    <Compile Include="Factory.cs" />
+    <Compile Include="MySqlFactory.cs" />
+    <Compile Include="SqlServerFactory.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Where.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
