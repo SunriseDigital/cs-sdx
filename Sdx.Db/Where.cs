@@ -27,7 +27,7 @@ namespace Sdx.Db
 
       public DbCommand build()
       {
-        var command = this.factory.CreateDbCommand();
+        var command = this.factory.CreateCommand();
         var builder = this.factory.CreateCommandBuilder();
         
         wheres.ForEach(obj => {

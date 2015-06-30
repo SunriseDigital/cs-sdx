@@ -271,5 +271,22 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       where.add("type", 2);
       Assert.Equal("`id` = '1' AND `type` = '2'", Sdx.Db.Util.CommandToSql(where.build()));
     }
+
+    [Fact]
+    public void TestSimpleSelect()
+    {
+      this.RunSimpleSelectForSqlServer();
+    }
+
+    private void RunSimpleSelectForSqlServer()
+    {
+      Sdx.Db.Factory factory = new Sdx.Db.SqlServerFactory();
+      Sdx.Db.Select select = factory.CreateSelect();
+      select.From("shop");
+
+      DbCommand command = select.build();
+
+      Assert.Equal("SELECT [shop].* FROM [shop]", command.CommandText);
+    }
   }
 }

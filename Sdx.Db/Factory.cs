@@ -37,7 +37,7 @@ namespace Sdx.Db
       return new Where(this);
     }
 
-    public DbCommand CreateDbCommand()
+    public DbCommand CreateCommand()
     {
       return this.factory.CreateCommand();
     }
@@ -45,6 +45,11 @@ namespace Sdx.Db
     public DbCommandBuilder CreateCommandBuilder()
     {
       return this.factory.CreateCommandBuilder();
+    }
+
+    public Select CreateSelect()
+    {
+      return new Select(this);
     }
   }
 }
