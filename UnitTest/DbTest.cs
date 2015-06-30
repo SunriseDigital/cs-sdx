@@ -257,26 +257,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void TestAdapterCreate()
     {
-      Sdx.Db.Adapter db;
-      DbCommand command;
+      this.RunAdapterCreate(new Sdx.Db.MySqlAdapter());
+      this.RunAdapterCreate(new Sdx.Db.SqlAdapter());
+    }
 
-      //mysql
-      db = new Sdx.Db.MySqlAdapter();
-
-      command = db.CreateCommand();
-
-      command.CommandText = "SELECT * FROM shop WHERE id = @id";
-      command.Parameters.Add(db.CreateParameter("@id", "1"));
-
-      Assert.Equal(
-        "SELECT * FROM shop WHERE id = '1'" ,
-        Sdx.Db.Util.CommandToSql(command)
-      );
-
-      //sqlserver
-      db = new Sdx.Db.SqlAdapter();
-
-      command = db.CreateCommand();
+    public void RunAdapterCreate(Sdx.Db.Adapter db)
+    {
+      DbCommand command = db.CreateCommand();
 
       command.CommandText = "SELECT * FROM shop WHERE id = @id";
       command.Parameters.Add(db.CreateParameter("@id", "1"));
