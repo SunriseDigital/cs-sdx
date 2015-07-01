@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -196,13 +197,19 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
         command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
 
-        DbDataReader reader = command.ExecuteReader();
-        List<Dictionary<string, string>> list = Sdx.Db.Util.CreateDictinaryList(reader);
-        Console.WriteLine(Sdx.DebugTool.Debug.Dump(list));
+        DbDataAdapter adapter = factory.CreateDataAdapter();
+        DataSet dataset = new DataSet();
 
-        Assert.Equal(1, list.Count());
-        Assert.Equal("天祥", list[0]["name_shop"]);
-        Assert.Equal("中華", list[0]["name_category"]);
+        adapter.SelectCommand = command;
+        adapter.Fill(dataset);
+        foreach (DataRow row in dataset.Tables[0].Rows)
+        {
+          Console.WriteLine(Sdx.DebugTool.Debug.Dump(row["name_category"]));
+        }
+
+        Assert.Equal(1, dataset.Tables[0].Rows.Count);
+        Assert.Equal("天祥", dataset.Tables[0].Rows[0]["name_shop"]);
+        Assert.Equal("中華", dataset.Tables[0].Rows[0]["name_category"]);
       }
     }
 

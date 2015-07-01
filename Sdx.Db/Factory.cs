@@ -51,5 +51,10 @@ namespace Sdx.Db
     {
       return new Select(this);
     }
+
+    public DbDataAdapter CreateDataAdapter()
+    {
+      return this.factory.CreateDataAdapter();
+    }
   }
 }
