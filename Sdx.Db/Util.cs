@@ -69,5 +69,16 @@ namespace Sdx.Db
 
       return list;
     }
+
+    public static Dictionary<string, object> ToDictionary(DataRow row)
+    {
+      Dictionary<string, object> dic = new Dictionary<string, object>();
+      foreach (DataColumn column in row.Table.Columns)
+      {
+        dic[column.ToString()] = row[column.ToString()];
+      }
+
+      return dic;
+    }
   }
 }

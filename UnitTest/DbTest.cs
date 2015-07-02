@@ -282,36 +282,115 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void TestSimpleSelect()
     {
-      this.RunSimpleSelectForSqlServer();
+      List<DbCommand> commands;
+      Sdx.Db.Factory factory;
+
+      factory = new Sdx.Db.SqlServerFactory();
+      factory.ConnectionString = this.SqlServerConnectionString;
+      commands = this.RunSimpleSelect(factory, "[", "]");
+      this.execDbCommandForSqlServer(factory, commands);
+
+      factory = new Sdx.Db.MySqlFactory();
+      factory.ConnectionString = this.MySqlConnectionString;
+      commands = this.RunSimpleSelect(factory, "`", "`");
+      this.execDbCommandForSqlServer(factory, commands);
     }
 
-    private void RunSimpleSelectForSqlServer()
+    private List<DbCommand> RunSimpleSelect(Sdx.Db.Factory factory, String leftQuoteChar, String rightQuoteChar)
     {
-      Sdx.Db.Factory factory = new Sdx.Db.SqlServerFactory();
       Sdx.Db.Select select = factory.CreateSelect();
 
+      List<DbCommand> commands = new List<DbCommand>();
+
       select.From("shop");
-      Assert.Equal("SELECT [shop].* FROM [shop]", select.build().CommandText);
+      commands.Add(select.build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.* FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
       select.From("shop", "s");
-      Assert.Equal("SELECT [s].* FROM [shop] AS [s]", select.build().CommandText);
+      commands.Add(select.build());
+      Assert.Equal(
+        String.Format("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
       select.From("shop");
       select.Table("shop").Columns.Add("id");
-      Assert.Equal("SELECT [shop].[id] FROM [shop]", select.build().CommandText);
+      commands.Add(select.build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
       select.Table("shop").Columns.Clear();
-      Assert.Equal("SELECT [shop].* FROM [shop]", select.build().CommandText);
+      commands.Add(select.build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.* FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
-      select.Table("shop").SetColumns(new String[]{"id"});
-      Assert.Equal("SELECT [shop].[id] FROM [shop]", select.build().CommandText);
+      select.Table("shop").SetColumns(new String[] { "id" });
+      commands.Add(select.build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
       select.Table("shop").SetColumns("id");
-      Assert.Equal("SELECT [shop].[id] FROM [shop]", select.build().CommandText);
+      commands.Add(select.build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
       select.Table("shop").AddColumn("name");
-      Assert.Equal("SELECT [shop].[id], [shop].[name] FROM [shop]", select.build().CommandText);
+      commands.Add(select.build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
+      return commands;
+    }
+
+    [Conditional("ON_VISUAL_STUDIO")]
+    private void execDbCommandForSqlServer(Sdx.Db.Factory factory, List<DbCommand> commands)
+    {
+      this.execDbCommand(factory, commands);
+    }
+
+    private void execDbCommandForMySql(Sdx.Db.Factory factory, List<DbCommand> commands)
+    {
+      this.execDbCommand(factory, commands);
+    }
+
+    /// <summary>
+    /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
+    /// </summary>
+    /// <param name="factory"></param>
+    /// <param name="commands"></param>
+    private void execDbCommand(Sdx.Db.Factory factory, List<DbCommand> commands)
+    {
+      commands.ForEach(command => {
+        DbConnection con = factory.CreateConnection();
+        using(con)
+        {
+          con.Open();
+          command.Connection = con;
+          DbDataAdapter adapter = factory.CreateDataAdapter();
+          DataSet dataset = new DataSet();
+          adapter.SelectCommand = command;
+          adapter.Fill(dataset);
+
+          Console.WriteLine("execDbCommand");
+          foreach (DataRow row in dataset.Tables[0].Rows)
+          {
+            Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+          }
+        }
+      });
     }
   }
 }
