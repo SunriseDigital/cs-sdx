@@ -68,5 +68,14 @@ namespace UnitTest
         Debug.Dump(dic)
       );
     }
+
+    [Fact]
+    public void DumpInt()
+    {
+      Assert.Equal(
+        "System.Int32 10",
+        Debug.Dump(10)
+      );
+    }
   }
 }
