@@ -71,6 +71,11 @@ namespace Sdx.DebugTool
         return indent + "String(" + strVal.Length + ") " + strVal;
       }
 
+      if (value == null)
+      {
+        return indent + "NULL";
+      }
+
       //それ以外のクラスはTypeNameを付与
       Type type = value.GetType();
       String result = indent + type.Namespace + "." + type.Name;
@@ -107,8 +112,7 @@ namespace Sdx.DebugTool
       else
       {
         //タイトル部分
-        result += Environment.NewLine;
-        result += value.ToString();
+        result += " " + value.ToString();
       }
 
       return result;
