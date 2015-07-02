@@ -397,6 +397,16 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         commands[commands.Count - 1].CommandText
       );
 
+      //同じテーブルをJOINしてもAliasを与えなければ上書きになる
+      select.Table("shop").InnerJoin(
+        "category",
+        "{0}.category_id = {1}.id AND {1}.id = 1"
+      ).Columns.Add("*");
+      commands.Add(select.Build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
 
 
       return commands;

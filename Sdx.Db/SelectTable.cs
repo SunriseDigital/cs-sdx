@@ -73,7 +73,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public SelectTable InnerJoin(string table, string condition = null, string alias = null)
+    public SelectTable AddJoin(string table, JoinType joinType, string condition = null, string alias = null)
     {
       SelectTable joinTable = new SelectTable(this.select);
 
@@ -81,9 +81,25 @@ namespace Sdx.Db
       joinTable.TableName = table;
       joinTable.Alias = alias;
       joinTable.JoinCondition = condition;
-      joinTable.JoinType = JoinType.Inner;
+      joinTable.JoinType = joinType;
+
+      int findIndex = this.select.Joins.FindIndex(jt =>
+      {
+        return jt.Name == joinTable.Name;
+      });
+
+      if(findIndex != -1)
+      {
+        this.select.Joins.RemoveAt(findIndex);
+      }
+
       this.select.Joins.Add(joinTable);
       return joinTable;
+    }
+
+    public SelectTable InnerJoin(string table, string condition = null, string alias = null)
+    {
+      return this.AddJoin(table, JoinType.Inner, condition, alias);
     }
 
     public SelectTable ParentTable { get; set; }

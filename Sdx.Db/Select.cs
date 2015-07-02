@@ -4,7 +4,7 @@ using System.Data.Common;
 
 namespace Sdx.Db
 {
-  enum JoinType
+  public enum JoinType
   {
     Inner,
     Left
@@ -56,6 +56,7 @@ namespace Sdx.Db
 
     public DbCommand Build()
     {
+      Console.WriteLine(this.joins);
       DbCommand command = this.factory.CreateCommand();
 
       command.CommandText = "SELECT "
