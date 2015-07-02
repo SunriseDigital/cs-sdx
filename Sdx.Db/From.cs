@@ -8,14 +8,12 @@ namespace Sdx.Db
   {
     private Select select;
 
-    private List<String> columns;
+    private ColumnList columns;
 
     public From(Select select)
     {
       this.select = select;
-      this.columns = new List<String>();
-
-      this.columns.Add("*");
+      this.columns = new ColumnList();
     }
 
     public string TableName { get; set; }
@@ -27,7 +25,7 @@ namespace Sdx.Db
 
     public string Alias { get; set; }
 
-    public List<String> Columns
+    public ColumnList Columns
     {
       get { return columns; }
     }
@@ -75,19 +73,6 @@ namespace Sdx.Db
       return result;
     }
 
-    public From SetColumns(params string[] columns)
-    {
-      this.columns.Clear();
-      this.columns.AddRange(columns);
-      return this;
-    }
-
-    public From AddColumn(string column)
-    {
-      this.columns.Add(column);
-      return this;
-    }
-
     public From InnerJoin(string table, string condition = null, string alias = null)
     {
       From joinTable = new From(this.select);
@@ -98,7 +83,7 @@ namespace Sdx.Db
       joinTable.JoinCondition = condition;
       joinTable.JoinType = JoinType.Inner;
       this.select.Joins.Add(joinTable);
-      return this;
+      return joinTable;
     }
 
     public From ParentTable { get; set; }

@@ -43,7 +43,7 @@ namespace Sdx.Db
       get { return this.joins; }
     }
 
-    public Select From(string tableName, string alias = null)
+    public From From(string tableName, string alias = null)
     {
       From from = new From(this);
       from.TableName = tableName;
@@ -51,7 +51,7 @@ namespace Sdx.Db
 
       this.from = from;
 
-      return this;
+      return from;
     }
 
     public DbCommand Build()
