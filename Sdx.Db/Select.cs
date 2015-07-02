@@ -23,12 +23,12 @@ namespace Sdx.Db
   {
     private Factory factory;
     private DbCommandBuilder builder;
-    private From from;
-    private List<From> joins;
+    private SelectTable from;
+    private List<SelectTable> joins;
 
     public Select(Factory factory)
     {
-      this.joins = new List<From>();
+      this.joins = new List<SelectTable>();
       this.factory = factory;
       this.builder = factory.CreateCommandBuilder();
     }
@@ -38,14 +38,14 @@ namespace Sdx.Db
       get { return this.builder; }
     }
 
-    internal List<From> Joins
+    internal List<SelectTable> Joins
     {
       get { return this.joins; }
     }
 
-    public From From(string tableName, string alias = null)
+    public SelectTable From(string tableName, string alias = null)
     {
-      From from = new From(this);
+      SelectTable from = new SelectTable(this);
       from.TableName = tableName;
       from.Alias = alias;
 
@@ -90,14 +90,14 @@ namespace Sdx.Db
       return command;
     }
 
-    public From Table(string name)
+    public SelectTable Table(string name)
     {
       if(this.from.Name == name)
       {
         return this.from;
       }
 
-      foreach(From from in this.joins)
+      foreach(SelectTable from in this.joins)
       {
         if(from.Name == name)
         {

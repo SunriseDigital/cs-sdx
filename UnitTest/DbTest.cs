@@ -397,6 +397,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         commands[commands.Count - 1].CommandText
       );
 
+
+
       return commands;
     }
 

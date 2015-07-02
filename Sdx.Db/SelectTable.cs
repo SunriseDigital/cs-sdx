@@ -4,13 +4,13 @@ using System.Data.Common;
 
 namespace Sdx.Db
 {
-  public class From
+  public class SelectTable
   {
     private Select select;
 
     private ColumnList columns;
 
-    public From(Select select)
+    public SelectTable(Select select)
     {
       this.select = select;
       this.columns = new ColumnList();
@@ -73,9 +73,9 @@ namespace Sdx.Db
       return result;
     }
 
-    public From InnerJoin(string table, string condition = null, string alias = null)
+    public SelectTable InnerJoin(string table, string condition = null, string alias = null)
     {
-      From joinTable = new From(this.select);
+      SelectTable joinTable = new SelectTable(this.select);
 
       joinTable.ParentTable = this;
       joinTable.TableName = table;
@@ -86,7 +86,7 @@ namespace Sdx.Db
       return joinTable;
     }
 
-    public From ParentTable { get; set; }
+    public SelectTable ParentTable { get; set; }
 
     public string JoinCondition { get; set; }
 
