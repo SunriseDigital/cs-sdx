@@ -4,6 +4,21 @@ using System.Data.Common;
 
 namespace Sdx.Db
 {
+  enum JoinType
+  {
+    Inner,
+    Left
+  };
+
+  static class JoinTypeExt
+  {
+    public static string SqlString(this JoinType gender)
+    {
+      string[] strings = { "INNER JOIN", "LEFT JOIN" };
+      return  strings[(int) gender];
+    }
+  }
+
   public class Select
   {
     private Factory factory;
@@ -18,9 +33,19 @@ namespace Sdx.Db
       this.builder = factory.CreateCommandBuilder();
     }
 
+    internal DbCommandBuilder Builder
+    {
+      get { return this.builder; }
+    }
+
+    internal List<From> Joins
+    {
+      get { return this.joins; }
+    }
+
     public Select From(string tableName, string alias = null)
     {
-      From from = new From(this.builder);
+      From from = new From(this);
       from.TableName = tableName;
       from.Alias = alias;
 
@@ -29,13 +54,38 @@ namespace Sdx.Db
       return this;
     }
 
-    public System.Data.Common.DbCommand build()
+    public DbCommand Build()
     {
       DbCommand command = this.factory.CreateCommand();
 
-      command.CommandText = "SELECT " 
-        + this.from.BuildColumsString()
-        + " FROM " +this.from.BuildTableString();
+      command.CommandText = "SELECT "
+        + this.from.BuildColumsString();
+
+      this.joins.ForEach(from => {
+        command.CommandText += ", " + from.BuildColumsString();
+      });
+
+      command.CommandText += " FROM " + this.from.BuildTableString();
+
+      this.joins.ForEach(from => {
+        command.CommandText += " "
+          + from.JoinType.SqlString() + " " + from.QuotedTableName;
+
+        if(from.Alias != null)
+        {
+          command.CommandText += " AS " + from.QuotedName;
+        }
+
+        if(from.JoinCondition != null)
+        {
+          command.CommandText += " ON "
+            + String.Format(
+              from.JoinCondition,
+              from.ParentTable.QuotedName,
+              from.QuotedName
+            );
+        }
+      });
 
       return command;
     }

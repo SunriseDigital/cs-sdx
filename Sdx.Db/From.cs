@@ -6,17 +6,24 @@ namespace Sdx.Db
 {
   public class From
   {
-    private DbCommandBuilder builder;
+    private Select select;
 
     private List<String> columns;
 
-    public From(DbCommandBuilder builder)
+    public From(Select select)
     {
-      this.builder = builder;
+      this.select = select;
       this.columns = new List<String>();
+
+      this.columns.Add("*");
     }
 
     public string TableName { get; set; }
+
+    internal string QuotedTableName
+    {
+      get { return this.select.Builder.QuoteIdentifier(this.TableName); }
+    }
 
     public string Alias { get; set; }
 
@@ -30,31 +37,40 @@ namespace Sdx.Db
       get { return this.Alias == null ? this.TableName : this.Alias; }
     }
 
+    internal string QuotedName
+    {
+      get { return this.select.Builder.QuoteIdentifier(this.Name); }
+    }
+
+
     internal string BuildColumsString()
     {
-      if (this.columns.Count == 0)
+      if(this.columns.Count == 0 && this.ParentTable == null)
       {
-        return this.builder.QuoteIdentifier(this.Name) + ".*";
+        throw new Exception("Column is empty.");
       }
 
       var result = "";
       this.columns.ForEach((column) => {
-        result += this.builder.QuoteIdentifier(this.Name) 
-          + "."
-          + this.builder.QuoteIdentifier(column)  
-          + ", ";
+        if(result.Length > 0)
+        {
+          result += ", ";
+        }
+
+        result += this.select.Builder.QuoteIdentifier(this.Name) + ".";
+
+        result += (column == "*") ? column : this.select.Builder.QuoteIdentifier(column);
       });
 
-      //最後のカンマとスペースを取り除く
-      return result.Substring(0, result.Length - 2);
+      return result;
     }
 
     internal string BuildTableString()
     {
-      var result = this.builder.QuoteIdentifier(this.TableName);
+      var result = this.select.Builder.QuoteIdentifier(this.TableName);
       if(this.Alias != null)
       {
-        result += " AS " + this.builder.QuoteIdentifier(this.Alias);
+        result += " AS " + this.select.Builder.QuoteIdentifier(this.Alias);
       }
       return result;
     }
@@ -71,5 +87,24 @@ namespace Sdx.Db
       this.columns.Add(column);
       return this;
     }
+
+    public From InnerJoin(string table, string condition = null, string alias = null)
+    {
+      From joinTable = new From(this.select);
+
+      joinTable.ParentTable = this;
+      joinTable.TableName = table;
+      joinTable.Alias = alias;
+      joinTable.JoinCondition = condition;
+      joinTable.JoinType = JoinType.Inner;
+      this.select.Joins.Add(joinTable);
+      return this;
+    }
+
+    public From ParentTable { get; set; }
+
+    public string JoinCondition { get; set; }
+
+    internal JoinType JoinType { get; set; }
   }
 }

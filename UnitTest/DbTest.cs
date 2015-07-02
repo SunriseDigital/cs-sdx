@@ -303,14 +303,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       List<DbCommand> commands = new List<DbCommand>();
 
       select.From("shop");
-      commands.Add(select.build());
+      commands.Add(select.Build());
       Assert.Equal(
         String.Format("SELECT {0}shop{1}.* FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
         commands[commands.Count - 1].CommandText
       );
 
       select.From("shop", "s");
-      commands.Add(select.build());
+      commands.Add(select.Build());
       Assert.Equal(
         String.Format("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}", leftQuoteChar, rightQuoteChar),
         commands[commands.Count - 1].CommandText
@@ -318,35 +318,36 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       select.From("shop");
       select.Table("shop").Columns.Add("id");
-      commands.Add(select.build());
+      commands.Add(select.Build());
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
+        String.Format("SELECT {0}shop{1}.*, {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
         commands[commands.Count - 1].CommandText
       );
 
       select.Table("shop").Columns.Clear();
-      commands.Add(select.build());
+      select.Table("shop").Columns.Add("*");
+      commands.Add(select.Build());
       Assert.Equal(
         String.Format("SELECT {0}shop{1}.* FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
         commands[commands.Count - 1].CommandText
       );
 
       select.Table("shop").SetColumns(new String[] { "id" });
-      commands.Add(select.build());
+      commands.Add(select.Build());
       Assert.Equal(
         String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
         commands[commands.Count - 1].CommandText
       );
 
       select.Table("shop").SetColumns("id");
-      commands.Add(select.build());
+      commands.Add(select.Build());
       Assert.Equal(
         String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
         commands[commands.Count - 1].CommandText
       );
 
       select.Table("shop").AddColumn("name");
-      commands.Add(select.build());
+      commands.Add(select.Build());
       Assert.Equal(
         String.Format("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
         commands[commands.Count - 1].CommandText
@@ -364,6 +365,39 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     private void execDbCommandForMySql(Sdx.Db.Factory factory, List<DbCommand> commands)
     {
       this.execDbCommand(factory, commands);
+    }
+
+    [Fact]
+    public void TestSelectJoin()
+    {
+      List<DbCommand> commands;
+      Sdx.Db.Factory factory;
+
+      factory = new Sdx.Db.SqlServerFactory();
+      factory.ConnectionString = this.SqlServerConnectionString;
+      commands = this.RunSelectJoin(factory, "[", "]");
+      this.execDbCommandForSqlServer(factory, commands);
+    }
+
+    private List<DbCommand> RunSelectJoin(Sdx.Db.Factory factory, string leftQuoteChar, string rightQuoteChar)
+    {
+      Sdx.Db.Select select = factory.CreateSelect();
+      List<DbCommand> commands = new List<DbCommand>();
+
+      select.From("shop");
+
+      select.Table("shop").InnerJoin(
+        "category",
+        "{0}.category_id = {1}.id"
+      );
+      
+      commands.Add(select.Build());
+      Assert.Equal(
+        String.Format("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id", leftQuoteChar, rightQuoteChar),
+        commands[commands.Count - 1].CommandText
+      );
+
+      return commands;
     }
 
     /// <summary>
