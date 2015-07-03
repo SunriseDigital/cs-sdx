@@ -161,6 +161,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
+        Console.WriteLine(setupSql);
         DbTransaction sqlTran = con.BeginTransaction();
         DbCommand command = con.CreateCommand();
         command.Transaction = sqlTran;
@@ -185,6 +186,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void TestFactorySimpleRetrieve()
     {
+      ResetMySqlDatabase();
       foreach (TestDb db in this.CreateTestDbList())
       {
         RunFactorySimpleRetrieve(db);
