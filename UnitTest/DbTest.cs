@@ -19,6 +19,7 @@ using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClas
 
 namespace UnitTest
 {
+
   [TestClass]
   public class DbTest
   {
@@ -40,6 +41,7 @@ namespace UnitTest
         return String.Format(sql, this.LeftQuoteChar, this.RightQupteChar);
       }
     }
+
     private String MySqlConnectionString
     {
       get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963"; }
@@ -161,7 +163,6 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
-        Console.WriteLine(setupSql);
         DbTransaction sqlTran = con.BeginTransaction();
         DbCommand command = con.CreateCommand();
         command.Transaction = sqlTran;
@@ -214,10 +215,6 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
         adapter.SelectCommand = command;
         adapter.Fill(dataset);
-        foreach (DataRow row in dataset.Tables[0].Rows)
-        {
-          Console.WriteLine(Sdx.DebugTool.Debug.Dump(row["name_category"]));
-        }
 
         Assert.Equal(1, dataset.Tables[0].Rows.Count);
         Assert.Equal("天祥", dataset.Tables[0].Rows[0]["name_shop"]);
