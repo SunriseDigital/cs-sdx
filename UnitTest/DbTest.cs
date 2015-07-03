@@ -182,26 +182,18 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       }
     }
 
-    [Conditional("ON_VISUAL_STUDIO")]
-    private void RunFactorySimpleRetrieveForSqlServer()
+    [Fact]
+    public void TestFactorySimpleRetrieve()
     {
-      ResetSqlServerDatabase();
-      var factory = new Sdx.Db.SqlServerFactory();
-      factory.ConnectionString = this.SqlServerConnectionString;
-      RunFactorySimpleRetrieve(factory);
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFactorySimpleRetrieve(db);
+      }
     }
 
-    private void RunFactorySimpleRetrieveForMySql()
+    private void RunFactorySimpleRetrieve(TestDb db)
     {
-      ResetMySqlDatabase();
-      var factory = new Sdx.Db.MySqlFactory();
-      factory.ConnectionString = this.MySqlConnectionString;
-      RunFactorySimpleRetrieve(factory);
-    }
-
-    private void RunFactorySimpleRetrieve(Sdx.Db.Factory factory)
-    {
-      var con = factory.CreateConnection();
+      var con = db.Factory.CreateConnection();
       using (con)
       {
         con.Open();
@@ -213,9 +205,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
           + " WHERE shop.id = @shop@id"
           ;
 
-        command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
+        command.Parameters.Add(db.Factory.CreateParameter("@shop@id", "1"));
 
-        DbDataAdapter adapter = factory.CreateDataAdapter();
+        DbDataAdapter adapter = db.Factory.CreateDataAdapter();
         DataSet dataset = new DataSet();
 
         adapter.SelectCommand = command;
@@ -232,23 +224,24 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestFactorySimpleRetrieve()
-    {
-      RunFactorySimpleRetrieveForSqlServer();
-      RunFactorySimpleRetrieveForMySql();
-    }
-
-    [Fact]
     public void TestWhereWithTable()
     {
-      var factory = new Sdx.Db.SqlServerFactory();
-      Sdx.Db.Where where = factory.CreateWhere();
-      where.add("id", "1", "shop");
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        Sdx.Db.Where where = db.Factory.CreateWhere();
+        where.add("id", "1", "shop");
 
-      Assert.Equal("[shop].[id] = '1'", Sdx.Db.Util.CommandToSql(where.build()));
+        Assert.Equal(
+          db.Sql("{0}shop{1}.{0}id{1} = '1'"),
+          Sdx.Db.Util.CommandToSql(where.build())
+        );
 
-      where.add("type", 2, "category");
-      Assert.Equal("[shop].[id] = '1' AND [category].[type] = '2'", Sdx.Db.Util.CommandToSql(where.build()));
+        where.add("type", 2, "category");
+        Assert.Equal(
+          db.Sql("{0}shop{1}.{0}id{1} = '1' AND {0}category{1}.{0}type{1} = '2'"),
+          Sdx.Db.Util.CommandToSql(where.build())
+        );
+      }
     }
 
     [Fact]
@@ -269,32 +262,23 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void TestWhereSimple()
     {
-      this.RunWhereSimpleForSqlServer(new Sdx.Db.SqlServerFactory());
-      this.RunWhereSimpleForMySql(new Sdx.Db.MySqlFactory());
-    }
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        Sdx.Db.Where where = db.Factory.CreateWhere();
 
-    private void RunWhereSimpleForSqlServer(Sdx.Db.Factory factory)
-    {
-      Sdx.Db.Where where = factory.CreateWhere();
+        where.add("id", "1");
 
-      where.add("id", "1");
+        Assert.Equal(
+          db.Sql("{0}id{1} = '1'"),
+          Sdx.Db.Util.CommandToSql(where.build())
+        );
 
-      Assert.Equal("[id] = '1'", Sdx.Db.Util.CommandToSql(where.build()));
-
-      where.add("type", 2);
-      Assert.Equal("[id] = '1' AND [type] = '2'", Sdx.Db.Util.CommandToSql(where.build()));
-    }
-
-    private void RunWhereSimpleForMySql(Sdx.Db.Factory factory)
-    {
-      Sdx.Db.Where where = factory.CreateWhere();
-
-      where.add("id", "1");
-
-      Assert.Equal("`id` = '1'", Sdx.Db.Util.CommandToSql(where.build()));
-
-      where.add("type", 2);
-      Assert.Equal("`id` = '1' AND `type` = '2'", Sdx.Db.Util.CommandToSql(where.build()));
+        where.add("type", 2);
+        Assert.Equal(
+          db.Sql("{0}id{1} = '1' AND {0}type{1} = '2'"),
+          Sdx.Db.Util.CommandToSql(where.build())
+        );
+      }
     }
 
     private List<TestDb> CreateTestDbList()
