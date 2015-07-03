@@ -22,6 +22,24 @@ namespace UnitTest
   [TestClass]
   public class DbTest
   {
+    class TestDb
+    {
+      private DbCommand command;
+      private List<DbCommand> commands = new List<DbCommand>();
+      public Sdx.Db.Factory Factory { get; set; }
+      public String LeftQuoteChar { get; set; }
+      public String RightQupteChar { get; set; }
+      public DbCommand Command 
+      {
+        get { return this.command; }
+        set { this.command = value; this.commands.Add(command); }
+      }
+      public List<DbCommand> Commands { get { return this.commands; } }
+      public String Sql(String sql)
+      {
+        return String.Format(sql, this.LeftQuoteChar, this.RightQupteChar);
+      }
+    }
     private String MySqlConnectionString
     {
       get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963"; }
@@ -279,110 +297,109 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("`id` = '1' AND `type` = '2'", Sdx.Db.Util.CommandToSql(where.build()));
     }
 
+    private List<TestDb> CreateTestDbList()
+    {
+      var list = new List<TestDb>();
+      TestDb testDb;
+
+#if ON_VISUAL_STUDIO
+      testDb = new TestDb();
+      testDb.Factory = new Sdx.Db.SqlServerFactory();
+      testDb.Factory.ConnectionString = this.SqlServerConnectionString;
+      testDb.LeftQuoteChar = "[";
+      testDb.RightQupteChar = "]";
+      list.Add(testDb);
+#endif
+
+      testDb = new TestDb();
+      testDb.Factory = new Sdx.Db.MySqlFactory();
+      testDb.Factory.ConnectionString = this.MySqlConnectionString;
+      testDb.LeftQuoteChar = "`";
+      testDb.RightQupteChar = "`";
+      list.Add(testDb);
+
+      return list;
+    }
+
     [Fact]
     public void TestSimpleSelect()
     {
-      List<DbCommand> commands;
-      Sdx.Db.Factory factory;
-
-      factory = new Sdx.Db.SqlServerFactory();
-      factory.ConnectionString = this.SqlServerConnectionString;
-      commands = this.RunSimpleSelect(factory, "[", "]");
-      this.execDbCommandForSqlServer(factory, commands);
-
-      factory = new Sdx.Db.MySqlFactory();
-      factory.ConnectionString = this.MySqlConnectionString;
-      commands = this.RunSimpleSelect(factory, "`", "`");
-      this.execDbCommandForSqlServer(factory, commands);
+      foreach(TestDb db in this.CreateTestDbList())
+      {
+        RunSimpleSelect(db);
+        ExecSql(db);
+      }
     }
 
-    private List<DbCommand> RunSimpleSelect(Sdx.Db.Factory factory, String leftQuoteChar, String rightQuoteChar)
+    private void RunSimpleSelect(TestDb db)
     {
-      Sdx.Db.Select select = factory.CreateSelect();
-
-      List<DbCommand> commands = new List<DbCommand>();
+      Sdx.Db.Select select = db.Factory.CreateSelect();
 
       select.From("shop").Columns.Add("*");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.* FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
+        db.Command.CommandText
       );
 
       select.From("shop", "s").Columns.Add("*");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}"),
+        db.Command.CommandText
       );
 
       select.From("shop");
       select.Table("shop").Columns.Add("id");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
+        db.Command.CommandText
       );
 
       select.Table("shop").Columns.Clear();
       select.Table("shop").Columns.Add("*");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.* FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
+        db.Command.CommandText
       );
 
       select.Table("shop").Columns.Clear().Add("id");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
+        db.Command.CommandText
       );
 
       select.Table("shop").Columns.Clear().Add("id");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
+        db.Command.CommandText
       );
 
       select.Table("shop").Columns.Add("name");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
+        db.Command.CommandText
       );
-
-      return commands;
-    }
-
-    [Conditional("ON_VISUAL_STUDIO")]
-    private void execDbCommandForSqlServer(Sdx.Db.Factory factory, List<DbCommand> commands)
-    {
-      this.execDbCommand(factory, commands);
-    }
-
-    private void execDbCommandForMySql(Sdx.Db.Factory factory, List<DbCommand> commands)
-    {
-      this.execDbCommand(factory, commands);
     }
 
     [Fact]
-    public void TestSelectJoin()
+    public void TestSelectSimpleInnerJoin()
     {
-      List<DbCommand> commands;
-      Sdx.Db.Factory factory;
-
-      factory = new Sdx.Db.SqlServerFactory();
-      factory.ConnectionString = this.SqlServerConnectionString;
-      commands = this.RunSelectJoin(factory, "[", "]");
-      this.execDbCommandForSqlServer(factory, commands);
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectSimpleInnerJoin(db);
+        ExecSql(db);
+      }
     }
 
-    private List<DbCommand> RunSelectJoin(Sdx.Db.Factory factory, string leftQuoteChar, string rightQuoteChar)
+    private void RunSelectSimpleInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = factory.CreateSelect();
-      List<DbCommand> commands = new List<DbCommand>();
+      Sdx.Db.Select select = db.Factory.CreateSelect();
 
       select.From("shop").Columns.Add("*");
 
@@ -390,11 +407,11 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         "category",
         "{0}.category_id = {1}.id"
       ).Columns.Add("*");
-      
-      commands.Add(select.Build());
+
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id"),
+        db.Command.CommandText
       );
 
       //同じテーブルをJOINしてもAliasを与えなければ上書きになる
@@ -402,14 +419,11 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         "category",
         "{0}.category_id = {1}.id AND {1}.id = 1"
       ).Columns.Add("*");
-      commands.Add(select.Build());
+      db.Command = select.Build();
       Assert.Equal(
-        String.Format("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1", leftQuoteChar, rightQuoteChar),
-        commands[commands.Count - 1].CommandText
+        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
+        db.Command.CommandText
       );
-
-
-      return commands;
     }
 
     /// <summary>
@@ -417,15 +431,16 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     /// </summary>
     /// <param name="factory"></param>
     /// <param name="commands"></param>
-    private void execDbCommand(Sdx.Db.Factory factory, List<DbCommand> commands)
+    private void ExecSql(TestDb db)
     {
-      commands.ForEach(command => {
-        DbConnection con = factory.CreateConnection();
+      db.Commands.ForEach(command =>
+      {
+        DbConnection con = db.Factory.CreateConnection();
         using(con)
         {
           con.Open();
           command.Connection = con;
-          DbDataAdapter adapter = factory.CreateDataAdapter();
+          DbDataAdapter adapter = db.Factory.CreateDataAdapter();
           DataSet dataset = new DataSet();
           adapter.SelectCommand = command;
           adapter.Fill(dataset);
