@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using UnitTest.DummyAttributes;
+using UnitTest.DummyClasses;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -16,7 +16,7 @@ namespace UnitTest
   public class TestTemplate : BaseTest
   {
     [ClassInitialize]
-    public static void InitilizeClass(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext context)
+    public static void InitilizeClass(TestContext context)
     {
       Console.WriteLine("FixtureSetUp");
       //最初のテストメソッドを実行する前に一回だけ実行したい処理はここ

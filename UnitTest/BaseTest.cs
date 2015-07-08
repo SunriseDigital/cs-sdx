@@ -1,6 +1,6 @@
 ﻿using System;
 
-using UnitTest.DummyAttributes;
+using UnitTest.DummyClasses;
 
 #if ON_VISUAL_STUDIO
 using ClassInitialize = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;

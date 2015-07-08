@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace UnitTest.DummyAttributes
+namespace UnitTest.DummyClasses
 {
   /// <summary>
   /// xunitをVisualStudioのテストエクスプローラーで動かし、なおかつtravisでコンパイルを通すために空のAttributeを作成。
@@ -17,4 +17,6 @@ namespace UnitTest.DummyAttributes
   class TestInitializeAttribute : Attribute { }
 
   class TestCleanupAttribute : Attribute { }
+
+  public class TestContext { }
 }

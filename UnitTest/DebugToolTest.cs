@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Sdx.DebugTool;
 
 using Xunit;
-using UnitTest.DummyAttributes;
+using UnitTest.DummyClasses;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
