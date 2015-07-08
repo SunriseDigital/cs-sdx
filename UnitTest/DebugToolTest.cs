@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 using Sdx.DebugTool;
 
 using Xunit;
-using UnitTest.Attibute;
+using UnitTest.DummyAttributes;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using ClassInitializeAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;
+using ClassCleanupAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute;
 #endif
 
 namespace UnitTest

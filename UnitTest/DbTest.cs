@@ -10,16 +10,17 @@ using System.Diagnostics;
 using System.Configuration;
 
 using Xunit;
-using UnitTest.Attibute;
+using UnitTest.DummyAttributes;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using ClassInitializeAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;
+using ClassCleanupAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute;
 #endif
 
 namespace UnitTest
 {
-
   [TestClass]
   public class DbTest :BaseTest
   {
@@ -42,23 +43,29 @@ namespace UnitTest
       }
     }
 
-    public override void FixtureSetUp()
+    [ClassInitialize]
+    public static void InitilizeClass(Microsoft.VisualStudio.TestTools.UnitTesting.TestContext context)
     {
       ResetMySqlDatabase();
       ResetSqlServerDatabase();
     }
 
-    private String MySqlConnectionString
+    public override void FixtureSetUp()
+    {
+      DbTest.InitilizeClass(null);
+    }
+
+    private static String MySqlConnectionString
     {
       get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963"; }
     }
 
-    private String SqlServerConnectionString
+    private static String SqlServerConnectionString
     {
       get { return "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;"; }
     }
 
-    private void ResetMySqlDatabase()
+    private static void ResetMySqlDatabase()
     {
       Sdx.Db.Factory factory = new Sdx.Db.MySqlFactory();
 
@@ -86,20 +93,20 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         }
       }
 
-      factory.ConnectionString = this.MySqlConnectionString;
+      factory.ConnectionString = DbTest.MySqlConnectionString;
       var con = factory.CreateConnection();
       using(con)
       {
         con.Open();
-        this.ExecuteSqlFile(con, "setup.mysql.sql");
-        this.ExecuteSqlFile(con, "insert.sql");
+        DbTest.ExecuteSqlFile(con, "setup.mysql.sql");
+        DbTest.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetMySqlDatabase");
     }
 
     [Conditional("ON_VISUAL_STUDIO")]
-    private void ResetSqlServerDatabase()
+    private static void ResetSqlServerDatabase()
     {
       //SdxTestデータベースをDROPします
       Sdx.Db.Factory factory = new Sdx.Db.SqlServerFactory();
@@ -151,19 +158,19 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         createUserSql.ExecuteNonQuery();
       }
 
-      factory.ConnectionString = this.SqlServerConnectionString;
+      factory.ConnectionString = DbTest.SqlServerConnectionString;
       var con = factory.CreateConnection();
       using(con)
       {
         con.Open();
-        this.ExecuteSqlFile(con, "setup.sqlserver.sql");
-        this.ExecuteSqlFile(con, "insert.sql");
+        DbTest.ExecuteSqlFile(con, "setup.sqlserver.sql");
+        DbTest.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetSqlServerDatabase");
     }
 
-    private void ExecuteSqlFile(DbConnection con, string dataFilePath)
+    private static void ExecuteSqlFile(DbConnection con, string dataFilePath)
     {
       //setup.sqlを流し込みます。
       using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
@@ -293,7 +300,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
       testDb.Factory = new Sdx.Db.SqlServerFactory();
-      testDb.Factory.ConnectionString = this.SqlServerConnectionString;
+      testDb.Factory.ConnectionString = DbTest.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
@@ -301,7 +308,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       testDb = new TestDb();
       testDb.Factory = new Sdx.Db.MySqlFactory();
-      testDb.Factory.ConnectionString = this.MySqlConnectionString;
+      testDb.Factory.ConnectionString = DbTest.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);

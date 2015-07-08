@@ -1,5 +1,12 @@
 ﻿using System;
-using System.Diagnostics; 
+
+using UnitTest.DummyAttributes;
+
+#if ON_VISUAL_STUDIO
+using ClassInitialize = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;
+using TestInitializeAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
+using TestCleanupAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute;
+#endif
 
 namespace UnitTest
 {
@@ -36,11 +43,23 @@ namespace UnitTest
       this.SetUp();
     }
 
+    [TestInitialize]
+    public void TestInitialize()
+    {
+      this.SetUp();
+    }
+
+    [TestCleanup]
+    public void TestCleanup()
+    {
+      this.TearDown();
+    }
+    
     virtual public void FixtureSetUp()
     {
 
     }
-
+    
     virtual protected void SetUp()
     {
 
@@ -58,7 +77,9 @@ namespace UnitTest
 
     public void Dispose()
     {
+#if !ON_VISUAL_STUDIO
       this.TearDown();
+#endif
     }
   }
 }

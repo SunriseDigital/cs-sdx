@@ -24,7 +24,7 @@ CREATE TABLE category_type (
   id int IDENTITY ,
   name nvarchar(100),
   code nvarchar(50),
-  CONSTRAINT pk_category PRIMARY KEY CLUSTERED (id),
+  CONSTRAINT pk_category_type PRIMARY KEY CLUSTERED (id),
   CONSTRAINT key_category_type_code UNIQUE NONCLUSTERED (code)
 );
 
