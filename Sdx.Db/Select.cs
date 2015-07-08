@@ -56,27 +56,37 @@ namespace Sdx.Db
 
     public DbCommand Build()
     {
-      Console.WriteLine(this.joins);
       DbCommand command = this.factory.CreateCommand();
 
-      command.CommandText = "SELECT ";
+      command.CommandText = "SELECT";
+
+      //カラムを組み立てる
+      var columns = "";
 
       //fromのカラムを追加
       if(this.from.Columns.Count > 0)
       {
-        command.CommandText += this.from.BuildColumsString();
+        columns += " " + this.from.BuildColumsString();
       }   
 
       //joinしてるテーブルのカラムを追加
       this.joins.ForEach(sTable => {
         if(sTable.Columns.Count > 0)
         {
-          command.CommandText += ", " + sTable.BuildColumsString();
+          if (columns.Length > 0)
+          {
+            columns += ", ";
+          }
+
+          columns += sTable.BuildColumsString();
         }
       });
 
-      command.CommandText += " FROM " + this.from.BuildTableString();
 
+      //FROMを追加
+      command.CommandText += columns + " FROM " + this.from.BuildTableString();
+
+      //JOIN句を組み立てる
       this.joins.ForEach(from => {
         command.CommandText += " "
           + from.JoinType.SqlString() + " " + from.QuotedTableName;
