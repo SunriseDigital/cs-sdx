@@ -53,7 +53,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ColumnList.cs" />
     <Compile Include="Factory.cs" />
     <Compile Include="MySqlFactory.cs" />
     <Compile Include="Select.cs" />

@@ -25,6 +25,10 @@ namespace UnitTest
   [TestClass]
   public class DbTest :BaseTest
   {
+    /// <summary>
+    /// 複数のDBのテストをまとめて行うためのDbFactoryのラッパークラス
+    /// CreateTestDbList()メソッドで生成しています。
+    /// </summary>
     class TestDb
     {
       private DbCommand command;
@@ -318,27 +322,28 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestSimpleSelect()
+    public void TestSelectSimple()
     {
       foreach(TestDb db in this.CreateTestDbList())
       {
-        RunSimpleSelect(db);
+        RunSelectSimple(db);
         ExecSql(db);
       }
     }
 
-    private void RunSimpleSelect(TestDb db)
+    private void RunSelectSimple(TestDb db)
     {
       Sdx.Db.Select select = db.Factory.CreateSelect();
 
-      select.From("shop").Columns.Add("*");
+      //AddColumn
+      select.From("shop").AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.From("shop", "s").Columns.Add("*");
+      select.From("shop", "s").AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}"),
@@ -346,29 +351,81 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       select.From("shop");
-      select.Table("shop").Columns.Add("id");
+      select.Table("shop").AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns.Clear();
-      select.Table("shop").Columns.Add("*");
+      //SetColumns
+      select.From("shop").SetColumns("id");
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
+        db.Command.CommandText
+      );
+
+      select.From("shop").SetColumns("id", "name");
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
+        db.Command.CommandText
+      );
+
+      select.From("shop").SetColumns(new String[]{"id", "name"});
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
+        db.Command.CommandText
+      );
+
+      //AddColumns
+      select.From("shop").AddColumns("id");
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
+        db.Command.CommandText
+      );
+
+      select.Table("shop").AddColumns("name");
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
+        db.Command.CommandText
+      );
+
+      select.From("shop").AddColumns("id", "name");
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
+        db.Command.CommandText
+      );
+
+      select.From("shop").AddColumns(new String[]{"id", "name"});
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
+        db.Command.CommandText
+      );
+
+      //ClearColumns
+      select.From("shop").SetColumns(new String[] { "id", "name" });
+      select.Table("shop").ClearColumns().AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns.Clear().Add("id");
+      select.Table("shop").ClearColumns().AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns.Clear().Add("id");
+      select.Table("shop").ClearColumns().AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),

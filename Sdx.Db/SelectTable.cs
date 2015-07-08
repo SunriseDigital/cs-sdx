@@ -8,12 +8,11 @@ namespace Sdx.Db
   {
     private Select select;
 
-    private ColumnList columns;
+    private List<String> columns = new List<string>();
 
     public SelectTable(Select select)
     {
       this.select = select;
-      this.columns = new ColumnList();
     }
 
     public string TableName { get; set; }
@@ -25,7 +24,7 @@ namespace Sdx.Db
 
     public string Alias { get; set; }
 
-    public ColumnList Columns
+    public List<String> Columns
     {
       get { return columns; }
     }
@@ -107,5 +106,27 @@ namespace Sdx.Db
     public string JoinCondition { get; set; }
 
     internal JoinType JoinType { get; set; }
+
+    public SelectTable ClearColumns()
+    {
+      this.Columns.Clear();
+      return this;
+    }
+
+    public SelectTable SetColumns(params String[] columns)
+    {
+      this.ClearColumns();
+      this.AddColumns(columns);
+      return this;
+    }
+
+    public SelectTable AddColumns(params String[] columns)
+    {
+      foreach (var column in columns)
+      {
+        this.Columns.Add(column);
+      }
+      return this;
+    }
   }
 }
