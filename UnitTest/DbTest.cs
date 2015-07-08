@@ -479,6 +479,34 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
+    [Fact]
+    public void TestSelectMultipleInnerJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectMultipleInnerJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectMultipleInnerJoin(TestDb db)
+    {
+      Sdx.Db.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .InnerJoin("category", "{0}.category_id = {1}.id")
+        .InnerJoin("category_type", "{0}.category_type_id = {1}.id");
+
+      select.Table("shop").AddColumns("*");
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id"),
+        db.Command.CommandText
+      );
+    }
+
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
     /// </summary>

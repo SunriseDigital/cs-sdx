@@ -59,11 +59,20 @@ namespace Sdx.Db
       Console.WriteLine(this.joins);
       DbCommand command = this.factory.CreateCommand();
 
-      command.CommandText = "SELECT "
-        + this.from.BuildColumsString();
+      command.CommandText = "SELECT ";
 
-      this.joins.ForEach(from => {
-        command.CommandText += ", " + from.BuildColumsString();
+      //fromのカラムを追加
+      if(this.from.Columns.Count > 0)
+      {
+        command.CommandText += this.from.BuildColumsString();
+      }   
+
+      //joinしてるテーブルのカラムを追加
+      this.joins.ForEach(sTable => {
+        if(sTable.Columns.Count > 0)
+        {
+          command.CommandText += ", " + sTable.BuildColumsString();
+        }
       });
 
       command.CommandText += " FROM " + this.from.BuildTableString();

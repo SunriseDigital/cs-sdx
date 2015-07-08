@@ -72,7 +72,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public SelectTable AddJoin(string table, JoinType joinType, string condition = null, string alias = null)
+    public SelectTable AddJoin(string table, JoinType joinType, string condition, string alias = null)
     {
       SelectTable joinTable = new SelectTable(this.select);
 
@@ -96,7 +96,7 @@ namespace Sdx.Db
       return joinTable;
     }
 
-    public SelectTable InnerJoin(string table, string condition = null, string alias = null)
+    public SelectTable InnerJoin(string table, string condition, string alias = null)
     {
       return this.AddJoin(table, JoinType.Inner, condition, alias);
     }
