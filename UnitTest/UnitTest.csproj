@@ -67,7 +67,7 @@
     <Compile Include="DebugToolTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
-    <Compile Include="TestClassAttribute.cs" />
+    <Compile Include="DummyClassAttribute.cs" />
     <Compile Include="TestTemplate.cs" />
   </ItemGroup>
   <ItemGroup>

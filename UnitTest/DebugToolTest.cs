@@ -16,7 +16,7 @@ using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClas
 namespace UnitTest
 {
   [TestClass]
-  public class DebugToolTest
+  public class DebugToolTest : BaseTest
   {
     [Fact]
     public void TestDumpString()

@@ -21,7 +21,7 @@ namespace UnitTest
 {
 
   [TestClass]
-  public class DbTest
+  public class DbTest :BaseTest
   {
     class TestDb
     {
@@ -40,6 +40,12 @@ namespace UnitTest
       {
         return String.Format(sql, this.LeftQuoteChar, this.RightQupteChar);
       }
+    }
+
+    public override void FixtureSetUp()
+    {
+      ResetMySqlDatabase();
+      ResetSqlServerDatabase();
     }
 
     private String MySqlConnectionString
@@ -187,7 +193,6 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void TestFactorySimpleRetrieve()
     {
-      ResetMySqlDatabase();
       foreach (TestDb db in this.CreateTestDbList())
       {
         RunFactorySimpleRetrieve(db);
