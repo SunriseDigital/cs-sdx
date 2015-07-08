@@ -536,6 +536,37 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
+    [Fact]
+    public void TestSelectSameTableInnerJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectSameTableInnerJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectSameTableInnerJoin(TestDb db)
+    {
+      Sdx.Db.Select select = db.Factory.CreateSelect();
+      select.From("shop").AddColumns("*");
+
+      select.Table("shop")
+        .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
+        .AddColumns("*");
+
+      select.Table("shop")
+        .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
+        .AddColumns("*");
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.*, {0}main_image{1}.*, {0}sub_image{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.main_image_id = {0}main_image{1}.id INNER JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.sub_image_id = {0}sub_image{1}.id"),
+        db.Command.CommandText
+      );
+    }
+
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
     /// </summary>
