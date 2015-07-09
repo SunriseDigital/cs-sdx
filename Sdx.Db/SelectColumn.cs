@@ -8,15 +8,27 @@ namespace Sdx.Db
   public class SelectColumn
   {
     private object name;
-    public SelectColumn(string columnName)
+    public SelectColumn(object columnName)
     {
-      if(columnName == "*")
+      if(columnName is Expr)
       {
-        name = new Expr(columnName);
+        name = columnName;
+      }
+      else if( columnName is string)
+      {
+        var strName = columnName as string;
+        if (strName == "*")
+        {
+          name = new Expr(strName);
+        }
+        else
+        {
+          name = columnName;
+        }
       }
       else
       {
-        name = columnName;
+        throw new Exception("columnName must be instance of string or Expr");
       }
     }
 

@@ -587,6 +587,34 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
+
+      select.Table("shop")
+        .ClearColumns()
+        .AddColumns(new  Dictionary<string, object>()
+         { 
+           {"shop_id", "id"},
+           {"shop_name", "name"},
+         });
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1}, {0}shop{1}.{0}name{1} as {0}shop_name{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
+
+      select.Table("shop")
+        .ClearColumns()
+        .AddColumns(new Dictionary<string, object>()
+         { 
+           {"shop_id", "id"},
+           {"shop_name", new Sdx.Db.Expr("name")},
+         });
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1}, {0}shop{1}.name as {0}shop_name{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
     }
 
     /// <summary>

@@ -125,11 +125,19 @@ namespace Sdx.Db
       return this;
     }
 
-    public void AddColumn(string columnName, string alias = null)
+    public void AddColumn(object columnName, string alias = null)
     {
       var column = new SelectColumn(columnName);
       column.Alias = alias;
       this.columns.Add(column);
+    }
+
+    public void AddColumns(Dictionary<string, object> columns)
+    {
+      foreach(var column in columns)
+      {
+        this.AddColumn(column.Value, column.Key);
+      }
     }
   }
 }
