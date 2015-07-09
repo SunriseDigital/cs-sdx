@@ -567,6 +567,22 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
+    [Fact]
+    public void TestSelectColumnAliasInnerJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectColumnAliasInnerJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectColumnAliasInnerJoin(TestDb db)
+    {
+      Sdx.Db.Select select = db.Factory.CreateSelect();
+      select.From("shop").AddColumn("id", "shop_id");
+    }
+
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
     /// </summary>

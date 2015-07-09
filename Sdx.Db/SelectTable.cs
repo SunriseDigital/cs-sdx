@@ -124,9 +124,14 @@ namespace Sdx.Db
     {
       foreach (var column in columns)
       {
-        this.Columns.Add(column);
+        this.AddColumn(column);
       }
       return this;
+    }
+
+    public void AddColumn(string column, string alias = null)
+    {
+      this.columns.Add(column);
     }
   }
 }
