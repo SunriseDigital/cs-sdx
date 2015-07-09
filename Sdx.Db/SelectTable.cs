@@ -8,7 +8,7 @@ namespace Sdx.Db
   {
     private Select select;
 
-    private List<String> columns = new List<string>();
+    private List<SelectColumn> columns = new List<SelectColumn>();
 
     public SelectTable(Select select)
     {
@@ -19,7 +19,7 @@ namespace Sdx.Db
 
     public string Alias { get; internal set; }
 
-    public List<String> Columns
+    public List<SelectColumn> Columns
     {
       get { return columns; }
     }
@@ -46,13 +46,11 @@ namespace Sdx.Db
 
         result += this.select.Factory.QuoteIdentifier(this.Name) + ".";
 
-        if(column == "*")
+        result += this.select.Factory.QuoteIdentifier(column);
+
+        if(column.Alias != null)
         {
-          result += this.select.Factory.QuoteIdentifier(new Expr(column));
-        }
-        else
-        {
-          result += this.select.Factory.QuoteIdentifier(column);
+          result += " as " + this.select.Factory.QuoteIdentifier(column.Alias);
         }
         
       });
@@ -127,8 +125,10 @@ namespace Sdx.Db
       return this;
     }
 
-    public void AddColumn(string column, string alias = null)
+    public void AddColumn(string columnName, string alias = null)
     {
+      var column = new SelectColumn(columnName);
+      column.Alias = alias;
       this.columns.Add(column);
     }
   }

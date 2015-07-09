@@ -57,6 +57,7 @@
     <Compile Include="Factory.cs" />
     <Compile Include="MySqlFactory.cs" />
     <Compile Include="Select.cs" />
+    <Compile Include="SelectColumn.cs" />
     <Compile Include="SqlServerFactory.cs" />
     <Compile Include="SelectTable.cs" />
     <Compile Include="Util.cs" />

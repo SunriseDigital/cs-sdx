@@ -68,5 +68,17 @@ namespace Sdx.Db
     {
       return expr.ToString();
     }
+
+    internal string QuoteIdentifier(SelectColumn column)
+    {
+      if(column.isExpr())
+      {
+        return this.QuoteIdentifier(column.Name as Expr);
+      }
+      else
+      {
+        return this.QuoteIdentifier(column.Name as string);
+      }
+    }
   }
 }

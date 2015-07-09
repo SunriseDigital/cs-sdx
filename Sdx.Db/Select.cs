@@ -22,7 +22,6 @@ namespace Sdx.Db
   public class Select
   {
     private Factory factory;
-    private DbCommandBuilder builder;
     private SelectTable from;
     private List<SelectTable> joins;
 

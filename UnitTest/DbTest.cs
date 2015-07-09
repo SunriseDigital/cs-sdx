@@ -432,7 +432,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns.Add("name");
+      select.Table("shop").AddColumns("name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -454,12 +454,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       Sdx.Db.Select select = db.Factory.CreateSelect();
 
-      select.From("shop").Columns.Add("*");
+      select.From("shop").AddColumns("*");
 
       select.Table("shop").InnerJoin(
         "category",
         "{0}.category_id = {1}.id"
-      ).Columns.Add("*");
+      ).AddColumns("*");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -471,7 +471,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       select.Table("shop").InnerJoin(
         "category",
         "{0}.category_id = {1}.id AND {1}.id = 1"
-      ).Columns.Add("*");
+      ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
@@ -581,6 +581,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       Sdx.Db.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("id", "shop_id");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
     }
 
     /// <summary>
