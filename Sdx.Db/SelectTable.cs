@@ -97,6 +97,11 @@ namespace Sdx.Db
       return this.AddJoin(table, JoinType.Inner, condition, alias);
     }
 
+    public SelectTable LeftJoin(string table, string condition, string alias = null)
+    {
+      return this.AddJoin(table, JoinType.Left, condition, alias);
+    }
+
     public SelectTable ParentTable { get; private set; }
 
     public string JoinCondition { get; private set; }
@@ -125,19 +130,22 @@ namespace Sdx.Db
       return this;
     }
 
-    public void AddColumn(object columnName, string alias = null)
+    public SelectTable AddColumn(object columnName, string alias = null)
     {
       var column = new SelectColumn(columnName);
       column.Alias = alias;
       this.columns.Add(column);
+      return this;
     }
 
-    public void AddColumns(Dictionary<string, object> columns)
+    public SelectTable AddColumns(Dictionary<string, object> columns)
     {
       foreach(var column in columns)
       {
         this.AddColumn(column.Value, column.Key);
       }
+
+      return this;
     }
   }
 }

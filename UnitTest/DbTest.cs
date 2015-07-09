@@ -568,16 +568,16 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestSelectColumnAliasInnerJoin()
+    public void TestSelectColumnAlias()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunSelectColumnAliasInnerJoin(db);
+        RunSelectColumnAlias(db);
         ExecSql(db);
       }
     }
 
-    private void RunSelectColumnAliasInnerJoin(TestDb db)
+    private void RunSelectColumnAlias(TestDb db)
     {
       Sdx.Db.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("id", "shop_id");
@@ -590,7 +590,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       select.Table("shop")
         .ClearColumns()
-        .AddColumns(new  Dictionary<string, object>()
+        .AddColumns(new Dictionary<string, object>()
          { 
            {"shop_id", "id"},
            {"shop_name", "name"},
@@ -613,6 +613,30 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1}, {0}shop{1}.name as {0}shop_name{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectLeftJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectLeftJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectLeftJoin(TestDb db)
+    {
+      Sdx.Db.Select select = db.Factory.CreateSelect();
+      select.From("shop")
+        .AddColumn("*")
+        .LeftJoin("image", "{0}.main_image_id={1}.id");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN {0}image{1} ON {0}shop{1}.main_image_id={0}image{1}.id"),
        db.Command.CommandText
       );
     }
