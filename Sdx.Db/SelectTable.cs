@@ -19,7 +19,7 @@ namespace Sdx.Db
 
     internal string QuotedTableName
     {
-      get { return this.select.Builder.QuoteIdentifier(this.TableName); }
+      get { return this.select.Factory.QuoteIdentifier(this.TableName); }
     }
 
     public string Alias { get; set; }
@@ -29,34 +29,35 @@ namespace Sdx.Db
       get { return columns; }
     }
 
-    public string Name 
+    public string Name
     {
       get { return this.Alias == null ? this.TableName : this.Alias; }
     }
 
     internal string QuotedName
     {
-      get { return this.select.Builder.QuoteIdentifier(this.Name); }
+      get { return this.select.Factory.QuoteIdentifier(this.Name); }
     }
 
 
     internal string BuildColumsString()
     {
-      if(this.columns.Count == 0 && this.ParentTable == null)
+      if (this.columns.Count == 0 && this.ParentTable == null)
       {
         throw new Exception("Column is empty.");
       }
 
       var result = "";
-      this.columns.ForEach((column) => {
-        if(result.Length > 0)
+      this.columns.ForEach((column) =>
+      {
+        if (result.Length > 0)
         {
           result += ", ";
         }
 
-        result += this.select.Builder.QuoteIdentifier(this.Name) + ".";
+        result += this.select.Factory.QuoteIdentifier(this.Name) + ".";
 
-        result += (column == "*") ? column : this.select.Builder.QuoteIdentifier(column);
+        result += (column == "*") ? column : this.select.Factory.QuoteIdentifier(column);
       });
 
       return result;
@@ -64,10 +65,10 @@ namespace Sdx.Db
 
     internal string BuildTableString()
     {
-      var result = this.select.Builder.QuoteIdentifier(this.TableName);
-      if(this.Alias != null)
+      var result = this.select.Factory.QuoteIdentifier(this.TableName);
+      if (this.Alias != null)
       {
-        result += " AS " + this.select.Builder.QuoteIdentifier(this.Alias);
+        result += " AS " + this.select.Factory.QuoteIdentifier(this.Alias);
       }
       return result;
     }
@@ -87,7 +88,7 @@ namespace Sdx.Db
         return jt.Name == joinTable.Name;
       });
 
-      if(findIndex != -1)
+      if (findIndex != -1)
       {
         this.select.Joins.RemoveAt(findIndex);
       }

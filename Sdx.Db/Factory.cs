@@ -5,7 +5,8 @@ namespace Sdx.Db
 {
   public abstract class Factory
   {
-    DbProviderFactory factory;
+    private DbProviderFactory factory;
+    private DbCommandBuilder builder;
 
     protected abstract DbProviderFactory GetFactory();
 
@@ -14,6 +15,7 @@ namespace Sdx.Db
     public Factory()
     {
       this.factory = this.GetFactory();
+      this.builder = this.factory.CreateCommandBuilder();
     }
 
     public DbConnection CreateConnection()
@@ -55,6 +57,11 @@ namespace Sdx.Db
     public DbDataAdapter CreateDataAdapter()
     {
       return this.factory.CreateDataAdapter();
+    }
+
+    public string QuoteIdentifier(string unquotedIdentifier)
+    {
+      return this.builder.QuoteIdentifier(unquotedIdentifier);
     }
   }
 }

@@ -30,12 +30,11 @@ namespace Sdx.Db
     {
       this.joins = new List<SelectTable>();
       this.factory = factory;
-      this.builder = factory.CreateCommandBuilder();
     }
 
-    internal DbCommandBuilder Builder
+    internal Factory Factory
     {
-      get { return this.builder; }
+      get { return this.factory; }
     }
 
     internal List<SelectTable> Joins
