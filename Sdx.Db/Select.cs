@@ -86,22 +86,24 @@ namespace Sdx.Db
       command.CommandText += columns + " FROM " + this.from.BuildTableString();
 
       //JOIN句を組み立てる
-      this.joins.ForEach(from => {
+      this.joins.ForEach(sTable => {
         command.CommandText += " "
-          + from.JoinType.SqlString() + " " + from.QuotedTableName;
+          + sTable.JoinType.SqlString()
+          + " "
+          + this.Factory.QuoteIdentifier(sTable.TableName);
 
-        if(from.Alias != null)
+        if(sTable.Alias != null)
         {
-          command.CommandText += " AS " + from.QuotedName;
+          command.CommandText += " AS " + this.Factory.QuoteIdentifier(sTable.Name);
         }
 
-        if(from.JoinCondition != null)
+        if(sTable.JoinCondition != null)
         {
           command.CommandText += " ON "
             + String.Format(
-              from.JoinCondition,
-              from.ParentTable.QuotedName,
-              from.QuotedName
+              sTable.JoinCondition,
+              this.Factory.QuoteIdentifier(sTable.ParentTable.Name),
+              this.Factory.QuoteIdentifier(sTable.Name)
             );
         }
       });

@@ -63,5 +63,10 @@ namespace Sdx.Db
     {
       return this.builder.QuoteIdentifier(unquotedIdentifier);
     }
+
+    public string QuoteIdentifier(Expr expr)
+    {
+      return expr.ToString();
+    }
   }
 }

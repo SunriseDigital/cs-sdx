@@ -15,14 +15,9 @@ namespace Sdx.Db
       this.select = select;
     }
 
-    public string TableName { get; set; }
+    public string TableName { get; internal set; }
 
-    internal string QuotedTableName
-    {
-      get { return this.select.Factory.QuoteIdentifier(this.TableName); }
-    }
-
-    public string Alias { get; set; }
+    public string Alias { get; internal set; }
 
     public List<String> Columns
     {
@@ -33,12 +28,6 @@ namespace Sdx.Db
     {
       get { return this.Alias == null ? this.TableName : this.Alias; }
     }
-
-    internal string QuotedName
-    {
-      get { return this.select.Factory.QuoteIdentifier(this.Name); }
-    }
-
 
     internal string BuildColumsString()
     {
@@ -57,7 +46,15 @@ namespace Sdx.Db
 
         result += this.select.Factory.QuoteIdentifier(this.Name) + ".";
 
-        result += (column == "*") ? column : this.select.Factory.QuoteIdentifier(column);
+        if(column == "*")
+        {
+          result += this.select.Factory.QuoteIdentifier(new Expr(column));
+        }
+        else
+        {
+          result += this.select.Factory.QuoteIdentifier(column);
+        }
+        
       });
 
       return result;
@@ -102,11 +99,11 @@ namespace Sdx.Db
       return this.AddJoin(table, JoinType.Inner, condition, alias);
     }
 
-    public SelectTable ParentTable { get; set; }
+    public SelectTable ParentTable { get; private set; }
 
-    public string JoinCondition { get; set; }
+    public string JoinCondition { get; private set; }
 
-    internal JoinType JoinType { get; set; }
+    public JoinType JoinType { get; private set; }
 
     public SelectTable ClearColumns()
     {
