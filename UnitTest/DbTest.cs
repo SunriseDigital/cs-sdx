@@ -641,6 +641,53 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
+    [Fact]
+    public void TestSelectJoinOrder()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectJoinOrder(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectJoinOrder(TestDb db)
+    {
+      Sdx.Db.Select select = db.Factory.CreateSelect();
+      select.From("shop").AddColumn("*");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7") ;
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} AS {0}image3{1} ON {0}shop{1}.main_image_id={0}image3{1}.id INNER JOIN {0}image{1} AS {0}image5{1} ON {0}shop{1}.main_image_id={0}image5{1}.id INNER JOIN {0}image{1} AS {0}image7{1} ON {0}shop{1}.main_image_id={0}image7{1}.id LEFT JOIN {0}image{1} AS {0}image1{1} ON {0}shop{1}.main_image_id={0}image1{1}.id LEFT JOIN {0}image{1} AS {0}image2{1} ON {0}shop{1}.main_image_id={0}image2{1}.id LEFT JOIN {0}image{1} AS {0}image4{1} ON {0}shop{1}.main_image_id={0}image4{1}.id LEFT JOIN {0}image{1} AS {0}image6{1} ON {0}shop{1}.main_image_id={0}image6{1}.id"),
+       db.Command.CommandText
+      );
+
+      select = db.Factory.CreateSelect();
+      select.From("shop").AddColumn("*");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
+      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
+
+      select.JoinOrder = Sdx.Db.JoinOrder.Natural;
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN {0}image{1} AS {0}image1{1} ON {0}shop{1}.main_image_id={0}image1{1}.id LEFT JOIN {0}image{1} AS {0}image2{1} ON {0}shop{1}.main_image_id={0}image2{1}.id INNER JOIN {0}image{1} AS {0}image3{1} ON {0}shop{1}.main_image_id={0}image3{1}.id LEFT JOIN {0}image{1} AS {0}image4{1} ON {0}shop{1}.main_image_id={0}image4{1}.id INNER JOIN {0}image{1} AS {0}image5{1} ON {0}shop{1}.main_image_id={0}image5{1}.id LEFT JOIN {0}image{1} AS {0}image6{1} ON {0}shop{1}.main_image_id={0}image6{1}.id INNER JOIN {0}image{1} AS {0}image7{1} ON {0}shop{1}.main_image_id={0}image7{1}.id"),
+       db.Command.CommandText
+      );
+    }
+
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
     /// </summary>

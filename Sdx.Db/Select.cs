@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 
 namespace Sdx.Db
 {
@@ -9,6 +10,12 @@ namespace Sdx.Db
     Inner,
     Left
   };
+
+  public enum JoinOrder
+  {
+    InnerFront,
+    Natural
+  }
 
   static class JoinTypeExt
   {
@@ -29,6 +36,7 @@ namespace Sdx.Db
     {
       this.joins = new List<SelectTable>();
       this.factory = factory;
+      this.JoinOrder = JoinOrder.InnerFront;
     }
 
     internal Factory Factory
@@ -40,6 +48,8 @@ namespace Sdx.Db
     {
       get { return this.joins; }
     }
+
+    public JoinOrder JoinOrder { get; set; }
 
     public SelectTable From(string tableName, string alias = null)
     {
@@ -65,7 +75,7 @@ namespace Sdx.Db
       if(this.from.Columns.Count > 0)
       {
         columns += " " + this.from.BuildColumsString();
-      }   
+      }
 
       //joinしてるテーブルのカラムを追加
       this.joins.ForEach(sTable => {
@@ -80,12 +90,22 @@ namespace Sdx.Db
         }
       });
 
-
       //FROMを追加
       command.CommandText += columns + " FROM " + this.from.BuildTableString();
 
       //JOIN句を組み立てる
-      this.joins.ForEach(sTable => {
+      //InnerFrontのときはソートするのでコピーする
+      List<SelectTable> joins;
+      if (this.JoinOrder == JoinOrder.InnerFront)
+      {
+        joins = this.joins.OrderBy(table => table.JoinType == JoinType.Left).ToList();
+      }
+      else
+      {
+        joins = this.joins;
+      }
+
+      joins.ForEach(sTable => {
         command.CommandText += " "
           + sTable.JoinType.SqlString()
           + " "
