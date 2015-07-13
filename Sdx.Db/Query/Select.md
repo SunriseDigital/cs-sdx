@@ -153,5 +153,28 @@ DbCommand command = select.Build();
 SELECT [shop].[id] AS [shop_id], [shop].[name] AS [shop_name] FROM [shop];
 ```
 
+### JOIN
 
+JOINは`Sdx.Db.Query.Table`の`InnerJoin`あるいは`LeftJoin`を使用します。
 
+```c#
+var select = db.CreateSelect();
+
+select
+  .From("shop")
+  .AddColumn("*");
+
+Sdx.Db.Query.Table categoryTable = select.Table("shop")
+  .InnderJoin("category", "{0}.category_id = {1}.id")
+  .AddColumn("*");
+  
+DbCommand command = select.Build();
+```
+
+```sql
+SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].category_id = [category].id
+```
+
+`Select.Table()`は既にJOINしたテーブル（FROM句も含む）の`Table`オブジェクトを取得します。また、`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Table`オブジェクトを返します。
+
+`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件をstringで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。
