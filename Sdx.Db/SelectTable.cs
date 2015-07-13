@@ -21,7 +21,7 @@ namespace Sdx.Db
 
     public List<SelectColumn> Columns
     {
-      get { return columns; }
+      get { return this.columns; }
     }
 
     public string Name
@@ -33,6 +33,7 @@ namespace Sdx.Db
     {
       if (this.columns.Count == 0 && this.ParentTable == null)
       {
+        //TODO これが意図したときに呼ばれてない気がする。後、これは例外じゃ無いほうがいいのでは？
         throw new Exception("Column is empty.");
       }
 
@@ -50,7 +51,7 @@ namespace Sdx.Db
 
         if(column.Alias != null)
         {
-          result += " as " + this.select.Factory.QuoteIdentifier(column.Alias);
+          result += " AS " + this.select.Factory.QuoteIdentifier(column.Alias);
         }
         
       });
@@ -146,6 +147,11 @@ namespace Sdx.Db
       }
 
       return this;
+    }
+
+    public string AppendAlias(string column)
+    {
+      return this.select.Factory.QuoteIdentifier(this.Name) + "." + this.select.Factory.QuoteIdentifier(column);
     }
   }
 }

@@ -30,11 +30,11 @@ namespace Sdx.Db
   {
     private Factory factory;
     private SelectTable from;
-    private List<SelectTable> joins;
+    private List<SelectTable> joins = new List<SelectTable>();
+    private List<SelectColumn> columns = new List<SelectColumn>();
 
     public Select(Factory factory)
     {
-      this.joins = new List<SelectTable>();
       this.factory = factory;
       this.JoinOrder = JoinOrder.InnerFront;
     }
@@ -70,6 +70,12 @@ namespace Sdx.Db
 
       //カラムを組み立てる
       var columns = "";
+
+      //selectのカラムを追加
+      if(this.columns.Count > 0)
+      {
+        columns += " " + this.BuildColumsString();
+      }
 
       //fromのカラムを追加
       if(this.from.Columns.Count > 0)
@@ -146,6 +152,74 @@ namespace Sdx.Db
       }
 
       throw new Exception("Missing " + name + " table current context.");
+    }
+
+    public List<SelectColumn> Columns
+    {
+      get { return this.columns; }
+    }
+
+    public Select ClearColumns()
+    {
+      this.columns.Clear();
+      return this;
+    }
+
+    public Select SetColumns(params String[] columns)
+    {
+      this.ClearColumns();
+      this.AddColumns(columns);
+      return this;
+    }
+
+    public Select AddColumns(params String[] columns)
+    {
+      foreach (var column in columns)
+      {
+        this.AddColumn(column);
+      }
+      return this;
+    }
+
+
+    public Select AddColumns(Dictionary<string, object> columns)
+    {
+      foreach (var column in columns)
+      {
+        this.AddColumn(column.Value, column.Key);
+      }
+
+      return this;
+    }
+
+    public Select AddColumn(object columnName, string alias = null)
+    {
+      var column = new SelectColumn(columnName);
+      column.Alias = alias;
+      this.columns.Add(column);
+      return this;
+    }
+
+    internal string BuildColumsString()
+    {
+      var result = "";
+      this.columns.ForEach((column) =>
+      {
+        if (result.Length > 0)
+        {
+          result += ", ";
+        }
+
+        result += this.Factory.QuoteIdentifier(column);
+
+        if (column.Alias != null)
+        {
+          result += " AS " + this.Factory.QuoteIdentifier(column.Alias);
+        }
+
+      });
+
+      return result;
     }
   }
 }

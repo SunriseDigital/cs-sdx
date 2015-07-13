@@ -584,7 +584,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1} FROM {0}shop{1}"),
+       db.Sql("SELECT {0}shop{1}.{0}id{1} AS {0}shop_id{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
 
@@ -598,7 +598,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1}, {0}shop{1}.{0}name{1} as {0}shop_name{1} FROM {0}shop{1}"),
+       db.Sql("SELECT {0}shop{1}.{0}id{1} AS {0}shop_id{1}, {0}shop{1}.{0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
 
@@ -612,7 +612,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.{0}id{1} as {0}shop_id{1}, {0}shop{1}.name as {0}shop_name{1} FROM {0}shop{1}"),
+       db.Sql("SELECT {0}shop{1}.{0}id{1} AS {0}shop_id{1}, {0}shop{1}.name AS {0}shop_name{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
     }
@@ -684,6 +684,76 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN {0}image{1} AS {0}image1{1} ON {0}shop{1}.main_image_id={0}image1{1}.id LEFT JOIN {0}image{1} AS {0}image2{1} ON {0}shop{1}.main_image_id={0}image2{1}.id INNER JOIN {0}image{1} AS {0}image3{1} ON {0}shop{1}.main_image_id={0}image3{1}.id LEFT JOIN {0}image{1} AS {0}image4{1} ON {0}shop{1}.main_image_id={0}image4{1}.id INNER JOIN {0}image{1} AS {0}image5{1} ON {0}shop{1}.main_image_id={0}image5{1}.id LEFT JOIN {0}image{1} AS {0}image6{1} ON {0}shop{1}.main_image_id={0}image6{1}.id INNER JOIN {0}image{1} AS {0}image7{1} ON {0}shop{1}.main_image_id={0}image7{1}.id"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectNonTableColumns()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectNonTableColumns(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectNonTableColumns(TestDb db)
+    {
+      Sdx.Db.Select select = db.Factory.CreateSelect();
+
+      //単純なAddColumns
+      select.From("shop");
+      select.AddColumns("id", "name");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}id{1}, {0}name{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
+
+      //テーブル名だけすり替える
+      select.From("category");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}id{1}, {0}name{1} FROM {0}category{1}"),
+       db.Command.CommandText
+      );
+
+      //SetColumns
+      select.From("shop");
+      select.SetColumns("name", "category_id");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}name{1}, {0}category_id{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
+
+      //AddColumn Dictinary
+      select.ClearColumns().From("shop");
+      select.AddColumns(new Dictionary<string, object>() { 
+        {"shop_id", "id"},
+        {"shop_name", "name"}
+      });
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}id{1} AS {0}shop_id{1}, {0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
+
+      //AddColumn MAX
+      select.ClearColumns().From("shop");
+      select.AddColumn(
+        new Sdx.Db.Expr("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
+        "max_id"
+      );
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT MAX({0}shop{1}.{0}id{1}) AS {0}max_id{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
     }
