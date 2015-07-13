@@ -20,11 +20,31 @@ using System.Data.Common;
 var db = new Sdx.Db.SqlServerFactory();
 var select = db.CreateSelect();
 
-select.From("shop").AddColumn("*");
+select.From("shop");
+select.AddColumn("*");
 DbCommand command = select.Build();
 ```
 
-`Select.From()`はテーブル名を指定すると、FROM句をそのテーブルに設定し、そのテーブルの`Table`を返します。上記例の`AddColumn`は`shop`テーブルの`Table`オブジェクトへのカラムの追加になります。
+`Select.From()`でテーブル名を指定し、`Select.AddColumn`でカラムを追加します。
+
+`DbCommand.CommandText`は下記のようになります。
+
+```sql
+SELECT * FROM [shop];
+```
+
+#### テーブルを指定したカラムの指定
+
+```c#
+var db = new Sdx.Db.SqlServerFactory();
+var select = db.CreateSelect();
+
+Sdx.Db.Query.Table shopTable = select.From("shop");
+shopTable.AddColumn("*");
+DbCommand command = select.Build();
+```
+
+`Select.From()`は指定したテーブルの`Sdx.Db.Query.Table`オブジェクトを返します。`Table.AddColumn()`でカラムを追加するとテーブルを指定してカラムを追加することが可能です。
 
 生成されるSQLは以下のようになります。
 
@@ -54,9 +74,26 @@ SELECT [shop].[id], [shop].[name] FROM [shop];
 
 このように追加したカラムが`*`以外の時は自動でクオートされます。
 
-## エイリアスの指定
+#### クオートを回避する
 
-### テーブル名にエイリアス指定
+例えば下記のようなSQLを作りたいとき、自動クオートを回避したいと思います。
+
+```sql
+SELECT MAX(shop.id) FROM [shop]
+```
+
+その時は`Sdx.Db.Query.Expr`で`string`をラッピングして追加してください。
+
+```c#
+select.From("shop");
+select.AddColumn(
+  new Sdx.Db.Query.Expr("MAX(shop.id)")
+);
+```
+
+### エイリアスの指定
+
+#### テーブル名にエイリアス指定
 
 ```c#
 var select = db.CreateSelect();
@@ -71,7 +108,7 @@ DbCommand command = select.Build();
 SELECT [s].* FROM [shop] AS [s];
 ```
 
-### カラムにエイリアス指定
+#### カラムにエイリアス指定
 
 カラムにエイリアスを指定する方法は`Select.AddColumn`の第二引数にエイリアス名を渡す方法と`Select.AddColumns`に`Dictionary<string, object>`を渡す方法と2つあります。
 
@@ -105,5 +142,6 @@ DbCommand command = select.Build();
 ```sql
 SELECT [shop].[id] AS [shop_id], [shop].[name] AS [shop_name] FROM [shop];
 ```
+
 
 
