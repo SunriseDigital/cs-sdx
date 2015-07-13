@@ -244,7 +244,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        Sdx.Db.Where where = db.Factory.CreateWhere();
+        Sdx.Db.Query.Where where = db.Factory.CreateWhere();
         where.add("id", "1", "shop");
 
         Assert.Equal(
@@ -280,7 +280,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        Sdx.Db.Where where = db.Factory.CreateWhere();
+        Sdx.Db.Query.Where where = db.Factory.CreateWhere();
 
         where.add("id", "1");
 
@@ -333,7 +333,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimple(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
 
       //AddColumn
       select.From("shop").AddColumns("*");
@@ -452,7 +452,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimpleInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
 
       select.From("shop").AddColumns("*");
 
@@ -491,7 +491,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectMultipleInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
         .InnerJoin("category", "{0}.category_id = {1}.id")
@@ -522,7 +522,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNoColumnInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
         .InnerJoin("category", "{0}.category_id = {1}.id")
@@ -548,7 +548,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSameTableInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumns("*");
 
       select.Table("shop")
@@ -579,7 +579,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectColumnAlias(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("id", "shop_id");
 
       db.Command = select.Build();
@@ -607,7 +607,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .AddColumns(new Dictionary<string, object>()
          { 
            {"shop_id", "id"},
-           {"shop_name", new Sdx.Db.Expr("name")},
+           {"shop_name", new Sdx.Db.Query.Expr("name")},
          });
 
       db.Command = select.Build();
@@ -629,7 +629,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectLeftJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop")
         .AddColumn("*")
         .LeftJoin("image", "{0}.main_image_id={1}.id");
@@ -653,7 +653,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectJoinOrder(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("*");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
@@ -679,7 +679,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
       select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
 
-      select.JoinOrder = Sdx.Db.JoinOrder.Natural;
+      select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 
       db.Command = select.Build();
       Assert.Equal(
@@ -700,7 +700,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNonTableColumns(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
 
       //単純なAddColumns
       select.From("shop");
@@ -747,7 +747,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       //AddColumn MAX
       select.ClearColumns().From("shop");
       select.AddColumn(
-        new Sdx.Db.Expr("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
+        new Sdx.Db.Query.Expr("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
         "max_id"
       );
 

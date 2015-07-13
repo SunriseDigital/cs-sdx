@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Data.Common;
 
-namespace Sdx.Db
+namespace Sdx.Db.Query
 {
-  public class SelectTable
+  public class Table
   {
     private Select select;
 
-    private List<SelectColumn> columns = new List<SelectColumn>();
+    private List<Column> columns = new List<Column>();
 
-    public SelectTable(Select select)
+    public Table(Select select)
     {
       this.select = select;
     }
@@ -19,7 +19,7 @@ namespace Sdx.Db
 
     public string Alias { get; internal set; }
 
-    public List<SelectColumn> Columns
+    public List<Column> Columns
     {
       get { return this.columns; }
     }
@@ -69,9 +69,9 @@ namespace Sdx.Db
       return result;
     }
 
-    public SelectTable AddJoin(string table, JoinType joinType, string condition, string alias = null)
+    public Table AddJoin(string table, JoinType joinType, string condition, string alias = null)
     {
-      SelectTable joinTable = new SelectTable(this.select);
+      Table joinTable = new Table(this.select);
 
       joinTable.ParentTable = this;
       joinTable.TableName = table;
@@ -93,36 +93,36 @@ namespace Sdx.Db
       return joinTable;
     }
 
-    public SelectTable InnerJoin(string table, string condition, string alias = null)
+    public Table InnerJoin(string table, string condition, string alias = null)
     {
       return this.AddJoin(table, JoinType.Inner, condition, alias);
     }
 
-    public SelectTable LeftJoin(string table, string condition, string alias = null)
+    public Table LeftJoin(string table, string condition, string alias = null)
     {
       return this.AddJoin(table, JoinType.Left, condition, alias);
     }
 
-    public SelectTable ParentTable { get; private set; }
+    public Table ParentTable { get; private set; }
 
     public string JoinCondition { get; private set; }
 
     public JoinType JoinType { get; private set; }
 
-    public SelectTable ClearColumns()
+    public Table ClearColumns()
     {
       this.Columns.Clear();
       return this;
     }
 
-    public SelectTable SetColumns(params String[] columns)
+    public Table SetColumns(params String[] columns)
     {
       this.ClearColumns();
       this.AddColumns(columns);
       return this;
     }
 
-    public SelectTable AddColumns(params String[] columns)
+    public Table AddColumns(params String[] columns)
     {
       foreach (var column in columns)
       {
@@ -131,15 +131,15 @@ namespace Sdx.Db
       return this;
     }
 
-    public SelectTable AddColumn(object columnName, string alias = null)
+    public Table AddColumn(object columnName, string alias = null)
     {
-      var column = new SelectColumn(columnName);
+      var column = new Column(columnName);
       column.Alias = alias;
       this.columns.Add(column);
       return this;
     }
 
-    public SelectTable AddColumns(Dictionary<string, object> columns)
+    public Table AddColumns(Dictionary<string, object> columns)
     {
       foreach(var column in columns)
       {

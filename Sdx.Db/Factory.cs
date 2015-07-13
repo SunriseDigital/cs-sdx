@@ -34,9 +34,9 @@ namespace Sdx.Db
       return param;
     }
 
-    public Where CreateWhere()
+    public Sdx.Db.Query.Where CreateWhere()
     {
-      return new Where(this);
+      return new Sdx.Db.Query.Where(this);
     }
 
     public DbCommand CreateCommand()
@@ -49,9 +49,9 @@ namespace Sdx.Db
       return this.factory.CreateCommandBuilder();
     }
 
-    public Select CreateSelect()
+    public Sdx.Db.Query.Select CreateSelect()
     {
-      return new Select(this);
+      return new Sdx.Db.Query.Select(this);
     }
 
     public DbDataAdapter CreateDataAdapter()
@@ -64,16 +64,16 @@ namespace Sdx.Db
       return this.builder.QuoteIdentifier(unquotedIdentifier);
     }
 
-    public string QuoteIdentifier(Expr expr)
+    public string QuoteIdentifier(Sdx.Db.Query.Expr expr)
     {
       return expr.ToString();
     }
 
-    internal string QuoteIdentifier(SelectColumn column)
+    public string QuoteIdentifier(Sdx.Db.Query.Column column)
     {
       if(column.isExpr())
       {
-        return this.QuoteIdentifier(column.Name as Expr);
+        return this.QuoteIdentifier(column.Name as Sdx.Db.Query.Expr);
       }
       else
       {

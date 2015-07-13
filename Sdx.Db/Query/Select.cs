@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 
-namespace Sdx.Db
+namespace Sdx.Db.Query
 {
   public enum JoinType
   {
@@ -29,9 +29,9 @@ namespace Sdx.Db
   public class Select
   {
     private Factory factory;
-    private SelectTable from;
-    private List<SelectTable> joins = new List<SelectTable>();
-    private List<SelectColumn> columns = new List<SelectColumn>();
+    private Table from;
+    private List<Table> joins = new List<Table>();
+    private List<Column> columns = new List<Column>();
 
     public Select(Factory factory)
     {
@@ -44,16 +44,16 @@ namespace Sdx.Db
       get { return this.factory; }
     }
 
-    internal List<SelectTable> Joins
+    internal List<Table> Joins
     {
       get { return this.joins; }
     }
 
     public JoinOrder JoinOrder { get; set; }
 
-    public SelectTable From(string tableName, string alias = null)
+    public Table From(string tableName, string alias = null)
     {
-      SelectTable from = new SelectTable(this);
+      Table from = new Table(this);
       from.TableName = tableName;
       from.Alias = alias;
 
@@ -101,7 +101,7 @@ namespace Sdx.Db
 
       //JOIN句を組み立てる
       //InnerFrontのときはソートするのでコピーする
-      List<SelectTable> joins;
+      List<Table> joins;
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
         joins = this.joins.OrderBy(table => table.JoinType == JoinType.Left).ToList();
@@ -136,14 +136,14 @@ namespace Sdx.Db
       return command;
     }
 
-    public SelectTable Table(string name)
+    public Table Table(string name)
     {
       if(this.from.Name == name)
       {
         return this.from;
       }
 
-      foreach(SelectTable from in this.joins)
+      foreach(Table from in this.joins)
       {
         if(from.Name == name)
         {
@@ -154,7 +154,7 @@ namespace Sdx.Db
       throw new Exception("Missing " + name + " table current context.");
     }
 
-    public List<SelectColumn> Columns
+    public List<Column> Columns
     {
       get { return this.columns; }
     }
@@ -194,7 +194,7 @@ namespace Sdx.Db
 
     public Select AddColumn(object columnName, string alias = null)
     {
-      var column = new SelectColumn(columnName);
+      var column = new Column(columnName);
       column.Alias = alias;
       this.columns.Add(column);
       return this;
