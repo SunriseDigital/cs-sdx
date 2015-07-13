@@ -5,5 +5,5 @@
 
 ## modules
 
-* [Sdx.Db](https://github.com/SunriseDigital/cs-sdx/tree/master/Sdx.Db)
-* [Sdx.DebugTool](https://github.com/SunriseDigital/cs-sdx/tree/master/Sdx.DebugTool)
+* [Sdx.Db](Sdx.Db)
+* [Sdx.DebugTool](Sdx.DebugTool)
