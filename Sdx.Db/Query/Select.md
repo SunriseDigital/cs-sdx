@@ -36,7 +36,6 @@ SELECT * FROM [shop];
 #### テーブルを指定したカラムの指定
 
 ```c#
-var db = new Sdx.Db.SqlServerFactory();
 var select = db.CreateSelect();
 
 Sdx.Db.Query.Table shopTable = select.From("shop");
