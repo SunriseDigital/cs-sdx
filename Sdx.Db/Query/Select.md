@@ -6,7 +6,7 @@ SELECT文の組み立てを行います。
 
 ## 使い方
 
-### テーブルとカラムの指定
+### テーブルとカラム
 
 `Select`は`DbCommand`を生成します。`DbCommand`は`System.Data.Common`名前空間なので参照できるようにします。
 
@@ -33,7 +33,7 @@ DbCommand command = select.Build();
 SELECT * FROM [shop];
 ```
 
-#### テーブルを指定したカラムの指定
+#### テーブルを指定したカラムの追加
 
 ```c#
 var select = db.CreateSelect();
@@ -101,9 +101,9 @@ select.AddColumn(
 );
 ```
 
-### エイリアスの指定
+### エイリアス
 
-#### テーブル名にエイリアス指定
+#### テーブルのエイリアス
 
 ```c#
 var select = db.CreateSelect();
@@ -118,7 +118,7 @@ DbCommand command = select.Build();
 SELECT [s].* FROM [shop] AS [s];
 ```
 
-#### カラムにエイリアス指定
+#### カラムのエイリアス
 
 カラムにエイリアスを指定する方法は`Select.AddColumn`の第二引数にエイリアス名を渡す方法と`Select.AddColumns`に`Dictionary<string, object>`を渡す方法と2つあります。
 
