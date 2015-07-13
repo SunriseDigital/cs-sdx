@@ -73,6 +73,17 @@ SELECT [shop].[id], [shop].[name] FROM [shop];
 
 このように追加したカラムが`*`以外の時は自動でクオートされます。
 
+各カラム系メソッドは自分自身を返しますので、いわゆる[Fluent interface](http://martinfowler.com/bliki/FluentInterface.html)が利用できます。
+
+```c#
+var select = db.CreateSelect();
+
+select.From("shop")
+  .AddColumn("id")
+  .AddColumn("name")
+  .AddColumn("category_id");
+```
+
 #### クオートを回避する
 
 例えば下記のようなSQLを作りたいとき、自動クオートを回避したいと思います。
