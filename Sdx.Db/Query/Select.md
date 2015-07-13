@@ -213,3 +213,24 @@ FROM
         [image] AS [sub_image]
     ON  [shop].sub_image_id = [sub_image].id"
 ```
+
+#### JoinOrder
+
+生成されるSQLのJOINの順番は、デフォルトで、`INNER JOIN`を先に、`LEFT JOIN`を後に行います。
+
+```c#
+var select = db.CreateSelect();
+
+select
+  .From("shop")
+  .AddColumn("*");
+  
+select.Table("shop")
+  .LeftJoin("image", "{0}.main_image_id = {1}.id", "main_image");
+
+select.Table("shop")
+  .LeftJoin("image", "{0}.sub_image_id = {1}.id", "sub_image");
+  
+select.Table("shop")
+  .InnerJoin("category", );
+```
