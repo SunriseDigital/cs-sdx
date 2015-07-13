@@ -178,3 +178,38 @@ SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].catego
 `Select.Table()`は既にJOINしたテーブル（FROM句も含む）の`Table`オブジェクトを取得します。また、`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Table`オブジェクトを返します。
 
 `InnerJoin`/`LeftJoin`の第二引数にはJOINの条件をstringで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。
+
+#### 同じテーブルをJOINする
+
+JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブルを複数回JOINする場合はテーブルにエイリアスを付与する必要があります。
+
+```c#
+var select = db.CreateSelect();
+
+select
+  .From("shop")
+  .AddColumn("*");
+  
+select.Table("shop")
+  .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
+  .AddColumn("*");
+
+select.Table("shop")
+  .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
+  .AddColumn("*");
+```
+
+```sql
+SELECT
+    [shop].*,
+    [main_image].*,
+    [sub_image].*
+FROM
+    [shop]
+    INNER JOIN
+        [image] AS [main_image]
+    ON  [shop].main_image_id = [main_image].id
+    INNER JOIN
+        [image] AS [sub_image]
+    ON  [shop].sub_image_id = [sub_image].id"
+```
