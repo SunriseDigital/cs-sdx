@@ -32,11 +32,13 @@ namespace Sdx.Db.Query
     private Factory factory;
     private List<Table> joins = new List<Table>();
     private List<Column> columns = new List<Column>();
+    private Where where;
 
     public Select(Factory factory)
     {
       this.factory = factory;
       this.JoinOrder = JoinOrder.InnerFront;
+      this.where = new Where(factory);
     }
 
     internal Factory Factory
@@ -125,6 +127,12 @@ namespace Sdx.Db.Query
         {
           this.appendJoinString(command, table);
         }
+      }
+
+      if(this.where.Count > 0)
+      {
+        command.CommandText += " WHERE ";
+        this.where.Build(command);
       }
 
       return command;
@@ -247,6 +255,14 @@ namespace Sdx.Db.Query
       }
 
       return this;
+    }
+
+    public Where Where
+    {
+      get
+      {
+        return this.where;
+      }
     }
   }
 }

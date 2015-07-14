@@ -10,12 +10,17 @@ namespace Sdx.Db.Query
       private List<Object> wheres = new List<object>();
       private Factory factory;
 
+      public int Count
+      {
+        get { return wheres.Count; }
+      }
+
       public Where(Factory factory)
       {
         this.factory = factory;
       }
 
-      public Where add(String column, Object value, String table = null)
+      public Where Add(String column, Object value, String table = null)
       {
         wheres.Add(new Dictionary<String, Object> {
           {"column", column},
@@ -25,35 +30,36 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public DbCommand build()
+      public void Build(DbCommand command)
       {
-        var command = this.factory.CreateCommand();
-        var builder = this.factory.CreateCommandBuilder();
-        
-        wheres.ForEach(obj => {
-          if(command.CommandText.Length > 0)
+        string whereString = "";
+        wheres.ForEach(obj =>
+        {
+          if (whereString.Length > 0)
           {
-            command.CommandText += " AND ";
+            whereString += " AND ";
           }
 
-          if(obj is Dictionary<String, Object>)
+          if (obj is Dictionary<String, Object>)
           {
             Dictionary<String, Object> dic = obj as Dictionary<String, Object>;
-            String placeHolder = "@" + dic["table"] + "@" + dic["column"]; ;
+            String placeHolder;
             if (dic["table"] != null)
             {
-              command.CommandText += String.Format(
+              placeHolder = "@" + dic["table"] + "@" + dic["column"];
+              whereString += String.Format(
                 "{0}.{1} = {2}",
-                builder.QuoteIdentifier(dic["table"] as String),
-                builder.QuoteIdentifier(dic["column"] as String),
+                this.factory.QuoteIdentifier(dic["table"] as String),
+                this.factory.QuoteIdentifier(dic["column"] as String),
                 placeHolder
               );
             }
             else
             {
-              command.CommandText += String.Format(
+              placeHolder = "@" + dic["column"];
+              whereString += String.Format(
                 "{0} = {1}",
-                builder.QuoteIdentifier(dic["column"] as String),
+                this.factory.QuoteIdentifier(dic["column"] as String),
                 placeHolder
               );
             }
@@ -66,6 +72,13 @@ namespace Sdx.Db.Query
           }
         });
 
+        command.CommandText += whereString;
+      }
+
+      public DbCommand Build()
+      {
+        var command = this.factory.CreateCommand();
+        this.Build(command);
         return command;
       }
     }

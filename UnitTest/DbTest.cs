@@ -62,7 +62,7 @@ namespace UnitTest
 
     private static String MySqlConnectionString
     {
-      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963"; }
+      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963;"; }
     }
 
     private static String SqlServerConnectionString
@@ -245,17 +245,17 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       foreach (TestDb db in this.CreateTestDbList())
       {
         Sdx.Db.Query.Where where = db.Factory.CreateWhere();
-        where.add("id", "1", "shop");
+        where.Add("id", "1", "shop");
 
         Assert.Equal(
           db.Sql("{0}shop{1}.{0}id{1} = '1'"),
-          Sdx.Db.Util.CommandToSql(where.build())
+          Sdx.Db.Util.CommandToSql(where.Build())
         );
 
-        where.add("type", 2, "category");
+        where.Add("type", 2, "category");
         Assert.Equal(
           db.Sql("{0}shop{1}.{0}id{1} = '1' AND {0}category{1}.{0}type{1} = '2'"),
-          Sdx.Db.Util.CommandToSql(where.build())
+          Sdx.Db.Util.CommandToSql(where.Build())
         );
       }
     }
@@ -282,17 +282,17 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       {
         Sdx.Db.Query.Where where = db.Factory.CreateWhere();
 
-        where.add("id", "1");
+        where.Add("id", "1");
 
         Assert.Equal(
           db.Sql("{0}id{1} = '1'"),
-          Sdx.Db.Util.CommandToSql(where.build())
+          Sdx.Db.Util.CommandToSql(where.Build())
         );
 
-        where.add("type", 2);
+        where.Add("type", 2);
         Assert.Equal(
           db.Sql("{0}id{1} = '1' AND {0}type{1} = '2'"),
-          Sdx.Db.Util.CommandToSql(where.build())
+          Sdx.Db.Util.CommandToSql(where.Build())
         );
       }
     }
@@ -780,6 +780,52 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, {0}category{1}"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectWhereSimple()
+    {
+      //var factory = new Sdx.Db.MySqlFactory();
+      //factory.ConnectionString = MySqlConnectionString;
+      //var con = factory.CreateConnection();
+      //var command = factory.CreateCommand();
+      //command.CommandText = "SELECT * FROM shop WHERE id = @shop@id";
+      //command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
+      //using(con)
+      //{
+      //  con.Open();
+      //  command.Connection = con;
+      //  DbDataAdapter adapter = factory.CreateDataAdapter();
+      //  DataSet dataset = new DataSet();
+      //  adapter.SelectCommand = command;
+      //  adapter.Fill(dataset);
+
+      //  Console.WriteLine("execDbCommand");
+      //  foreach (DataRow row in dataset.Tables[0].Rows)
+      //  {
+      //    Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+      //  }
+      //}
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectWhereSimple(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectWhereSimple(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select.From("shop").AddColumn("*");
+
+      select.Where.Add("id", "1");
+
+      db.Command = select.Build();
+      Console.WriteLine(Sdx.Db.Util.CommandToSql(db.Command));
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id"),
        db.Command.CommandText
       );
     }
