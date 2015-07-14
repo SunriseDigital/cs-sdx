@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sdx.Db
+namespace Sdx.Db.Query
 {
-  public class SelectColumn
+  public class Column
   {
     private object name;
-    public SelectColumn(object columnName)
+    public Column(object columnName)
     {
       if(columnName is Expr)
       {
@@ -32,7 +32,7 @@ namespace Sdx.Db
       }
     }
 
-    public SelectColumn(Expr columnName)
+    public Column(Expr columnName)
     {
       name = columnName;
     }

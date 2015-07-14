@@ -9,7 +9,7 @@ using System.Data.SqlClient;
 
 namespace Sdx.Db
 {
-  public class Util
+  public static class Util
   {
     /// <summary>
     /// デバッグやロギング用です。サニタイズしませんので注意してください。

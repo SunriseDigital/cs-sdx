@@ -244,7 +244,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        Sdx.Db.Where where = db.Factory.CreateWhere();
+        Sdx.Db.Query.Where where = db.Factory.CreateWhere();
         where.add("id", "1", "shop");
 
         Assert.Equal(
@@ -280,7 +280,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        Sdx.Db.Where where = db.Factory.CreateWhere();
+        Sdx.Db.Query.Where where = db.Factory.CreateWhere();
 
         where.add("id", "1");
 
@@ -333,7 +333,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimple(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
 
       //AddColumn
       select.From("shop").AddColumns("*");
@@ -343,14 +343,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
-      select.From("shop", "s").AddColumns("*");
+      select.Remove("shop").From("shop", "s").AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}"),
         db.Command.CommandText
       );
 
-      select.From("shop");
+      select.Remove("s").From("shop");
       select.Table("shop").AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
@@ -359,21 +359,21 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //SetColumns
-      select.From("shop").SetColumns("id");
+      select.Remove("shop").From("shop").SetColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.From("shop").SetColumns("id", "name");
+      select.Remove("shop").From("shop").SetColumns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.From("shop").SetColumns(new String[]{"id", "name"});
+      select.Remove("shop").From("shop").SetColumns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -381,7 +381,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //AddColumns
-      select.From("shop").AddColumns("id");
+      select.Remove("shop").From("shop").AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
@@ -395,14 +395,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
-      select.From("shop").AddColumns("id", "name");
+      select.Remove("shop").From("shop").AddColumns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.From("shop").AddColumns(new String[]{"id", "name"});
+      select.Remove("shop").From("shop").AddColumns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -410,7 +410,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //ClearColumns
-      select.From("shop").SetColumns(new String[] { "id", "name" });
+      select.Remove("shop").From("shop").SetColumns(new String[] { "id", "name" });
       select.Table("shop").ClearColumns().AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
@@ -452,7 +452,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimpleInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
 
       select.From("shop").AddColumns("*");
 
@@ -467,6 +467,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
+      //上書きなので順番が入れ替わるはず
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id = {1}.id");
+
       //同じテーブルをJOINしてもAliasを与えなければ上書きになる
       select.Table("shop").InnerJoin(
         "category",
@@ -474,7 +477,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
+        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} ON {0}shop{1}.main_image_id = {0}image{1}.id INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
         db.Command.CommandText
       );
     }
@@ -491,7 +494,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectMultipleInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
         .InnerJoin("category", "{0}.category_id = {1}.id")
@@ -522,7 +525,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNoColumnInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
         .InnerJoin("category", "{0}.category_id = {1}.id")
@@ -548,7 +551,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSameTableInnerJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumns("*");
 
       select.Table("shop")
@@ -579,7 +582,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectColumnAlias(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("id", "shop_id");
 
       db.Command = select.Build();
@@ -607,7 +610,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .AddColumns(new Dictionary<string, object>()
          { 
            {"shop_id", "id"},
-           {"shop_name", new Sdx.Db.Expr("name")},
+           {"shop_name", new Sdx.Db.Query.Expr("name")},
          });
 
       db.Command = select.Build();
@@ -629,7 +632,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectLeftJoin(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop")
         .AddColumn("*")
         .LeftJoin("image", "{0}.main_image_id={1}.id");
@@ -653,7 +656,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectJoinOrder(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("*");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
@@ -661,7 +664,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
       select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7") ;
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -679,7 +682,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
       select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
 
-      select.JoinOrder = Sdx.Db.JoinOrder.Natural;
+      select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 
       db.Command = select.Build();
       Assert.Equal(
@@ -700,7 +703,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNonTableColumns(TestDb db)
     {
-      Sdx.Db.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
 
       //単純なAddColumns
       select.From("shop");
@@ -713,7 +716,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //テーブル名だけすり替える
-      select.From("category");
+      select.Remove("shop").From("category");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -722,7 +725,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //SetColumns
-      select.From("shop");
+      select.Remove("category").From("shop");
       select.SetColumns("name", "category_id");
 
       db.Command = select.Build();
@@ -732,7 +735,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //AddColumn Dictinary
-      select.ClearColumns().From("shop");
+      select.ClearColumns().Remove("shop").From("shop");
       select.AddColumns(new Dictionary<string, object>() { 
         {"shop_id", "id"},
         {"shop_name", "name"}
@@ -743,17 +746,40 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}id{1} AS {0}shop_id{1}, {0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
-
+      
       //AddColumn MAX
-      select.ClearColumns().From("shop");
+      select.ClearColumns().Remove("shop").From("shop");
       select.AddColumn(
-        new Sdx.Db.Expr("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
+        new Sdx.Db.Query.Expr("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
         "max_id"
       );
 
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT MAX({0}shop{1}.{0}id{1}) AS {0}max_id{1} FROM {0}shop{1}"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectMultipleFrom()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectMultipleFrom(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectMultipleFrom(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select.From("shop").AddColumn("*");
+      select.From("category");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, {0}category{1}"),
        db.Command.CommandText
       );
     }

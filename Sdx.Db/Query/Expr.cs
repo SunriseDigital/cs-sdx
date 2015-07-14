@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sdx.Db
+namespace Sdx.Db.Query
 {
   public class Expr
   {

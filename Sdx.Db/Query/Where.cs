@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.Common;
 
-namespace Sdx.Db
+namespace Sdx.Db.Query
 {
     public class Where
     {
