@@ -179,6 +179,16 @@ SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].catego
 
 `InnerJoin`/`LeftJoin`の第二引数にはJOINの条件をstringで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。
 
+JOINの条件内のカラム名など、プレイすフォルダ以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオーとしてください。
+
+```c#
+var db = new Sdx.Db.SqlServerFactory();
+...
+
+select.Table("shop")
+  .InnerJoin("category", "{0}."+db.QuoteIdentifier(column)+" = {1}.id");
+```
+
 #### 同じテーブルをJOINする
 
 JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブルを複数回JOINする場合はテーブルにエイリアスを付与する必要があります。
@@ -211,7 +221,7 @@ FROM
     ON  [shop].main_image_id = [main_image].id
     INNER JOIN
         [image] AS [sub_image]
-    ON  [shop].sub_image_id = [sub_image].id"
+    ON  [shop].sub_image_id = [sub_image].id
 ```
 
 #### JoinOrder
@@ -232,5 +242,21 @@ select.Table("shop")
   .LeftJoin("image", "{0}.sub_image_id = {1}.id", "sub_image");
   
 select.Table("shop")
-  .InnerJoin("category", );
+  .InnerJoin("category", "{0}.category_id = {1}.id");
+```
+
+```sql
+SELECT
+    [shop].*
+FROM
+    [shop]
+    INNER JOIN
+        [category]
+    ON  [shop].category_id = [category].id
+    LEFT JOIN
+        [image] AS [main_image]
+    ON  [shop].main_image_id = [main_image].id
+    LEFT JOIN
+        [image] AS [sub_image]
+    ON  [shop].sub_image_id = [sub_image].id
 ```
