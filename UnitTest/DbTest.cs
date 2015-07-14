@@ -467,6 +467,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
+      //上書きなので順番が入れ替わるはず
+      select.Table("shop").InnerJoin("image", "{0}.main_image_id = {1}.id");
+
       //同じテーブルをJOINしてもAliasを与えなければ上書きになる
       select.Table("shop").InnerJoin(
         "category",
@@ -474,7 +477,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
+        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} ON {0}shop{1}.main_image_id = {0}image{1}.id INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
         db.Command.CommandText
       );
     }
@@ -743,7 +746,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}id{1} AS {0}shop_id{1}, {0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
-
+      
       //AddColumn MAX
       select.ClearColumns().From("shop");
       select.AddColumn(
