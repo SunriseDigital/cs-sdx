@@ -7,6 +7,7 @@ namespace Sdx.Db.Query
 {
   public enum JoinType
   {
+    From,
     Inner,
     Left
   };
@@ -21,7 +22,7 @@ namespace Sdx.Db.Query
   {
     public static string SqlString(this JoinType gender)
     {
-      string[] strings = { "INNER JOIN", "LEFT JOIN" };
+      string[] strings = { "FROM", "INNER JOIN", "LEFT JOIN" };
       return  strings[(int) gender];
     }
   }
@@ -29,7 +30,6 @@ namespace Sdx.Db.Query
   public class Select
   {
     private Factory factory;
-    private Table from;
     private List<Table> joins = new List<Table>();
     private List<Column> columns = new List<Column>();
 
@@ -56,8 +56,9 @@ namespace Sdx.Db.Query
       Table from = new Table(this);
       from.TableName = tableName;
       from.Alias = alias;
+      from.JoinType = JoinType.From;
 
-      this.from = from;
+      this.joins.Add(from);
 
       return from;
     }
@@ -69,85 +70,96 @@ namespace Sdx.Db.Query
       command.CommandText = "SELECT";
 
       //カラムを組み立てる
-      var columns = "";
+      var columnString = "";
 
       //selectのカラムを追加
       if(this.columns.Count > 0)
       {
-        columns += " " + this.BuildColumsString();
+        columnString += " " + this.BuildColumsString();
       }
 
-      //fromのカラムを追加
-      if(this.from.Columns.Count > 0)
-      {
-        columns += " " + this.from.BuildColumsString();
-      }
-
-      //joinしてるテーブルのカラムを追加
+      //from/joinしてるテーブルのカラムを追加
       this.joins.ForEach(sTable => {
         if(sTable.Columns.Count > 0)
         {
-          if (columns.Length > 0)
+          if (columnString.Length > 0)
           {
-            columns += ", ";
+            columnString += ",";
           }
 
-          columns += sTable.BuildColumsString();
+          columnString += " " + sTable.BuildColumsString();
         }
       });
 
-      //FROMを追加
-      command.CommandText += columns + " FROM " + this.from.BuildTableString();
+      command.CommandText += columnString + " FROM ";
 
-      //JOIN句を組み立てる
-      //InnerFrontのときはソートするのでコピーする
-      List<Table> joins;
+      //FROMを追加
+      string formString = "";
+      foreach (Table table in this.joins.Where(t => t.JoinType == JoinType.From))
+      {
+        if (formString != "")
+        {
+          formString += ", ";
+        }
+
+        formString += table.BuildTableString();
+      }
+
+      command.CommandText += formString;
+
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        joins = this.joins.OrderBy(table => table.JoinType == JoinType.Left).ToList();
+        foreach(var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
+        {
+          this.appendJoinString(command, table);
+        }
+
+        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Left))
+        {
+          this.appendJoinString(command, table);
+        }
       }
       else
       {
-        joins = this.joins;
+        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        {
+          this.appendJoinString(command, table);
+        }
       }
-
-      joins.ForEach(sTable => {
-        command.CommandText += " "
-          + sTable.JoinType.SqlString()
-          + " "
-          + this.Factory.QuoteIdentifier(sTable.TableName);
-
-        if(sTable.Alias != null)
-        {
-          command.CommandText += " AS " + this.Factory.QuoteIdentifier(sTable.Name);
-        }
-
-        if(sTable.JoinCondition != null)
-        {
-          command.CommandText += " ON "
-            + String.Format(
-              sTable.JoinCondition,
-              this.Factory.QuoteIdentifier(sTable.ParentTable.Name),
-              this.Factory.QuoteIdentifier(sTable.Name)
-            );
-        }
-      });
 
       return command;
     }
 
-    public Table Table(string name)
+    private void appendJoinString(DbCommand command, Table table)
     {
-      if(this.from.Name == name)
+      command.CommandText += " "
+        + table.JoinType.SqlString()
+        + " "
+        + this.Factory.QuoteIdentifier(table.TableName);
+
+      if (table.Alias != null)
       {
-        return this.from;
+        command.CommandText += " AS " + this.Factory.QuoteIdentifier(table.Name);
       }
 
-      foreach(Table from in this.joins)
+      if (table.JoinCondition != null)
       {
-        if(from.Name == name)
+        command.CommandText += " ON "
+          + String.Format(
+            table.JoinCondition,
+            this.Factory.QuoteIdentifier(table.ParentTable.Name),
+            this.Factory.QuoteIdentifier(table.Name)
+          );
+      }
+    }
+
+    public Table Table(string name)
+    {
+      foreach (Table table in this.joins)
+      {
+        if (table.Name == name)
         {
-          return from;
+          return table;
         }
       }
 
@@ -220,6 +232,21 @@ namespace Sdx.Db.Query
       });
 
       return result;
+    }
+
+    public Select Remove(string tableName)
+    {
+      int findIndex = this.joins.FindIndex(jt =>
+      {
+        return jt.Name == tableName;
+      });
+
+      if (findIndex != -1)
+      {
+        this.joins.RemoveAt(findIndex);
+      }
+
+      return this;
     }
   }
 }

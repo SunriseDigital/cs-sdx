@@ -79,15 +79,7 @@ namespace Sdx.Db.Query
       joinTable.JoinCondition = condition;
       joinTable.JoinType = joinType;
 
-      int findIndex = this.select.Joins.FindIndex(jt =>
-      {
-        return jt.Name == joinTable.Name;
-      });
-
-      if (findIndex != -1)
-      {
-        this.select.Joins.RemoveAt(findIndex);
-      }
+      this.select.Remove(joinTable.Name);
 
       this.select.Joins.Add(joinTable);
       return joinTable;
@@ -107,7 +99,7 @@ namespace Sdx.Db.Query
 
     public string JoinCondition { get; private set; }
 
-    public JoinType JoinType { get; private set; }
+    public JoinType JoinType { get; internal set; }
 
     public Table ClearColumns()
     {
