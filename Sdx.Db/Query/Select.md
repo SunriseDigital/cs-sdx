@@ -179,7 +179,7 @@ SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].catego
 
 `InnerJoin`/`LeftJoin`の第二引数にはJOINの条件をstringで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。
 
-JOINの条件内のカラム名など、プレイすフォルダ以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオーとしてください。
+JOINの条件内のカラム名など、`{0}`/`{1}`を利用したテーブル名以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオーとしてください。
 
 ```c#
 var db = new Sdx.Db.SqlServerFactory();
@@ -191,7 +191,42 @@ select.Table("shop")
 
 #### 同じテーブルをJOINする
 
-JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブルを複数回JOINする場合はテーブルにエイリアスを付与する必要があります。
+JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回した場合、上書きされます。
+
+```c#
+select.From("shop").AddColumn("*");
+
+select.Table("shop").InnerJoin(
+  "category",
+  "{0}.category_id = {1}.id"
+);
+
+select.Table("shop").InnerJoin(
+  "category",
+  "{0}.category_id = {1}.id AND {1}.id = 1"
+);
+db.Command = select.Build();
+```
+
+上書きするので`category`のJOINの方が後ろに来ます。
+
+```sql
+SELECT
+    [shop].*,
+    [category].*
+FROM
+    [shop]
+    INNER JOIN
+        [image]
+    ON  [shop].main_image_id = [image].image_id
+    INNER JOIN
+        [category]
+    ON  [shop].category_id = [category].id
+    AND [category].id = 1
+```
+
+
+同じテーブルを複数回JOINする場合はテーブルにエイリアスを付与する必要があります。
 
 ```c#
 var select = db.CreateSelect();
