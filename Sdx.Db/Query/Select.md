@@ -295,3 +295,10 @@ FROM
         [image] AS [sub_image]
     ON  [shop].sub_image_id = [sub_image].id
 ```
+
+この挙動が気に入らない場合、JOINを呼んだ順番にJOINすることも可能です。
+
+```c#
+var select = db.CreateSelect();
+select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
+```
