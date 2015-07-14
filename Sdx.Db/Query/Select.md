@@ -33,6 +33,19 @@ DbCommand command = select.Build();
 SELECT * FROM [shop];
 ```
 
+`Select.From()`は複数回呼ぶと追加されていきます。
+
+```c#
+select.From("shop");
+select.From("category");
+select.AddColumn("*");
+DbCommand command = select.Build();
+```
+
+```sql
+SELECT * FROM [shop], [category];
+```
+
 #### テーブルを指定したカラムの追加
 
 ```c#
