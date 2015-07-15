@@ -817,15 +817,37 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectWhereSimple(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select;
+
+      //selectに対する呼び出し
+      select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("*");
 
       select.Where.Add("id", "1");
 
       db.Command = select.Build();
-      Console.WriteLine(Sdx.Db.Util.CommandToSql(db.Command));
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@_@0"),
+       db.Command.CommandText
+      );
+
+      select.Where.Add("name", "foo", "shop");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@_@0 AND {0}shop{1}.{0}name{1} = @name@shop@1"),
+       db.Command.CommandText
+      );
+
+      //tableに対する呼び出し
+      select = db.Factory.CreateSelect();
+      select.From("shop").AddColumn("*");
+
+      select.Table("shop").Where.Add("id", "1");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@shop@0"),
        db.Command.CommandText
       );
     }

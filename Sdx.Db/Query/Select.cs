@@ -261,6 +261,7 @@ namespace Sdx.Db.Query
     {
       get
       {
+        this.where.Table = null;
         return this.where;
       }
     }

@@ -145,5 +145,27 @@ namespace Sdx.Db.Query
     {
       return this.select.Factory.QuoteIdentifier(this.Name) + "." + this.select.Factory.QuoteIdentifier(column);
     }
+
+    public Where Where
+    {
+      get
+      {
+        Where where = this.select.Where;
+        where.Table = this.Name;
+        return where;
+        //ここは下記のようにするとTableの代入ができません。
+        //this.select.Where.Table = this.Name;
+        //return this.select.Where;
+        //Select.Writeが下記のような実装になっているからです。
+        //public Where Where
+        //{
+        //  get
+        //  {
+        //    this.where.Table = null;
+        //    return this.where;
+        //  }
+        //}
+      }
+    }
   }
 }

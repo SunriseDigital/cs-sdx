@@ -15,6 +15,8 @@ namespace Sdx.Db.Query
         get { return wheres.Count; }
       }
 
+      public string Table { get; set; }
+
       public Where(Factory factory)
       {
         this.factory = factory;
@@ -22,6 +24,13 @@ namespace Sdx.Db.Query
 
       public Where Add(String column, Object value, String table = null)
       {
+
+        Console.WriteLine(String.Format("{0}/{1}/{2}", column, table, this.Table));
+        if (table == null)
+        {
+          table = this.Table;
+        }
+
         wheres.Add(new Dictionary<String, Object> {
           {"column", column},
           {"table", table},
@@ -30,7 +39,7 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public void Build(DbCommand command)
+      public void Build(DbCommand command, int startIndex = 0)
       {
         string whereString = "";
         wheres.ForEach(obj =>
@@ -43,10 +52,11 @@ namespace Sdx.Db.Query
           if (obj is Dictionary<String, Object>)
           {
             Dictionary<String, Object> dic = obj as Dictionary<String, Object>;
-            String placeHolder;
+
+            var placeHolder = "@" + dic["column"] + "@{0}@" + startIndex.ToString();
             if (dic["table"] != null)
             {
-              placeHolder = "@" + dic["table"] + "@" + dic["column"];
+              placeHolder = String.Format(placeHolder, dic["table"]);
               whereString += String.Format(
                 "{0}.{1} = {2}",
                 this.factory.QuoteIdentifier(dic["table"] as String),
@@ -56,7 +66,7 @@ namespace Sdx.Db.Query
             }
             else
             {
-              placeHolder = "@" + dic["column"];
+              placeHolder =  String.Format(placeHolder, "_");
               whereString += String.Format(
                 "{0} = {1}",
                 this.factory.QuoteIdentifier(dic["column"] as String),
@@ -70,6 +80,8 @@ namespace Sdx.Db.Query
           {
             Where where = obj as Where;
           }
+
+          ++startIndex;
         });
 
         command.CommandText += whereString;
