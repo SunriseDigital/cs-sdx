@@ -55,7 +55,17 @@ namespace Sdx.Db.Query
 
     public class Where
     {
-      private List<Dictionary<string, object>> wheres = new List<Dictionary<string, object>>();
+      private class Condition
+      {
+        public Where Where { get; set; }
+        public string Table { get; set; }
+        public Comparison Comparison { get; set; }
+        public Logical Logical { get; set; }
+        public string Column { get; set; }
+        public object Value { get; set; }
+      }
+
+      private List<Condition> wheres = new List<Condition>();
       private Factory factory;
 
       public int Count
@@ -75,9 +85,10 @@ namespace Sdx.Db.Query
       public Where Add(Where where, Logical logical = Logical.And)
       {
         where.EnableBracket = true;
-        this.wheres.Add(new Dictionary<String, Object> {
-          {"where", where},
-          {"logical", logical}
+        this.Add(new Condition
+        {
+          Where = where,
+          Logical = logical
         });
         return this;
       }
@@ -89,44 +100,54 @@ namespace Sdx.Db.Query
           table = this.Table;
         }
 
-        this.wheres.Add(new Dictionary<String, Object> {
-          {"column", column},
-          {"table", table},
-          {"value", value},
-          {"comparison", comparison},
-          {"logical", logical}
+        this.Add(new Condition
+        {
+          Column = column,
+          Table = table,
+          Logical = logical,
+          Comparison = comparison,
+          Value = value
         });
+
         return this;
+      }
+
+      private void Add(Condition cond)
+      {
+        if(cond.Logical == Logical.Or && this.wheres.Count == 0)
+        {
+          //一番最初のWhereがOrで足されたということは何かプログラマーの意図と違うことが起こってるはず。
+          throw new Exception("Illegal logical operation for the first where condition `"+cond.Logical.SqlString()+"`");
+        }
+
+        this.wheres.Add(cond);
       }
 
       public int Build(DbCommand command, int startIndex = 0)
       {
         string whereString = "";
-        if (this.EnableBracket)
-        {
-          whereString = "(";
-        }
 
-        int loopCount = 0;
-        wheres.ForEach(dic =>
+        wheres.ForEach(cond =>
         {
-          if (loopCount > 0)
+          if (whereString.Length > 0)
           {
-            whereString += ((Logical)dic["logical"]).SqlString();
+            whereString += cond.Logical.SqlString();
           }
 
-          loopCount++;
-
-          if (dic.ContainsKey("table"))
+          if (cond.Where != null)
           {
-            var placeHolder = "@" + dic["column"] + "@{0}@" + startIndex.ToString();
-            if (dic["table"] != null)
+            startIndex = cond.Where.Build(command, startIndex);
+          }
+          else
+          {
+            var placeHolder = "@" + cond.Column + "@{0}@" + startIndex.ToString();
+            if (cond.Table != null)
             {
-              placeHolder = String.Format(placeHolder, dic["table"]);
+              placeHolder = String.Format(placeHolder, cond.Table);
               whereString += String.Format(
                 "{0}.{1} = {2}",
-                this.factory.QuoteIdentifier(dic["table"] as String),
-                this.factory.QuoteIdentifier(dic["column"] as String),
+                this.factory.QuoteIdentifier(cond.Table),
+                this.factory.QuoteIdentifier(cond.Column),
                 placeHolder
               );
             }
@@ -135,26 +156,19 @@ namespace Sdx.Db.Query
               placeHolder =  String.Format(placeHolder, "_");
               whereString += String.Format(
                 "{0} = {1}",
-                this.factory.QuoteIdentifier(dic["column"] as String),
+                this.factory.QuoteIdentifier(cond.Column),
                 placeHolder
               );
             }
 
-            command.Parameters.Add(this.factory.CreateParameter(placeHolder, dic["value"].ToString()));
+            command.Parameters.Add(this.factory.CreateParameter(placeHolder, cond.Value.ToString()));
             ++startIndex;
           }
-          else if (dic.ContainsKey("where"))
-          {
-            Where where = dic["where"] as Where;
-            startIndex = where.Build(command, startIndex);
-          }
-
-          
         });
 
         if (this.EnableBracket)
         {
-          whereString += ")";
+          whereString = "(" + whereString + ")";
         }
 
         command.CommandText += whereString;
