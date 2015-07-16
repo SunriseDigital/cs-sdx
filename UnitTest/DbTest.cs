@@ -850,6 +850,22 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@shop@0"),
        db.Command.CommandText
       );
+
+      //WhereのAdd
+      select = db.Factory.CreateSelect();
+      select.From("shop").AddColumn("*");
+
+      select.Where.Add(
+        select.CreateWhere()
+          .Add("id", "1")
+          .Add("id", "2", logical: Sdx.Db.Query.Logical.Or)
+      );
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@_@0 OR {0}id{1} = @id@_@1)"),
+       db.Command.CommandText
+      );
     }
 
     /// <summary>

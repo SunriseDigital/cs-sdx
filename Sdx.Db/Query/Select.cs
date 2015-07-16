@@ -18,7 +18,7 @@ namespace Sdx.Db.Query
     Natural
   }
 
-  static class JoinTypeExt
+  public static class SelectEnumExtension
   {
     public static string SqlString(this JoinType gender)
     {
@@ -264,6 +264,11 @@ namespace Sdx.Db.Query
         this.where.Table = null;
         return this.where;
       }
+    }
+
+    public Where CreateWhere()
+    {
+      return new Where(this.factory);
     }
   }
 }

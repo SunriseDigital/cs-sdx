@@ -5,15 +5,65 @@ using System.Data.Common;
 
 namespace Sdx.Db.Query
 {
+    public enum Logical
+    {
+      And,
+      Or
+    }
+
+    public enum Comparison
+    {
+      Equal,
+      NotEqual,
+      AltNotEqual,
+      GreaterThan,
+      Less_than,
+      GreaterEqual,
+      LessEqual,
+      Like,
+      NotLike,
+      In,
+      NotIn
+    }
+
+    public static class WhereEnumExtension
+    {
+      public static string SqlString(this Logical logical)
+      {
+        string[] strings = { " AND ", " OR "};
+        return strings[(int)logical];
+      }
+
+      public static string SqlString(this Comparison comp)
+      {
+        string[] strings = {
+          " = ",
+          " <> ",
+          " != ",
+          " > ",
+          " < ",
+          " >= ",
+          " <= ",
+          " LIKE ",
+          " NOT LIKE ",
+          " IN ",
+          " NOT IN "
+        };
+        return strings[(int)comp];
+      }
+    }
+
     public class Where
     {
-      private List<Object> wheres = new List<object>();
+      private List<Dictionary<string, object>> wheres = new List<Dictionary<string, object>>();
       private Factory factory;
 
       public int Count
       {
         get { return wheres.Count; }
       }
+
+      public bool EnableBracket { get; set; }
 
       public string Table { get; set; }
 
@@ -22,37 +72,53 @@ namespace Sdx.Db.Query
         this.factory = factory;
       }
 
-      public Where Add(String column, Object value, String table = null)
+      public Where Add(Where where, Logical logical = Logical.And)
       {
+        where.EnableBracket = true;
+        this.wheres.Add(new Dictionary<String, Object> {
+          {"where", where},
+          {"logical", logical}
+        });
+        return this;
+      }
 
-        Console.WriteLine(String.Format("{0}/{1}/{2}", column, table, this.Table));
+      public Where Add(String column, Object value, String table = null, Comparison comparison = Comparison.Equal, Logical logical = Logical.And)
+      {
         if (table == null)
         {
           table = this.Table;
         }
 
-        wheres.Add(new Dictionary<String, Object> {
+        this.wheres.Add(new Dictionary<String, Object> {
           {"column", column},
           {"table", table},
-          {"value", value}
+          {"value", value},
+          {"comparison", comparison},
+          {"logical", logical}
         });
         return this;
       }
 
-      public void Build(DbCommand command, int startIndex = 0)
+      public int Build(DbCommand command, int startIndex = 0)
       {
         string whereString = "";
-        wheres.ForEach(obj =>
+        if (this.EnableBracket)
         {
-          if (whereString.Length > 0)
+          whereString = "(";
+        }
+
+        int loopCount = 0;
+        wheres.ForEach(dic =>
+        {
+          if (loopCount > 0)
           {
-            whereString += " AND ";
+            whereString += ((Logical)dic["logical"]).SqlString();
           }
 
-          if (obj is Dictionary<String, Object>)
-          {
-            Dictionary<String, Object> dic = obj as Dictionary<String, Object>;
+          loopCount++;
 
+          if (dic.ContainsKey("table"))
+          {
             var placeHolder = "@" + dic["column"] + "@{0}@" + startIndex.ToString();
             if (dic["table"] != null)
             {
@@ -75,16 +141,24 @@ namespace Sdx.Db.Query
             }
 
             command.Parameters.Add(this.factory.CreateParameter(placeHolder, dic["value"].ToString()));
+            ++startIndex;
           }
-          else if (obj is Where)
+          else if (dic.ContainsKey("where"))
           {
-            Where where = obj as Where;
+            Where where = dic["where"] as Where;
+            startIndex = where.Build(command, startIndex);
           }
 
-          ++startIndex;
+          
         });
 
+        if (this.EnableBracket)
+        {
+          whereString += ")";
+        }
+
         command.CommandText += whereString;
+        return startIndex;
       }
 
       public DbCommand Build()
