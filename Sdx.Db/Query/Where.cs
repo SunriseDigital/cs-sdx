@@ -65,6 +65,16 @@ namespace Sdx.Db.Query
         public object Value { get; set; }
       }
 
+      private class ConditionCount
+      {
+        private int value = 0;
+        public int Value { get { return this.value; } }
+        public void Incr()
+        {
+          ++this.value;
+        }
+      }
+
       private List<Condition> wheres = new List<Condition>();
       private Factory factory;
 
@@ -123,7 +133,7 @@ namespace Sdx.Db.Query
         this.wheres.Add(cond);
       }
 
-      public int Build(DbCommand command, int startIndex = 0)
+      private void Build(DbCommand command, ConditionCount condCount)
       {
         string whereString = "";
 
@@ -136,11 +146,15 @@ namespace Sdx.Db.Query
 
           if (cond.Where != null)
           {
-            startIndex = cond.Where.Build(command, startIndex);
+            if(condCount.Value > 0)
+            {
+              command.CommandText += cond.Logical.SqlString();
+            }
+            cond.Where.Build(command, condCount);
           }
           else
           {
-            var placeHolder = "@" + cond.Column + "@{0}@" + startIndex.ToString();
+            var placeHolder = "@" + cond.Column + "@{0}@" + condCount.Value;
             if (cond.Table != null)
             {
               placeHolder = String.Format(placeHolder, cond.Table);
@@ -162,7 +176,7 @@ namespace Sdx.Db.Query
             }
 
             command.Parameters.Add(this.factory.CreateParameter(placeHolder, cond.Value.ToString()));
-            ++startIndex;
+            condCount.Incr();
           }
         });
 
@@ -172,7 +186,11 @@ namespace Sdx.Db.Query
         }
 
         command.CommandText += whereString;
-        return startIndex;
+      }
+
+      public void Build(DbCommand command)
+      {
+        this.Build(command, new ConditionCount());
       }
 
       public DbCommand Build()
