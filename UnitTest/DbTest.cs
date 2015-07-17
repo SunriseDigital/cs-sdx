@@ -785,29 +785,34 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
+    public void trySqlAction()
+    {
+      var factory = new Sdx.Db.MySqlFactory();
+      factory.ConnectionString = MySqlConnectionString;
+      var con = factory.CreateConnection();
+      var command = factory.CreateCommand();
+      command.CommandText = "SELECT * FROM shop WHERE id = @shop@id";
+      command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
+      using (con)
+      {
+        con.Open();
+        command.Connection = con;
+        DbDataAdapter adapter = factory.CreateDataAdapter();
+        DataSet dataset = new DataSet();
+        adapter.SelectCommand = command;
+        adapter.Fill(dataset);
+
+        Console.WriteLine("execDbCommand");
+        foreach (DataRow row in dataset.Tables[0].Rows)
+        {
+          Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+        }
+      }
+    }
+
+    [Fact]
     public void TestSelectWhereSimple()
     {
-      //var factory = new Sdx.Db.MySqlFactory();
-      //factory.ConnectionString = MySqlConnectionString;
-      //var con = factory.CreateConnection();
-      //var command = factory.CreateCommand();
-      //command.CommandText = "SELECT * FROM shop WHERE id = @shop@id";
-      //command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
-      //using(con)
-      //{
-      //  con.Open();
-      //  command.Connection = con;
-      //  DbDataAdapter adapter = factory.CreateDataAdapter();
-      //  DataSet dataset = new DataSet();
-      //  adapter.SelectCommand = command;
-      //  adapter.Fill(dataset);
-
-      //  Console.WriteLine("execDbCommand");
-      //  foreach (DataRow row in dataset.Tables[0].Rows)
-      //  {
-      //    Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
-      //  }
-      //}
       foreach (TestDb db in this.CreateTestDbList())
       {
         RunSelectWhereSimple(db);
