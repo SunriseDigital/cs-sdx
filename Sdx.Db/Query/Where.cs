@@ -92,7 +92,31 @@ namespace Sdx.Db.Query
         this.factory = factory;
       }
 
-      public Where Add(Where where, Logical logical = Logical.And)
+      public Where AddOr(Where where)
+      {
+        this.Add(where, Logical.Or);
+        return this;
+      }
+
+      public Where AddOr(String column, Object value, String table = null, Comparison comparison = Comparison.Equal)
+      {
+        this.Add(column, value, Logical.Or, table, comparison);
+        return this;
+      }
+
+      public Where Add(Where where)
+      {
+        this.Add(where, Logical.And);
+        return this;
+      }
+
+      public Where Add(String column, Object value, String table = null, Comparison comparison = Comparison.Equal)
+      {
+        this.Add(column, value, Logical.And, table, comparison);
+        return this;
+      }
+
+      private Where Add(Where where, Logical logical)
       {
         where.EnableBracket = true;
         this.Add(new Condition
@@ -103,7 +127,7 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public Where Add(String column, Object value, String table = null, Comparison comparison = Comparison.Equal, Logical logical = Logical.And)
+      private Where Add(String column, Object value, Logical logical, String table = null, Comparison comparison = Comparison.Equal)
       {
         if (table == null)
         {

@@ -858,7 +858,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       select.Where.Add(
         select.CreateWhere()
           .Add("id", "1")
-          .Add("id", "2", logical: Sdx.Db.Query.Logical.Or)
+          .AddOr("id", "2")
       );
 
       db.Command = select.Build();
@@ -871,18 +871,16 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       select = db.Factory.CreateSelect();
       select.From("shop").AddColumn("*");
 
-      select.Where.Add(
-        select.CreateWhere()
-          .Add("id", "3")
-          .Add("id", "4")
-      );
-
-      select.Where.Add(
-        select.CreateWhere()
-          .Add("id", "1")
-          .Add("id", "2", logical: Sdx.Db.Query.Logical.Or)
-        ,Sdx.Db.Query.Logical.Or
-      );
+      select.Where
+        .Add(
+          select.CreateWhere()
+            .Add("id", "3")
+            .Add("id", "4")
+        ).AddOr(
+          select.CreateWhere()
+            .Add("id", "1")
+            .AddOr("id", "2")
+        );
 
       db.Command = select.Build();
       Assert.Equal(
