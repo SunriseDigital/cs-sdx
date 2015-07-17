@@ -71,13 +71,23 @@ namespace Sdx.Db
 
     public string QuoteIdentifier(Sdx.Db.Query.Column column)
     {
-      if(column.isExpr())
+      return this.QuoteIdentifier(column.Name);
+    }
+
+    public string QuoteIdentifier(Sdx.Db.Query.Table table)
+    {
+      return this.QuoteIdentifier(table.TableName);
+    }
+
+    private string QuoteIdentifier(object obj)
+    {
+      if (obj is Sdx.Db.Query.Expr)
       {
-        return this.QuoteIdentifier(column.Name as Sdx.Db.Query.Expr);
+        return this.QuoteIdentifier(obj as Sdx.Db.Query.Expr);
       }
       else
       {
-        return this.QuoteIdentifier(column.Name as string);
+        return this.QuoteIdentifier(obj as string);
       }
     }
   }

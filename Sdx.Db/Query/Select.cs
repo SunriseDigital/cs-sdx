@@ -140,16 +140,10 @@ namespace Sdx.Db.Query
 
     private void appendJoinString(DbCommand command, Table table)
     {
-      command.CommandText += " " + table.JoinType.SqlString() + " ";
+      command.CommandText += " " 
+        + table.JoinType.SqlString() + " "
+        + this.Factory.QuoteIdentifier(table);
 
-      if (table.TableNameExpr != null)
-      {
-        command.CommandText += table.TableNameExpr;
-      }
-      else
-      {
-        command.CommandText += this.Factory.QuoteIdentifier(table.TableName);
-      }
 
       if (table.Alias != null)
       {

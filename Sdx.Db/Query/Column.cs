@@ -43,10 +43,5 @@ namespace Sdx.Db.Query
     {
       get { return this.name; }
     }
-
-    public bool isExpr()
-    {
-      return this.name is Expr;
-    }
   }
 }

@@ -15,7 +15,7 @@ namespace Sdx.Db.Query
       this.select = select;
     }
 
-    public string TableName { get; internal set; }
+    public object TableName { get; internal set; }
 
     public string Alias { get; internal set; }
 
@@ -33,7 +33,7 @@ namespace Sdx.Db.Query
           return this.Alias;
         }
 
-        return this.TableName; 
+        return this.TableName.ToString(); 
       
       }
     }
@@ -70,7 +70,7 @@ namespace Sdx.Db.Query
 
     internal string BuildTableString()
     {
-      var result = this.select.Factory.QuoteIdentifier(this.TableName);
+      var result = this.select.Factory.QuoteIdentifier(this);
       if (this.Alias != null)
       {
         result += " AS " + this.select.Factory.QuoteIdentifier(this.Alias);
@@ -78,13 +78,12 @@ namespace Sdx.Db.Query
       return result;
     }
 
-    private Table AddJoin(string table, JoinType joinType, string condition, string alias = null, Expr tableNameExpr = null)
+    private Table AddJoin(object table, JoinType joinType, string condition, string alias = null)
     {
       Table joinTable = new Table(this.select);
 
       joinTable.ParentTable = this;
       joinTable.TableName = table;
-      joinTable.TableNameExpr = tableNameExpr;
       joinTable.Alias = alias;
       joinTable.JoinCondition = condition;
       joinTable.JoinType = joinType;
@@ -97,12 +96,12 @@ namespace Sdx.Db.Query
 
     public Table InnerJoin(Expr table, string condition, string alias = null)
     {
-      return this.AddJoin(null, JoinType.Inner, condition, alias, table);
+      return this.AddJoin(table, JoinType.Inner, condition, alias);
     }
 
     public Table LeftJoin(Expr table, string condition, string alias = null)
     {
-      return this.AddJoin(null, JoinType.Left, condition, alias, table);
+      return this.AddJoin(table, JoinType.Left, condition, alias);
     }
 
     public Table InnerJoin(string table, string condition, string alias = null)
@@ -187,7 +186,5 @@ namespace Sdx.Db.Query
         //}
       }
     }
-
-    public Expr TableNameExpr { get; set; }
   }
 }
