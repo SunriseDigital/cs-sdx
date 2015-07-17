@@ -791,8 +791,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       factory.ConnectionString = MySqlConnectionString;
       var con = factory.CreateConnection();
       var command = factory.CreateCommand();
-      command.CommandText = "SELECT * FROM shop WHERE id = @shop@id";
+      command.CommandText = "SELECT * FROM shop INNER JOIN (SELECT id FROM category WHERE id = @sub_cat@id) as sub_cat ON shop.category_id = sub_cat.id WHERE shop.id = @shop@id";
       command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
+      command.Parameters.Add(factory.CreateParameter("@sub_cat@id", "1"));
       using (con)
       {
         con.Open();
@@ -890,6 +891,35 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@_@0 AND {0}id{1} = @id@_@1) OR ({0}id{1} = @id@_@2 OR {0}id{1} = @id@_@3)"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectRawSubqueryJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectRawSubqueryJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectRawSubqueryJoin(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*")
+        .InnerJoin(
+          select.Expr("(SELECT id FROM category WHERE id = 1)"),
+          "{0}.category_id = {1}.id",
+          "sub_cat"
+        );
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id"),
        db.Command.CommandText
       );
     }

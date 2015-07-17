@@ -26,7 +26,16 @@ namespace Sdx.Db.Query
 
     public string Name
     {
-      get { return this.Alias == null ? this.TableName : this.Alias; }
+      get 
+      {
+        if (this.Alias != null)
+        {
+          return this.Alias;
+        }
+
+        return this.TableName; 
+      
+      }
     }
 
     internal string BuildColumsString()
@@ -69,12 +78,13 @@ namespace Sdx.Db.Query
       return result;
     }
 
-    public Table AddJoin(string table, JoinType joinType, string condition, string alias = null)
+    private Table AddJoin(string table, JoinType joinType, string condition, string alias = null, Expr tableNameExpr = null)
     {
       Table joinTable = new Table(this.select);
 
       joinTable.ParentTable = this;
       joinTable.TableName = table;
+      joinTable.TableNameExpr = tableNameExpr;
       joinTable.Alias = alias;
       joinTable.JoinCondition = condition;
       joinTable.JoinType = joinType;
@@ -83,6 +93,16 @@ namespace Sdx.Db.Query
 
       this.select.Joins.Add(joinTable);
       return joinTable;
+    }
+
+    public Table InnerJoin(Expr table, string condition, string alias = null)
+    {
+      return this.AddJoin(null, JoinType.Inner, condition, alias, table);
+    }
+
+    public Table LeftJoin(Expr table, string condition, string alias = null)
+    {
+      return this.AddJoin(null, JoinType.Left, condition, alias, table);
     }
 
     public Table InnerJoin(string table, string condition, string alias = null)
@@ -167,5 +187,7 @@ namespace Sdx.Db.Query
         //}
       }
     }
+
+    public Expr TableNameExpr { get; set; }
   }
 }
