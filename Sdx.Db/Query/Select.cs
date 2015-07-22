@@ -53,7 +53,7 @@ namespace Sdx.Db.Query
 
     public JoinOrder JoinOrder { get; set; }
 
-    public Table From(string tableName, string alias = null)
+    public Table From(object tableName, string alias = null)
     {
       Table from = new Table(this);
       from.Target = tableName;
