@@ -33,7 +33,6 @@ namespace Sdx.Db.Query
     private List<Table> joins = new List<Table>();
     private List<Column> columns = new List<Column>();
     private Where where;
-    private int subqueryCount;
 
     public Select(Factory factory)
     {
@@ -66,7 +65,7 @@ namespace Sdx.Db.Query
       return from;
     }
 
-    private string BuildSelectString(DbParameterCollection parameters, String subqueryKey = null)
+    private string BuildSelectString(DbParameterCollection parameters, Where.ConditionCount condCount)
     {
       string selectString = "SELECT";
 
@@ -113,40 +112,39 @@ namespace Sdx.Db.Query
       {
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
         {
-          selectString += this.buildJoinString(table, parameters);
+          selectString += this.buildJoinString(table, parameters, condCount);
         }
 
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(table, parameters);
+          selectString += this.buildJoinString(table, parameters, condCount);
         }
       }
       else
       {
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(table, parameters);
+          selectString += this.buildJoinString(table, parameters, condCount);
         }
       }
 
       if (this.where.Count > 0)
       {
         selectString += " WHERE ";
-        selectString += this.where.Build(parameters, subqueryKey);
+        selectString += this.where.Build(parameters, condCount);
       }
 
       return selectString;
     }
 
-    private string buildJoinString(Table table, DbParameterCollection parameters)
+    private string buildJoinString(Table table, DbParameterCollection parameters, Where.ConditionCount condCount)
     {
       string joinString = "";
 
       if (table.Target is Select)
       {
         Select select = table.Target as Select;
-        string subquery = select.BuildSelectString(parameters, this.subqueryCount.ToString());
-        ++this.subqueryCount;
+        string subquery = select.BuildSelectString(parameters, condCount);
         joinString += " "
           + table.JoinType.SqlString() + " "
           + "(" + subquery + ")";
@@ -178,10 +176,9 @@ namespace Sdx.Db.Query
 
     public DbCommand Build()
     {
-      this.subqueryCount = 0;
       DbCommand command = this.factory.CreateCommand();
-
-      command.CommandText = this.BuildSelectString(command.Parameters);
+      var condCount = new Where.ConditionCount();
+      command.CommandText = this.BuildSelectString(command.Parameters, condCount);
 
       return command;
     }

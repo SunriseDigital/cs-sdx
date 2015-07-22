@@ -937,8 +937,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
-        .AddColumn("*");
-
+        .AddColumn("*")
+        .Where.Add("id", "1");
 
       Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
       sub
@@ -950,7 +950,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@category@0@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@category@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @id@shop@1"),
        db.Command.CommandText
       );
     }
