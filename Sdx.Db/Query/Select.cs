@@ -65,7 +65,7 @@ namespace Sdx.Db.Query
       return from;
     }
 
-    private string BuildSelectString(DbParameterCollection parameters, Where.ConditionCount condCount)
+    internal string BuildSelectString(DbParameterCollection parameters, Where.ConditionCount condCount)
     {
       string selectString = "SELECT";
 

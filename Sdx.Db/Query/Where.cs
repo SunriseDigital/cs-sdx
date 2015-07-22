@@ -194,6 +194,11 @@ namespace Sdx.Db.Query
         {
           rightHand = cond.Value.ToString();
         }
+        else if (cond.Value is Select)
+        {
+          Select select = (Select)cond.Value;
+          rightHand = "(" + select.BuildSelectString(parameters, condCount) + ")";
+        }
         else
         {
           rightHand = "@" + cond.Column + "@" + condCount.Value;
