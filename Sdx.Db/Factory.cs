@@ -76,7 +76,7 @@ namespace Sdx.Db
 
     public string QuoteIdentifier(Sdx.Db.Query.Table table)
     {
-      return this.QuoteIdentifier(table.TableName);
+      return this.QuoteIdentifier(table.Target);
     }
 
     private string QuoteIdentifier(object obj)

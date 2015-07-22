@@ -53,10 +53,10 @@ namespace Sdx.Db.Query
 
     public JoinOrder JoinOrder { get; set; }
 
-    public Table From(string tableName, string alias = null)
+    public Table From(object tableName, string alias = null)
     {
       Table from = new Table(this);
-      from.TableName = tableName;
+      from.Target = tableName;
       from.Alias = alias;
       from.JoinType = JoinType.From;
 
@@ -65,24 +65,23 @@ namespace Sdx.Db.Query
       return from;
     }
 
-    public DbCommand Build()
+    internal string BuildSelectString(DbParameterCollection parameters, Where.ConditionCount condCount)
     {
-      DbCommand command = this.factory.CreateCommand();
-
-      command.CommandText = "SELECT";
+      string selectString = "SELECT";
 
       //カラムを組み立てる
       var columnString = "";
 
       //selectのカラムを追加
-      if(this.columns.Count > 0)
+      if (this.columns.Count > 0)
       {
         columnString += " " + this.BuildColumsString();
       }
 
       //from/joinしてるテーブルのカラムを追加
-      this.joins.ForEach(sTable => {
-        if(sTable.Columns.Count > 0)
+      this.joins.ForEach(sTable =>
+      {
+        if (sTable.Columns.Count > 0)
         {
           if (columnString.Length > 0)
           {
@@ -93,7 +92,7 @@ namespace Sdx.Db.Query
         }
       });
 
-      command.CommandText += columnString + " FROM ";
+      selectString += columnString + " FROM ";
 
       //FROMを追加
       string formString = "";
@@ -104,61 +103,97 @@ namespace Sdx.Db.Query
           formString += ", ";
         }
 
-        formString += table.BuildTableString();
+        if(table.Target is Select)
+        {
+          Select select = table.Target as Select;
+          formString += "(" + select.BuildSelectString(parameters, condCount) + ")";
+        }
+        else
+        {
+          formString += this.Factory.QuoteIdentifier(table);
+        }
+
+        if (table.Alias != null)
+        {
+          formString += " AS " + this.Factory.QuoteIdentifier(table.Alias);
+        }
       }
 
-      command.CommandText += formString;
+      selectString += formString;
 
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach(var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
         {
-          this.appendJoinString(command, table);
+          selectString += this.buildJoinString(table, parameters, condCount);
         }
 
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Left))
         {
-          this.appendJoinString(command, table);
+          selectString += this.buildJoinString(table, parameters, condCount);
         }
       }
       else
       {
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          this.appendJoinString(command, table);
+          selectString += this.buildJoinString(table, parameters, condCount);
         }
       }
 
-      if(this.where.Count > 0)
+      if (this.where.Count > 0)
       {
-        command.CommandText += " WHERE ";
-        this.where.Build(command);
+        selectString += " WHERE ";
+        selectString += this.where.Build(parameters, condCount);
       }
 
-      return command;
+      return selectString;
     }
 
-    private void appendJoinString(DbCommand command, Table table)
+    private string buildJoinString(Table table, DbParameterCollection parameters, Where.ConditionCount condCount)
     {
-      command.CommandText += " " 
-        + table.JoinType.SqlString() + " "
-        + this.Factory.QuoteIdentifier(table);
+      string joinString = "";
 
+      if (table.Target is Select)
+      {
+        Select select = table.Target as Select;
+        string subquery = select.BuildSelectString(parameters, condCount);
+        joinString += " "
+          + table.JoinType.SqlString() + " "
+          + "(" + subquery + ")";
+      }
+      else
+      {
+        joinString += " "
+          + table.JoinType.SqlString() + " "
+          + this.Factory.QuoteIdentifier(table);
+      }
 
       if (table.Alias != null)
       {
-        command.CommandText += " AS " + this.Factory.QuoteIdentifier(table.Name);
+        joinString += " AS " + this.Factory.QuoteIdentifier(table.Name);
       }
 
       if (table.JoinCondition != null)
       {
-        command.CommandText += " ON "
+        joinString += " ON "
           + String.Format(
             table.JoinCondition,
             this.Factory.QuoteIdentifier(table.ParentTable.Name),
             this.Factory.QuoteIdentifier(table.Name)
           );
       }
+
+      return joinString;
+    }
+
+    public DbCommand Build()
+    {
+      DbCommand command = this.factory.CreateCommand();
+      var condCount = new Where.ConditionCount();
+      command.CommandText = this.BuildSelectString(command.Parameters, condCount);
+
+      return command;
     }
 
     public Table Table(string name)

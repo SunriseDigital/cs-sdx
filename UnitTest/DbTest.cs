@@ -784,27 +784,27 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
-    [Fact, Conditional("ON_VISUAL_STUDIO")]
+    [Fact]
     public void trySqlAction()
     {
-      var factory = new Sdx.Db.SqlServerFactory();
-      factory.ConnectionString = SqlServerConnectionString;
-      var con = factory.CreateConnection();
-      var command = factory.CreateCommand();
-      command.CommandText = "SELECT * FROM shop WHERE [category_id] IN (SELECT id FROM category WHERE id = 1)";
-      using (con)
+      foreach (TestDb db in this.CreateTestDbList())
       {
-        con.Open();
-        command.Connection = con;
-        DbDataAdapter adapter = factory.CreateDataAdapter();
-        DataSet dataset = new DataSet();
-        adapter.SelectCommand = command;
-        adapter.Fill(dataset);
-
-        Console.WriteLine("execDbCommand");
-        foreach (DataRow row in dataset.Tables[0].Rows)
+        var con = db.Factory.CreateConnection();
+        var command = db.Factory.CreateCommand();
+        command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)");
+        using (con)
         {
-          Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+          con.Open();
+          command.Connection = con;
+          DbDataAdapter adapter = db.Factory.CreateDataAdapter();
+          DataSet dataset = new DataSet();
+          adapter.SelectCommand = command;
+          adapter.Fill(dataset);
+
+          foreach (DataRow row in dataset.Tables[0].Rows)
+          {
+            Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+          }
         }
       }
     }
@@ -831,7 +831,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@_@0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@0"),
        db.Command.CommandText
       );
 
@@ -839,7 +839,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@_@0 AND {0}shop{1}.{0}name{1} = @name@shop@1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@0 AND {0}shop{1}.{0}name{1} = @name@1"),
        db.Command.CommandText
       );
 
@@ -851,7 +851,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@shop@0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@0"),
        db.Command.CommandText
       );
 
@@ -867,7 +867,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@_@0 OR {0}id{1} = @id@_@1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 OR {0}id{1} = @id@1)"),
        db.Command.CommandText
       );
 
@@ -888,7 +888,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@_@0 AND {0}id{1} = @id@_@1) OR ({0}id{1} = @id@_@2 OR {0}id{1} = @id@_@3)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 AND {0}id{1} = @id@1) OR ({0}id{1} = @id@2 OR {0}id{1} = @id@3)"),
        db.Command.CommandText
       );
     }
@@ -923,31 +923,130 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestSelectRawSubqueryWhere()
+    public void TestSelectSubqueryJoin()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunSelectRawSubqueryWhere(db);
+        RunSelectSubqueryJoin(db);
         ExecSql(db);
       }
     }
 
-    private void RunSelectRawSubqueryWhere(TestDb db)
+    private void RunSelectSubqueryJoin(TestDb db)
     {
       Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
-        .AddColumn("*");
+        .AddColumn("*")
+        .Where.Add("id", "1");
 
-      select.Where.Add(
-        "category_id",
-        select.Expr("(SELECT id FROM category WHERE id = 1)"),
-        comparison: Sdx.Db.Query.Comparison.In
+      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      sub
+        .From("category")
+        .AddColumn("id")
+        .Where.Add("id", "1");
+
+      select.Table("shop").InnerJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @id@1"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectSubqueryWhere()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectSubqueryWhere(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectSubqueryWhere(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*")
+        .Where.Add("id", "1");
+
+      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      sub
+        .From("category")
+        .AddColumn("id")
+        .Where.Add("id", "1");
+
+      select.Table("shop").Where.Add("category_id", sub, comparison:Sdx.Db.Query.Comparison.In);
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@0 AND {0}shop{1}.{0}category_id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@1)"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectRawSubqueryFrom()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectRawSubqueryFrom(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectRawSubqueryFrom(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*")
+        .Where.Add("id", "1");
+
+      select.From(
+        new Sdx.Db.Query.Expr("(SELECT id FROM category WHERE id = 1)"),
+        "sub_cat"
       );
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @id@0"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectSubqueryFrom()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectSubqueryFrom(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectSubqueryFrom(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*")
+        .Where.Add("id", "1");
+
+      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      sub
+        .From("category")
+        .AddColumn("id")
+        .Where.Add("id", "1");
+
+      select.From(sub, "sub_cat");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @id@1"),
        db.Command.CommandText
       );
     }

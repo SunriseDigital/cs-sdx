@@ -15,7 +15,7 @@ namespace Sdx.Db.Query
       this.select = select;
     }
 
-    public object TableName { get; internal set; }
+    public object Target { get; internal set; }
 
     public string Alias { get; internal set; }
 
@@ -33,7 +33,7 @@ namespace Sdx.Db.Query
           return this.Alias;
         }
 
-        return this.TableName.ToString(); 
+        return this.Target.ToString(); 
       
       }
     }
@@ -68,22 +68,12 @@ namespace Sdx.Db.Query
       return result;
     }
 
-    internal string BuildTableString()
-    {
-      var result = this.select.Factory.QuoteIdentifier(this);
-      if (this.Alias != null)
-      {
-        result += " AS " + this.select.Factory.QuoteIdentifier(this.Alias);
-      }
-      return result;
-    }
-
     private Table AddJoin(object table, JoinType joinType, string condition, string alias = null)
     {
       Table joinTable = new Table(this.select);
 
       joinTable.ParentTable = this;
-      joinTable.TableName = table;
+      joinTable.Target = table;
       joinTable.Alias = alias;
       joinTable.JoinCondition = condition;
       joinTable.JoinType = joinType;
@@ -92,6 +82,11 @@ namespace Sdx.Db.Query
 
       this.select.Joins.Add(joinTable);
       return joinTable;
+    }
+
+    public Table InnerJoin(Select select, string condition, string alias = null)
+    {
+      return this.AddJoin(select, JoinType.Inner, condition, alias);
     }
 
     public Table InnerJoin(Expr table, string condition, string alias = null)
