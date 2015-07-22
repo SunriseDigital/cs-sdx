@@ -65,7 +65,7 @@ namespace Sdx.Db.Query
       return from;
     }
 
-    internal string BuildSelectString(DbParameterCollection parameters, Where.ConditionCount condCount)
+    internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
       string selectString = "SELECT";
 
@@ -150,7 +150,7 @@ namespace Sdx.Db.Query
       return selectString;
     }
 
-    private string buildJoinString(Table table, DbParameterCollection parameters, Where.ConditionCount condCount)
+    private string buildJoinString(Table table, DbParameterCollection parameters, Counter condCount)
     {
       string joinString = "";
 
@@ -190,7 +190,7 @@ namespace Sdx.Db.Query
     public DbCommand Build()
     {
       DbCommand command = this.factory.CreateCommand();
-      var condCount = new Where.ConditionCount();
+      var condCount = new Counter();
       command.CommandText = this.BuildSelectString(command.Parameters, condCount);
 
       return command;

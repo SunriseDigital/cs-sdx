@@ -65,16 +65,6 @@ namespace Sdx.Db.Query
         public object Value { get; set; }
       }
 
-      internal class ConditionCount
-      {
-        private int value = 0;
-        public int Value { get { return this.value; } }
-        public void Incr()
-        {
-          ++this.value;
-        }
-      }
-
       private List<Condition> wheres = new List<Condition>();
       private Factory factory;
 
@@ -157,7 +147,7 @@ namespace Sdx.Db.Query
         this.wheres.Add(cond);
       }
 
-      internal string Build(DbParameterCollection parameters, ConditionCount condCount)
+      public string Build(DbParameterCollection parameters, Counter condCount)
       {
         string whereString = "";
 
@@ -187,7 +177,7 @@ namespace Sdx.Db.Query
         return whereString;
       }
 
-      private string BuildValueConditionString(DbParameterCollection parameters, Condition cond, ConditionCount condCount)
+      private string BuildValueConditionString(DbParameterCollection parameters, Condition cond, Counter condCount)
       {
         string rightHand;
         if (cond.Value is Expr)
@@ -224,18 +214,6 @@ namespace Sdx.Db.Query
             rightHand
           );
         }
-      }
-
-      public void Build(DbCommand command)
-      {
-        command.CommandText += this.Build(command.Parameters, new ConditionCount());
-      }
-
-      public DbCommand Build()
-      {
-        var command = this.factory.CreateCommand();
-        this.Build(command);
-        return command;
       }
     }
 }

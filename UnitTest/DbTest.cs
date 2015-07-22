@@ -244,18 +244,24 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        Sdx.Db.Query.Where where = db.Factory.CreateWhere();
+        var command = db.Factory.CreateCommand();
+        var counter = new Sdx.Db.Query.Counter();
+        var where = db.Factory.CreateWhere();
+
         where.Add("id", "1", "shop");
+        command.CommandText = where.Build(command.Parameters, counter);
 
         Assert.Equal(
           db.Sql("{0}shop{1}.{0}id{1} = '1'"),
-          Sdx.Db.Util.CommandToSql(where.Build())
+          Sdx.Db.Util.CommandToSql(command)
         );
 
         where.Add("type", 2, "category");
+        command.CommandText = where.Build(command.Parameters, counter);
+        
         Assert.Equal(
           db.Sql("{0}shop{1}.{0}id{1} = '1' AND {0}category{1}.{0}type{1} = '2'"),
-          Sdx.Db.Util.CommandToSql(where.Build())
+          Sdx.Db.Util.CommandToSql(command)
         );
       }
     }
@@ -280,19 +286,22 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        Sdx.Db.Query.Where where = db.Factory.CreateWhere();
+        var command = db.Factory.CreateCommand();
+        var counter = new Sdx.Db.Query.Counter();
+        var where = db.Factory.CreateWhere();
 
         where.Add("id", "1");
-
+        command.CommandText = where.Build(command.Parameters, counter);
         Assert.Equal(
           db.Sql("{0}id{1} = '1'"),
-          Sdx.Db.Util.CommandToSql(where.Build())
+          Sdx.Db.Util.CommandToSql(command)
         );
 
         where.Add("type", 2);
+        command.CommandText = where.Build(command.Parameters, counter);
         Assert.Equal(
           db.Sql("{0}id{1} = '1' AND {0}type{1} = '2'"),
-          Sdx.Db.Util.CommandToSql(where.Build())
+          Sdx.Db.Util.CommandToSql(command)
         );
       }
     }
