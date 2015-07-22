@@ -103,7 +103,20 @@ namespace Sdx.Db.Query
           formString += ", ";
         }
 
-        formString += table.BuildTableString();
+        if(table.Target is Select)
+        {
+          Select select = table.Target as Select;
+          formString += "(" + select.BuildSelectString(parameters, condCount) + ")";
+        }
+        else
+        {
+          formString += this.Factory.QuoteIdentifier(table);
+        }
+
+        if (table.Alias != null)
+        {
+          formString += " AS " + this.Factory.QuoteIdentifier(table.Alias);
+        }
       }
 
       selectString += formString;

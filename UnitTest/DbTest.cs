@@ -1018,6 +1018,39 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
+    [Fact]
+    public void TestSelectSubqueryFrom()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectSubqueryFrom(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectSubqueryFrom(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*")
+        .Where.Add("id", "1");
+
+      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      sub
+        .From("category")
+        .AddColumn("id")
+        .Where.Add("id", "1");
+
+      select.From(sub, "sub_cat");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @id@1"),
+       db.Command.CommandText
+      );
+    }
+
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
     /// </summary>

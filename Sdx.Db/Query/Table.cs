@@ -68,16 +68,6 @@ namespace Sdx.Db.Query
       return result;
     }
 
-    internal string BuildTableString()
-    {
-      var result = this.select.Factory.QuoteIdentifier(this);
-      if (this.Alias != null)
-      {
-        result += " AS " + this.select.Factory.QuoteIdentifier(this.Alias);
-      }
-      return result;
-    }
-
     private Table AddJoin(object table, JoinType joinType, string condition, string alias = null)
     {
       Table joinTable = new Table(this.select);
