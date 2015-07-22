@@ -784,27 +784,27 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
-    [Fact, Conditional("ON_VISUAL_STUDIO")]
+    [Fact]
     public void trySqlAction()
     {
-      var factory = new Sdx.Db.SqlServerFactory();
-      factory.ConnectionString = SqlServerConnectionString;
-      var con = factory.CreateConnection();
-      var command = factory.CreateCommand();
-      command.CommandText = "SELECT * FROM shop WHERE [category_id] IN (SELECT id FROM category WHERE id = 1)";
-      using (con)
+      foreach (TestDb db in this.CreateTestDbList())
       {
-        con.Open();
-        command.Connection = con;
-        DbDataAdapter adapter = factory.CreateDataAdapter();
-        DataSet dataset = new DataSet();
-        adapter.SelectCommand = command;
-        adapter.Fill(dataset);
-
-        Console.WriteLine("execDbCommand");
-        foreach (DataRow row in dataset.Tables[0].Rows)
+        var con = db.Factory.CreateConnection();
+        var command = db.Factory.CreateCommand();
+        command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)");
+        using (con)
         {
-          Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+          con.Open();
+          command.Connection = con;
+          DbDataAdapter adapter = db.Factory.CreateDataAdapter();
+          DataSet dataset = new DataSet();
+          adapter.SelectCommand = command;
+          adapter.Fill(dataset);
+
+          foreach (DataRow row in dataset.Tables[0].Rows)
+          {
+            Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+          }
         }
       }
     }
