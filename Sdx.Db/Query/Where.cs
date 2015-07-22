@@ -187,36 +187,18 @@ namespace Sdx.Db.Query
         return whereString;
       }
 
-      private string AppendRightHandString(DbParameterCollection parameters, Condition cond, ConditionCount condCount)
+      private string BuildValueConditionString(DbParameterCollection parameters, Condition cond, ConditionCount condCount)
       {
         string rightHand;
         if (cond.Value is Expr)
         {
-          return cond.Value.ToString();
+          rightHand = cond.Value.ToString();
         }
         else
         {
-          string rightHandFormat;
-          rightHandFormat = "@" + cond.Column + "@{0}@" + condCount.Value;
-           
-          if (cond.Table != null)
-          {
-            rightHand = String.Format(rightHandFormat, cond.Table);
-            parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
-            return rightHand;
-          }
-          else
-          {
-            rightHand = String.Format(rightHandFormat, "_");
-            parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
-            return rightHand;
-          }
+          rightHand = "@" + cond.Column + "@" + condCount.Value;
+          parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
         }
-      }
-
-      private string BuildValueConditionString(DbParameterCollection parameters, Condition cond, ConditionCount condCount)
-      {
-        string rightHand = this.AppendRightHandString(parameters, cond, condCount);
         
         if (cond.Table != null)
         {

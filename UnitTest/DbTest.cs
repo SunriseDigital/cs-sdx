@@ -831,7 +831,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@_@0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@0"),
        db.Command.CommandText
       );
 
@@ -839,7 +839,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@_@0 AND {0}shop{1}.{0}name{1} = @name@shop@1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@0 AND {0}shop{1}.{0}name{1} = @name@1"),
        db.Command.CommandText
       );
 
@@ -851,7 +851,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@shop@0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@0"),
        db.Command.CommandText
       );
 
@@ -867,7 +867,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@_@0 OR {0}id{1} = @id@_@1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 OR {0}id{1} = @id@1)"),
        db.Command.CommandText
       );
 
@@ -888,7 +888,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@_@0 AND {0}id{1} = @id@_@1) OR ({0}id{1} = @id@_@2 OR {0}id{1} = @id@_@3)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 AND {0}id{1} = @id@1) OR ({0}id{1} = @id@2 OR {0}id{1} = @id@3)"),
        db.Command.CommandText
       );
     }
@@ -950,7 +950,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@category@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @id@shop@1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @id@1"),
        db.Command.CommandText
       );
     }
