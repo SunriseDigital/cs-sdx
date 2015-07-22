@@ -784,7 +784,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
-    [Fact]
+    [Fact, Conditional("ON_VISUAL_STUDIO")]
     public void trySqlAction()
     {
       var factory = new Sdx.Db.SqlServerFactory();
