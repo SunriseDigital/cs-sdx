@@ -191,48 +191,53 @@ namespace Sdx.Db.Query
         command.CommandText += whereString;
       }
 
-      private string BuildValueConditionString(DbCommand command, Condition cond, ConditionCount condCount)
+      private string AppendRightHandString(DbParameterCollection parameters, Condition cond, ConditionCount condCount)
       {
-        string placeHolder;
-        if(cond.Value is Expr)
+        string rightHand;
+        if (cond.Value is Expr)
         {
-          placeHolder = cond.Value.ToString();
+          return cond.Value.ToString();
         }
         else
         {
-          placeHolder = "@" + cond.Column + "@{0}@" + condCount.Value;
+          string rightHandFormat = "@" + cond.Column + "@{0}@" + condCount.Value;
+          if (cond.Table != null)
+          {
+            rightHand = String.Format(rightHandFormat, cond.Table);
+            parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
+            return rightHand;
+          }
+          else
+          {
+            rightHand = String.Format(rightHandFormat, "_");
+            parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
+            return rightHand;
+          }
         }
+      }
+
+      private string BuildValueConditionString(DbCommand command, Condition cond, ConditionCount condCount)
+      {
+        string rightHand = this.AppendRightHandString(command.Parameters, cond, condCount);
+
         
         if (cond.Table != null)
         {
-          if (!(cond.Value is Expr))
-          {
-            placeHolder = String.Format(placeHolder, cond.Table);
-            command.Parameters.Add(this.factory.CreateParameter(placeHolder, cond.Value.ToString()));
-          }
-
           return String.Format(
             "{0}.{1}{2}{3}",
             this.factory.QuoteIdentifier(cond.Table),
             this.factory.QuoteIdentifier(cond.Column),
             cond.Comparison.SqlString(),
-            placeHolder
+            rightHand
           );
-
         }
         else
         {
-          if (!(cond.Value is Expr))
-          {
-            placeHolder = String.Format(placeHolder, "_");
-            command.Parameters.Add(this.factory.CreateParameter(placeHolder, cond.Value.ToString()));
-          }
-
           return String.Format(
             "{0}{1}{2}",
             this.factory.QuoteIdentifier(cond.Column),
             cond.Comparison.SqlString(),
-            placeHolder
+            rightHand
           );
         }
       }
