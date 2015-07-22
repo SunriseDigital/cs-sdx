@@ -923,31 +923,34 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestSelectRawSubqueryWhere()
+    public void TestSelectSubqueryJoin()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunSelectRawSubqueryWhere(db);
+        RunSelectSubqueryJoin(db);
         ExecSql(db);
       }
     }
 
-    private void RunSelectRawSubqueryWhere(TestDb db)
+    private void RunSelectSubqueryJoin(TestDb db)
     {
       Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
         .AddColumn("*");
 
-      select.Where.Add(
-        "category_id",
-        select.Expr("(SELECT id FROM category WHERE id = 1)"),
-        comparison: Sdx.Db.Query.Comparison.In
-      );
+
+      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      sub
+        .From("category")
+        .AddColumn("id")
+        .Where.Add("id", "1");
+
+      select.Table("shop").InnerJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@category@0@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id"),
        db.Command.CommandText
       );
     }

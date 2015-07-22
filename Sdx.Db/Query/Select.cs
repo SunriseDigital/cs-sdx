@@ -33,6 +33,7 @@ namespace Sdx.Db.Query
     private List<Table> joins = new List<Table>();
     private List<Column> columns = new List<Column>();
     private Where where;
+    private int subqueryCount;
 
     public Select(Factory factory)
     {
@@ -56,7 +57,7 @@ namespace Sdx.Db.Query
     public Table From(string tableName, string alias = null)
     {
       Table from = new Table(this);
-      from.TableName = tableName;
+      from.Target = tableName;
       from.Alias = alias;
       from.JoinType = JoinType.From;
 
@@ -65,24 +66,23 @@ namespace Sdx.Db.Query
       return from;
     }
 
-    public DbCommand Build()
+    private string BuildSelectString(DbParameterCollection parameters, String subqueryKey = null)
     {
-      DbCommand command = this.factory.CreateCommand();
-
-      command.CommandText = "SELECT";
+      string selectString = "SELECT";
 
       //カラムを組み立てる
       var columnString = "";
 
       //selectのカラムを追加
-      if(this.columns.Count > 0)
+      if (this.columns.Count > 0)
       {
         columnString += " " + this.BuildColumsString();
       }
 
       //from/joinしてるテーブルのカラムを追加
-      this.joins.ForEach(sTable => {
-        if(sTable.Columns.Count > 0)
+      this.joins.ForEach(sTable =>
+      {
+        if (sTable.Columns.Count > 0)
         {
           if (columnString.Length > 0)
           {
@@ -93,7 +93,7 @@ namespace Sdx.Db.Query
         }
       });
 
-      command.CommandText += columnString + " FROM ";
+      selectString += columnString + " FROM ";
 
       //FROMを追加
       string formString = "";
@@ -107,58 +107,83 @@ namespace Sdx.Db.Query
         formString += table.BuildTableString();
       }
 
-      command.CommandText += formString;
+      selectString += formString;
 
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach(var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
         {
-          this.appendJoinString(command, table);
+          selectString += this.buildJoinString(table, parameters);
         }
 
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Left))
         {
-          this.appendJoinString(command, table);
+          selectString += this.buildJoinString(table, parameters);
         }
       }
       else
       {
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          this.appendJoinString(command, table);
+          selectString += this.buildJoinString(table, parameters);
         }
       }
 
-      if(this.where.Count > 0)
+      if (this.where.Count > 0)
       {
-        command.CommandText += " WHERE ";
-        this.where.Build(command);
+        selectString += " WHERE ";
+        selectString += this.where.Build(parameters, subqueryKey);
       }
 
-      return command;
+      return selectString;
     }
 
-    private void appendJoinString(DbCommand command, Table table)
+    private string buildJoinString(Table table, DbParameterCollection parameters)
     {
-      command.CommandText += " " 
-        + table.JoinType.SqlString() + " "
-        + this.Factory.QuoteIdentifier(table);
+      string joinString = "";
 
+      if (table.Target is Select)
+      {
+        Select select = table.Target as Select;
+        string subquery = select.BuildSelectString(parameters, this.subqueryCount.ToString());
+        ++this.subqueryCount;
+        joinString += " "
+          + table.JoinType.SqlString() + " "
+          + "(" + subquery + ")";
+      }
+      else
+      {
+        joinString += " "
+          + table.JoinType.SqlString() + " "
+          + this.Factory.QuoteIdentifier(table);
+      }
 
       if (table.Alias != null)
       {
-        command.CommandText += " AS " + this.Factory.QuoteIdentifier(table.Name);
+        joinString += " AS " + this.Factory.QuoteIdentifier(table.Name);
       }
 
       if (table.JoinCondition != null)
       {
-        command.CommandText += " ON "
+        joinString += " ON "
           + String.Format(
             table.JoinCondition,
             this.Factory.QuoteIdentifier(table.ParentTable.Name),
             this.Factory.QuoteIdentifier(table.Name)
           );
       }
+
+      return joinString;
+    }
+
+    public DbCommand Build()
+    {
+      this.subqueryCount = 0;
+      DbCommand command = this.factory.CreateCommand();
+
+      command.CommandText = this.BuildSelectString(command.Parameters);
+
+      return command;
     }
 
     public Table Table(string name)

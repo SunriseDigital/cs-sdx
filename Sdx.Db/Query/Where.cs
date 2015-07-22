@@ -157,7 +157,7 @@ namespace Sdx.Db.Query
         this.wheres.Add(cond);
       }
 
-      private void Build(DbCommand command, ConditionCount condCount)
+      private string Build(DbParameterCollection parameters, ConditionCount condCount, string subqueryKey)
       {
         string whereString = "";
 
@@ -170,15 +170,11 @@ namespace Sdx.Db.Query
 
           if (cond.Where != null)
           {
-            if(condCount.Value > 0)
-            {
-              command.CommandText += cond.Logical.SqlString();
-            }
-            cond.Where.Build(command, condCount);
+            whereString += cond.Where.Build(parameters, condCount, subqueryKey);
           }
           else
           {
-            whereString += this.BuildValueConditionString(command, cond, condCount);
+            whereString += this.BuildValueConditionString(parameters, cond, condCount, subqueryKey);
             condCount.Incr();
           }
         });
@@ -188,10 +184,10 @@ namespace Sdx.Db.Query
           whereString = "(" + whereString + ")";
         }
 
-        command.CommandText += whereString;
+        return whereString;
       }
 
-      private string AppendRightHandString(DbParameterCollection parameters, Condition cond, ConditionCount condCount)
+      private string AppendRightHandString(DbParameterCollection parameters, Condition cond, ConditionCount condCount, string subqueryKey)
       {
         string rightHand;
         if (cond.Value is Expr)
@@ -200,7 +196,16 @@ namespace Sdx.Db.Query
         }
         else
         {
-          string rightHandFormat = "@" + cond.Column + "@{0}@" + condCount.Value;
+          string rightHandFormat;
+          if(subqueryKey != null)
+          {
+            rightHandFormat = "@" + cond.Column + "@{0}@" + subqueryKey + "@" + condCount.Value;
+          }
+          else
+          {
+            rightHandFormat = "@" + cond.Column + "@{0}@" + condCount.Value;
+          }
+           
           if (cond.Table != null)
           {
             rightHand = String.Format(rightHandFormat, cond.Table);
@@ -216,10 +221,9 @@ namespace Sdx.Db.Query
         }
       }
 
-      private string BuildValueConditionString(DbCommand command, Condition cond, ConditionCount condCount)
+      private string BuildValueConditionString(DbParameterCollection parameters, Condition cond, ConditionCount condCount, string subqueryKey)
       {
-        string rightHand = this.AppendRightHandString(command.Parameters, cond, condCount);
-
+        string rightHand = this.AppendRightHandString(parameters, cond, condCount, subqueryKey);
         
         if (cond.Table != null)
         {
@@ -244,7 +248,7 @@ namespace Sdx.Db.Query
 
       public void Build(DbCommand command)
       {
-        this.Build(command, new ConditionCount());
+        command.CommandText += this.Build(command.Parameters, new ConditionCount(), null);
       }
 
       public DbCommand Build()
@@ -252,6 +256,11 @@ namespace Sdx.Db.Query
         var command = this.factory.CreateCommand();
         this.Build(command);
         return command;
+      }
+
+      internal string Build(DbParameterCollection parameters, string subquerykey)
+      {
+        return this.Build(parameters, new ConditionCount(), subquerykey);
       }
     }
 }
