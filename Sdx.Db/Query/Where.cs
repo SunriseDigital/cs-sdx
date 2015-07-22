@@ -178,28 +178,7 @@ namespace Sdx.Db.Query
           }
           else
           {
-            var placeHolder = "@" + cond.Column + "@{0}@" + condCount.Value;
-            if (cond.Table != null)
-            {
-              placeHolder = String.Format(placeHolder, cond.Table);
-              whereString += String.Format(
-                "{0}.{1} = {2}",
-                this.factory.QuoteIdentifier(cond.Table),
-                this.factory.QuoteIdentifier(cond.Column),
-                placeHolder
-              );
-            }
-            else
-            {
-              placeHolder =  String.Format(placeHolder, "_");
-              whereString += String.Format(
-                "{0} = {1}",
-                this.factory.QuoteIdentifier(cond.Column),
-                placeHolder
-              );
-            }
-
-            command.Parameters.Add(this.factory.CreateParameter(placeHolder, cond.Value.ToString()));
+            whereString += this.BuildValueConditionString(command, cond, condCount);
             condCount.Incr();
           }
         });
@@ -210,6 +189,52 @@ namespace Sdx.Db.Query
         }
 
         command.CommandText += whereString;
+      }
+
+      private string BuildValueConditionString(DbCommand command, Condition cond, ConditionCount condCount)
+      {
+        string placeHolder;
+        if(cond.Value is Expr)
+        {
+          placeHolder = cond.Value.ToString();
+        }
+        else
+        {
+          placeHolder = "@" + cond.Column + "@{0}@" + condCount.Value;
+        }
+        
+        if (cond.Table != null)
+        {
+          if (!(cond.Value is Expr))
+          {
+            placeHolder = String.Format(placeHolder, cond.Table);
+            command.Parameters.Add(this.factory.CreateParameter(placeHolder, cond.Value.ToString()));
+          }
+
+          return String.Format(
+            "{0}.{1}{2}{3}",
+            this.factory.QuoteIdentifier(cond.Table),
+            this.factory.QuoteIdentifier(cond.Column),
+            cond.Comparison.SqlString(),
+            placeHolder
+          );
+
+        }
+        else
+        {
+          if (!(cond.Value is Expr))
+          {
+            placeHolder = String.Format(placeHolder, "_");
+            command.Parameters.Add(this.factory.CreateParameter(placeHolder, cond.Value.ToString()));
+          }
+
+          return String.Format(
+            "{0}{1}{2}",
+            this.factory.QuoteIdentifier(cond.Column),
+            cond.Comparison.SqlString(),
+            placeHolder
+          );
+        }
       }
 
       public void Build(DbCommand command)

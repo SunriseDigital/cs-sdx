@@ -787,13 +787,11 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void trySqlAction()
     {
-      var factory = new Sdx.Db.MySqlFactory();
-      factory.ConnectionString = MySqlConnectionString;
+      var factory = new Sdx.Db.SqlServerFactory();
+      factory.ConnectionString = SqlServerConnectionString;
       var con = factory.CreateConnection();
       var command = factory.CreateCommand();
-      command.CommandText = "SELECT * FROM shop INNER JOIN (SELECT id FROM category WHERE id = @sub_cat@id) as sub_cat ON shop.category_id = sub_cat.id WHERE shop.id = @shop@id";
-      command.Parameters.Add(factory.CreateParameter("@shop@id", "1"));
-      command.Parameters.Add(factory.CreateParameter("@sub_cat@id", "1"));
+      command.CommandText = "SELECT * FROM shop WHERE [category_id] IN (SELECT id FROM category WHERE id = 1)";
       using (con)
       {
         con.Open();
@@ -920,6 +918,36 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id"),
+       db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectRawSubqueryWhere()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectRawSubqueryWhere(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectRawSubqueryWhere(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*");
+
+      select.Where.Add(
+        "category_id",
+        select.Expr("(SELECT id FROM category WHERE id = 1)"),
+        comparison: Sdx.Db.Query.Comparison.In
+      );
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)"),
        db.Command.CommandText
       );
     }
