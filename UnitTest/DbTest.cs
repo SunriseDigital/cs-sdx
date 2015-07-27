@@ -844,6 +844,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Command.CommandText
       );
 
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+
       select.Where.Add("name", "foo", "shop");
 
       db.Command = select.Build();
@@ -851,6 +854,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@0 AND {0}shop{1}.{0}name{1} = @name@1"),
        db.Command.CommandText
       );
+
+      Assert.Equal(2, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+      Assert.Equal("foo", db.Command.Parameters[1].Value);
 
       //tableに対する呼び出し
       select = db.Factory.CreateSelect();
@@ -863,6 +870,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@0"),
        db.Command.CommandText
       );
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
 
       //WhereのAdd
       select = db.Factory.CreateSelect();
@@ -879,6 +889,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 OR {0}id{1} = @id@1)"),
        db.Command.CommandText
       );
+
+      Assert.Equal(2, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+      Assert.Equal("2", db.Command.Parameters[1].Value);
 
       //Where2つをORでつなぐ
       select = db.Factory.CreateSelect();
@@ -900,6 +914,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 AND {0}id{1} = @id@1) OR ({0}id{1} = @id@2 OR {0}id{1} = @id@3)"),
        db.Command.CommandText
       );
+
+      Assert.Equal(4, db.Command.Parameters.Count);
+      Assert.Equal("3", db.Command.Parameters[0].Value);
+      Assert.Equal("4", db.Command.Parameters[1].Value);
+      Assert.Equal("1", db.Command.Parameters[2].Value);
+      Assert.Equal("2", db.Command.Parameters[3].Value);
     }
 
     [Fact]
@@ -929,6 +949,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id"),
        db.Command.CommandText
       );
+
+      Assert.Equal(0, db.Command.Parameters.Count);
     }
 
     [Fact]
@@ -953,7 +975,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       sub
         .From("category")
         .AddColumn("id")
-        .Where.Add("id", "1");
+        .Where.Add("id", "2");
 
       select.Table("shop").InnerJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
 
@@ -962,6 +984,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @id@1"),
        db.Command.CommandText
       );
+
+      Assert.Equal(2, db.Command.Parameters.Count);
+      Assert.Equal("2", db.Command.Parameters[0].Value);//サブクエリのWhereの方が先にAddされる
+      Assert.Equal("1", db.Command.Parameters[1].Value);
     }
 
     [Fact]
@@ -986,7 +1012,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       sub
         .From("category")
         .AddColumn("id")
-        .Where.Add("id", "1");
+        .Where.Add("id", "2");
 
       select.Table("shop").Where.Add("category_id", sub, comparison:Sdx.Db.Query.Comparison.In);
 
@@ -995,6 +1021,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@0 AND {0}shop{1}.{0}category_id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@1)"),
        db.Command.CommandText
       );
+
+      Assert.Equal(2, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+      Assert.Equal("2", db.Command.Parameters[1].Value);
     }
 
     [Fact]
@@ -1025,6 +1055,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @id@0"),
        db.Command.CommandText
       );
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
     }
 
     [Fact]
@@ -1049,7 +1082,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       sub
         .From("category")
         .AddColumn("id")
-        .Where.Add("id", "1");
+        .Where.Add("id", "2");
 
       select.From(sub, "sub_cat");
 
@@ -1058,6 +1091,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @id@1"),
        db.Command.CommandText
       );
+
+      Assert.Equal(2, db.Command.Parameters.Count);
+      Assert.Equal("2", db.Command.Parameters[0].Value);//サブクエリーのWhereの方が先にAddされる
+      Assert.Equal("1", db.Command.Parameters[1].Value);
     }
 
     [Fact]
@@ -1086,6 +1123,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Command.CommandText
       );
 
+      Assert.Equal(4, db.Command.Parameters.Count);
       Assert.Equal("1", db.Command.Parameters[0].Value);
       Assert.Equal("2", db.Command.Parameters[1].Value);
       Assert.Equal("3", db.Command.Parameters[2].Value);
