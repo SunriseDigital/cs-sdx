@@ -39,9 +39,35 @@ namespace Sdx.Db.Query
 
     public string Alias { get; set; }
 
+    public Table Table { get; set; }
+
     public object Name
     {
       get { return this.name; }
+    }
+
+    private string QuotedName(Factory factory)
+    {
+      if(this.name is Expr)
+      {
+        return factory.QuoteIdentifier(this.name as Expr);
+      }
+      else
+      {
+        return factory.QuoteIdentifier(this.name as String);
+      }
+    }
+
+    internal string Build(Factory factory)
+    {
+      if(this.Table != null)
+      {
+        return factory.QuoteIdentifier(this.Table) + "." + this.QuotedName(factory);
+      }
+      else
+      {
+        return this.QuotedName(factory);
+      }
     }
   }
 }

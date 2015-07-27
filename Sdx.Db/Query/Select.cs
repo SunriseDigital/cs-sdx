@@ -32,6 +32,7 @@ namespace Sdx.Db.Query
     private Factory factory;
     private List<Table> joins = new List<Table>();
     private List<Column> columns = new List<Column>();
+    private List<Column> groups = new List<Column>();
     private Where where;
 
     public Select(Factory factory)
@@ -49,6 +50,11 @@ namespace Sdx.Db.Query
     internal List<Table> Joins
     {
       get { return this.joins; }
+    }
+
+    internal List<Column> Groups
+    {
+      get { return this.groups; }
     }
 
     public JoinOrder JoinOrder { get; set; }
@@ -121,6 +127,7 @@ namespace Sdx.Db.Query
 
       selectString += formString;
 
+      //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
         foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
@@ -146,6 +153,24 @@ namespace Sdx.Db.Query
         selectString += " WHERE ";
         selectString += this.where.Build(parameters, condCount);
       }
+
+      //GROUP
+      if (this.Groups.Count > 0)
+      {
+        var groupString = "";
+        this.Groups.ForEach(column =>
+        {
+          if(groupString != "")
+          {
+            groupString += ", ";
+          }
+
+          groupString += column.Build(this.factory);
+        });
+
+        selectString += " GROUP BY " + groupString;
+      }
+
 
       return selectString;
     }
@@ -309,6 +334,13 @@ namespace Sdx.Db.Query
     public Expr Expr(string str)
     {
       return new Expr(str);
+    }
+
+    public Select Group(string columnName)
+    {
+      var column = new Column(columnName);
+      this.groups.Add(column);
+      return this;
     }
   }
 }

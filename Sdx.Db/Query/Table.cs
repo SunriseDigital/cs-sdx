@@ -181,5 +181,13 @@ namespace Sdx.Db.Query
         //}
       }
     }
+
+    public Table Group(object columnName)
+    {
+      var column = new Column(columnName);
+      column.Table = this;
+      this.select.Groups.Add(column);
+      return this;
+    }
   }
 }
