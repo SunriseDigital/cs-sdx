@@ -1060,6 +1060,38 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
     }
 
+    [Fact]
+    public void TestSelectWhereIn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectWhereIn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectWhereIn(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*")
+        .Where
+          .Add("id", new string[] { "1", "2" })
+          .AddOr("id", new string[] { "3", "4" });
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} IN (@id@0, @id@1) OR {0}shop{1}.{0}id{1} IN (@id@2, @id@3)"),
+       db.Command.CommandText
+      );
+
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+      Assert.Equal("2", db.Command.Parameters[1].Value);
+      Assert.Equal("3", db.Command.Parameters[2].Value);
+      Assert.Equal("4", db.Command.Parameters[3].Value);
+    }
+
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
     /// </summary>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Data.Common;
+using System.Linq;
 
 namespace Sdx.Db.Query
 {
@@ -57,7 +58,6 @@ namespace Sdx.Db.Query
     {
       private class Condition
       {
-        public Where Where { get; set; }
         public string Table { get; set; }
         public Comparison Comparison { get; set; }
         public Logical Logical { get; set; }
@@ -111,7 +111,7 @@ namespace Sdx.Db.Query
         where.EnableBracket = true;
         this.Add(new Condition
         {
-          Where = where,
+          Value = where,
           Logical = logical
         });
         return this;
@@ -158,14 +158,14 @@ namespace Sdx.Db.Query
             whereString += cond.Logical.SqlString();
           }
 
-          if (cond.Where != null)
+          if (cond.Value is Where)
           {
-            whereString += cond.Where.Build(parameters, condCount);
+            Where where = cond.Value as Where;
+            whereString += where.Build(parameters, condCount);
           }
           else
           {
             whereString += this.BuildValueConditionString(parameters, cond, condCount);
-            condCount.Incr();
           }
         });
 
@@ -183,16 +183,38 @@ namespace Sdx.Db.Query
         if (cond.Value is Expr)
         {
           rightHand = cond.Value.ToString();
+          condCount.Incr();
         }
         else if (cond.Value is Select)
         {
           Select select = (Select)cond.Value;
           rightHand = "(" + select.BuildSelectString(parameters, condCount) + ")";
         }
+        //IEnumerable<>かどうかチェック。
+        else if (!(cond.Value is string) && cond.Value.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
+        {
+          cond.Comparison = Comparison.In;
+          string inCond = "";
+          var list = cond.Value as IEnumerable<object>;
+          foreach(var value in list)
+          {
+            if(inCond != "")
+            {
+              inCond += ", ";
+            }
+            string holder = "@" + cond.Column + "@" + condCount.Value;
+            parameters.Add(this.factory.CreateParameter(holder, value.ToString()));
+            inCond += holder;
+            condCount.Incr();
+          }
+
+          rightHand = "(" + inCond + ")";
+        }
         else
         {
           rightHand = "@" + cond.Column + "@" + condCount.Value;
           parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
+          condCount.Incr();
         }
         
         if (cond.Table != null)
