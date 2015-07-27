@@ -69,11 +69,6 @@ namespace Sdx.Db
       return expr.ToString();
     }
 
-    public string QuoteIdentifier(Sdx.Db.Query.Column column)
-    {
-      return this.QuoteIdentifier(column.Name);
-    }
-
     public string QuoteIdentifier(Sdx.Db.Query.Table table)
     {
       return this.QuoteIdentifier(table.Target);

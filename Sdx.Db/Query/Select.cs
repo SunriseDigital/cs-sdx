@@ -84,20 +84,6 @@ namespace Sdx.Db.Query
         columnString += " " + this.BuildColumsString();
       }
 
-      //from/joinしてるテーブルのカラムを追加
-      this.joins.ForEach(sTable =>
-      {
-        if (sTable.Columns.Count > 0)
-        {
-          if (columnString.Length > 0)
-          {
-            columnString += ",";
-          }
-
-          columnString += " " + sTable.BuildColumsString();
-        }
-      });
-
       selectString += columnString + " FROM ";
 
       //FROMを追加
@@ -239,9 +225,17 @@ namespace Sdx.Db.Query
       get { return this.columns; }
     }
 
-    public Select ClearColumns()
+    public Select ClearColumns(Table table = null)
     {
-      this.columns.Clear();
+      if (table == null)
+      {
+        this.columns.Clear();
+      }
+      else
+      {
+        this.columns.RemoveAll(column => column.Table != null && column.Table.Name == table.Name);
+      }
+      
       return this;
     }
 
@@ -290,13 +284,7 @@ namespace Sdx.Db.Query
           result += ", ";
         }
 
-        result += this.Factory.QuoteIdentifier(column);
-
-        if (column.Alias != null)
-        {
-          result += " AS " + this.Factory.QuoteIdentifier(column.Alias);
-        }
-
+        result += column.Build(this.factory);
       });
 
       return result;
@@ -311,8 +299,11 @@ namespace Sdx.Db.Query
 
       if (findIndex != -1)
       {
+        this.ClearColumns(this.joins[findIndex]);
         this.joins.RemoveAt(findIndex);
       }
+
+      
 
       return this;
     }

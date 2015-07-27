@@ -60,14 +60,22 @@ namespace Sdx.Db.Query
 
     internal string Build(Factory factory)
     {
+      var sql = "";
       if(this.Table != null)
       {
-        return factory.QuoteIdentifier(this.Table) + "." + this.QuotedName(factory);
+        sql = factory.QuoteIdentifier(this.Table.Name) + "." + this.QuotedName(factory);
       }
       else
       {
-        return this.QuotedName(factory);
+        sql = this.QuotedName(factory);
       }
+
+      if(this.Alias != null)
+      {
+        sql += " AS " + factory.QuoteIdentifier(this.Alias);
+      }
+
+      return sql;
     }
   }
 }

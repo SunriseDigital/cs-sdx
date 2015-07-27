@@ -8,8 +8,6 @@ namespace Sdx.Db.Query
   {
     private Select select;
 
-    private List<Column> columns = new List<Column>();
-
     public Table(Select select)
     {
       this.select = select;
@@ -18,11 +16,6 @@ namespace Sdx.Db.Query
     public object Target { get; internal set; }
 
     public string Alias { get; internal set; }
-
-    public List<Column> Columns
-    {
-      get { return this.columns; }
-    }
 
     public string Name
     {
@@ -34,38 +27,7 @@ namespace Sdx.Db.Query
         }
 
         return this.Target.ToString(); 
-      
       }
-    }
-
-    internal string BuildColumsString()
-    {
-      if (this.columns.Count == 0 && this.ParentTable == null)
-      {
-        //TODO これが意図したときに呼ばれてない気がする。後、これは例外じゃ無いほうがいいのでは？
-        throw new Exception("Column is empty.");
-      }
-
-      var result = "";
-      this.columns.ForEach((column) =>
-      {
-        if (result.Length > 0)
-        {
-          result += ", ";
-        }
-
-        result += this.select.Factory.QuoteIdentifier(this.Name) + ".";
-
-        result += this.select.Factory.QuoteIdentifier(column);
-
-        if(column.Alias != null)
-        {
-          result += " AS " + this.select.Factory.QuoteIdentifier(column.Alias);
-        }
-        
-      });
-
-      return result;
     }
 
     private Table AddJoin(object table, JoinType joinType, string condition, string alias = null)
@@ -117,7 +79,7 @@ namespace Sdx.Db.Query
 
     public Table ClearColumns()
     {
-      this.Columns.Clear();
+      this.select.ClearColumns(this);
       return this;
     }
 
@@ -141,7 +103,8 @@ namespace Sdx.Db.Query
     {
       var column = new Column(columnName);
       column.Alias = alias;
-      this.columns.Add(column);
+      column.Table = this;
+      this.select.Columns.Add(column);
       return this;
     }
 
