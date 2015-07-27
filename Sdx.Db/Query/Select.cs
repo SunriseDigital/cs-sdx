@@ -73,45 +73,23 @@ namespace Sdx.Db.Query
 
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
-      string selectString = "SELECT";
+      string selectString = "SELECT ";
 
       //カラムを組み立てる
-      var columnString = "";
-
-      //selectのカラムを追加
-      if (this.columns.Count > 0)
-      {
-        columnString += " " + this.BuildColumsString();
-      }
-
-      selectString += columnString + " FROM ";
+      selectString += this.BuildColumsString() + " FROM ";
 
       //FROMを追加
-      string formString = "";
+      var fromString = "";
       foreach (Table table in this.joins.Where(t => t.JoinType == JoinType.From))
       {
-        if (formString != "")
+        if (fromString != "")
         {
-          formString += ", ";
+          fromString += ", ";
         }
-
-        if(table.Target is Select)
-        {
-          Select select = table.Target as Select;
-          formString += "(" + select.BuildSelectString(parameters, condCount) + ")";
-        }
-        else
-        {
-          formString += this.Factory.QuoteIdentifier(table);
-        }
-
-        if (table.Alias != null)
-        {
-          formString += " AS " + this.Factory.QuoteIdentifier(table.Alias);
-        }
+        fromString += this.buildJoinString(table, parameters, condCount);
       }
 
-      selectString += formString;
+      selectString += fromString;
 
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
@@ -165,19 +143,20 @@ namespace Sdx.Db.Query
     {
       string joinString = "";
 
+      if (table.JoinType != JoinType.From)
+      {
+        joinString += " " + table.JoinType.SqlString() + " ";
+      }
+
       if (table.Target is Select)
       {
         Select select = table.Target as Select;
         string subquery = select.BuildSelectString(parameters, condCount);
-        joinString += " "
-          + table.JoinType.SqlString() + " "
-          + "(" + subquery + ")";
+        joinString += "(" + subquery + ")";
       }
       else
       {
-        joinString += " "
-          + table.JoinType.SqlString() + " "
-          + this.Factory.QuoteIdentifier(table);
+        joinString += this.Factory.QuoteIdentifier(table);
       }
 
       if (table.Alias != null)
@@ -302,8 +281,6 @@ namespace Sdx.Db.Query
         this.ClearColumns(this.joins[findIndex]);
         this.joins.RemoveAt(findIndex);
       }
-
-      
 
       return this;
     }
