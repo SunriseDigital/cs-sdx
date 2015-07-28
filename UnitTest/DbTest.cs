@@ -261,7 +261,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       {
         var command = db.Factory.CreateCommand();
         var counter = new Sdx.Db.Query.Counter();
-        var where = db.Factory.CreateWhere();
+        var select = db.Factory.CreateSelect();
+        var where = select.CreateWhere();
 
         where.Add("id", "1");
         command.CommandText = where.Build(command.Parameters, counter);
@@ -1104,6 +1105,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectGroup(TestDb db)
     {
+      //TableにGroup
       Sdx.Db.Query.Select select = db.Factory.CreateSelect();
       select
         .From("shop")
@@ -1117,16 +1119,21 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       select.Having.Add(
-        new Sdx.Db.Query.Expr("SUM(id)"),
+        new Sdx.Db.Query.Expr("SUM({shop}.id)"),
         10,
         Sdx.Db.Query.Comparison.GreaterEqual
       );
+
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} GROUP BY {0}shop{1}.{0}id{1} HAVING SUM(id) >= @0"),
+       db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} GROUP BY {0}shop{1}.{0}id{1} HAVING SUM({0}shop{1}.id) >= @0"),
        db.Command.CommandText
       );
 
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("10", db.Command.Parameters[0].Value);
+
+      //selectに直接
       select = db.Factory.CreateSelect();
       select.From("shop");
 
@@ -1134,17 +1141,28 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .AddColumn("id")
         .Group("id");
 
+      select.Having.Add(
+        new Sdx.Db.Query.Expr("SUM(id)"),
+        20,
+        Sdx.Db.Query.Comparison.GreaterEqual
+      );
+
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}id{1} FROM {0}shop{1} GROUP BY {0}id{1}"),
+       db.Sql("SELECT {0}id{1} FROM {0}shop{1} GROUP BY {0}id{1} HAVING SUM(id) >= @0"),
        db.Command.CommandText
       );
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("20", db.Command.Parameters[0].Value);
+
+
     }
 
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
     /// </summary>
-    /// <param name="factory"></param>
+    /// <param name="select"></param>
     /// <param name="commands"></param>
     private void ExecSql(TestDb db)
     {

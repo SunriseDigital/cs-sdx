@@ -40,8 +40,8 @@ namespace Sdx.Db.Query
     {
       this.factory = factory;
       this.JoinOrder = JoinOrder.InnerFront;
-      this.where = new Where(factory);
-      this.having = new Where(factory);
+      this.where = new Where(this);
+      this.having = new Where(this);
     }
 
     internal Factory Factory
@@ -304,7 +304,7 @@ namespace Sdx.Db.Query
 
     public Where CreateWhere()
     {
-      return new Where(this.factory);
+      return new Where(this);
     }
 
     public Expr Expr(string str)

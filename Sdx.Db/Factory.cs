@@ -34,11 +34,6 @@ namespace Sdx.Db
       return param;
     }
 
-    public Sdx.Db.Query.Where CreateWhere()
-    {
-      return new Sdx.Db.Query.Where(this);
-    }
-
     public DbCommand CreateCommand()
     {
       return this.factory.CreateCommand();

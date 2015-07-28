@@ -65,7 +65,7 @@ namespace Sdx.Db.Query
       }
 
       private List<Condition> wheres = new List<Condition>();
-      private Factory factory;
+      private Select select;
 
       public int Count
       {
@@ -76,9 +76,9 @@ namespace Sdx.Db.Query
 
       public Table Table { get; set; }
 
-      public Where(Factory factory)
+      public Where(Select select)
       {
-        this.factory = factory;
+        this.select = select;
       }
 
       public Where AddOr(Where where)
@@ -199,7 +199,7 @@ namespace Sdx.Db.Query
               inCond += ", ";
             }
             string holder = "@" + condCount.Value;
-            parameters.Add(this.factory.CreateParameter(holder, value.ToString()));
+            parameters.Add(this.select.Factory.CreateParameter(holder, value.ToString()));
             inCond += holder;
             condCount.Incr();
           }
@@ -209,13 +209,19 @@ namespace Sdx.Db.Query
         else
         {
           rightHand = "@" + condCount.Value;
-          parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
+          parameters.Add(this.select.Factory.CreateParameter(rightHand, cond.Value.ToString()));
           condCount.Incr();
         }
 
+        var leftHand = cond.Column.Build(this.select.Factory);
+
+        this.select.Joins.ForEach(table => {
+          leftHand = leftHand.Replace("{"+table.Name+"}", this.select.Factory.QuoteIdentifier(table.Name));
+        });
+
         return String.Format(
           "{0}{1}{2}",
-          cond.Column.Build(this.factory),
+          leftHand,
           cond.Comparison.SqlString(),
           rightHand
         );
