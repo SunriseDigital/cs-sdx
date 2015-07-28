@@ -3,16 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sdx.DebugTool;
 
 using Xunit;
-using Sdx.DebugTool;
+using UnitTest.DummyClasses;
+
+#if ON_VISUAL_STUDIO
+using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
+using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
+using ClassInitializeAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;
+using ClassCleanupAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute;
+using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
+#endif
 
 namespace UnitTest
 {
-  public class DebugToolTest
+  [TestClass]
+  public class DebugToolTest : BaseTest
   {
     [Fact]
-    public void DumpString()
+    public void TestDumpString()
     {
       Assert.Equal("String(4) aaaa", Debug.Dump("aaaa"));
       Assert.Equal("String(3) 日本語", Debug.Dump("日本語"));
@@ -20,7 +30,7 @@ namespace UnitTest
     }
 
     [Fact]
-    public void DumpArray()
+    public void TestDumpArray()
     {
       Assert.Equal(
         "System.String[](1)" + Environment.NewLine +
@@ -58,7 +68,7 @@ namespace UnitTest
     }
 
     [Fact]
-    public void DumpDictionary()
+    public void TestDumpDictionary()
     {
       Dictionary<String, String> dic = new Dictionary<string, string>();
       dic.Add("foo", "bar");

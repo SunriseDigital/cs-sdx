@@ -6,5 +6,5 @@
 
 ## Classes
 
-* [Debug](https://github.com/SunriseDigital/cs-sdx/blob/master/Sdx.DebugTool/Debug.md)
-* [DisplayHttpModule](https://github.com/SunriseDigital/cs-sdx/blob/master/Sdx.DebugTool/DisplayHttpModule.md)
+* [Debug](Debug.md)
+* [DisplayHttpModule](DisplayHttpModule.md)
