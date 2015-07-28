@@ -34,12 +34,14 @@ namespace Sdx.Db.Query
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private Where where;
+    private Where having;
 
     public Select(Factory factory)
     {
       this.factory = factory;
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Where(factory);
+      this.having = new Where(factory);
     }
 
     internal Factory Factory
@@ -135,6 +137,12 @@ namespace Sdx.Db.Query
         selectString += " GROUP BY " + groupString;
       }
 
+      //Having
+      if(this.having.Count > 0)
+      {
+        selectString += " HAVING ";
+        selectString += this.having.Build(parameters, condCount);
+      }
 
       return selectString;
     }
@@ -309,6 +317,15 @@ namespace Sdx.Db.Query
       var column = new Column(columnName);
       this.groups.Add(column);
       return this;
+    }
+
+    public Where Having 
+    {
+      get
+      {
+        this.having.Table = null;
+        return this.having;
+      }
     }
   }
 }

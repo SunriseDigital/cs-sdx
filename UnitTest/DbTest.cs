@@ -23,7 +23,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 namespace UnitTest
 {
   [TestClass]
-  public class DbTest :BaseTest
+  public class DbTest : BaseTest
   {
     /// <summary>
     /// 複数のDBのテストをまとめて行うためのDbFactoryのラッパークラス
@@ -36,7 +36,7 @@ namespace UnitTest
       public Sdx.Db.Factory Factory { get; set; }
       public String LeftQuoteChar { get; set; }
       public String RightQupteChar { get; set; }
-      public DbCommand Command 
+      public DbCommand Command
       {
         get { return this.command; }
         set { this.command = value; this.commands.Add(command); }
@@ -100,7 +100,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
 
       factory.ConnectionString = DbTest.MySqlConnectionString;
       var con = factory.CreateConnection();
-      using(con)
+      using (con)
       {
         con.Open();
         DbTest.ExecuteSqlFile(con, "setup.mysql.sql");
@@ -132,7 +132,7 @@ DROP DATABASE [sdxtest]
 ";
           dropSql.ExecuteNonQuery();
         }
-        catch(DbException e)
+        catch (DbException e)
         {
           //do nothing
         }
@@ -165,7 +165,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       factory.ConnectionString = DbTest.SqlServerConnectionString;
       var con = factory.CreateConnection();
-      using(con)
+      using (con)
       {
         con.Open();
         DbTest.ExecuteSqlFile(con, "setup.sqlserver.sql");
@@ -258,7 +258,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
         where.Add("type", 2, "category");
         command.CommandText = where.Build(command.Parameters, counter);
-        
+
         Assert.Equal(
           db.Sql("{0}shop{1}.{0}id{1} = '1' AND {0}category{1}.{0}type{1} = '2'"),
           Sdx.Db.Util.CommandToSql(command)
@@ -333,7 +333,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     [Fact]
     public void TestSelectSimple()
     {
-      foreach(TestDb db in this.CreateTestDbList())
+      foreach (TestDb db in this.CreateTestDbList())
       {
         RunSelectSimple(db);
         ExecSql(db);
@@ -755,7 +755,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}id{1} AS {0}shop_id{1}, {0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
-      
+
       //AddColumn MAX
       select.ClearColumns().Remove("shop").From("shop");
       select.AddColumn(
@@ -840,7 +840,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @0"),
        db.Command.CommandText
       );
 
@@ -851,7 +851,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @id@0 AND {0}shop{1}.{0}name{1} = @name@1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @0 AND {0}shop{1}.{0}name{1} = @1"),
        db.Command.CommandText
       );
 
@@ -867,7 +867,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @0"),
        db.Command.CommandText
       );
 
@@ -886,7 +886,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 OR {0}id{1} = @id@1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @0 OR {0}id{1} = @1)"),
        db.Command.CommandText
       );
 
@@ -911,7 +911,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @id@0 AND {0}id{1} = @id@1) OR ({0}id{1} = @id@2 OR {0}id{1} = @id@3)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @0 AND {0}id{1} = @1) OR ({0}id{1} = @2 OR {0}id{1} = @3)"),
        db.Command.CommandText
       );
 
@@ -981,7 +981,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @id@1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -1014,11 +1014,11 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").Where.Add("category_id", sub, comparison:Sdx.Db.Query.Comparison.In);
+      select.Table("shop").Where.Add("category_id", sub, comparison: Sdx.Db.Query.Comparison.In);
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @id@0 AND {0}shop{1}.{0}category_id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @0 AND {0}shop{1}.{0}category_id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @1)"),
        db.Command.CommandText
       );
 
@@ -1052,7 +1052,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @id@0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @0"),
        db.Command.CommandText
       );
 
@@ -1088,7 +1088,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @id@0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @id@1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -1119,7 +1119,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} IN (@id@0, @id@1) OR {0}shop{1}.{0}id{1} IN (@id@2, @id@3)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} IN (@0, @1) OR {0}shop{1}.{0}id{1} IN (@2, @3)"),
        db.Command.CommandText
       );
 
@@ -1154,6 +1154,17 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Command.CommandText
       );
 
+      select.Having.Add(
+        new Sdx.Db.Query.Expr("SUM(id)"),
+        10,
+        comparison: Sdx.Db.Query.Comparison.GreaterEqual
+      );
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} GROUP BY {0}shop{1}.{0}id{1} HAVING SUM(id) >= @0"),
+       db.Command.CommandText
+      );
+
       select = db.Factory.CreateSelect();
       select.From("shop");
 
@@ -1178,7 +1189,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Commands.ForEach(command =>
       {
         DbConnection con = db.Factory.CreateConnection();
-        using(con)
+        using (con)
         {
           con.Open();
           command.Connection = con;

@@ -61,7 +61,7 @@ namespace Sdx.Db.Query
         public string Table { get; set; }
         public Comparison Comparison { get; set; }
         public Logical Logical { get; set; }
-        public string Column { get; set; }
+        public object Column { get; set; }
         public object Value { get; set; }
       }
 
@@ -84,29 +84,29 @@ namespace Sdx.Db.Query
 
       public Where AddOr(Where where)
       {
-        this.Add(where, Logical.Or);
+        this.AddWhere(where, Logical.Or);
         return this;
       }
 
       public Where AddOr(String column, Object value, String table = null, Comparison comparison = Comparison.Equal)
       {
-        this.Add(column, value, Logical.Or, table, comparison);
+        this.AddColumn(column, value, Logical.Or, table, comparison);
         return this;
       }
 
       public Where Add(Where where)
       {
-        this.Add(where, Logical.And);
+        this.AddWhere(where, Logical.And);
         return this;
       }
 
-      public Where Add(String column, Object value, String table = null, Comparison comparison = Comparison.Equal)
+      public Where Add(Object column, Object value, String table = null, Comparison comparison = Comparison.Equal)
       {
-        this.Add(column, value, Logical.And, table, comparison);
+        this.AddColumn(column, value, Logical.And, table, comparison);
         return this;
       }
 
-      private Where Add(Where where, Logical logical)
+      private Where AddWhere(Where where, Logical logical)
       {
         where.EnableBracket = true;
         this.Add(new Condition
@@ -117,7 +117,7 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private Where Add(String column, Object value, Logical logical, String table = null, Comparison comparison = Comparison.Equal)
+      private Where AddColumn(Object column, Object value, Logical logical, String table = null, Comparison comparison = Comparison.Equal)
       {
         if (table == null)
         {
@@ -202,7 +202,7 @@ namespace Sdx.Db.Query
             {
               inCond += ", ";
             }
-            string holder = "@" + cond.Column + "@" + condCount.Value;
+            string holder = "@" + condCount.Value;
             parameters.Add(this.factory.CreateParameter(holder, value.ToString()));
             inCond += holder;
             condCount.Incr();
@@ -212,7 +212,7 @@ namespace Sdx.Db.Query
         }
         else
         {
-          rightHand = "@" + cond.Column + "@" + condCount.Value;
+          rightHand = "@" + condCount.Value;
           parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
           condCount.Incr();
         }
