@@ -28,7 +28,7 @@ namespace Sdx.Db.Query
       }
       else
       {
-        throw new Exception("columnName must be instance of string or Expr");
+        throw new Exception("columnName support only Sdx.Db.Query.Expr or string, " + columnName.GetType() + " given.");
       }
     }
 

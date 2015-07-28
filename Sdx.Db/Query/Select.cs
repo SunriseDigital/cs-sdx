@@ -156,7 +156,7 @@ namespace Sdx.Db.Query
       }
       else
       {
-        joinString += this.Factory.QuoteIdentifier(table);
+        joinString += this.Factory.QuoteIdentifier(table.Target);
       }
 
       if (table.Alias != null)

@@ -59,30 +59,19 @@ namespace Sdx.Db
       return this.factory.CreateDataAdapter();
     }
 
-    public string QuoteIdentifier(string unquotedIdentifier)
-    {
-      return this.builder.QuoteIdentifier(unquotedIdentifier);
-    }
-
-    public string QuoteIdentifier(Sdx.Db.Query.Expr expr)
-    {
-      return expr.ToString();
-    }
-
-    public string QuoteIdentifier(Sdx.Db.Query.Table table)
-    {
-      return this.QuoteIdentifier(table.Target);
-    }
-
-    private string QuoteIdentifier(object obj)
+    public string QuoteIdentifier(object obj)
     {
       if (obj is Sdx.Db.Query.Expr)
       {
-        return this.QuoteIdentifier(obj as Sdx.Db.Query.Expr);
+        return (obj as Sdx.Db.Query.Expr).ToString();
+      }
+      else if(obj is string)
+      {
+        return this.builder.QuoteIdentifier(obj as string);
       }
       else
       {
-        return this.QuoteIdentifier(obj as string);
+        throw new Exception("QuoteIdentifier support only Sdx.Db.Query.Expr or string, "+obj.GetType()+" given.");
       }
     }
   }
