@@ -33,8 +33,17 @@ namespace Sdx.Db.Query
     private List<Table> joins = new List<Table>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
+    private List<OrderBy> orders = new List<OrderBy>();
     private Where where;
     private Where having;
+    private int limit;
+    private int offset;
+
+    private class OrderBy
+    {
+      public Column Column { get; set; }
+      public Order Order { get; set; }
+    }
 
     public Select(Factory factory)
     {
@@ -142,6 +151,27 @@ namespace Sdx.Db.Query
       {
         selectString += " HAVING ";
         selectString += this.having.Build(parameters, condCount);
+      }
+
+      //ORDER
+      if(this.orders.Count > 0)
+      {
+        var orderString = "";
+        this.orders.ForEach(orderBy => { 
+          if(orderString.Length > 0)
+          {
+            orderString += ", ";
+          }
+          orderString += orderBy.Column.Build(this.factory) + " " + orderBy.Order.SqlString();
+        });
+
+        selectString += " ORDER BY " + orderString;
+      }
+
+      //LIMIT/OFFSET
+      if(this.limit != null)
+      {
+        //this.factory.BuildLimitQuery(this.limit, this.offset);
       }
 
       return selectString;
@@ -312,7 +342,7 @@ namespace Sdx.Db.Query
       return new Expr(str);
     }
 
-    public Select Group(string columnName)
+    public Select Group(object columnName)
     {
       var column = new Column(columnName);
       this.groups.Add(column);
@@ -326,6 +356,23 @@ namespace Sdx.Db.Query
         this.having.Table = null;
         return this.having;
       }
+    }
+
+    public Select Limit(int limit, int offset = 0)
+    {
+      this.limit = limit;
+      this.offset = offset;
+      return this;
+    }
+
+    public void Order(object columnName, Order order)
+    {
+      var column = new Column(columnName);
+      orders.Add(new OrderBy()
+      {
+        Column = column,
+        Order = order
+      });
     }
   }
 }

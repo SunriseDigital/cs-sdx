@@ -1094,16 +1094,16 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestSelectGroup()
+    public void TestSelectGroupHaving()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunSelectGroup(db);
+        RunSelectGroupHaving(db);
         ExecSql(db);
       }
     }
 
-    private void RunSelectGroup(TestDb db)
+    private void RunSelectGroupHaving(TestDb db)
     {
       //TableにGroup
       Sdx.Db.Query.Select select = db.Factory.CreateSelect();
@@ -1155,8 +1155,32 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       Assert.Equal(1, db.Command.Parameters.Count);
       Assert.Equal("20", db.Command.Parameters[0].Value);
+    }
 
+    [Fact]
+    public void TestOrderSelectLimitOffset()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectOrderLimitOffset(db);
+        ExecSql(db);
+      }
+    }
 
+    private void RunSelectOrderLimitOffset(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*");
+
+      select.Order("id", Sdx.Db.Query.Order.DESC);
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC"),
+       db.Command.CommandText
+      );
     }
 
     /// <summary>
