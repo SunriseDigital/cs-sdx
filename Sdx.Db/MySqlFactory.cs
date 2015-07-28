@@ -9,5 +9,15 @@ namespace Sdx.Db
     {
       return DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
     }
+
+    internal override string AppendLimitQuery(string selectSql, int limit, int offset)
+    {
+      selectSql += " LIMIT " + limit;
+      if (offset > 0)
+      {
+        selectSql += " OFFSET " + offset;
+      }
+      return selectSql;
+    }
   }
 }

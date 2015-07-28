@@ -69,5 +69,7 @@ namespace Sdx.Db
         throw new Exception("QuoteIdentifier support only Sdx.Db.Query.Expr or string, "+obj.GetType()+" given.");
       }
     }
+
+    internal abstract string AppendLimitQuery(string selectSql, int limit, int offset);
   }
 }

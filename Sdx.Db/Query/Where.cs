@@ -6,54 +6,6 @@ using System.Linq;
 
 namespace Sdx.Db.Query
 {
-    public enum Logical
-    {
-      And,
-      Or
-    }
-
-    public enum Comparison
-    {
-      Equal,
-      NotEqual,
-      AltNotEqual,
-      GreaterThan,
-      Less_than,
-      GreaterEqual,
-      LessEqual,
-      Like,
-      NotLike,
-      In,
-      NotIn
-    }
-
-    public static class WhereEnumExtension
-    {
-      public static string SqlString(this Logical logical)
-      {
-        string[] strings = { " AND ", " OR "};
-        return strings[(int)logical];
-      }
-
-      public static string SqlString(this Comparison comp)
-      {
-        string[] strings = {
-          " = ",
-          " <> ",
-          " != ",
-          " > ",
-          " < ",
-          " >= ",
-          " <= ",
-          " LIKE ",
-          " NOT LIKE ",
-          " IN ",
-          " NOT IN "
-        };
-        return strings[(int)comp];
-      }
-    }
-
     public class Where
     {
       private class Condition

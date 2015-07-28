@@ -1181,7 +1181,52 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC"),
        db.Command.CommandText
       );
+
+      select.Limit(100);
+      db.Command = select.Build();
+
+      this.AssertCommandText(
+        typeof(Sdx.Db.SqlServerFactory),
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY"),
+        db
+      );
+
+      this.AssertCommandText(
+        typeof(Sdx.Db.MySqlFactory),
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100"),
+        db
+      );
+
+      select.Limit(100, 10);
+      db.Command = select.Build();
+
+      this.AssertCommandText(
+        typeof(Sdx.Db.SqlServerFactory),
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC OFFSET 10 ROWS FETCH NEXT 100 ROWS ONLY"),
+        db
+      );
+
+      this.AssertCommandText(
+        typeof(Sdx.Db.MySqlFactory),
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100 OFFSET 10"),
+        db
+      );
+      
     }
+
+    private void AssertCommandText(Type type, string expected, TestDb db)
+    {
+      Console.WriteLine(type);
+      if (type != db.Factory.GetType())
+      {
+        return;
+      }
+
+      Assert.Equal(expected, db.Command.CommandText);
+    }
+
+
+
 
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。

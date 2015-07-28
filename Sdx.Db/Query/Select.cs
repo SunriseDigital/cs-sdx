@@ -5,28 +5,6 @@ using System.Linq;
 
 namespace Sdx.Db.Query
 {
-  public enum JoinType
-  {
-    From,
-    Inner,
-    Left
-  };
-
-  public enum JoinOrder
-  {
-    InnerFront,
-    Natural
-  }
-
-  public static class SelectEnumExtension
-  {
-    public static string SqlString(this JoinType gender)
-    {
-      string[] strings = { "FROM", "INNER JOIN", "LEFT JOIN" };
-      return  strings[(int) gender];
-    }
-  }
-
   public class Select
   {
     private Factory factory;
@@ -36,8 +14,8 @@ namespace Sdx.Db.Query
     private List<OrderBy> orders = new List<OrderBy>();
     private Where where;
     private Where having;
-    private int limit;
-    private int offset;
+    private int limit = -1;
+    private int offset = -1;
 
     private class OrderBy
     {
@@ -169,9 +147,9 @@ namespace Sdx.Db.Query
       }
 
       //LIMIT/OFFSET
-      if(this.limit != null)
+      if(this.limit > -1)
       {
-        //this.factory.BuildLimitQuery(this.limit, this.offset);
+        selectString = this.factory.AppendLimitQuery(selectString, this.limit, this.offset);
       }
 
       return selectString;
