@@ -220,7 +220,7 @@ namespace Sdx.Db.Query
       }
       else
       {
-        this.columns.RemoveAll(column => column.Table != null && column.Table.Name == table.Name);
+        this.columns.RemoveAll(column => column.Table != null && column.Table == table.Name);
       }
       
       return this;

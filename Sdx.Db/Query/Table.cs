@@ -103,7 +103,7 @@ namespace Sdx.Db.Query
     {
       var column = new Column(columnName);
       column.Alias = alias;
-      column.Table = this;
+      column.Table = this.Name;
       this.select.Columns.Add(column);
       return this;
     }
@@ -148,7 +148,7 @@ namespace Sdx.Db.Query
     public Table Group(object columnName)
     {
       var column = new Column(columnName);
-      column.Table = this;
+      column.Table = this.Name;
       this.select.Groups.Add(column);
       return this;
     }

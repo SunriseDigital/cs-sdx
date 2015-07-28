@@ -58,10 +58,9 @@ namespace Sdx.Db.Query
     {
       private class Condition
       {
-        public string Table { get; set; }
         public Comparison Comparison { get; set; }
         public Logical Logical { get; set; }
-        public object Column { get; set; }
+        public Column Column { get; set; }
         public object Value { get; set; }
       }
 
@@ -88,7 +87,7 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public Where AddOr(String column, Object value, String table = null, Comparison comparison = Comparison.Equal)
+      public Where AddOr(Object column, Object value, String table = null, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.Or, table, comparison);
         return this;
@@ -117,17 +116,19 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private Where AddColumn(Object column, Object value, Logical logical, String table = null, Comparison comparison = Comparison.Equal)
+      private Where AddColumn(Object columnName, Object value, Logical logical, String table = null, Comparison comparison = Comparison.Equal)
       {
         if (table == null)
         {
           table = this.Table;
         }
 
+        var column = new Column(columnName);
+        column.Table = table;
+
         this.Add(new Condition
         {
           Column = column,
-          Table = table,
           Logical = logical,
           Comparison = comparison,
           Value = value
@@ -216,26 +217,13 @@ namespace Sdx.Db.Query
           parameters.Add(this.factory.CreateParameter(rightHand, cond.Value.ToString()));
           condCount.Incr();
         }
-        
-        if (cond.Table != null)
-        {
-          return String.Format(
-            "{0}.{1}{2}{3}",
-            this.factory.QuoteIdentifier(cond.Table),
-            this.factory.QuoteIdentifier(cond.Column),
-            cond.Comparison.SqlString(),
-            rightHand
-          );
-        }
-        else
-        {
-          return String.Format(
-            "{0}{1}{2}",
-            this.factory.QuoteIdentifier(cond.Column),
-            cond.Comparison.SqlString(),
-            rightHand
-          );
-        }
+
+        return String.Format(
+          "{0}{1}{2}",
+          cond.Column.Build(this.factory),
+          cond.Comparison.SqlString(),
+          rightHand
+        );
       }
     }
 }
