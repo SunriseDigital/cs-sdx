@@ -240,33 +240,6 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
-    public void TestWhereWithTable()
-    {
-      foreach (TestDb db in this.CreateTestDbList())
-      {
-        var command = db.Factory.CreateCommand();
-        var counter = new Sdx.Db.Query.Counter();
-        var where = db.Factory.CreateWhere();
-
-        where.Add("id", "1", "shop");
-        command.CommandText = where.Build(command.Parameters, counter);
-
-        Assert.Equal(
-          db.Sql("{0}shop{1}.{0}id{1} = '1'"),
-          Sdx.Db.Util.CommandToSql(command)
-        );
-
-        where.Add("type", 2, "category");
-        command.CommandText = where.Build(command.Parameters, counter);
-
-        Assert.Equal(
-          db.Sql("{0}shop{1}.{0}id{1} = '1' AND {0}category{1}.{0}type{1} = '2'"),
-          Sdx.Db.Util.CommandToSql(command)
-        );
-      }
-    }
-
-    [Fact]
     public void TestUtilCommandToSql()
     {
       SqlCommand cmd;
@@ -847,17 +820,6 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal(1, db.Command.Parameters.Count);
       Assert.Equal("1", db.Command.Parameters[0].Value);
 
-      select.Where.Add("name", "foo", "shop");
-
-      db.Command = select.Build();
-      Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @0 AND {0}shop{1}.{0}name{1} = @1"),
-       db.Command.CommandText
-      );
-
-      Assert.Equal(2, db.Command.Parameters.Count);
-      Assert.Equal("1", db.Command.Parameters[0].Value);
-      Assert.Equal("foo", db.Command.Parameters[1].Value);
 
       //tableに対する呼び出し
       select = db.Factory.CreateSelect();
@@ -1014,7 +976,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").Where.Add("category_id", sub, comparison: Sdx.Db.Query.Comparison.In);
+      select.Table("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1157,7 +1119,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       select.Having.Add(
         new Sdx.Db.Query.Expr("SUM(id)"),
         10,
-        comparison: Sdx.Db.Query.Comparison.GreaterEqual
+        Sdx.Db.Query.Comparison.GreaterEqual
       );
       db.Command = select.Build();
       Assert.Equal(

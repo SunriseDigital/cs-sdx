@@ -103,7 +103,7 @@ namespace Sdx.Db.Query
     {
       var column = new Column(columnName);
       column.Alias = alias;
-      column.Table = this.Name;
+      column.Table = this;
       this.select.Columns.Add(column);
       return this;
     }
@@ -128,7 +128,7 @@ namespace Sdx.Db.Query
       get
       {
         Where where = this.select.Where;
-        where.Table = this.Name;
+        where.Table = this;
         return where;
         //ここは下記のようにするとTableの代入ができません。
         //this.select.Where.Table = this.Name;
@@ -148,7 +148,7 @@ namespace Sdx.Db.Query
     public Table Group(object columnName)
     {
       var column = new Column(columnName);
-      column.Table = this.Name;
+      column.Table = this;
       this.select.Groups.Add(column);
       return this;
     }

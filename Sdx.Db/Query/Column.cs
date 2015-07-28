@@ -39,7 +39,7 @@ namespace Sdx.Db.Query
 
     public string Alias { get; set; }
 
-    public string Table { get; set; }
+    public Table Table { get; set; }
 
     public object Name
     {
@@ -63,7 +63,7 @@ namespace Sdx.Db.Query
       var sql = "";
       if(this.Table != null)
       {
-        sql = factory.QuoteIdentifier(this.Table) + "." + this.QuotedName(factory);
+        sql = factory.QuoteIdentifier(this.Table.Name) + "." + this.QuotedName(factory);
       }
       else
       {

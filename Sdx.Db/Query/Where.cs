@@ -74,7 +74,7 @@ namespace Sdx.Db.Query
 
       public bool EnableBracket { get; set; }
 
-      public string Table { get; set; }
+      public Table Table { get; set; }
 
       public Where(Factory factory)
       {
@@ -87,9 +87,9 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public Where AddOr(Object column, Object value, String table = null, Comparison comparison = Comparison.Equal)
+      public Where AddOr(Object column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, table, comparison);
+        this.AddColumn(column, value, Logical.Or, comparison);
         return this;
       }
 
@@ -99,9 +99,9 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public Where Add(Object column, Object value, String table = null, Comparison comparison = Comparison.Equal)
+      public Where Add(Object column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, table, comparison);
+        this.AddColumn(column, value, Logical.And, comparison);
         return this;
       }
 
@@ -116,15 +116,10 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private Where AddColumn(Object columnName, Object value, Logical logical, String table = null, Comparison comparison = Comparison.Equal)
+      private Where AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
       {
-        if (table == null)
-        {
-          table = this.Table;
-        }
-
         var column = new Column(columnName);
-        column.Table = table;
+        column.Table = this.Table;
 
         this.Add(new Condition
         {
