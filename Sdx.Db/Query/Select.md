@@ -399,14 +399,57 @@ select.Table("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
 ```
 
 ```sql
-SELECT [shop].* FROM [shop] 
-  WHERE [shop].[id] = @0 
-  AND [shop].[category_id] IN (
-    SELECT [category].[id] 
-      FROM [category] 
-      WHERE [category].[id] = @1
-  )
+SELECT
+    [shop].*
+FROM
+    [shop]
+WHERE
+    [shop].[id] = @0
+AND [shop].[category_id] IN(
+        SELECT
+            [category].[id]
+        FROM
+            [category]
+        WHERE
+            [category].[id] = @1
+    )
 
 # DbCommand.Parameters["@0"] = 1
-# DbCommand.Parameters["@0"] = 2
+# DbCommand.Parameters["@1"] = 2
+```
+
+#### `Where.Add()`に`Where`をセット
+
+`Where`を入れ子にするとカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
+
+```c#
+var select = db.Factory.CreateSelect();
+select.From("shop").AddColumn("*");
+
+select.Where
+  .Add(
+    select.CreateWhere()
+      .Add("id", "3")
+      .Add("id", "4")
+  ).AddOr(
+    select.CreateWhere()
+      .Add("id", "1")
+      .AddOr("id", "2")
+  );
+```
+
+```sql
+SELECT
+    [shop].*
+FROM
+    [shop]
+WHERE
+    ( [id] = @0 AND [id] = @1 )
+OR  
+    ( [id] = @2 OR  [id] = @3 )
+    
+# DbCommand.Parameters["@0"] = 3
+# DbCommand.Parameters["@1"] = 4
+# DbCommand.Parameters["@2"] = 1
+# DbCommand.Parameters["@3"] = 2
 ```
