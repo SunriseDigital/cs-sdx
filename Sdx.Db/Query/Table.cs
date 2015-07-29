@@ -152,5 +152,15 @@ namespace Sdx.Db.Query
       this.select.Groups.Add(column);
       return this;
     }
+
+    public Table Order(object columnName, Order order)
+    {
+      var column = new Column(columnName);
+      column.Table = this;
+      column.Order = order;
+      this.select.Orders.Add(column);
+
+      return this;
+    }
   }
 }

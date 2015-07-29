@@ -11,17 +11,11 @@ namespace Sdx.Db.Query
     private List<Table> joins = new List<Table>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
-    private List<OrderBy> orders = new List<OrderBy>();
+    private List<Column> orders = new List<Column>();
     private Where where;
     private Where having;
     private int limit = -1;
     private int offset = -1;
-
-    private class OrderBy
-    {
-      public Column Column { get; set; }
-      public Order Order { get; set; }
-    }
 
     public Select(Factory factory)
     {
@@ -44,6 +38,11 @@ namespace Sdx.Db.Query
     internal List<Column> Groups
     {
       get { return this.groups; }
+    }
+
+    internal List<Column> Orders
+    {
+      get { return this.orders; }
     }
 
     public JoinOrder JoinOrder { get; set; }
@@ -135,12 +134,12 @@ namespace Sdx.Db.Query
       if(this.orders.Count > 0)
       {
         var orderString = "";
-        this.orders.ForEach(orderBy => { 
+        this.orders.ForEach(column => { 
           if(orderString.Length > 0)
           {
             orderString += ", ";
           }
-          orderString += orderBy.Column.Build(this.factory) + " " + orderBy.Order.SqlString();
+          orderString += column.Build(this.factory) + " " + column.Order.SqlString();
         });
 
         selectString += " ORDER BY " + orderString;
@@ -343,14 +342,13 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public void Order(object columnName, Order order)
+    public Select Order(object columnName, Order order)
     {
       var column = new Column(columnName);
-      orders.Add(new OrderBy()
-      {
-        Column = column,
-        Order = order
-      });
+      column.Order = order;
+      orders.Add(column);
+
+      return this;
     }
   }
 }

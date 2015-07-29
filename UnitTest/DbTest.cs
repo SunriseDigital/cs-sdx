@@ -1225,8 +1225,32 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal(expected, db.Command.CommandText);
     }
 
+    [Fact]
+    public void TestSelectOrderTable()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectOrderTable(db);
+        ExecSql(db);
+      }
+    }
 
+    private void RunSelectOrderTable(TestDb db)
+    {
+      var select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .AddColumn("*")
+        .Order("id", Sdx.Db.Query.Order.DESC);
 
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}shop{1}.{0}id{1} DESC"),
+       db.Command.CommandText
+      );
+
+      Assert.Equal(0, db.Command.Parameters.Count);
+    }
 
     /// <summary>
     /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。

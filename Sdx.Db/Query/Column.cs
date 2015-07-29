@@ -41,6 +41,8 @@ namespace Sdx.Db.Query
 
     public Table Table { get; set; }
 
+    public Order Order { get; set; }
+
     public object Name
     {
       get { return this.name; }
