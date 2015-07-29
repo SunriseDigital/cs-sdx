@@ -110,7 +110,7 @@ SELECT MAX(shop.id) FROM [shop]
 ```c#
 select.From("shop");
 select.AddColumn(
-  new Sdx.Db.Query.Expr("MAX(shop.id)")
+  Sdx.Db.Query.Expr.Wrap("MAX(shop.id)")
 );
 ```
 
