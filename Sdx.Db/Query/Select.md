@@ -114,6 +114,7 @@ select.AddColumn(
 );
 ```
 
+<br><br><br>
 ### エイリアス
 
 #### テーブルのエイリアス
@@ -166,6 +167,7 @@ DbCommand command = select.Build();
 SELECT [shop].[id] AS [shop_id], [shop].[name] AS [shop_name] FROM [shop];
 ```
 
+<br><br><br>
 ### JOIN
 
 JOINは`Sdx.Db.Query.Table`の`InnerJoin`あるいは`LeftJoin`を使用します。
