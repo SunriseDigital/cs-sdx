@@ -317,3 +317,32 @@ FROM
 var select = db.CreateSelect();
 select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 ```
+
+<br><br><br>
+### Where句
+
+`Select` `Table`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Where`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
+
+`Select.Where`に対する呼び出し。
+
+```c#
+var select = db.Factory.CreateSelect();
+select.From("shop").AddColumn("*");
+select.Where.Add("id", "1");
+```
+
+```sql
+SELECT [shop].* FROM [shop] WHERE [id] = 1;
+```
+
+`Table.Where`に対する呼び出し。
+
+```c#
+var select = db.Factory.CreateSelect();
+select.From("shop").AddColumn("*");
+select.Table("shop").Where.Add("id", "1");
+```
+
+```sql
+SELECT [shop].* FROM [shop] WHERE [shop].[id] = 1;
+```
