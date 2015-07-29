@@ -331,8 +331,8 @@ Add(object column, object value, Comparison comparison)
 
 | 名前 | 説明 |
 | --- | --- |
-| column | カラム名。String|Expr|Whereを受け付けます。 |
-| value | 値。String|Intなどの他に、サブクエリーのためSelectも受け付けます。 |
+| column | カラム名。String\|Expr\|Whereを受け付けます。 |
+| value | 値。String\|Intなどの他に、サブクエリーのためSelectも受け付けます。 |
 | comparison | 比較演算子。省略時は`=` |
 
 
