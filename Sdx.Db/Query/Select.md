@@ -331,13 +331,12 @@ Add(object column, object value, Comparison comparison)
 
 | 名前 | 説明 |
 | --- | --- |
-| column | カラム名。String\|Expr\|Whereを受け付けます。 |
-| value | 値。String\|Intなどの他に、サブクエリーのためSelectも受け付けます。 |
+| column | カラム名。String \| Expr \| Whereを受け付けます。 |
+| value | 値。String \| Int \| IEnumerable<> \| Selectなど、Selectはサブクエリ、IEnumerableはINを生成します。 |
 | comparison | 比較演算子。省略時は`=` |
 
 
-
-`Select.Where`に対する呼び出し。
+#### `Select.Where`に対する呼び出し。
 
 ```c#
 var select = db.Factory.CreateSelect();
@@ -346,10 +345,13 @@ select.Where.Add("id", "1");
 ```
 
 ```sql
-SELECT [shop].* FROM [shop] WHERE [id] = 1;
+SELECT [shop].* FROM [shop] WHERE [id] = @0;
+# DbCommand.Parameters["@0"] = 1
 ```
+※プレイスホルダは0から順番に`@数字`がふられます。
 
-`Table.Where`に対する呼び出し。
+
+#### `Table.Where`に対する呼び出し。
 
 ```c#
 var select = db.Factory.CreateSelect();
@@ -358,5 +360,53 @@ select.Table("shop").Where.Add("id", "1");
 ```
 
 ```sql
-SELECT [shop].* FROM [shop] WHERE [shop].[id] = 1;
+SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
+# DbCommand.Parameters["@0"] = 1
+```
+
+#### `IEnumerable<>`を使ったINの生成。
+
+`Add`の3番目の引数`Comparison`を指定しなくても自動的にINが使用されます。
+
+```c#
+var select = db.Factory.CreateSelect();
+select.From("shop").AddColumn("*");
+select.Table("shop").Where.Add("id", new string[] { "1", "2" });
+```
+
+```sql
+SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
+# DbCommand.Parameters["@0"] = 1
+# DbCommand.Parameters["@0"] = 2
+```
+
+#### サブクエリ
+
+```c#
+var select = db.Factory.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("*")
+  .Where.Add("id", "1");
+
+var sub = db.Factory.CreateSelect();
+sub
+  .From("category")
+  .AddColumn("id")
+  .Where.Add("id", "2");
+
+select.Table("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
+```
+
+```sql
+SELECT [shop].* FROM [shop] 
+  WHERE [shop].[id] = @0 
+  AND [shop].[category_id] IN (
+    SELECT [category].[id] 
+      FROM [category] 
+      WHERE [category].[id] = @1
+  )
+
+# DbCommand.Parameters["@0"] = 1
+# DbCommand.Parameters["@0"] = 2
 ```
