@@ -317,7 +317,7 @@ namespace Sdx.Db.Query
 
     public Expr Expr(string str)
     {
-      return new Expr(str);
+      return Sdx.Db.Query.Expr.Wrap(str);
     }
 
     public Select Group(object columnName)

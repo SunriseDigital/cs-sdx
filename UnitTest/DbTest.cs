@@ -593,7 +593,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .AddColumns(new Dictionary<string, object>()
          { 
            {"shop_id", "id"},
-           {"shop_name", new Sdx.Db.Query.Expr("name")},
+           {"shop_name", Sdx.Db.Query.Expr.Wrap("name")},
          });
 
       db.Command = select.Build();
@@ -733,7 +733,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       //AddColumn MAX
       select.ClearColumns().Remove("shop").From("shop");
       select.AddColumn(
-        new Sdx.Db.Query.Expr("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
+        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
         "max_id"
       );
 
@@ -1009,7 +1009,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .Where.Add("id", "1");
 
       select.From(
-        new Sdx.Db.Query.Expr("(SELECT id FROM category WHERE id = 1)"),
+        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
         "sub_cat"
       );
 
@@ -1119,7 +1119,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       select.Having.Add(
-        new Sdx.Db.Query.Expr("SUM({shop}.id)"),
+        Sdx.Db.Query.Expr.Wrap("SUM({shop}.id)"),
         10,
         Sdx.Db.Query.Comparison.GreaterEqual
       );
@@ -1142,7 +1142,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .Group("id");
 
       select.Having.Add(
-        new Sdx.Db.Query.Expr("SUM(id)"),
+        Sdx.Db.Query.Expr.Wrap("SUM(id)"),
         20,
         Sdx.Db.Query.Comparison.GreaterEqual
       );

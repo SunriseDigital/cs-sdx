@@ -19,7 +19,7 @@ namespace Sdx.Db.Query
         var strName = columnName as string;
         if (strName == "*")
         {
-          name = new Expr(strName);
+          name = Expr.Wrap(strName);
         }
         else
         {
