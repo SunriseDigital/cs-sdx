@@ -513,7 +513,7 @@ GROUP句はORDER句同様、`Select.Group()`/`Tabl.Group()`があります。HAV
 
 #### Select.Group()/Select.Having
 ```c#
-select = db.Factory.CreateSelect();
+select = db.CreateSelect();
 select.From("shop");
 
 select
@@ -534,7 +534,7 @@ SELECT [id] FROM [shop] GROUP BY [id] HAVING SUM(shop.id) >= @0
 
 #### Table.Group()/Table.Having
 ```c#
-select = db.Factory.CreateSelect();
+select = db.CreateSelect();
 select
   .From("shop")
   .Column("id")
@@ -561,7 +561,7 @@ FETCH ステートメントのオプション NEXT の使用法が無効です�
 LIMIT/OFFSET句は`Select.Limit`/`Select.Offset`のプロパティにセットします。
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select
   .From("shop")
   .Column("*");
@@ -578,3 +578,4 @@ SELECT [shop].* FROM [shop] ORDER BY [id] DESC OFFSET 20 ROWS FETCH NEXT 10 ROWS
 # MySql
 SELECT `shop`.* FROM `shop` ORDER BY `id` DESC LIMIT 100 OFFSET 10
 ```
+
