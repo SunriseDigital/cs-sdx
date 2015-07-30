@@ -333,7 +333,25 @@ Add(object column, object value, Comparison comparison)
 | --- | --- |
 | column | カラム名。String \| Expr \| Whereを受け付けます。 |
 | value | 値。String \| Int \| IEnumerable<> \| Selectなど、Selectはサブクエリ、IEnumerableはINを生成します。 |
-| comparison | 比較演算子。省略時は`=` |
+| comparison | 比較演算子。`Sdx.Db.Query.Comparison`のEnum。省略時は`Sdx.Db.Query.Comparison.Equal` |
+
+```c#
+//Comparison
+public enum Comparison
+{
+  Equal,
+  NotEqual,
+  AltNotEqual,
+  GreaterThan,
+  LessThan,
+  GreaterEqual,
+  LessEqual,
+  Like,
+  NotLike,
+  In,
+  NotIn
+}
+```
 
 
 #### Select.Whereに対する呼び出し
