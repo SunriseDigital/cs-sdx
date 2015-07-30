@@ -21,11 +21,11 @@ var db = new Sdx.Db.SqlServerFactory();
 var select = db.CreateSelect();
 
 select.From("shop");
-select.AddColumn("*");
+select.Column("*");
 DbCommand command = select.Build();
 ```
 
-`Select.From()`でテーブル名を指定し、`Select.AddColumn`でカラムを追加します。
+`Select.From()`でテーブル名を指定し、`Select.Column`でカラムを追加します。
 
 `DbCommand.CommandText`は下記のようになります。
 
@@ -38,7 +38,7 @@ SELECT * FROM [shop];
 ```c#
 select.From("shop");
 select.From("category");
-select.AddColumn("*");
+select.Column("*");
 DbCommand command = select.Build();
 ```
 
@@ -52,11 +52,11 @@ SELECT * FROM [shop], [category];
 var select = db.CreateSelect();
 
 Sdx.Db.Query.Table shopTable = select.From("shop");
-shopTable.AddColumn("*");
+shopTable.Column("*");
 DbCommand command = select.Build();
 ```
 
-`Select.From()`は指定したテーブルの`Sdx.Db.Query.Table`オブジェクトを返します。`Table.AddColumn()`でカラムを追加するとテーブルを指定してカラムを追加することが可能です。
+`Select.From()`は指定したテーブルの`Sdx.Db.Query.Table`オブジェクトを返します。`Table.Column()`でカラムを追加するとテーブルを指定してカラムを追加することが可能です。
 
 生成されるSQLは以下のようになります。
 
@@ -64,16 +64,16 @@ DbCommand command = select.Build();
 SELECT [shop].* FROM [shop];
 ```
 
-複数のカラムを追加する`AddColumns`メソッドもあります。`AddColumns`は可変引数を受け付けます。
+複数のカラムを追加する`Columns`メソッドもあります。`Columns`は可変引数を受け付けます。
 
 ```c#
 var select = db.CreateSelect();
 
 Sdx.Db.Query.Table shopTable =  select.From("shop");
 
-shopTable.AddColumns("id", "name");
+shopTable.Columns("id", "name");
 //あるいは
-//shopTable.AddColumns(new string[](){"id", "name"});
+//shopTable.Columns(new string[](){"id", "name"});
 
 DbCommand command = select.Build();
 ```
@@ -92,9 +92,9 @@ SELECT [shop].[id], [shop].[name] FROM [shop];
 var select = db.CreateSelect();
 
 select.From("shop")
-  .AddColumn("id")
-  .AddColumn("name")
-  .AddColumn("category_id");
+  .Column("id")
+  .Column("name")
+  .Column("category_id");
 ```
 
 #### クオートを回避する
@@ -109,7 +109,7 @@ SELECT MAX(shop.id) FROM [shop]
 
 ```c#
 select.From("shop");
-select.AddColumn(
+select.Column(
   Sdx.Db.Query.Expr.Wrap("MAX(shop.id)")
 );
 ```
@@ -122,7 +122,7 @@ select.AddColumn(
 ```c#
 var select = db.CreateSelect();
 
-select.From("shop", "s").AddColumn("*");
+select.From("shop", "s").Column("*");
 DbCommand command = select.Build();
 ```
 
@@ -134,26 +134,26 @@ SELECT [s].* FROM [shop] AS [s];
 
 #### カラムのエイリアス
 
-カラムにエイリアスを指定する方法は`Select.AddColumn`の第二引数にエイリアス名を渡す方法と`Select.AddColumns`に`Dictionary<string, object>`を渡す方法と2つあります。
+カラムにエイリアスを指定する方法は`Select.Column`の第二引数にエイリアス名を渡す方法と`Select.Columns`に`Dictionary<string, object>`を渡す方法と2つあります。
 
-まずは`Select.AddColumn`
+まずは`Select.Column`
 
 ```c#
 var select = db.CreateSelect();
 
 select.From("shop")
-  .AddColumn("id", "shop_id")
-  .AddColumn("name", "shop_name")
+  .Column("id", "shop_id")
+  .Column("name", "shop_name")
   ;
 DbCommand command = select.Build();
 ```
 
-`Select.AddColumns`に`Dictionary<string, object>`を渡す。
+`Select.Columns`に`Dictionary<string, object>`を渡す。
 
 ```c#
 var select = db.CreateSelect();
 
-select.From("shop").AddColumns(new Dictionary<string, object>(){
+select.From("shop").Columns(new Dictionary<string, object>(){
   {"shop_id", "id"},
   {"shop_name", "name"},
 });
@@ -177,11 +177,11 @@ var select = db.CreateSelect();
 
 select
   .From("shop")
-  .AddColumn("*");
+  .Column("*");
 
 Sdx.Db.Query.Table categoryTable = select.Table("shop")
   .InnderJoin("category", "{0}.category_id = {1}.id")
-  .AddColumn("*");
+  .Column("*");
   
 DbCommand command = select.Build();
 ```
@@ -209,7 +209,7 @@ select.Table("shop")
 JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回した場合、上書きされます。
 
 ```c#
-select.From("shop").AddColumn("*");
+select.From("shop").Column("*");
 
 select.Table("shop").InnerJoin(
   "category",
@@ -248,15 +248,15 @@ var select = db.CreateSelect();
 
 select
   .From("shop")
-  .AddColumn("*");
+  .Column("*");
   
 select.Table("shop")
   .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
-  .AddColumn("*");
+  .Column("*");
 
 select.Table("shop")
   .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
-  .AddColumn("*");
+  .Column("*");
 ```
 
 ```sql
@@ -283,7 +283,7 @@ var select = db.CreateSelect();
 
 select
   .From("shop")
-  .AddColumn("*");
+  .Column("*");
   
 select.Table("shop")
   .LeftJoin("image", "{0}.main_image_id = {1}.id", "main_image");
@@ -358,7 +358,7 @@ public enum Comparison
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").AddColumn("*");
+select.From("shop").Column("*");
 select.Where.Add("id", "1");
 ```
 
@@ -373,7 +373,7 @@ SELECT [shop].* FROM [shop] WHERE [id] = @0;
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").AddColumn("*");
+select.From("shop").Column("*");
 select.Table("shop").Where.Add("id", "1");
 ```
 
@@ -388,7 +388,7 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").AddColumn("*");
+select.From("shop").Column("*");
 select.Table("shop").Where.Add("id", new string[] { "1", "2" });
 ```
 
@@ -404,13 +404,13 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
 var select = db.CreateSelect();
 select
   .From("shop")
-  .AddColumn("*")
+  .Column("*")
   .Where.Add("id", "1");
 
 var sub = db.CreateSelect();
 sub
   .From("category")
-  .AddColumn("id")
+  .Column("id")
   .Where.Add("id", "2");
 
 select.Table("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
@@ -442,7 +442,7 @@ AND [shop].[category_id] IN(
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").AddColumn("*");
+select.From("shop").Column("*");
 
 select.Where
   .Add(
@@ -483,7 +483,7 @@ ORDER句は`Select.Order()`、`Table.Order`で行います。`Table`の方はカ
 var select = db.CreateSelect();
 select
   .From("shop")
-  .AddColumn("*");
+  .Column("*");
 
 select.Order("id", Sdx.Db.Query.Order.DESC);
 ```
@@ -498,7 +498,7 @@ SELECT [shop].* FROM [shop] ORDER BY [id] DESC
 var select = db.CreateSelect();
 select
   .From("shop")
-  .AddColumn("*")
+  .Column("*")
   .Order("id", Sdx.Db.Query.Order.ASC);
 ```
 
@@ -517,7 +517,7 @@ select = db.Factory.CreateSelect();
 select.From("shop");
 
 select
-  .AddColumn("id")
+  .Column("id")
   .Group("id")
   .Having.Add(
     Sdx.Db.Query.Expr.Wrap("SUM(shop.id)"),
@@ -537,7 +537,7 @@ SELECT [id] FROM [shop] GROUP BY [id] HAVING SUM(shop.id) >= @0
 select = db.Factory.CreateSelect();
 select
   .From("shop")
-  .AddColumn("id")
+  .Column("id")
   .Group("id")
   .Having.Add("id", "2", Sdx.Db.Query.Comparison.GreaterEqual);
 ```
@@ -558,17 +558,17 @@ System.Data.SqlClient.SqlException: '0' 付近に不適切な構文がありま�
 FETCH ステートメントのオプション NEXT の使用法が無効です。
 ```
 
-LIMIT/OFFSET句は`Select.Limit(int limit, int offset = 0)`でセットします。
+LIMIT/OFFSET句は`Select.Limit`/`Select.Offset`のプロパティにセットします。
 
 ```c#
 var select = db.Factory.CreateSelect();
 select
   .From("shop")
-  .AddColumn("*");
+  .Column("*");
 
-select
-  .Order("id", Sdx.Db.Query.Order.DESC);
-  .Limit(10, 20)
+select.Order("id", Sdx.Db.Query.Order.DESC);
+select.Limit = 10;
+select.Offset = 20;
 ```
 
 ```sql
@@ -578,4 +578,3 @@ SELECT [shop].* FROM [shop] ORDER BY [id] DESC OFFSET 20 ROWS FETCH NEXT 10 ROWS
 # MySql
 SELECT `shop`.* FROM `shop` ORDER BY `id` DESC LIMIT 100 OFFSET 10
 ```
-
