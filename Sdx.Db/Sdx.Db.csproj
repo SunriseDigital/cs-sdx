@@ -56,11 +56,11 @@
     <Compile Include="Query\Counter.cs" />
     <Compile Include="Query\Enums.cs" />
     <Compile Include="Query\Expr.cs" />
-    <Compile Include="Factory.cs" />
-    <Compile Include="MySqlFactory.cs" />
+    <Compile Include="Adapter.cs" />
+    <Compile Include="MySqlAdapter.cs" />
     <Compile Include="Query\Select.cs" />
     <Compile Include="Query\Column.cs" />
-    <Compile Include="SqlServerFactory.cs" />
+    <Compile Include="SqlServerAdapter.cs" />
     <Compile Include="Query\Table.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Query\Where.cs" />

@@ -7,7 +7,7 @@ namespace Sdx.Db.Query
 {
   public class Select
   {
-    private Factory factory;
+    private Adapter adapter;
     private List<Table> tables = new List<Table>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
@@ -15,9 +15,9 @@ namespace Sdx.Db.Query
     private Where where;
     private Where having;
 
-    internal Select(Factory factory)
+    internal Select(Adapter adapter)
     {
-      this.factory = factory;
+      this.adapter = adapter;
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Where(this);
       this.having = new Where(this);
@@ -26,9 +26,9 @@ namespace Sdx.Db.Query
       this.Limit = -1;
     }
 
-    internal Factory Factory
+    internal Adapter Adapter
     {
-      get { return this.factory; }
+      get { return this.adapter; }
     }
 
     internal List<Table> TableList
@@ -123,7 +123,7 @@ namespace Sdx.Db.Query
             groupString += ", ";
           }
 
-          groupString += column.Build(this.factory);
+          groupString += column.Build(this.adapter);
         });
 
         selectString += " GROUP BY " + groupString;
@@ -145,7 +145,7 @@ namespace Sdx.Db.Query
           {
             orderString += ", ";
           }
-          orderString += column.Build(this.factory) + " " + column.Order.SqlString();
+          orderString += column.Build(this.adapter) + " " + column.Order.SqlString();
         });
 
         selectString += " ORDER BY " + orderString;
@@ -154,7 +154,7 @@ namespace Sdx.Db.Query
       //LIMIT/OFFSET
       if(this.Limit > -1)
       {
-        selectString = this.factory.AppendLimitQuery(selectString, this.Limit, this.Offset);
+        selectString = this.adapter.AppendLimitQuery(selectString, this.Limit, this.Offset);
       }
 
       return selectString;
@@ -177,12 +177,12 @@ namespace Sdx.Db.Query
       }
       else
       {
-        joinString += this.Factory.QuoteIdentifier(table.Name);
+        joinString += this.Adapter.QuoteIdentifier(table.Name);
       }
 
       if (table.Alias != null)
       {
-        joinString += " AS " + this.Factory.QuoteIdentifier(table.ContextName);
+        joinString += " AS " + this.Adapter.QuoteIdentifier(table.ContextName);
       }
 
       if (table.JoinCondition != null)
@@ -190,8 +190,8 @@ namespace Sdx.Db.Query
         joinString += " ON "
           + String.Format(
             table.JoinCondition,
-            this.Factory.QuoteIdentifier(table.ParentTable.ContextName),
-            this.Factory.QuoteIdentifier(table.ContextName)
+            this.Adapter.QuoteIdentifier(table.ParentTable.ContextName),
+            this.Adapter.QuoteIdentifier(table.ContextName)
           );
       }
 
@@ -200,7 +200,7 @@ namespace Sdx.Db.Query
 
     public DbCommand Build()
     {
-      DbCommand command = this.factory.CreateCommand();
+      DbCommand command = this.adapter.CreateCommand();
       var condCount = new Counter();
       command.CommandText = this.BuildSelectString(command.Parameters, condCount);
 
@@ -272,7 +272,7 @@ namespace Sdx.Db.Query
           result += ", ";
         }
 
-        result += column.Build(this.factory);
+        result += column.Build(this.adapter);
       });
 
       return result;

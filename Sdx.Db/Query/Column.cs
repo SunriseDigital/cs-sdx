@@ -48,33 +48,33 @@ namespace Sdx.Db.Query
       get { return this.name; }
     }
 
-    private string QuotedName(Factory factory)
+    private string QuotedName(Adapter db)
     {
       if(this.name is Expr)
       {
-        return factory.QuoteIdentifier(this.name as Expr);
+        return db.QuoteIdentifier(this.name as Expr);
       }
       else
       {
-        return factory.QuoteIdentifier(this.name as String);
+        return db.QuoteIdentifier(this.name as String);
       }
     }
 
-    internal string Build(Factory factory)
+    internal string Build(Adapter db)
     {
       var sql = "";
       if(this.Table != null)
       {
-        sql = factory.QuoteIdentifier(this.Table.ContextName) + "." + this.QuotedName(factory);
+        sql = db.QuoteIdentifier(this.Table.ContextName) + "." + this.QuotedName(db);
       }
       else
       {
-        sql = this.QuotedName(factory);
+        sql = this.QuotedName(db);
       }
 
       if(this.Alias != null)
       {
-        sql += " AS " + factory.QuoteIdentifier(this.Alias);
+        sql += " AS " + db.QuoteIdentifier(this.Alias);
       }
 
       return sql;

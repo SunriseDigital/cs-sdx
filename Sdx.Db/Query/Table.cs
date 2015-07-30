@@ -118,7 +118,7 @@ namespace Sdx.Db.Query
 
     public string AppendAlias(string column)
     {
-      return this.select.Factory.QuoteIdentifier(this.ContextName) + "." + this.select.Factory.QuoteIdentifier(column);
+      return this.select.Adapter.QuoteIdentifier(this.ContextName) + "." + this.select.Adapter.QuoteIdentifier(column);
     }
 
     public Where Where

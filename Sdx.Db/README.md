@@ -10,5 +10,5 @@
 
 ## Classes
 
-* [Factory](Factory.md)
+* [Adapter](Adapter.md)
 * [Util](Util.md)

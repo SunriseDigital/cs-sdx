@@ -151,7 +151,7 @@ namespace Sdx.Db.Query
               inCond += ", ";
             }
             string holder = "@" + condCount.Value;
-            parameters.Add(this.select.Factory.CreateParameter(holder, value.ToString()));
+            parameters.Add(this.select.Adapter.CreateParameter(holder, value.ToString()));
             inCond += holder;
             condCount.Incr();
           }
@@ -161,14 +161,14 @@ namespace Sdx.Db.Query
         else
         {
           rightHand = "@" + condCount.Value;
-          parameters.Add(this.select.Factory.CreateParameter(rightHand, cond.Value.ToString()));
+          parameters.Add(this.select.Adapter.CreateParameter(rightHand, cond.Value.ToString()));
           condCount.Incr();
         }
 
-        var leftHand = cond.Column.Build(this.select.Factory);
+        var leftHand = cond.Column.Build(this.select.Adapter);
 
         this.select.TableList.ForEach(table => {
-          leftHand = leftHand.Replace("{"+table.ContextName+"}", this.select.Factory.QuoteIdentifier(table.ContextName));
+          leftHand = leftHand.Replace("{"+table.ContextName+"}", this.select.Adapter.QuoteIdentifier(table.ContextName));
         });
 
         return String.Format(

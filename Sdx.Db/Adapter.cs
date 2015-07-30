@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace Sdx.Db
 {
-  public abstract class Factory
+  public abstract class Adapter
   {
     private DbProviderFactory factory;
     private DbCommandBuilder builder;
@@ -12,7 +12,7 @@ namespace Sdx.Db
 
     public string ConnectionString { get; set; }
 
-    public Factory()
+    public Adapter()
     {
       this.factory = this.GetFactory();
       this.builder = this.factory.CreateCommandBuilder();

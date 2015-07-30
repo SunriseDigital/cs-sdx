@@ -33,7 +33,7 @@ namespace UnitTest
     {
       private DbCommand command;
       private List<DbCommand> commands = new List<DbCommand>();
-      public Sdx.Db.Factory Factory { get; set; }
+      public Sdx.Db.Adapter Adapter { get; set; }
       public String LeftQuoteChar { get; set; }
       public String RightQupteChar { get; set; }
       public DbCommand Command
@@ -72,7 +72,7 @@ namespace UnitTest
 
     private static void ResetMySqlDatabase()
     {
-      Sdx.Db.Factory factory = new Sdx.Db.MySqlFactory();
+      Sdx.Db.Adapter factory = new Sdx.Db.MySqlAdapter();
 
       var masterCon = factory.CreateConnection();
       masterCon.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=";
@@ -114,7 +114,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
     private static void ResetSqlServerDatabase()
     {
       //SdxTestデータベースをDROPします
-      Sdx.Db.Factory factory = new Sdx.Db.SqlServerFactory();
+      Sdx.Db.Adapter factory = new Sdx.Db.SqlServerAdapter();
       var masterCon = factory.CreateConnection();
       String pwd = ConfigurationManager.AppSettings["SqlServerSaPwd"];
       masterCon.ConnectionString = "Server=.\\SQLEXPRESS;Database=master;User Id=sa;Password=" + pwd;
@@ -213,7 +213,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunFactorySimpleRetrieve(TestDb db)
     {
-      var con = db.Factory.CreateConnection();
+      var con = db.Adapter.CreateConnection();
       using (con)
       {
         con.Open();
@@ -225,9 +225,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
           + " WHERE shop.id = @shop@id"
           ;
 
-        command.Parameters.Add(db.Factory.CreateParameter("@shop@id", "1"));
+        command.Parameters.Add(db.Adapter.CreateParameter("@shop@id", "1"));
 
-        DbDataAdapter adapter = db.Factory.CreateDataAdapter();
+        DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
         DataSet dataset = new DataSet();
 
         adapter.SelectCommand = command;
@@ -261,16 +261,16 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
-      testDb.Factory = new Sdx.Db.SqlServerFactory();
-      testDb.Factory.ConnectionString = DbQueryTest.SqlServerConnectionString;
+      testDb.Adapter = new Sdx.Db.SqlServerAdapter();
+      testDb.Adapter.ConnectionString = DbQueryTest.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
 #endif
 
       testDb = new TestDb();
-      testDb.Factory = new Sdx.Db.MySqlFactory();
-      testDb.Factory.ConnectionString = DbQueryTest.MySqlConnectionString;
+      testDb.Adapter = new Sdx.Db.MySqlAdapter();
+      testDb.Adapter.ConnectionString = DbQueryTest.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);
@@ -290,7 +290,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimple(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
 
       //Column
       select.From("shop").Columns("*");
@@ -409,7 +409,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimpleInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
 
       select.From("shop").Columns("*");
 
@@ -451,7 +451,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectMultipleInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .InnerJoin("category", "{0}.category_id = {1}.id")
@@ -482,7 +482,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNoColumnInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .InnerJoin("category", "{0}.category_id = {1}.id")
@@ -508,7 +508,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSameTableInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop").Columns("*");
 
       select.Table("shop")
@@ -539,7 +539,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectColumnAlias(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop").Column("id", "shop_id");
 
       db.Command = select.Build();
@@ -589,7 +589,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectLeftJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop")
         .Column("*")
         .LeftJoin("image", "{0}.main_image_id={1}.id");
@@ -613,7 +613,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectJoinOrder(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
@@ -629,7 +629,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Command.CommandText
       );
 
-      select = db.Factory.CreateSelect();
+      select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
       select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
@@ -660,7 +660,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNonTableColumns(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
 
       //単純なAddColumns
       select.From("shop");
@@ -730,7 +730,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectMultipleFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
       select.From("category");
 
@@ -746,14 +746,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        var con = db.Factory.CreateConnection();
-        var command = db.Factory.CreateCommand();
+        var con = db.Adapter.CreateConnection();
+        var command = db.Adapter.CreateCommand();
         command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)");
         using (con)
         {
           con.Open();
           command.Connection = con;
-          DbDataAdapter adapter = db.Factory.CreateDataAdapter();
+          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
           DataSet dataset = new DataSet();
           adapter.SelectCommand = command;
           adapter.Fill(dataset);
@@ -781,7 +781,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Sdx.Db.Query.Select select;
 
       //selectに対する呼び出し
-      select = db.Factory.CreateSelect();
+      select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
 
       select.Where.Add("id", "1");
@@ -797,7 +797,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
 
       //tableに対する呼び出し
-      select = db.Factory.CreateSelect();
+      select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
 
       select.Table("shop").Where.Add("id", "1");
@@ -812,7 +812,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("1", db.Command.Parameters[0].Value);
 
       //WhereのAdd
-      select = db.Factory.CreateSelect();
+      select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
 
       select.Where.Add(
@@ -832,7 +832,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("2", db.Command.Parameters[1].Value);
 
       //Where2つをORでつなぐ
-      select = db.Factory.CreateSelect();
+      select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
 
       select.Where
@@ -871,7 +871,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectRawSubqueryJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
@@ -902,13 +902,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
         .From("category")
         .Column("id")
@@ -939,13 +939,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryLeftJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
         .From("category")
         .Column("id")
@@ -976,13 +976,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryWhere(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
         .From("category")
         .Column("id")
@@ -1013,7 +1013,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectRawSubqueryFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
@@ -1046,13 +1046,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
         .From("category")
         .Column("id")
@@ -1083,7 +1083,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectWhereIn(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
@@ -1117,7 +1117,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     private void RunSelectGroupHaving(TestDb db)
     {
       //TableにGroup
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("id")
@@ -1145,7 +1145,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("10", db.Command.Parameters[0].Value);
 
       //selectに直接
-      select = db.Factory.CreateSelect();
+      select = db.Adapter.CreateSelect();
       select.From("shop");
 
       select
@@ -1180,7 +1180,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectOrderLimitOffset(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*");
@@ -1197,13 +1197,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Command = select.Build();
 
       this.AssertCommandText(
-        typeof(Sdx.Db.SqlServerFactory),
+        typeof(Sdx.Db.SqlServerAdapter),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY"),
         db
       );
 
       this.AssertCommandText(
-        typeof(Sdx.Db.MySqlFactory),
+        typeof(Sdx.Db.MySqlAdapter),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100"),
         db
       );
@@ -1213,13 +1213,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       db.Command = select.Build();
 
       this.AssertCommandText(
-        typeof(Sdx.Db.SqlServerFactory),
+        typeof(Sdx.Db.SqlServerAdapter),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC OFFSET 10 ROWS FETCH NEXT 100 ROWS ONLY"),
         db
       );
 
       this.AssertCommandText(
-        typeof(Sdx.Db.MySqlFactory),
+        typeof(Sdx.Db.MySqlAdapter),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100 OFFSET 10"),
         db
       );
@@ -1229,7 +1229,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     private void AssertCommandText(Type type, string expected, TestDb db)
     {
       Console.WriteLine(type);
-      if (type != db.Factory.GetType())
+      if (type != db.Adapter.GetType())
       {
         return;
       }
@@ -1249,7 +1249,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectOrderTable(TestDb db)
     {
-      var select = db.Factory.CreateSelect();
+      var select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("*")
@@ -1276,7 +1276,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectHavingTable(TestDb db)
     {
-      var select = db.Factory.CreateSelect();
+      var select = db.Adapter.CreateSelect();
       select
         .From("shop")
         .Column("id")
@@ -1302,12 +1302,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       db.Commands.ForEach(command =>
       {
-        DbConnection con = db.Factory.CreateConnection();
+        DbConnection con = db.Adapter.CreateConnection();
         using (con)
         {
           con.Open();
           command.Connection = con;
-          DbDataAdapter adapter = db.Factory.CreateDataAdapter();
+          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
           DataSet dataset = new DataSet();
           adapter.SelectCommand = command;
           adapter.Fill(dataset);

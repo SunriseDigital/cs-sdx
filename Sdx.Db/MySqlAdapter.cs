@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace Sdx.Db
 {
-  public class MySqlFactory : Factory
+  public class MySqlAdapter : Adapter
   {
     override protected DbProviderFactory GetFactory()
     {

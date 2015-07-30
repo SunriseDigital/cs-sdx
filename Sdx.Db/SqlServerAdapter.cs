@@ -3,7 +3,7 @@ using System.Data.Common;
 
 namespace Sdx.Db
 {
-  public class SqlServerFactory : Factory
+  public class SqlServerAdapter : Adapter
   {
     override protected DbProviderFactory GetFactory()
     {

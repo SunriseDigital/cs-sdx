@@ -14,10 +14,10 @@ SELECT文の組み立てを行います。できるだけ生成できないSQL�
 using System.Data.Common;
 ```
 
-`Select`の生成は`Factory`から行います。
+`Select`の生成は`Adapter`から行います。
 
 ```c#
-var db = new Sdx.Db.SqlServerFactory();
+var db = new Sdx.Db.SqlServerAdapter();
 var select = db.CreateSelect();
 
 select.From("shop");
@@ -198,7 +198,7 @@ SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].catego
 JOINの条件内のカラム名など、`{0}`/`{1}`を利用したテーブル名以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオーとしてください。
 
 ```c#
-var db = new Sdx.Db.SqlServerFactory();
+var db = new Sdx.Db.SqlServerAdapter();
 ...
 
 select.Table("shop")
