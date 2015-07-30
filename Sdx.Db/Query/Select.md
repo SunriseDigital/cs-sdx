@@ -319,7 +319,7 @@ select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 ```
 
 <br><br><br>
-### Where句
+### WHERE句
 
 `Select` `Table`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Where`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
 
@@ -336,7 +336,7 @@ Add(object column, object value, Comparison comparison)
 | comparison | 比較演算子。省略時は`=` |
 
 
-#### `Select.Where`に対する呼び出し。
+#### Select.Whereに対する呼び出し
 
 ```c#
 var select = db.Factory.CreateSelect();
@@ -351,7 +351,7 @@ SELECT [shop].* FROM [shop] WHERE [id] = @0;
 ※プレイスホルダは0から順番に`@数字`がふられます。
 
 
-#### `Table.Where`に対する呼び出し。
+#### Table.Whereに対する呼び出し
 
 ```c#
 var select = db.Factory.CreateSelect();
@@ -364,7 +364,7 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
 # DbCommand.Parameters["@0"] = 1
 ```
 
-#### `IEnumerable<>`を使ったINの生成。
+#### IEnumerable<>を使ったINの生成
 
 `Add`の3番目の引数`Comparison`を指定しなくても自動的にINが使用されます。
 
@@ -380,7 +380,7 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
 # DbCommand.Parameters["@0"] = 2
 ```
 
-#### サブクエリ
+#### WHERE句にサブクエリ
 
 ```c#
 var select = db.Factory.CreateSelect();
@@ -418,9 +418,9 @@ AND [shop].[category_id] IN(
 # DbCommand.Parameters["@1"] = 2
 ```
 
-#### `Where.Add()`に`Where`をセット
+#### ORを含むような複雑なWHERE句
 
-`Where`を入れ子にするとカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
+`Where.Add()`に`Where`をセットすると子供の`Where`はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
 
 ```c#
 var select = db.Factory.CreateSelect();
@@ -455,4 +455,4 @@ OR
 ```
 
 <br><br><br>
-### 
+### ORDER句
