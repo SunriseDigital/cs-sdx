@@ -319,7 +319,7 @@ select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 ```
 
 <br><br><br>
-### Where句
+### WHERE句
 
 `Select` `Table`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Where`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
 
@@ -333,13 +333,31 @@ Add(object column, object value, Comparison comparison)
 | --- | --- |
 | column | カラム名。String \| Expr \| Whereを受け付けます。 |
 | value | 値。String \| Int \| IEnumerable<> \| Selectなど、Selectはサブクエリ、IEnumerableはINを生成します。 |
-| comparison | 比較演算子。省略時は`=` |
-
-
-#### `Select.Where`に対する呼び出し。
+| comparison | 比較演算子。`Sdx.Db.Query.Comparison`enum。省略時は`Sdx.Db.Query.Comparison.Equal` |
 
 ```c#
-var select = db.Factory.CreateSelect();
+//Comparison
+public enum Comparison
+{
+  Equal,
+  NotEqual,
+  AltNotEqual,
+  GreaterThan,
+  LessThan,
+  GreaterEqual,
+  LessEqual,
+  Like,
+  NotLike,
+  In,
+  NotIn
+}
+```
+
+
+#### Select.Whereに対する呼び出し
+
+```c#
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 select.Where.Add("id", "1");
 ```
@@ -351,10 +369,10 @@ SELECT [shop].* FROM [shop] WHERE [id] = @0;
 ※プレイスホルダは0から順番に`@数字`がふられます。
 
 
-#### `Table.Where`に対する呼び出し。
+#### Table.Whereに対する呼び出し
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 select.Table("shop").Where.Add("id", "1");
 ```
@@ -364,12 +382,12 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
 # DbCommand.Parameters["@0"] = 1
 ```
 
-#### `IEnumerable<>`を使ったINの生成。
+#### IEnumerable<>を使ったINの生成
 
 `Add`の3番目の引数`Comparison`を指定しなくても自動的にINが使用されます。
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 select.Table("shop").Where.Add("id", new string[] { "1", "2" });
 ```
@@ -380,16 +398,16 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
 # DbCommand.Parameters["@0"] = 2
 ```
 
-#### サブクエリ
+#### WHERE句にサブクエリ
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select
   .From("shop")
   .AddColumn("*")
   .Where.Add("id", "1");
 
-var sub = db.Factory.CreateSelect();
+var sub = db.CreateSelect();
 sub
   .From("category")
   .AddColumn("id")
@@ -418,12 +436,12 @@ AND [shop].[category_id] IN(
 # DbCommand.Parameters["@1"] = 2
 ```
 
-#### `Where.Add()`に`Where`をセット
+#### ORを含むような複雑なWHERE句
 
-`Where`を入れ子にするとカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
+`Where.Add()`に`Where`をセットすると子供の`Where`はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 
 select.Where
@@ -453,3 +471,111 @@ OR
 # DbCommand.Parameters["@2"] = 1
 # DbCommand.Parameters["@3"] = 2
 ```
+
+<br><br><br>
+### ORDER句
+
+ORDER句は`Select.Order()`、`Table.Order`で行います。`Table`の方はカラムにテーブル名が付与されます。`Order()`は2番めの引数に`Sdx.Db.Query.Order`enumを渡して`ASC`あるいは`DESC`を指定します。
+
+#### Select.Order()
+
+```c#
+var select = db.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("*");
+
+select.Order("id", Sdx.Db.Query.Order.DESC);
+```
+
+```sql
+SELECT [shop].* FROM [shop] ORDER BY [id] DESC
+```
+
+#### Table.Order()
+
+```c#
+var select = db.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("*")
+  .Order("id", Sdx.Db.Query.Order.ASC);
+```
+
+```sql
+SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
+```
+
+<br><br><br>
+### GROUP/HAVING句
+
+GROUP句はORDER句同様、`Select.Group()`/`Tabl.Group()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Table.Having`プロパティに対して操作を行います。
+
+#### Select.Group()/Select.Having
+```c#
+select = db.Factory.CreateSelect();
+select.From("shop");
+
+select
+  .AddColumn("id")
+  .Group("id")
+  .Having.Add(
+    Sdx.Db.Query.Expr.Wrap("SUM(shop.id)"),
+    10,
+    Sdx.Db.Query.Comparison.GreaterEqual
+  );
+```
+
+```sql
+SELECT [id] FROM [shop] GROUP BY [id] HAVING SUM(shop.id) >= @0
+
+# DbCommand.Parameters["@0"] = 10
+```
+
+#### Table.Group()/Table.Having
+```c#
+select = db.Factory.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("id")
+  .Group("id")
+  .Having.Add("id", "2", Sdx.Db.Query.Comparison.GreaterEqual);
+```
+
+```sql
+SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
+
+# DbCommand.Parameters["@0"] = 2
+```
+
+<br><br><br>
+### LIMIT/OFFSET句
+
+LIMIT/OFFSET句はSqlServerではサポートしていませんので、OFFSET/FETCH句が生成されます。SqlServerの仕様でORDER句を付与しないでOFFSET/FETCH句を使うと`System.Data.SqlClient.SqlException`がスローされます。
+
+```
+System.Data.SqlClient.SqlException: '0' 付近に不適切な構文があります。
+FETCH ステートメントのオプション NEXT の使用法が無効です。
+```
+
+LIMIT/OFFSET句は`Select.Limit(int limit, int offset = 0)`でセットします。
+
+```c#
+var select = db.Factory.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("*");
+
+select
+  .Order("id", Sdx.Db.Query.Order.DESC);
+  .Limit(10, 20)
+```
+
+```sql
+# SqlServer
+SELECT [shop].* FROM [shop] ORDER BY [id] DESC OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY
+
+# MySql
+SELECT `shop`.* FROM `shop` ORDER BY `id` DESC LIMIT 100 OFFSET 10
+```
+
