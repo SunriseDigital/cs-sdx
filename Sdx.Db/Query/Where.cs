@@ -19,14 +19,14 @@ namespace Sdx.Db.Query
       private List<Condition> wheres = new List<Condition>();
       private Select select;
 
-      public int Count
+      internal int Count
       {
         get { return wheres.Count; }
       }
 
-      public bool EnableBracket { get; set; }
+      internal bool EnableBracket { get; set; }
 
-      public Table Table { get; set; }
+      internal Table Table { get; set; }
 
       public Where(Select select)
       {
