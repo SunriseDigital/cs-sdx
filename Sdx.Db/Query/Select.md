@@ -511,7 +511,7 @@ SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
 
 GROUP句はORDER句同様、`Select.Group()`/`Tabl.Group()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Table.Having`プロパティに対して操作を行います。
 
-#### Select.Group()/TableSelect
+#### Select.Group()/Select.Having
 ```c#
 select = db.Factory.CreateSelect();
 select.From("shop");
