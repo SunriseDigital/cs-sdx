@@ -71,9 +71,9 @@ namespace Sdx.Db.Query
       return this.AddJoin(table, JoinType.Left, condition, alias);
     }
 
-    public Table ParentTable { get; private set; }
+    internal Table ParentTable { get; private set; }
 
-    public string JoinCondition { get; private set; }
+    internal string JoinCondition { get; private set; }
 
     public JoinType JoinType { get; internal set; }
 
@@ -83,23 +83,16 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Table SetColumns(params String[] columns)
-    {
-      this.ClearColumns();
-      this.AddColumns(columns);
-      return this;
-    }
-
-    public Table AddColumns(params String[] columns)
+    public Table Columns(params String[] columns)
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column);
+        this.Column(column);
       }
       return this;
     }
 
-    public Table AddColumn(object columnName, string alias = null)
+    public Table Column(object columnName, string alias = null)
     {
       var column = new Column(columnName);
       column.Alias = alias;
@@ -108,11 +101,11 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Table AddColumns(Dictionary<string, object> columns)
+    public Table Columns(Dictionary<string, object> columns)
     {
       foreach(var column in columns)
       {
-        this.AddColumn(column.Value, column.Key);
+        this.Column(column.Value, column.Key);
       }
 
       return this;
