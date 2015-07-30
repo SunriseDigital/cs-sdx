@@ -145,6 +145,16 @@ namespace Sdx.Db.Query
       }
     }
 
+    public Where Having
+    {
+      get
+      {
+        Where having = this.select.Having;
+        having.Table = this;
+        return having;
+      }
+    }
+
     public Table Group(object columnName)
     {
       var column = new Column(columnName);
