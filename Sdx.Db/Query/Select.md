@@ -357,7 +357,7 @@ public enum Comparison
 #### Select.Whereに対する呼び出し
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 select.Where.Add("id", "1");
 ```
@@ -372,7 +372,7 @@ SELECT [shop].* FROM [shop] WHERE [id] = @0;
 #### Table.Whereに対する呼び出し
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 select.Table("shop").Where.Add("id", "1");
 ```
@@ -387,7 +387,7 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
 `Add`の3番目の引数`Comparison`を指定しなくても自動的にINが使用されます。
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 select.Table("shop").Where.Add("id", new string[] { "1", "2" });
 ```
@@ -401,13 +401,13 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
 #### WHERE句にサブクエリ
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select
   .From("shop")
   .AddColumn("*")
   .Where.Add("id", "1");
 
-var sub = db.Factory.CreateSelect();
+var sub = db.CreateSelect();
 sub
   .From("category")
   .AddColumn("id")
@@ -441,7 +441,7 @@ AND [shop].[category_id] IN(
 `Where.Add()`に`Where`をセットすると子供の`Where`はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
 
 ```c#
-var select = db.Factory.CreateSelect();
+var select = db.CreateSelect();
 select.From("shop").AddColumn("*");
 
 select.Where
@@ -474,3 +474,35 @@ OR
 
 <br><br><br>
 ### ORDER句
+
+ORDER句は`Select.Order()`、`Table.Order`で行います。`Table`の方はカラムにテーブル名が付与されます。`Order()`は2番めの引数に`Sdx.Db.Query.Order`enumを渡して`ASC`あるいは`DESC`を指定します。
+
+#### Select.Order()
+
+```c#
+var select = db.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("*");
+
+select.Order("id", Sdx.Db.Query.Order.DESC);
+```
+
+```sql
+SELECT [shop].* FROM [shop] ORDER BY [id] DESC
+```
+
+#### Table.Order()
+
+```c#
+var select = db.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("*")
+  .Order("id", Sdx.Db.Query.Order.ASC);
+```
+
+```sql
+SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
+```
+
