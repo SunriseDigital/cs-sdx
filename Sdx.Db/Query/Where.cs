@@ -167,7 +167,7 @@ namespace Sdx.Db.Query
 
         var leftHand = cond.Column.Build(this.select.Factory);
 
-        this.select.Joins.ForEach(table => {
+        this.select.JoinList.ForEach(table => {
           leftHand = leftHand.Replace("{"+table.Name+"}", this.select.Factory.QuoteIdentifier(table.Name));
         });
 

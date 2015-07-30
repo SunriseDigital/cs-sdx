@@ -17,7 +17,7 @@ namespace Sdx.Db.Query
     private int limit = -1;
     private int offset = -1;
 
-    public Select(Factory factory)
+    internal Select(Factory factory)
     {
       this.factory = factory;
       this.JoinOrder = JoinOrder.InnerFront;
@@ -30,19 +30,24 @@ namespace Sdx.Db.Query
       get { return this.factory; }
     }
 
-    internal List<Table> Joins
+    internal List<Table> JoinList
     {
       get { return this.joins; }
     }
 
-    internal List<Column> Groups
+    internal List<Column> GroupList
     {
       get { return this.groups; }
     }
 
-    internal List<Column> Orders
+    internal List<Column> OrderList
     {
       get { return this.orders; }
+    }
+
+    internal List<Column> ColumnList
+    {
+      get { return this.columns; }
     }
 
     public JoinOrder JoinOrder { get; set; }
@@ -107,10 +112,10 @@ namespace Sdx.Db.Query
       }
 
       //GROUP
-      if (this.Groups.Count > 0)
+      if (this.GroupList.Count > 0)
       {
         var groupString = "";
-        this.Groups.ForEach(column =>
+        this.GroupList.ForEach(column =>
         {
           if(groupString != "")
           {
@@ -214,11 +219,6 @@ namespace Sdx.Db.Query
       throw new Exception("Missing " + name + " table current context.");
     }
 
-    public List<Column> Columns
-    {
-      get { return this.columns; }
-    }
-
     public Select ClearColumns(Table table = null)
     {
       if (table == null)
@@ -233,34 +233,27 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Select SetColumns(params String[] columns)
-    {
-      this.ClearColumns();
-      this.AddColumns(columns);
-      return this;
-    }
-
-    public Select AddColumns(params String[] columns)
+    public Select Columns(params String[] columns)
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column);
+        this.Column(column);
       }
       return this;
     }
 
 
-    public Select AddColumns(Dictionary<string, object> columns)
+    public Select Columns(Dictionary<string, object> columns)
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column.Value, column.Key);
+        this.Column(column.Value, column.Key);
       }
 
       return this;
     }
 
-    public Select AddColumn(object columnName, string alias = null)
+    public Select Column(object columnName, string alias = null)
     {
       var column = new Column(columnName);
       column.Alias = alias;
