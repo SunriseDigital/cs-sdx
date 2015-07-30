@@ -575,7 +575,7 @@ select
 # SqlServer
 SELECT [shop].* FROM [shop] ORDER BY [id] DESC OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY
 
-#MySql
+# MySql
 SELECT `shop`.* FROM `shop` ORDER BY `id` DESC LIMIT 100 OFFSET 10
 ```
 
