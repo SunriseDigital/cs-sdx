@@ -363,7 +363,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
-      //ColumnList
+      //Columns
       select.Remove("shop").From("shop").Columns("id");
       db.Command = select.Build();
       Assert.Equal(
