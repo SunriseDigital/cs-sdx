@@ -254,32 +254,6 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("SELECT * FROM user WHERE city = '東京' AND city_code = 'tokyo'", Sdx.Db.Util.CommandToSql(cmd));
     }
 
-    [Fact]
-    public void TestWhereSimple()
-    {
-      foreach (TestDb db in this.CreateTestDbList())
-      {
-        var command = db.Factory.CreateCommand();
-        var counter = new Sdx.Db.Query.Counter();
-        var select = db.Factory.CreateSelect();
-        var where = select.CreateWhere();
-
-        where.Add("id", "1");
-        command.CommandText = where.Build(command.Parameters, counter);
-        Assert.Equal(
-          db.Sql("{0}id{1} = '1'"),
-          Sdx.Db.Util.CommandToSql(command)
-        );
-
-        where.Add("type", 2);
-        command.CommandText = where.Build(command.Parameters, counter);
-        Assert.Equal(
-          db.Sql("{0}id{1} = '1' AND {0}type{1} = '2'"),
-          Sdx.Db.Util.CommandToSql(command)
-        );
-      }
-    }
-
     private List<TestDb> CreateTestDbList()
     {
       var list = new List<TestDb>();

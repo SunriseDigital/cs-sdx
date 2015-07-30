@@ -95,7 +95,7 @@ namespace Sdx.Db.Query
         this.wheres.Add(cond);
       }
 
-      public string Build(DbParameterCollection parameters, Counter condCount)
+      internal string Build(DbParameterCollection parameters, Counter condCount)
       {
         string whereString = "";
 

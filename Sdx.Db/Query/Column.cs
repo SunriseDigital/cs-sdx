@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Db.Query
 {
-  public class Column
+  internal class Column
   {
     private object name;
     public Column(object columnName)
