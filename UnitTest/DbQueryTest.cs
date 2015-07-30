@@ -23,7 +23,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 namespace UnitTest
 {
   [TestClass]
-  public class DbTest : BaseTest
+  public class DbQueryTest : BaseTest
   {
     /// <summary>
     /// 複数のDBのテストをまとめて行うためのDbFactoryのラッパークラス
@@ -57,7 +57,7 @@ namespace UnitTest
 
     public override void FixtureSetUp()
     {
-      DbTest.InitilizeClass(null);
+      DbQueryTest.InitilizeClass(null);
     }
 
     private static String MySqlConnectionString
@@ -98,13 +98,13 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         }
       }
 
-      factory.ConnectionString = DbTest.MySqlConnectionString;
+      factory.ConnectionString = DbQueryTest.MySqlConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {
         con.Open();
-        DbTest.ExecuteSqlFile(con, "setup.mysql.sql");
-        DbTest.ExecuteSqlFile(con, "insert.sql");
+        DbQueryTest.ExecuteSqlFile(con, "setup.mysql.sql");
+        DbQueryTest.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetMySqlDatabase");
@@ -163,13 +163,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         createUserSql.ExecuteNonQuery();
       }
 
-      factory.ConnectionString = DbTest.SqlServerConnectionString;
+      factory.ConnectionString = DbQueryTest.SqlServerConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {
         con.Open();
-        DbTest.ExecuteSqlFile(con, "setup.sqlserver.sql");
-        DbTest.ExecuteSqlFile(con, "insert.sql");
+        DbQueryTest.ExecuteSqlFile(con, "setup.sqlserver.sql");
+        DbQueryTest.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetSqlServerDatabase");
@@ -262,7 +262,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
       testDb.Factory = new Sdx.Db.SqlServerFactory();
-      testDb.Factory.ConnectionString = DbTest.SqlServerConnectionString;
+      testDb.Factory.ConnectionString = DbQueryTest.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
@@ -270,7 +270,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
       testDb = new TestDb();
       testDb.Factory = new Sdx.Db.MySqlFactory();
-      testDb.Factory.ConnectionString = DbTest.MySqlConnectionString;
+      testDb.Factory.ConnectionString = DbQueryTest.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);
