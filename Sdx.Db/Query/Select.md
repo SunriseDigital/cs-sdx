@@ -507,7 +507,7 @@ SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
 ```
 
 <br><br><br>
-### GROUP句/HAVING句
+### GROUP/HAVING句
 
 GROUP句はORDER句同様、`Select.Group()`/`Tabl.Group()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Table.Having`プロパティに対して操作を行います。
 
@@ -548,3 +548,5 @@ SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
 # DbCommand.Parameters["@0"] = 2
 ```
 
+<br><br><br>
+### LIMIT/OFFSET句
