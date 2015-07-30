@@ -33,7 +33,7 @@ namespace Sdx.Db.Query
     NotEqual,
     AltNotEqual,
     GreaterThan,
-    Less_than,
+    LessThan,
     GreaterEqual,
     LessEqual,
     Like,
