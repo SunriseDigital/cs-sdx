@@ -51,6 +51,11 @@ namespace Sdx.Db.Query
       return this.AddJoin(select, JoinType.Inner, condition, alias);
     }
 
+    public Table LeftJoin(Select table, string condition, string alias = null)
+    {
+      return this.AddJoin(table, JoinType.Left, condition, alias);
+    }
+
     public Table InnerJoin(Expr table, string condition, string alias = null)
     {
       return this.AddJoin(table, JoinType.Inner, condition, alias);
@@ -75,7 +80,7 @@ namespace Sdx.Db.Query
 
     internal string JoinCondition { get; private set; }
 
-    public JoinType JoinType { get; internal set; }
+    internal JoinType JoinType { get; set; }
 
     public Table ClearColumns()
     {

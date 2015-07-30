@@ -954,6 +954,43 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     }
 
     [Fact]
+    public void TestSelectSubqueryLeftJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectSubqueryLeftJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectSubqueryLeftJoin(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Factory.CreateSelect();
+      select
+        .From("shop")
+        .Column("*")
+        .Where.Add("id", "1");
+
+      Sdx.Db.Query.Select sub = db.Factory.CreateSelect();
+      sub
+        .From("category")
+        .Column("id")
+        .Where.Add("id", "2");
+
+      select.Table("shop").LeftJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Command.CommandText
+      );
+
+      Assert.Equal(2, db.Command.Parameters.Count);
+      Assert.Equal("2", db.Command.Parameters[0].Value);//サブクエリのWhereの方が先にAddされる
+      Assert.Equal("1", db.Command.Parameters[1].Value);
+    }
+
+    [Fact]
     public void TestSelectSubqueryWhere()
     {
       foreach (TestDb db in this.CreateTestDbList())
