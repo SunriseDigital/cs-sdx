@@ -550,3 +550,15 @@ SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
 
 <br><br><br>
 ### LIMIT/OFFSET句
+
+LIMIT/OFFSET句はSqlServerではサポートしていませんので、OFFSET/FETCH句が生成されます。SqlServerの仕様でORDER句を付与しないでOFFSET/FETCH句を使うと`System.Data.SqlClient.SqlException`がスローされます。
+
+```
+System.Data.SqlClient.SqlException: '0' 付近に不適切な構文があります。
+FETCH ステートメントのオプション NEXT の使用法が無効です。
+```
+
+LIMIT/OFFSET句は`Select.Limit(int limit, int offset = 0)`でセットします。
+
+
+
