@@ -56,7 +56,7 @@ namespace Sdx.Db.Query
     public Table From(object tableName, string alias = null)
     {
       Table from = new Table(this);
-      from.Target = tableName;
+      from.Name = tableName;
       from.Alias = alias;
       from.JoinType = JoinType.From;
 
@@ -169,20 +169,20 @@ namespace Sdx.Db.Query
         joinString += " " + table.JoinType.SqlString() + " ";
       }
 
-      if (table.Target is Select)
+      if (table.Name is Select)
       {
-        Select select = table.Target as Select;
+        Select select = table.Name as Select;
         string subquery = select.BuildSelectString(parameters, condCount);
         joinString += "(" + subquery + ")";
       }
       else
       {
-        joinString += this.Factory.QuoteIdentifier(table.Target);
+        joinString += this.Factory.QuoteIdentifier(table.Name);
       }
 
       if (table.Alias != null)
       {
-        joinString += " AS " + this.Factory.QuoteIdentifier(table.Name);
+        joinString += " AS " + this.Factory.QuoteIdentifier(table.ContextName);
       }
 
       if (table.JoinCondition != null)
@@ -190,8 +190,8 @@ namespace Sdx.Db.Query
         joinString += " ON "
           + String.Format(
             table.JoinCondition,
-            this.Factory.QuoteIdentifier(table.ParentTable.Name),
-            this.Factory.QuoteIdentifier(table.Name)
+            this.Factory.QuoteIdentifier(table.ParentTable.ContextName),
+            this.Factory.QuoteIdentifier(table.ContextName)
           );
       }
 
@@ -211,7 +211,7 @@ namespace Sdx.Db.Query
     {
       foreach (Table table in this.tables)
       {
-        if (table.Name == name)
+        if (table.ContextName == name)
         {
           return table;
         }
@@ -228,7 +228,7 @@ namespace Sdx.Db.Query
       }
       else
       {
-        this.columns.RemoveAll(column => column.Table != null && column.Table.Name == table.Name);
+        this.columns.RemoveAll(column => column.Table != null && column.Table.ContextName == table.ContextName);
       }
       
       return this;
@@ -282,7 +282,7 @@ namespace Sdx.Db.Query
     {
       int findIndex = this.tables.FindIndex(jt =>
       {
-        return jt.Name == tableName;
+        return jt.ContextName == tableName;
       });
 
       if (findIndex != -1)

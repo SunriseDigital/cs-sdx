@@ -13,11 +13,11 @@ namespace Sdx.Db.Query
       this.select = select;
     }
 
-    public object Target { get; internal set; }
+    public object Name { get; internal set; }
 
     public string Alias { get; internal set; }
 
-    public string Name
+    public string ContextName
     {
       get 
       {
@@ -26,7 +26,7 @@ namespace Sdx.Db.Query
           return this.Alias;
         }
 
-        return this.Target.ToString(); 
+        return this.Name.ToString(); 
       }
     }
 
@@ -35,12 +35,12 @@ namespace Sdx.Db.Query
       Table joinTable = new Table(this.select);
 
       joinTable.ParentTable = this;
-      joinTable.Target = table;
+      joinTable.Name = table;
       joinTable.Alias = alias;
       joinTable.JoinCondition = condition;
       joinTable.JoinType = joinType;
 
-      this.select.RemoveTable(joinTable.Name);
+      this.select.RemoveTable(joinTable.ContextName);
 
       this.select.TableList.Add(joinTable);
       return joinTable;
@@ -118,7 +118,7 @@ namespace Sdx.Db.Query
 
     public string AppendAlias(string column)
     {
-      return this.select.Factory.QuoteIdentifier(this.Name) + "." + this.select.Factory.QuoteIdentifier(column);
+      return this.select.Factory.QuoteIdentifier(this.ContextName) + "." + this.select.Factory.QuoteIdentifier(column);
     }
 
     public Where Where
@@ -129,7 +129,7 @@ namespace Sdx.Db.Query
         where.Table = this;
         return where;
         //ここは下記のようにするとTableの代入ができません。
-        //this.select.Where.Table = this.Name;
+        //this.select.Where.Table = this.ContextName;
         //return this.select.Where;
         //Select.Writeが下記のような実装になっているからです。
         //public Where Where

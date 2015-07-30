@@ -65,7 +65,7 @@ namespace Sdx.Db.Query
       var sql = "";
       if(this.Table != null)
       {
-        sql = factory.QuoteIdentifier(this.Table.Name) + "." + this.QuotedName(factory);
+        sql = factory.QuoteIdentifier(this.Table.ContextName) + "." + this.QuotedName(factory);
       }
       else
       {
