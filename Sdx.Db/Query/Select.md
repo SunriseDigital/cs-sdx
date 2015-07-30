@@ -509,7 +509,7 @@ SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
 <br><br><br>
 ### GROUP句
 
-ORDER句同様、`Select.Order()`/`Tabl.Order()`があります。
+ORDER句同様、`Select.Group()`/`Tabl.Group()`があります。
 
 #### Select.Group()
 ```c#
