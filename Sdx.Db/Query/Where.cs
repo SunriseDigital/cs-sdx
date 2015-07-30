@@ -19,14 +19,14 @@ namespace Sdx.Db.Query
       private List<Condition> wheres = new List<Condition>();
       private Select select;
 
-      public int Count
+      internal int Count
       {
         get { return wheres.Count; }
       }
 
-      public bool EnableBracket { get; set; }
+      internal bool EnableBracket { get; set; }
 
-      public Table Table { get; set; }
+      internal Table Table { get; set; }
 
       public Where(Select select)
       {
@@ -95,7 +95,7 @@ namespace Sdx.Db.Query
         this.wheres.Add(cond);
       }
 
-      public string Build(DbParameterCollection parameters, Counter condCount)
+      internal string Build(DbParameterCollection parameters, Counter condCount)
       {
         string whereString = "";
 
@@ -167,8 +167,8 @@ namespace Sdx.Db.Query
 
         var leftHand = cond.Column.Build(this.select.Factory);
 
-        this.select.Joins.ForEach(table => {
-          leftHand = leftHand.Replace("{"+table.Name+"}", this.select.Factory.QuoteIdentifier(table.Name));
+        this.select.TableList.ForEach(table => {
+          leftHand = leftHand.Replace("{"+table.ContextName+"}", this.select.Factory.QuoteIdentifier(table.ContextName));
         });
 
         return String.Format(

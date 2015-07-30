@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Db.Query
 {
-  public class Counter
+  internal class Counter
   {
     private int value = 0;
     public int Value { get { return this.value; } }

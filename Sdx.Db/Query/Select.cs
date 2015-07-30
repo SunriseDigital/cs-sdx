@@ -8,21 +8,22 @@ namespace Sdx.Db.Query
   public class Select
   {
     private Factory factory;
-    private List<Table> joins = new List<Table>();
+    private List<Table> tables = new List<Table>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
     private Where where;
     private Where having;
-    private int limit = -1;
-    private int offset = -1;
 
-    public Select(Factory factory)
+    internal Select(Factory factory)
     {
       this.factory = factory;
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Where(this);
       this.having = new Where(this);
+
+      //intは0で初期化されてしまうのでセットされていない状態を識別するため（`LIMIT 0`を可能にするため）-1をセット
+      this.Limit = -1;
     }
 
     internal Factory Factory
@@ -30,19 +31,24 @@ namespace Sdx.Db.Query
       get { return this.factory; }
     }
 
-    internal List<Table> Joins
+    internal List<Table> TableList
     {
-      get { return this.joins; }
+      get { return this.tables; }
     }
 
-    internal List<Column> Groups
+    internal List<Column> GroupList
     {
       get { return this.groups; }
     }
 
-    internal List<Column> Orders
+    internal List<Column> OrderList
     {
       get { return this.orders; }
+    }
+
+    internal List<Column> ColumnList
+    {
+      get { return this.columns; }
     }
 
     public JoinOrder JoinOrder { get; set; }
@@ -50,11 +56,11 @@ namespace Sdx.Db.Query
     public Table From(object tableName, string alias = null)
     {
       Table from = new Table(this);
-      from.Target = tableName;
+      from.Name = tableName;
       from.Alias = alias;
       from.JoinType = JoinType.From;
 
-      this.joins.Add(from);
+      this.tables.Add(from);
 
       return from;
     }
@@ -68,7 +74,7 @@ namespace Sdx.Db.Query
 
       //FROMを追加
       var fromString = "";
-      foreach (Table table in this.joins.Where(t => t.JoinType == JoinType.From))
+      foreach (Table table in this.tables.Where(t => t.JoinType == JoinType.From))
       {
         if (fromString != "")
         {
@@ -82,19 +88,19 @@ namespace Sdx.Db.Query
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner))
         {
           selectString += this.buildJoinString(table, parameters, condCount);
         }
 
-        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Left))
+        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Left))
         {
           selectString += this.buildJoinString(table, parameters, condCount);
         }
       }
       else
       {
-        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
           selectString += this.buildJoinString(table, parameters, condCount);
         }
@@ -107,10 +113,10 @@ namespace Sdx.Db.Query
       }
 
       //GROUP
-      if (this.Groups.Count > 0)
+      if (this.GroupList.Count > 0)
       {
         var groupString = "";
-        this.Groups.ForEach(column =>
+        this.GroupList.ForEach(column =>
         {
           if(groupString != "")
           {
@@ -146,9 +152,9 @@ namespace Sdx.Db.Query
       }
 
       //LIMIT/OFFSET
-      if(this.limit > -1)
+      if(this.Limit > -1)
       {
-        selectString = this.factory.AppendLimitQuery(selectString, this.limit, this.offset);
+        selectString = this.factory.AppendLimitQuery(selectString, this.Limit, this.Offset);
       }
 
       return selectString;
@@ -163,20 +169,20 @@ namespace Sdx.Db.Query
         joinString += " " + table.JoinType.SqlString() + " ";
       }
 
-      if (table.Target is Select)
+      if (table.Name is Select)
       {
-        Select select = table.Target as Select;
+        Select select = table.Name as Select;
         string subquery = select.BuildSelectString(parameters, condCount);
         joinString += "(" + subquery + ")";
       }
       else
       {
-        joinString += this.Factory.QuoteIdentifier(table.Target);
+        joinString += this.Factory.QuoteIdentifier(table.Name);
       }
 
       if (table.Alias != null)
       {
-        joinString += " AS " + this.Factory.QuoteIdentifier(table.Name);
+        joinString += " AS " + this.Factory.QuoteIdentifier(table.ContextName);
       }
 
       if (table.JoinCondition != null)
@@ -184,8 +190,8 @@ namespace Sdx.Db.Query
         joinString += " ON "
           + String.Format(
             table.JoinCondition,
-            this.Factory.QuoteIdentifier(table.ParentTable.Name),
-            this.Factory.QuoteIdentifier(table.Name)
+            this.Factory.QuoteIdentifier(table.ParentTable.ContextName),
+            this.Factory.QuoteIdentifier(table.ContextName)
           );
       }
 
@@ -203,20 +209,15 @@ namespace Sdx.Db.Query
 
     public Table Table(string name)
     {
-      foreach (Table table in this.joins)
+      foreach (Table table in this.tables)
       {
-        if (table.Name == name)
+        if (table.ContextName == name)
         {
           return table;
         }
       }
 
       throw new Exception("Missing " + name + " table current context.");
-    }
-
-    public List<Column> Columns
-    {
-      get { return this.columns; }
     }
 
     public Select ClearColumns(Table table = null)
@@ -227,40 +228,33 @@ namespace Sdx.Db.Query
       }
       else
       {
-        this.columns.RemoveAll(column => column.Table != null && column.Table.Name == table.Name);
+        this.columns.RemoveAll(column => column.Table != null && column.Table.ContextName == table.ContextName);
       }
       
       return this;
     }
 
-    public Select SetColumns(params String[] columns)
-    {
-      this.ClearColumns();
-      this.AddColumns(columns);
-      return this;
-    }
-
-    public Select AddColumns(params String[] columns)
+    public Select Columns(params String[] columns)
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column);
+        this.Column(column);
       }
       return this;
     }
 
 
-    public Select AddColumns(Dictionary<string, object> columns)
+    public Select Columns(Dictionary<string, object> columns)
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column.Value, column.Key);
+        this.Column(column.Value, column.Key);
       }
 
       return this;
     }
 
-    public Select AddColumn(object columnName, string alias = null)
+    public Select Column(object columnName, string alias = null)
     {
       var column = new Column(columnName);
       column.Alias = alias;
@@ -284,17 +278,17 @@ namespace Sdx.Db.Query
       return result;
     }
 
-    public Select Remove(string tableName)
+    public Select RemoveTable(string tableName)
     {
-      int findIndex = this.joins.FindIndex(jt =>
+      int findIndex = this.tables.FindIndex(jt =>
       {
-        return jt.Name == tableName;
+        return jt.ContextName == tableName;
       });
 
       if (findIndex != -1)
       {
-        this.ClearColumns(this.joins[findIndex]);
-        this.joins.RemoveAt(findIndex);
+        this.ClearColumns(this.tables[findIndex]);
+        this.tables.RemoveAt(findIndex);
       }
 
       return this;
@@ -314,11 +308,6 @@ namespace Sdx.Db.Query
       return new Where(this);
     }
 
-    public Expr Expr(string str)
-    {
-      return Sdx.Db.Query.Expr.Wrap(str);
-    }
-
     public Select Group(object columnName)
     {
       var column = new Column(columnName);
@@ -335,12 +324,9 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Select Limit(int limit, int offset = 0)
-    {
-      this.limit = limit;
-      this.offset = offset;
-      return this;
-    }
+    public int Limit { get; set; }
+
+    public int Offset { get; set; }
 
     public Select Order(object columnName, Order order)
     {

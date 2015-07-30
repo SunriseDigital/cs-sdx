@@ -42,15 +42,15 @@ namespace Sdx.Db.Query
     NotIn
   }
 
-  public static class Enumns
+  internal static class Enumns
   {
-    public static string SqlString(this Logical logical)
+    internal static string SqlString(this Logical logical)
     {
       string[] strings = { " AND ", " OR " };
       return strings[(int)logical];
     }
 
-    public static string SqlString(this Comparison comp)
+    internal static string SqlString(this Comparison comp)
     {
       string[] strings = {
           " = ",
@@ -68,13 +68,13 @@ namespace Sdx.Db.Query
       return strings[(int)comp];
     }
 
-    public static string SqlString(this JoinType gender)
+    internal static string SqlString(this JoinType gender)
     {
       string[] strings = { "FROM", "INNER JOIN", "LEFT JOIN" };
       return strings[(int)gender];
     }
 
-    public static string SqlString(this Order order)
+    internal static string SqlString(this Order order)
     {
       string[] strings = { "ASC", "DESC" };
       return strings[(int)order];

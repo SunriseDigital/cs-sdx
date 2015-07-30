@@ -13,11 +13,11 @@ namespace Sdx.Db.Query
       this.select = select;
     }
 
-    public object Target { get; internal set; }
+    public object Name { get; internal set; }
 
     public string Alias { get; internal set; }
 
-    public string Name
+    public string ContextName
     {
       get 
       {
@@ -26,7 +26,7 @@ namespace Sdx.Db.Query
           return this.Alias;
         }
 
-        return this.Target.ToString(); 
+        return this.Name.ToString(); 
       }
     }
 
@@ -35,20 +35,25 @@ namespace Sdx.Db.Query
       Table joinTable = new Table(this.select);
 
       joinTable.ParentTable = this;
-      joinTable.Target = table;
+      joinTable.Name = table;
       joinTable.Alias = alias;
       joinTable.JoinCondition = condition;
       joinTable.JoinType = joinType;
 
-      this.select.Remove(joinTable.Name);
+      this.select.RemoveTable(joinTable.ContextName);
 
-      this.select.Joins.Add(joinTable);
+      this.select.TableList.Add(joinTable);
       return joinTable;
     }
 
     public Table InnerJoin(Select select, string condition, string alias = null)
     {
       return this.AddJoin(select, JoinType.Inner, condition, alias);
+    }
+
+    public Table LeftJoin(Select table, string condition, string alias = null)
+    {
+      return this.AddJoin(table, JoinType.Left, condition, alias);
     }
 
     public Table InnerJoin(Expr table, string condition, string alias = null)
@@ -71,11 +76,11 @@ namespace Sdx.Db.Query
       return this.AddJoin(table, JoinType.Left, condition, alias);
     }
 
-    public Table ParentTable { get; private set; }
+    internal Table ParentTable { get; private set; }
 
-    public string JoinCondition { get; private set; }
+    internal string JoinCondition { get; private set; }
 
-    public JoinType JoinType { get; internal set; }
+    internal JoinType JoinType { get; set; }
 
     public Table ClearColumns()
     {
@@ -83,36 +88,29 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Table SetColumns(params String[] columns)
-    {
-      this.ClearColumns();
-      this.AddColumns(columns);
-      return this;
-    }
-
-    public Table AddColumns(params String[] columns)
+    public Table Columns(params String[] columns)
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column);
+        this.Column(column);
       }
       return this;
     }
 
-    public Table AddColumn(object columnName, string alias = null)
+    public Table Column(object columnName, string alias = null)
     {
       var column = new Column(columnName);
       column.Alias = alias;
       column.Table = this;
-      this.select.Columns.Add(column);
+      this.select.ColumnList.Add(column);
       return this;
     }
 
-    public Table AddColumns(Dictionary<string, object> columns)
+    public Table Columns(Dictionary<string, object> columns)
     {
       foreach(var column in columns)
       {
-        this.AddColumn(column.Value, column.Key);
+        this.Column(column.Value, column.Key);
       }
 
       return this;
@@ -120,7 +118,7 @@ namespace Sdx.Db.Query
 
     public string AppendAlias(string column)
     {
-      return this.select.Factory.QuoteIdentifier(this.Name) + "." + this.select.Factory.QuoteIdentifier(column);
+      return this.select.Factory.QuoteIdentifier(this.ContextName) + "." + this.select.Factory.QuoteIdentifier(column);
     }
 
     public Where Where
@@ -131,7 +129,7 @@ namespace Sdx.Db.Query
         where.Table = this;
         return where;
         //ここは下記のようにするとTableの代入ができません。
-        //this.select.Where.Table = this.Name;
+        //this.select.Where.Table = this.ContextName;
         //return this.select.Where;
         //Select.Writeが下記のような実装になっているからです。
         //public Where Where
@@ -159,7 +157,7 @@ namespace Sdx.Db.Query
     {
       var column = new Column(columnName);
       column.Table = this;
-      this.select.Groups.Add(column);
+      this.select.GroupList.Add(column);
       return this;
     }
 
@@ -168,7 +166,7 @@ namespace Sdx.Db.Query
       var column = new Column(columnName);
       column.Table = this;
       column.Order = order;
-      this.select.Orders.Add(column);
+      this.select.OrderList.Add(column);
 
       return this;
     }
