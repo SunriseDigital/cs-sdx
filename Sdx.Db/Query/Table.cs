@@ -40,9 +40,9 @@ namespace Sdx.Db.Query
       joinTable.JoinCondition = condition;
       joinTable.JoinType = joinType;
 
-      this.select.Remove(joinTable.Name);
+      this.select.RemoveTable(joinTable.Name);
 
-      this.select.JoinList.Add(joinTable);
+      this.select.TableList.Add(joinTable);
       return joinTable;
     }
 

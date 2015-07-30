@@ -326,14 +326,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
-      select.Remove("shop").From("shop", "s").Columns("*");
+      select.RemoveTable("shop").From("shop", "s").Columns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}"),
         db.Command.CommandText
       );
 
-      select.Remove("s").From("shop");
+      select.RemoveTable("s").From("shop");
       select.Table("shop").Columns("id");
       db.Command = select.Build();
       Assert.Equal(
@@ -342,21 +342,21 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //SetColumns
-      select.Remove("shop").From("shop").ClearColumns().Columns("id");
+      select.RemoveTable("shop").From("shop").ClearColumns().Columns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Remove("shop").From("shop").ClearColumns().Columns("id", "name");
+      select.RemoveTable("shop").From("shop").ClearColumns().Columns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Remove("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
+      select.RemoveTable("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -364,7 +364,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //Columns
-      select.Remove("shop").From("shop").Columns("id");
+      select.RemoveTable("shop").From("shop").Columns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
@@ -378,14 +378,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Command.CommandText
       );
 
-      select.Remove("shop").From("shop").Columns("id", "name");
+      select.RemoveTable("shop").From("shop").Columns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Remove("shop").From("shop").Columns(new String[] { "id", "name" });
+      select.RemoveTable("shop").From("shop").Columns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -393,7 +393,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //ClearColumns
-      select.Remove("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
+      select.RemoveTable("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
       select.Table("shop").ClearColumns().Columns("*");
       db.Command = select.Build();
       Assert.Equal(
@@ -699,7 +699,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //テーブル名だけすり替える
-      select.Remove("shop").From("category");
+      select.RemoveTable("shop").From("category");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -708,7 +708,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //SetColumns
-      select.Remove("category").From("shop");
+      select.RemoveTable("category").From("shop");
       select.ClearColumns().Columns("name", "category_id");
 
       db.Command = select.Build();
@@ -718,7 +718,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //Column Dictinary
-      select.ClearColumns().Remove("shop").From("shop");
+      select.ClearColumns().RemoveTable("shop").From("shop");
       select.Columns(new Dictionary<string, object>() { 
         {"shop_id", "id"},
         {"shop_name", "name"}
@@ -731,7 +731,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //Column MAX
-      select.ClearColumns().Remove("shop").From("shop");
+      select.ClearColumns().RemoveTable("shop").From("shop");
       select.Column(
         Sdx.Db.Query.Expr.Wrap("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
         "max_id"
@@ -1182,7 +1182,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
        db.Command.CommandText
       );
 
-      select.Limit(100);
+      select.Limit = 100;
       db.Command = select.Build();
 
       this.AssertCommandText(
@@ -1197,7 +1197,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db
       );
 
-      select.Limit(100, 10);
+      select.Limit = 100;
+      select.Offset = 10;
       db.Command = select.Build();
 
       this.AssertCommandText(

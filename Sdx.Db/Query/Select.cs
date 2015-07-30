@@ -8,14 +8,12 @@ namespace Sdx.Db.Query
   public class Select
   {
     private Factory factory;
-    private List<Table> joins = new List<Table>();
+    private List<Table> tables = new List<Table>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
     private Where where;
     private Where having;
-    private int limit = -1;
-    private int offset = -1;
 
     internal Select(Factory factory)
     {
@@ -23,6 +21,9 @@ namespace Sdx.Db.Query
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Where(this);
       this.having = new Where(this);
+
+      //intは0で初期化されてしまうのでセットされていない状態を識別するため（`LIMIT 0`を可能にするため）-1をセット
+      this.Limit = -1;
     }
 
     internal Factory Factory
@@ -30,9 +31,9 @@ namespace Sdx.Db.Query
       get { return this.factory; }
     }
 
-    internal List<Table> JoinList
+    internal List<Table> TableList
     {
-      get { return this.joins; }
+      get { return this.tables; }
     }
 
     internal List<Column> GroupList
@@ -59,7 +60,7 @@ namespace Sdx.Db.Query
       from.Alias = alias;
       from.JoinType = JoinType.From;
 
-      this.joins.Add(from);
+      this.tables.Add(from);
 
       return from;
     }
@@ -73,7 +74,7 @@ namespace Sdx.Db.Query
 
       //FROMを追加
       var fromString = "";
-      foreach (Table table in this.joins.Where(t => t.JoinType == JoinType.From))
+      foreach (Table table in this.tables.Where(t => t.JoinType == JoinType.From))
       {
         if (fromString != "")
         {
@@ -87,19 +88,19 @@ namespace Sdx.Db.Query
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner))
         {
           selectString += this.buildJoinString(table, parameters, condCount);
         }
 
-        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Left))
+        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Left))
         {
           selectString += this.buildJoinString(table, parameters, condCount);
         }
       }
       else
       {
-        foreach (var table in this.joins.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
           selectString += this.buildJoinString(table, parameters, condCount);
         }
@@ -151,9 +152,9 @@ namespace Sdx.Db.Query
       }
 
       //LIMIT/OFFSET
-      if(this.limit > -1)
+      if(this.Limit > -1)
       {
-        selectString = this.factory.AppendLimitQuery(selectString, this.limit, this.offset);
+        selectString = this.factory.AppendLimitQuery(selectString, this.Limit, this.Offset);
       }
 
       return selectString;
@@ -208,7 +209,7 @@ namespace Sdx.Db.Query
 
     public Table Table(string name)
     {
-      foreach (Table table in this.joins)
+      foreach (Table table in this.tables)
       {
         if (table.Name == name)
         {
@@ -277,17 +278,17 @@ namespace Sdx.Db.Query
       return result;
     }
 
-    public Select Remove(string tableName)
+    public Select RemoveTable(string tableName)
     {
-      int findIndex = this.joins.FindIndex(jt =>
+      int findIndex = this.tables.FindIndex(jt =>
       {
         return jt.Name == tableName;
       });
 
       if (findIndex != -1)
       {
-        this.ClearColumns(this.joins[findIndex]);
-        this.joins.RemoveAt(findIndex);
+        this.ClearColumns(this.tables[findIndex]);
+        this.tables.RemoveAt(findIndex);
       }
 
       return this;
@@ -323,12 +324,9 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Select Limit(int limit, int offset = 0)
-    {
-      this.limit = limit;
-      this.offset = offset;
-      return this;
-    }
+    public int Limit { get; set; }
+
+    public int Offset { get; set; }
 
     public Select Order(object columnName, Order order)
     {
