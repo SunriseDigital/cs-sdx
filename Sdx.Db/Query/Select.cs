@@ -307,11 +307,6 @@ namespace Sdx.Db.Query
       return new Where(this);
     }
 
-    public Expr Expr(string str)
-    {
-      return Sdx.Db.Query.Expr.Wrap(str);
-    }
-
     public Select Group(object columnName)
     {
       var column = new Column(columnName);

@@ -902,7 +902,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         .From("shop")
         .Column("*")
         .InnerJoin(
-          select.Expr("(SELECT id FROM category WHERE id = 1)"),
+          Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
           "{0}.category_id = {1}.id",
           "sub_cat"
         );
