@@ -507,9 +507,9 @@ SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
 ```
 
 <br><br><br>
-### GROUP句
+### GROUP句/HAVING句
 
-ORDER句同様、`Select.Group()`/`Tabl.Group()`があります。
+GROUP句はORDER句同様、`Select.Group()`/`Tabl.Group()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Table.Having`プロパティに対して操作を行います。
 
 #### Select.Group()
 ```c#
@@ -518,11 +518,18 @@ select.From("shop");
 
 select
   .AddColumn("id")
-  .Group("id");
+  .Group("id")
+  .Having.Add(
+    Sdx.Db.Query.Expr.Wrap("SUM(shop.id)"),
+    10,
+    Sdx.Db.Query.Comparison.GreaterEqual
+  );
 ```
 
 ```sql
-SELECT [id] FROM [shop] GROUP BY [id]
+SELECT [id] FROM [shop] GROUP BY [id] HAVING SUM(shop.id) >= @0
+
+# DbCommand.Parameters["@0"] = 10
 ```
 
 #### Table.Group()
@@ -531,10 +538,13 @@ select = db.Factory.CreateSelect();
 select
   .From("shop")
   .AddColumn("id")
-  .Group("id");
+  .Group("id")
+  .Having.Add("id", "2", Sdx.Db.Query.Comparison.GreaterEqual);
 ```
 
 ```sql
-SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id]
+SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
+
+# DbCommand.Parameters["@0"] = 2
 ```
 
