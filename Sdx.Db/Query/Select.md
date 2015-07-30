@@ -560,5 +560,22 @@ FETCH ステートメントのオプション NEXT の使用法が無効です�
 
 LIMIT/OFFSET句は`Select.Limit(int limit, int offset = 0)`でセットします。
 
+```c#
+var select = db.Factory.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("*");
 
+select
+  .Order("id", Sdx.Db.Query.Order.DESC);
+  .Limit(10, 20)
+```
+
+```sql
+# SqlServer
+SELECT [shop].* FROM [shop] ORDER BY [id] DESC OFFSET 20 ROWS FETCH NEXT 10 ROWS ONLY
+
+#MySql
+SELECT `shop`.* FROM `shop` ORDER BY `id` DESC LIMIT 100 OFFSET 10
+```
 
