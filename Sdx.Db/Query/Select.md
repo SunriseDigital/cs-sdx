@@ -506,3 +506,35 @@ select
 SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
 ```
 
+<br><br><br>
+### GROUP句
+
+ORDER句同様、`Select.Order()`/`Tabl.Order()e`があります。
+
+#### Select.Group()
+```c#
+select = db.Factory.CreateSelect();
+select.From("shop");
+
+select
+  .AddColumn("id")
+  .Group("id");
+```
+
+```sql
+SELECT [id] FROM [shop] GROUP BY [id]
+```
+
+#### Table.Group()
+```c#
+select = db.Factory.CreateSelect();
+select
+  .From("shop")
+  .AddColumn("id")
+  .Group("id");
+```
+
+```sql
+SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id]
+```
+
