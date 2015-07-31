@@ -12,15 +12,15 @@ namespace Sdx.Db.Query
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
-    private Where where;
-    private Where having;
+    private Condition where;
+    private Condition having;
 
     internal Select(Adapter adapter)
     {
       this.adapter = adapter;
       this.JoinOrder = JoinOrder.InnerFront;
-      this.where = new Where(this);
-      this.having = new Where(this);
+      this.where = new Condition(this);
+      this.having = new Condition(this);
 
       //intは0で初期化されてしまうのでセットされていない状態を識別するため（`LIMIT 0`を可能にするため）-1をセット
       this.Limit = -1;
@@ -330,7 +330,7 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Where Where
+    public Condition Where
     {
       get
       {
@@ -339,9 +339,9 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Where CreateWhere()
+    public Condition CreateWhere()
     {
-      return new Where(this);
+      return new Condition(this);
     }
 
     /// <summary>
@@ -356,7 +356,7 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Where Having 
+    public Condition Having 
     {
       get
       {

@@ -63,7 +63,7 @@
     <Compile Include="SqlServerAdapter.cs" />
     <Compile Include="Query\Table.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="Query\Where.cs" />
+    <Compile Include="Query\Condition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -322,9 +322,9 @@ select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 <br><br><br>
 ### WHERE句
 
-`Select` `Table`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Where`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
+`Select` `Table`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Condition`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
 
-`Where`は`Add`というメソッドを持っていて、これでWhere句をセットしていきます。
+`Condition`は`Add`というメソッドを持っていて、これでWhere句をセットしていきます。
 
 ```c#
 Add(object column, object value, Comparison comparison)
@@ -332,7 +332,7 @@ Add(object column, object value, Comparison comparison)
 
 | 名前 | 説明 |
 | --- | --- |
-| column | カラム名。String \| Expr \| Whereを受け付けます。 |
+| column | カラム名。String \| Expr \| Conditionを受け付けます。 |
 | value | 値。String \| Int \| IEnumerable<> \| Selectなど、Selectはサブクエリ、IEnumerableはINを生成します。 |
 | comparison | 比較演算子。`Sdx.Db.Query.Comparison`enum。省略時は`Sdx.Db.Query.Comparison.Equal` |
 

@@ -121,18 +121,18 @@ namespace Sdx.Db.Query
       return this.select.Adapter.QuoteIdentifier(this.ContextName) + "." + this.select.Adapter.QuoteIdentifier(column);
     }
 
-    public Where Where
+    public Condition Where
     {
       get
       {
-        Where where = this.select.Where;
+        Condition where = this.select.Where;
         where.Table = this;
         return where;
         //ここは下記のようにするとTableの代入ができません。
-        //this.select.Where.Table = this.ContextName;
-        //return this.select.Where;
+        //this.select.Condition.Table = this.ContextName;
+        //return this.select.Condition;
         //Select.Writeが下記のような実装になっているからです。
-        //public Where Where
+        //public Condition Condition
         //{
         //  get
         //  {
@@ -143,11 +143,11 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Where Having
+    public Condition Having
     {
       get
       {
-        Where having = this.select.Having;
+        Condition having = this.select.Having;
         having.Table = this;
         return having;
       }

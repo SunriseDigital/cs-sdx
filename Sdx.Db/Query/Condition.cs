@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace Sdx.Db.Query
 {
-    public class Where
+    public class Condition
     {
-      private class Condition
+      private class Holder
       {
         public Comparison Comparison { get; set; }
         public Logical Logical { get; set; }
@@ -16,7 +16,7 @@ namespace Sdx.Db.Query
         public object Value { get; set; }
       }
 
-      private List<Condition> wheres = new List<Condition>();
+      private List<Holder> wheres = new List<Holder>();
       private Select select;
 
       internal int Count
@@ -28,39 +28,39 @@ namespace Sdx.Db.Query
 
       internal Table Table { get; set; }
 
-      public Where(Select select)
+      public Condition(Select select)
       {
         this.select = select;
       }
 
-      public Where AddOr(Where where)
+      public Condition AddOr(Condition where)
       {
         this.AddWhere(where, Logical.Or);
         return this;
       }
 
-      public Where AddOr(Object column, Object value, Comparison comparison = Comparison.Equal)
+      public Condition AddOr(Object column, Object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.Or, comparison);
         return this;
       }
 
-      public Where Add(Where where)
+      public Condition Add(Condition where)
       {
         this.AddWhere(where, Logical.And);
         return this;
       }
 
-      public Where Add(Object column, Object value, Comparison comparison = Comparison.Equal)
+      public Condition Add(Object column, Object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.And, comparison);
         return this;
       }
 
-      private Where AddWhere(Where where, Logical logical)
+      private Condition AddWhere(Condition where, Logical logical)
       {
         where.EnableBracket = true;
-        this.Add(new Condition
+        this.Add(new Holder
         {
           Value = where,
           Logical = logical
@@ -68,12 +68,12 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private Where AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
+      private Condition AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
       {
         var column = new Column(columnName);
         column.Table = this.Table;
 
-        this.Add(new Condition
+        this.Add(new Holder
         {
           Column = column,
           Logical = logical,
@@ -84,36 +84,36 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private void Add(Condition cond)
+      private void Add(Holder holder)
       {
-        if(cond.Logical == Logical.Or && this.wheres.Count == 0)
+        if(holder.Logical == Logical.Or && this.wheres.Count == 0)
         {
           //一番最初のWhereがOrで足されたということは何かプログラマーの意図と違うことが起こってるはず。
-          throw new Exception("Illegal logical operation for the first where condition `"+cond.Logical.SqlString()+"`");
+          throw new Exception("Illegal logical operation for the first where condition `"+holder.Logical.SqlString()+"`");
         }
 
-        this.wheres.Add(cond);
+        this.wheres.Add(holder);
       }
 
       internal string Build(DbParameterCollection parameters, Counter condCount)
       {
         string whereString = "";
 
-        wheres.ForEach(cond =>
+        wheres.ForEach(holder =>
         {
           if (whereString.Length > 0)
           {
-            whereString += cond.Logical.SqlString();
+            whereString += holder.Logical.SqlString();
           }
 
-          if (cond.Value is Where)
+          if (holder.Value is Condition)
           {
-            Where where = cond.Value as Where;
+            Condition where = holder.Value as Condition;
             whereString += where.Build(parameters, condCount);
           }
           else
           {
-            whereString += this.BuildValueConditionString(parameters, cond, condCount);
+            whereString += this.BuildValueConditionString(parameters, holder, condCount);
           }
         });
 
@@ -125,7 +125,7 @@ namespace Sdx.Db.Query
         return whereString;
       }
 
-      private string BuildValueConditionString(DbParameterCollection parameters, Condition cond, Counter condCount)
+      private string BuildValueConditionString(DbParameterCollection parameters, Holder cond, Counter condCount)
       {
         string rightHand;
         if (cond.Value is Expr)
