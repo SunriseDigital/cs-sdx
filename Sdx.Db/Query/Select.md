@@ -552,7 +552,7 @@ SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
 <br><br><br>
 ### LIMIT/OFFSET句
 
-LIMIT/OFFSET句はSqlServerではサポートしていませんので、OFFSET/FETCH句が生成されます。`Select.Limit`/`Select.Offset`のプロパティにセットするとデータベースに適したLIMIT/OFFSET句が生成されます。
+LIMIT/OFFSET句は`Select.Limit`/`Select.Offset`のプロパティにセットします。SqlServerでは、OFFSET/FETCH句が生成されます（SqlServer2012以前では機能しませんので注意してください）。
 
 ```c#
 var select = db.CreateSelect();
