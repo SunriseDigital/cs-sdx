@@ -53,6 +53,12 @@ namespace Sdx.Db.Query
 
     public JoinOrder JoinOrder { get; set; }
 
+    /// <summary>
+    /// From句を追加。繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    /// <param contextName="contextName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="alias"></param>
+    /// <returns></returns>
     public Table From(object tableName, string alias = null)
     {
       Table from = new Table(this);
@@ -207,19 +213,29 @@ namespace Sdx.Db.Query
       return command;
     }
 
-    public Table Table(string name)
+    /// <summary>
+    /// From及びJoinしたテーブルの中からcontextNameのテーブルを探し返す
+    /// </summary>
+    /// <param name="contextName"></param>
+    /// <returns></returns>
+    public Table Table(string contextName)
     {
       foreach (Table table in this.tables)
       {
-        if (table.ContextName == name)
+        if (table.ContextName == contextName)
         {
           return table;
         }
       }
 
-      throw new Exception("Missing " + name + " table current context.");
+      throw new Exception("Missing " + contextName + " table current context.");
     }
 
+    /// <summary>
+    /// 追加したカラムをクリアする。
+    /// </summary>
+    /// <param contextName="table">Tableを渡すとそのテーブルのカラムのみをクリアします。</param>
+    /// <returns></returns>
     public Select ClearColumns(Table table = null)
     {
       if (table == null)
@@ -234,7 +250,12 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Select Columns(params String[] columns)
+    /// <summary>
+    /// エイリアスの付与はできません。
+    /// </summary>
+    /// <param contextName="columns">Sdx.Db.Query.Expr[]|String[]</param>
+    /// <returns></returns>
+    public Select Columns(params object[] columns)
     {
       foreach (var column in columns)
       {
@@ -243,7 +264,11 @@ namespace Sdx.Db.Query
       return this;
     }
 
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param contextName="columns">エイリアスがKeyでカラムがValueのDictionary</param>
+    /// <returns></returns>
     public Select Columns(Dictionary<string, object> columns)
     {
       foreach (var column in columns)
@@ -254,6 +279,12 @@ namespace Sdx.Db.Query
       return this;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="alias"></param>
+    /// <returns></returns>
     public Select Column(object columnName, string alias = null)
     {
       var column = new Column(columnName);
@@ -278,11 +309,16 @@ namespace Sdx.Db.Query
       return result;
     }
 
-    public Select RemoveTable(string tableName)
+    /// <summary>
+    /// From及びJoinしたテーブルの中からcontextNameのテーブルを探し削除する
+    /// </summary>
+    /// <param contextName="contextName"></param>
+    /// <returns></returns>
+    public Select RemoveTable(string contextName)
     {
       int findIndex = this.tables.FindIndex(jt =>
       {
-        return jt.ContextName == tableName;
+        return jt.ContextName == contextName;
       });
 
       if (findIndex != -1)
@@ -308,6 +344,11 @@ namespace Sdx.Db.Query
       return new Where(this);
     }
 
+    /// <summary>
+    /// 繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <returns></returns>
     public Select Group(object columnName)
     {
       var column = new Column(columnName);
@@ -328,6 +369,12 @@ namespace Sdx.Db.Query
 
     public int Offset { get; set; }
 
+    /// <summary>
+    /// 繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="order"></param>
+    /// <returns></returns>
     public Select Order(object columnName, Order order)
     {
       var column = new Column(columnName);
