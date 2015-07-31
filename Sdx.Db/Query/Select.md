@@ -510,7 +510,7 @@ SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
 <br><br><br>
 ### GROUP/HAVING句
 
-GROUP句はORDER句同様、`Select.Group()`/`Tabl.Group()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Table.Having`プロパティに対して操作を行います。
+GROUP句はORDER句同様、`Select.Group()`/`Table.Group()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Table.Having`プロパティに対して操作を行います。
 
 #### Select.Group()/Select.Having
 ```c#
@@ -552,14 +552,7 @@ SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
 <br><br><br>
 ### LIMIT/OFFSET句
 
-LIMIT/OFFSET句はSqlServerではサポートしていませんので、OFFSET/FETCH句が生成されます。SqlServerの仕様でORDER句を付与しないでOFFSET/FETCH句を使うと`System.Data.SqlClient.SqlException`がスローされます。
-
-```
-System.Data.SqlClient.SqlException: '0' 付近に不適切な構文があります。
-FETCH ステートメントのオプション NEXT の使用法が無効です。
-```
-
-LIMIT/OFFSET句は`Select.Limit`/`Select.Offset`のプロパティにセットします。
+LIMIT/OFFSET句は`Select.Limit`/`Select.Offset`のプロパティにセットします。SqlServerでは、OFFSET/FETCH句が生成されます（SqlServer2012以前では機能しませんので注意してください）。
 
 ```c#
 var select = db.CreateSelect();
@@ -580,3 +573,9 @@ SELECT [shop].* FROM [shop] ORDER BY [id] DESC OFFSET 20 ROWS FETCH NEXT 10 ROWS
 SELECT `shop`.* FROM `shop` ORDER BY `id` DESC LIMIT 100 OFFSET 10
 ```
 
+※ SqlServerの仕様でORDER句を付与しないでOFFSET/FETCH句を使うと`System.Data.SqlClient.SqlException`がスローされるので注意してください。
+
+```
+System.Data.SqlClient.SqlException: '0' 付近に不適切な構文があります。
+FETCH ステートメントのオプション NEXT の使用法が無効です。
+```
