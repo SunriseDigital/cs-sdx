@@ -44,7 +44,6 @@ namespace UnitTest
 
     private static void ResetMySqlDatabase()
     {
-      throw new Exception("ResetMySqlDatabase");
       Sdx.Db.Adapter factory = new Sdx.Db.MySqlAdapter();
 
       var masterCon = factory.CreateConnection();
