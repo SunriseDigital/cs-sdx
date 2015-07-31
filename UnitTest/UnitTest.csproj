@@ -63,7 +63,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseDbTest.cs" />
     <Compile Include="DbQueryTest.cs" />
+    <Compile Include="DbTableTest.cs" />
     <Compile Include="DebugToolTest.cs" />
     <Compile Include="DummyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
