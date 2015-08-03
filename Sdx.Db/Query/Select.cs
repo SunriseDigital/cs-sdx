@@ -73,10 +73,15 @@ namespace Sdx.Db.Query
 
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
-      string selectString = "SELECT ";
+      string selectString = "SELECT";
 
       //カラムを組み立てる
-      selectString += this.BuildColumsString() + " FROM ";
+      var columnString = this.BuildColumsString();
+      if (columnString.Length > 0)
+      {
+        selectString += " " + columnString;
+      }
+      selectString += " FROM ";
 
       //FROMを追加
       var fromString = "";
