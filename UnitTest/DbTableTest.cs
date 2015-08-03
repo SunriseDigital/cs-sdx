@@ -41,8 +41,9 @@ namespace UnitTest
 
       Assert.Equal(db.Adapter, shop1.Adapter);
       Assert.Equal(shop1.Adapter, shop2.Adapter);
-      
-      var select = shop1.Select();
+
+      var tShop = shop1;
+      var select = tShop.Select();
 
       var command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
@@ -52,6 +53,17 @@ namespace UnitTest
         {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1} 
       FROM {0}shop{1}"), command.CommandText);
+
+      tShop.Alias = "foo";
+      select = tShop.Select();
+      command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT 
+        {0}foo{1}.{0}id{1} AS {0}id@foo{1}, 
+        {0}foo{1}.{0}name{1} AS {0}name@foo{1}, 
+        {0}foo{1}.{0}category_id{1} AS {0}category_id@foo{1}, 
+        {0}foo{1}.{0}main_image_id{1} AS {0}main_image_id@foo{1}, 
+        {0}foo{1}.{0}sub_image_id{1} AS {0}sub_image_id@foo{1} 
+      FROM {0}shop{1} AS {0}foo{1}"), command.CommandText);
     }
   }
 }
