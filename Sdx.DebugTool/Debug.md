@@ -2,7 +2,7 @@
 
 ## 概要
 
-変数のダンプ、ページヘのデバッグ用ログの出力を行います。
+変数のダンプ、ページヘのデバッグ用ログの出力を行います。有効にするには`Sdx.DebugTool.DisplayHttpModule`をアプリケーションに追加する必要がます。詳しくは[こちら](Sdx.DebugTool/DisplayHttpModule)をご覧ください。
 
 ## メソッド
 
