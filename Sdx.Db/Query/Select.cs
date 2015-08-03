@@ -56,7 +56,7 @@ namespace Sdx.Db.Query
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="contextName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="contextName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
     public Table From(object tableName, string alias = null)
@@ -253,7 +253,7 @@ namespace Sdx.Db.Query
     /// <summary>
     /// エイリアスの付与はできません。
     /// </summary>
-    /// <param contextName="columns">Sdx.Db.Query.Expr[]|String[]</param>
+    /// <param contextName="columns">Sdx.Adapter.Query.Expr[]|String[]</param>
     /// <returns></returns>
     public Select Columns(params object[] columns)
     {
@@ -282,7 +282,7 @@ namespace Sdx.Db.Query
     /// <summary>
     /// 
     /// </summary>
-    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
     public Select Column(object columnName, string alias = null)
@@ -347,7 +347,7 @@ namespace Sdx.Db.Query
     /// <summary>
     /// 繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <returns></returns>
     public Select Group(object columnName)
     {
@@ -372,7 +372,7 @@ namespace Sdx.Db.Query
     /// <summary>
     /// 繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="order"></param>
     /// <returns></returns>
     public Select Order(object columnName, Order order)

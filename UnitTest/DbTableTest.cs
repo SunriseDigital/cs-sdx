@@ -14,58 +14,44 @@ using System;
 namespace UnitTest
 {
   [TestClass]
-  public class DbTableTest : BaseTest
+  public class DbTableTest : BaseDbTest
   {
     [ClassInitialize]
-    public static void InitilizeClass(TestContext context)
+    public new static void InitilizeClass(TestContext context)
     {
-      Console.WriteLine("FixtureSetUp");
-      //最初のテストメソッドを実行する前に一回だけ実行したい処理はここ
-    }
-
-    [ClassCleanup]
-    public static void CleanupClass()
-    {
-      Console.WriteLine("FixtureTearDown");
-      //全てのテストメソッドが実行された後一回だけ実行する処理はここ
-    }
-
-    override protected void SetUp()
-    {
-      Console.WriteLine("SetUp");
-      //各テストメソッドの前に実行する処理はここ
-    }
-
-    override protected void TearDown()
-    {
-      Console.WriteLine("TearDown");
-      //各テストメソッドの後に実行する処理はここ
-    }
-
-    override public void FixtureSetUp()
-    {
-      TestTemplate.InitilizeClass(null);
-      //ここのクラス名は適宜書き換えてください。
-      //MSTestのFixtureSetUpがstaticじゃないとだめだったのでこのような構造になってます。
-    }
-
-    override public void FixtureTearDown()
-    {
-      TestTemplate.CleanupClass();
-      //@see FixtureSetUp
-    }
-
-
-    [Fact]
-    public void TestMethod1()
-    {
-      Console.WriteLine("TestMethod1");
+      BaseDbTest.InitilizeClass(context);
     }
 
     [Fact]
-    public void TestMethod2()
+    public void TestCreateSelect()
     {
-      Console.WriteLine("TestMethod2");
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunCreateSelect(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunCreateSelect(TestDb db)
+    {
+      Sdx.Db.Table.DefaultAdapter = db.Adapter;
+
+      var shop1 = new Test.Orm.Table.Shop();
+      var shop2 = new Test.Orm.Table.Shop();
+
+      Assert.Equal(db.Adapter, shop1.Adapter);
+      Assert.Equal(shop1.Adapter, shop2.Adapter);
+      
+      var select = shop1.Select();
+
+      var command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT 
+        {0}shop{1}.{0}id{1} AS {0}id@shop{1}, 
+        {0}shop{1}.{0}name{1} AS {0}name@shop{1}, 
+        {0}shop{1}.{0}category_id{1} AS {0}category_id@shop{1}, 
+        {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
+        {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1} 
+      FROM {0}shop{1}"), command.CommandText);
     }
   }
 }

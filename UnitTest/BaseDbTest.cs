@@ -5,6 +5,8 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Data.Common;
 using System.Text;
+using System.Collections.Generic;
+using System.Data;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -15,12 +17,67 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 #endif
 
 using System;
+using System.Text.RegularExpressions;
 
 namespace UnitTest
 {
   [TestClass]
   public class BaseDbTest : BaseTest
   {
+    /// <summary>
+    /// 複数のDBのテストをまとめて行うためのDbFactoryのラッパークラス
+    /// CreateTestDbList()メソッドで生成しています。
+    /// </summary>
+    protected class TestDb
+    {
+      private DbCommand command;
+      private List<DbCommand> commands = new List<DbCommand>();
+      public Sdx.Db.Adapter Adapter { get; set; }
+      public String LeftQuoteChar { get; set; }
+      public String RightQupteChar { get; set; }
+      public DbCommand Command
+      {
+        get { return this.command; }
+        set { this.command = value; this.commands.Add(command); }
+      }
+      public List<DbCommand> Commands { get { return this.commands; } }
+      public String Sql(String sql)
+      {
+        //改行を取り除く
+        sql = sql.Replace(Environment.NewLine, "");
+
+        //連続したスペースを一個のスペースに置き換える
+        Regex re = new Regex(" +", RegexOptions.Singleline);
+        sql = re.Replace(sql, " ");
+
+        return String.Format(sql, this.LeftQuoteChar, this.RightQupteChar);
+      }
+    }
+
+    protected List<TestDb> CreateTestDbList()
+    {
+      var list = new List<TestDb>();
+      TestDb testDb;
+
+#if ON_VISUAL_STUDIO
+      testDb = new TestDb();
+      testDb.Adapter = new Sdx.Db.SqlServerAdapter();
+      testDb.Adapter.ConnectionString = DbQueryTest.SqlServerConnectionString;
+      testDb.LeftQuoteChar = "[";
+      testDb.RightQupteChar = "]";
+      list.Add(testDb);
+#endif
+
+      testDb = new TestDb();
+      testDb.Adapter = new Sdx.Db.MySqlAdapter();
+      testDb.Adapter.ConnectionString = DbQueryTest.MySqlConnectionString;
+      testDb.LeftQuoteChar = "`";
+      testDb.RightQupteChar = "`";
+      list.Add(testDb);
+
+      return list;
+    }
+
     public static void InitilizeClass(TestContext context)
     {
       ResetMySqlDatabase();
@@ -172,6 +229,34 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
           throw ex;
         }
       }
+    }
+
+    /// <summary>
+    /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
+    /// </summary>
+    /// <param name="select"></param>
+    /// <param name="commands"></param>
+    protected void ExecSql(TestDb db)
+    {
+      db.Commands.ForEach(command =>
+      {
+        DbConnection con = db.Adapter.CreateConnection();
+        using (con)
+        {
+          con.Open();
+          command.Connection = con;
+          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
+          DataSet dataset = new DataSet();
+          adapter.SelectCommand = command;
+          adapter.Fill(dataset);
+
+          Console.WriteLine("execDbCommand");
+          foreach (DataRow row in dataset.Tables[0].Rows)
+          {
+            Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+          }
+        }
+      });
     }
   }
 }

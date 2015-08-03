@@ -25,29 +25,6 @@ namespace UnitTest
   [TestClass]
   public class DbQueryTest : BaseDbTest
   {
-    /// <summary>
-    /// 複数のDBのテストをまとめて行うためのDbFactoryのラッパークラス
-    /// CreateTestDbList()メソッドで生成しています。
-    /// </summary>
-    class TestDb
-    {
-      private DbCommand command;
-      private List<DbCommand> commands = new List<DbCommand>();
-      public Sdx.Db.Adapter Adapter { get; set; }
-      public String LeftQuoteChar { get; set; }
-      public String RightQupteChar { get; set; }
-      public DbCommand Command
-      {
-        get { return this.command; }
-        set { this.command = value; this.commands.Add(command); }
-      }
-      public List<DbCommand> Commands { get { return this.commands; } }
-      public String Sql(String sql)
-      {
-        return String.Format(sql, this.LeftQuoteChar, this.RightQupteChar);
-      }
-    }
-
     [ClassInitialize]
     public new static void InitilizeClass(TestContext context)
     {
@@ -104,30 +81,6 @@ namespace UnitTest
       cmd.Parameters.AddWithValue("@City", "東京");
       cmd.Parameters.AddWithValue("@CityCode", "tokyo");
       Assert.Equal("SELECT * FROM user WHERE city = '東京' AND city_code = 'tokyo'", Sdx.Db.Util.CommandToSql(cmd));
-    }
-
-    private List<TestDb> CreateTestDbList()
-    {
-      var list = new List<TestDb>();
-      TestDb testDb;
-
-#if ON_VISUAL_STUDIO
-      testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.SqlServerAdapter();
-      testDb.Adapter.ConnectionString = DbQueryTest.SqlServerConnectionString;
-      testDb.LeftQuoteChar = "[";
-      testDb.RightQupteChar = "]";
-      list.Add(testDb);
-#endif
-
-      testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.MySqlAdapter();
-      testDb.Adapter.ConnectionString = DbQueryTest.MySqlConnectionString;
-      testDb.LeftQuoteChar = "`";
-      testDb.RightQupteChar = "`";
-      list.Add(testDb);
-
-      return list;
     }
 
     [Fact]
@@ -1143,34 +1096,6 @@ namespace UnitTest
 
       Assert.Equal(1, db.Command.Parameters.Count);
       Assert.Equal("2", db.Command.Parameters["@0"].Value);
-    }
-
-    /// <summary>
-    /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
-    /// </summary>
-    /// <param name="select"></param>
-    /// <param name="commands"></param>
-    private void ExecSql(TestDb db)
-    {
-      db.Commands.ForEach(command =>
-      {
-        DbConnection con = db.Adapter.CreateConnection();
-        using (con)
-        {
-          con.Open();
-          command.Connection = con;
-          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
-          DataSet dataset = new DataSet();
-          adapter.SelectCommand = command;
-          adapter.Fill(dataset);
-
-          Console.WriteLine("execDbCommand");
-          foreach (DataRow row in dataset.Tables[0].Rows)
-          {
-            Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
-          }
-        }
-      });
     }
   }
 }
