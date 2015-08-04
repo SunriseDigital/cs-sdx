@@ -56,26 +56,40 @@ namespace Sdx.Db.Query
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="contextName">Sdx.Adapter.Query.Expr|String</param>
-    /// <param contextName="alias"></param>
-    /// <returns></returns>
-    public Context From(object target, string alias = null)
+    public Context From(Sdx.Db.Table target, string alias = null)
+    {
+      var context = this.AddFrom(target.Meta.Name, alias);
+      context.setTable(target);
+      return context;
+    }
+
+    /// <summary>
+    /// From句を追加。繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    public Context From(Expr target, string alias = null)
+    {
+      return this.AddFrom(target, alias);
+    }
+
+    /// <summary>
+    /// From句を追加。繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    public Context From(String target, string alias = null)
+    {
+      return this.AddFrom(target, alias);
+    }
+
+    public Context From(Sdx.Db.Query.Select target, string alias = null)
+    {
+      return this.AddFrom(target, alias);
+    }
+
+    private Context AddFrom(object target, string alias)
     {
       Context context = new Context(this);
       context.Alias = alias;
       context.JoinType = JoinType.From;
-
-      if(target is Sdx.Db.Table)
-      {
-        var table = target as Sdx.Db.Table;
-        context.Target = table.Meta.Name;
-        context.setTable(table);
-      }
-      else
-      {
-        context.Target = target;
-      }
-
+      context.Target = target;
       this.contextList.Add(context);
 
       return context;
