@@ -61,7 +61,7 @@
     <Compile Include="Query\Select.cs" />
     <Compile Include="Query\Column.cs" />
     <Compile Include="SqlServerAdapter.cs" />
-    <Compile Include="Query\Table.cs" />
+    <Compile Include="Query\Context.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="TableMeta.cs" />
     <Compile Include="Util.cs" />
