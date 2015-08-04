@@ -32,42 +32,5 @@ namespace Sdx.Db
     {
       Table.metaList = new Dictionary<string, TableMeta>();
     }
-
-    public Table()
-    {
-      this.Adapter = Sdx.Db.Table.DefaultAdapter;
-    }
-
-    public Sdx.Db.Query.Select Select()
-    {
-      var select = this.Adapter.CreateSelect();
-      var tableMeta = this.Meta;
-
-      var tShop = select.From(tableMeta.Name, this.Alias);
-      tShop.setTable(this);
-
-      tableMeta.Columns.ForEach(columnName => {
-        tShop.Column(columnName, columnName + "@" + this.ContextName);
-      });
-
-      return select;
-    }
-
-    public static Adapter DefaultAdapter { get; set; }
-
-    public string Alias { get; set; }
-
-    public string ContextName
-    {
-      get
-      {
-        if(this.Alias != null)
-        {
-          return this.Alias;
-        }
-
-        return this.Meta.Name;
-      }
-    }
   }
 }

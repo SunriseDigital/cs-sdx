@@ -61,14 +61,24 @@ namespace Sdx.Db.Query
     /// <returns></returns>
     public Context From(object target, string alias = null)
     {
-      Context from = new Context(this);
-      from.Target = target;
-      from.Alias = alias;
-      from.JoinType = JoinType.From;
+      Context context = new Context(this);
+      context.Alias = alias;
+      context.JoinType = JoinType.From;
 
-      this.contextList.Add(from);
+      if(target is Sdx.Db.Table)
+      {
+        var table = target as Sdx.Db.Table;
+        context.Target = table.Meta.Name;
+        context.setTable(table);
+      }
+      else
+      {
+        context.Target = target;
+      }
 
-      return from;
+      this.contextList.Add(context);
+
+      return context;
     }
 
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
@@ -76,6 +86,11 @@ namespace Sdx.Db.Query
       string selectString = "SELECT";
 
       //カラムを組み立てる
+      foreach (Context context in this.contextList.Where(context => context.Table != null))
+      {
+        context.Table.Meta.Columns.ForEach(column => context.Column(column, column + "@" + context.Name));
+      }
+
       var columnString = this.BuildColumsString();
       if (columnString.Length > 0)
       {

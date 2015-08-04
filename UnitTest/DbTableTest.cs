@@ -34,16 +34,10 @@ namespace UnitTest
 
     private void RunCreateSelect(TestDb db)
     {
-      Sdx.Db.Table.DefaultAdapter = db.Adapter;
+      var tShop = new Test.Orm.Table.Shop();
+      var select = db.Adapter.CreateSelect();
 
-      var shop1 = new Test.Orm.Table.Shop();
-      var shop2 = new Test.Orm.Table.Shop();
-
-      Assert.Equal(db.Adapter, shop1.Adapter);
-      Assert.Equal(shop1.Adapter, shop2.Adapter);
-
-      var tShop = shop1;
-      var select = tShop.Select();
+      select.From(tShop);
 
       var command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
@@ -54,8 +48,8 @@ namespace UnitTest
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1} 
       FROM {0}shop{1}"), command.CommandText);
 
-      tShop.Alias = "foo";
-      select = tShop.Select();
+      select = db.Adapter.CreateSelect();
+      select.From(tShop, "foo");
       command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
         {0}foo{1}.{0}id{1} AS {0}id@foo{1}, 
@@ -78,7 +72,6 @@ namespace UnitTest
 
     private void RunJoinTable(TestDb db)
     {
-      Sdx.Db.Table.DefaultAdapter = db.Adapter;
 
       //db.Adapter.SetNamespace(Sdx.Db.Adapter.Namespace.Context, "Test.Context.Context");
 
@@ -88,8 +81,8 @@ namespace UnitTest
 
       //select.Context("shop").InnerJoin(db.Adapter.CreateTable("Category"));
 
-      var tShop = new Test.Orm.Table.Shop();
-      var select = tShop.Select();
+      var select = db.Adapter.CreateSelect();
+      select.From(new Test.Orm.Table.Shop());
 
       Assert.Equal(typeof(Test.Orm.Table.Shop), select.Context("shop").Table.GetType());
 
