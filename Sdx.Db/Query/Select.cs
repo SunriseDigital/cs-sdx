@@ -373,9 +373,11 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Condition CreateWhere()
+    public Condition CreateCondition(string baseCond = null)
     {
-      return new Condition(this);
+      var condition = new Condition(this);
+      condition.Base = baseCond;
+      return condition;
     }
 
     /// <summary>

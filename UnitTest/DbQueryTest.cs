@@ -621,7 +621,7 @@ namespace UnitTest
       select.From("shop").Column("*");
 
       select.Where.Add(
-        select.CreateWhere()
+        select.CreateCondition()
           .Add("id", "1")
           .AddOr("id", "2")
       );
@@ -642,11 +642,11 @@ namespace UnitTest
 
       select.Where
         .Add(
-          select.CreateWhere()
+          select.CreateCondition()
             .Add("id", "3")
             .Add("id", "4")
         ).AddOr(
-          select.CreateWhere()
+          select.CreateCondition()
             .Add("id", "1")
             .AddOr("id", "2")
         );

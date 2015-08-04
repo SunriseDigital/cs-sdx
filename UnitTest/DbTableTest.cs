@@ -112,5 +112,41 @@ namespace UnitTest
         FROM {0}shop{1} 
         INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"), db.Command.CommandText);
     }
+
+    [Fact]
+    public void TestJoinCondition()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunJoinCondition(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunJoinCondition(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+
+      //AddRight
+      select.From("shop").Columns("*");
+      var cond = select.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1");
+      var command = select.Build();
+      Assert.Equal(db.Sql("{{0}}.category_id = {{1}}.id AND {{1}}.{0}id{1} = @0"), cond.Build(command.Parameters));
+
+      //AddLeft
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      cond = select.CreateCondition("{0}.category_id = {1}.id").AddLeft("id", "1");
+      command = select.Build();
+      Assert.Equal(db.Sql("{{0}}.category_id = {{1}}.id AND {{0}}.{0}id{1} = @0"), cond.Build(command.Parameters));
+
+      //InnerJoin
+      //select = db.Adapter.CreateSelect();
+      //select.From("shop").Columns("*");
+      //select.Context("shop").InnerJoin(
+      //  "category",
+      //  select.CreateCondition(),
+      //).Columns("*");
+    }
   }
 }

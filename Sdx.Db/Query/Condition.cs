@@ -8,12 +8,20 @@ namespace Sdx.Db.Query
 {
     public class Condition
     {
+      private enum TableDetectMode
+      {
+        Column, //Sdx.Db.Query.Column.Context
+        Left,   //{0}
+        Right   //{1}
+      }
+
       private class Holder
       {
         public Comparison Comparison { get; set; }
         public Logical Logical { get; set; }
         public Column Column { get; set; }
         public object Value { get; set; }
+        public TableDetectMode TableDetectMode { get; set; }
       }
 
       private List<Holder> wheres = new List<Holder>();
@@ -68,7 +76,7 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private Condition AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
+      private void AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
       {
         var column = new Column(columnName);
         column.Context = this.Context;
@@ -78,10 +86,9 @@ namespace Sdx.Db.Query
           Column = column,
           Logical = logical,
           Comparison = comparison,
-          Value = value
+          Value = value,
+          TableDetectMode = TableDetectMode.Column
         });
-
-        return this;
       }
 
       private void Add(Holder holder)
@@ -95,9 +102,20 @@ namespace Sdx.Db.Query
         this.wheres.Add(holder);
       }
 
+      public string Build(DbParameterCollection parameters)
+      {
+        var counter = new Counter();
+        return this.Build(parameters, counter);
+      }
+
       internal string Build(DbParameterCollection parameters, Counter condCount)
       {
         string whereString = "";
+
+        if(this.Base != null)
+        {
+          whereString = this.Base;
+        }
 
         wheres.ForEach(holder =>
         {
@@ -171,12 +189,55 @@ namespace Sdx.Db.Query
           leftHand = leftHand.Replace("{"+context.Name+"}", this.select.Adapter.QuoteIdentifier(context.Name));
         });
 
+        if (cond.TableDetectMode == TableDetectMode.Left)
+        {
+          leftHand = "{0}." + leftHand;
+        }
+        else if (cond.TableDetectMode == TableDetectMode.Right)
+        {
+          leftHand = "{1}." + leftHand;
+        }
+
         return String.Format(
           "{0}{1}{2}",
           leftHand,
           cond.Comparison.SqlString(),
           rightHand
         );
+      }
+
+      public string Base { get; set; }
+
+      public Condition AddRight(object columnName, object value, Comparison comparison = Comparison.Equal)
+      {
+        var column = new Column(columnName);
+
+        this.Add(new Holder
+        {
+          Column = column,
+          Logical = Logical.And,
+          Comparison = comparison,
+          Value = value,
+          TableDetectMode = TableDetectMode.Right
+        });
+
+        return this;
+      }
+
+      public Condition AddLeft(object columnName, object value, Comparison comparison = Comparison.Equal)
+      {
+        var column = new Column(columnName);
+
+        this.Add(new Holder
+        {
+          Column = column,
+          Logical = Logical.And,
+          Comparison = comparison,
+          Value = value,
+          TableDetectMode = TableDetectMode.Left
+        });
+
+        return this;
       }
     }
 }

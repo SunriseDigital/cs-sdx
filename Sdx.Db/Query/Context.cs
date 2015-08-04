@@ -62,6 +62,11 @@ namespace Sdx.Db.Query
       return context;
     }
 
+    public Context InnerJoin(Select target, Condition condition, string alias = null)
+    {
+      return this.AddJoin(target, JoinType.Inner, null, alias);
+    }
+
     public Context InnerJoin(Select target, string condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Inner, condition, alias);
