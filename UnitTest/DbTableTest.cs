@@ -80,18 +80,18 @@ namespace UnitTest
     {
       Sdx.Db.Table.DefaultAdapter = db.Adapter;
 
-      //db.Adapter.SetNamespace(Sdx.Db.Adapter.Namespace.Table, "Test.Orm.Table");
+      //db.Adapter.SetNamespace(Sdx.Db.Adapter.Namespace.Context, "Test.Context.Context");
 
 
       //var tShop = db.Adapter.CreateTable("Shop");
       //var select = tShop.Select();
 
-      //select.Table("shop").InnerJoin(db.Adapter.CreateTable("Category"));
+      //select.Context("shop").InnerJoin(db.Adapter.CreateTable("Category"));
 
       var tShop = new Test.Orm.Table.Shop();
       var select = tShop.Select();
 
-      Assert.Equal(typeof(Test.Orm.Table.Shop), select.Table("shop").Orm.GetType());
+      Assert.Equal(typeof(Test.Orm.Table.Shop), select.Context("shop").Table.GetType());
 
     }
   }

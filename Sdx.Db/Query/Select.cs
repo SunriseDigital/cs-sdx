@@ -8,7 +8,7 @@ namespace Sdx.Db.Query
   public class Select
   {
     private Adapter adapter;
-    private List<Table> tables = new List<Table>();
+    private List<Context> contextList = new List<Context>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
@@ -31,9 +31,9 @@ namespace Sdx.Db.Query
       get { return this.adapter; }
     }
 
-    internal List<Table> TableList
+    internal List<Context> ContextList
     {
-      get { return this.tables; }
+      get { return this.contextList; }
     }
 
     internal List<Column> GroupList
@@ -59,14 +59,14 @@ namespace Sdx.Db.Query
     /// <param contextName="contextName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
-    public Table From(object tableName, string alias = null)
+    public Context From(object target, string alias = null)
     {
-      Table from = new Table(this);
-      from.Name = tableName;
+      Context from = new Context(this);
+      from.Target = target;
       from.Alias = alias;
       from.JoinType = JoinType.From;
 
-      this.tables.Add(from);
+      this.contextList.Add(from);
 
       return from;
     }
@@ -85,13 +85,13 @@ namespace Sdx.Db.Query
 
       //FROMを追加
       var fromString = "";
-      foreach (Table table in this.tables.Where(t => t.JoinType == JoinType.From))
+      foreach (Context context in this.contextList.Where(t => t.JoinType == JoinType.From))
       {
         if (fromString != "")
         {
           fromString += ", ";
         }
-        fromString += this.buildJoinString(table, parameters, condCount);
+        fromString += this.buildJoinString(context, parameters, condCount);
       }
 
       selectString += fromString;
@@ -99,21 +99,21 @@ namespace Sdx.Db.Query
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner))
         {
-          selectString += this.buildJoinString(table, parameters, condCount);
+          selectString += this.buildJoinString(context, parameters, condCount);
         }
 
-        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Left))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(table, parameters, condCount);
+          selectString += this.buildJoinString(context, parameters, condCount);
         }
       }
       else
       {
-        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(table, parameters, condCount);
+          selectString += this.buildJoinString(context, parameters, condCount);
         }
       }
 
@@ -171,38 +171,38 @@ namespace Sdx.Db.Query
       return selectString;
     }
 
-    private string buildJoinString(Table table, DbParameterCollection parameters, Counter condCount)
+    private string buildJoinString(Context context, DbParameterCollection parameters, Counter condCount)
     {
       string joinString = "";
 
-      if (table.JoinType != JoinType.From)
+      if (context.JoinType != JoinType.From)
       {
-        joinString += " " + table.JoinType.SqlString() + " ";
+        joinString += " " + context.JoinType.SqlString() + " ";
       }
 
-      if (table.Name is Select)
+      if (context.Target is Select)
       {
-        Select select = table.Name as Select;
+        Select select = context.Target as Select;
         string subquery = select.BuildSelectString(parameters, condCount);
         joinString += "(" + subquery + ")";
       }
       else
       {
-        joinString += this.Adapter.QuoteIdentifier(table.Name);
+        joinString += this.Adapter.QuoteIdentifier(context.Target);
       }
 
-      if (table.Alias != null)
+      if (context.Alias != null)
       {
-        joinString += " AS " + this.Adapter.QuoteIdentifier(table.ContextName);
+        joinString += " AS " + this.Adapter.QuoteIdentifier(context.Name);
       }
 
-      if (table.JoinCondition != null)
+      if (context.JoinCondition != null)
       {
         joinString += " ON "
           + String.Format(
-            table.JoinCondition,
-            this.Adapter.QuoteIdentifier(table.ParentTable.ContextName),
-            this.Adapter.QuoteIdentifier(table.ContextName)
+            context.JoinCondition,
+            this.Adapter.QuoteIdentifier(context.ParentContext.Name),
+            this.Adapter.QuoteIdentifier(context.Name)
           );
       }
 
@@ -223,33 +223,33 @@ namespace Sdx.Db.Query
     /// </summary>
     /// <param name="contextName"></param>
     /// <returns></returns>
-    public Table Table(string contextName)
+    public Context Context(string contextName)
     {
-      foreach (Table table in this.tables)
+      foreach (Context context in this.contextList)
       {
-        if (table.ContextName == contextName)
+        if (context.Name == contextName)
         {
-          return table;
+          return context;
         }
       }
 
-      throw new Exception("Missing " + contextName + " table current context.");
+      throw new Exception("Missing " + contextName + " context.");
     }
 
     /// <summary>
     /// 追加したカラムをクリアする。
     /// </summary>
-    /// <param contextName="table">Tableを渡すとそのテーブルのカラムのみをクリアします。</param>
+    /// <param contextName="context">Contextを渡すとそのテーブルのカラムのみをクリアします。</param>
     /// <returns></returns>
-    public Select ClearColumns(Table table = null)
+    public Select ClearColumns(Context context = null)
     {
-      if (table == null)
+      if (context == null)
       {
         this.columns.Clear();
       }
       else
       {
-        this.columns.RemoveAll(column => column.Table != null && column.Table.ContextName == table.ContextName);
+        this.columns.RemoveAll(column => column.Context != null && column.Context.Name == context.Name);
       }
       
       return this;
@@ -319,17 +319,17 @@ namespace Sdx.Db.Query
     /// </summary>
     /// <param contextName="contextName"></param>
     /// <returns></returns>
-    public Select RemoveTable(string contextName)
+    public Select RemoveContext(string contextName)
     {
-      int findIndex = this.tables.FindIndex(jt =>
+      int findIndex = this.contextList.FindIndex(jt =>
       {
-        return jt.ContextName == contextName;
+        return jt.Name == contextName;
       });
 
       if (findIndex != -1)
       {
-        this.ClearColumns(this.tables[findIndex]);
-        this.tables.RemoveAt(findIndex);
+        this.ClearColumns(this.contextList[findIndex]);
+        this.contextList.RemoveAt(findIndex);
       }
 
       return this;
@@ -339,7 +339,7 @@ namespace Sdx.Db.Query
     {
       get
       {
-        this.where.Table = null;
+        this.where.Context = null;
         return this.where;
       }
     }
@@ -365,7 +365,7 @@ namespace Sdx.Db.Query
     {
       get
       {
-        this.having.Table = null;
+        this.having.Context = null;
         return this.having;
       }
     }

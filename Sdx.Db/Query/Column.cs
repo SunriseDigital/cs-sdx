@@ -39,7 +39,7 @@ namespace Sdx.Db.Query
 
     public string Alias { get; set; }
 
-    public Table Table { get; set; }
+    public Context Context { get; set; }
 
     public Order Order { get; set; }
 
@@ -63,9 +63,9 @@ namespace Sdx.Db.Query
     internal string Build(Adapter db)
     {
       var sql = "";
-      if(this.Table != null)
+      if(this.Context != null)
       {
-        sql = db.QuoteIdentifier(this.Table.ContextName) + "." + this.QuotedName(db);
+        sql = db.QuoteIdentifier(this.Context.Name) + "." + this.QuotedName(db);
       }
       else
       {

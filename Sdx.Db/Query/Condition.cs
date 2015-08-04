@@ -26,7 +26,7 @@ namespace Sdx.Db.Query
 
       internal bool EnableBracket { get; set; }
 
-      internal Table Table { get; set; }
+      internal Context Context { get; set; }
 
       public Condition(Select select)
       {
@@ -71,7 +71,7 @@ namespace Sdx.Db.Query
       private Condition AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
       {
         var column = new Column(columnName);
-        column.Table = this.Table;
+        column.Context = this.Context;
 
         this.Add(new Holder
         {
@@ -167,8 +167,8 @@ namespace Sdx.Db.Query
 
         var leftHand = cond.Column.Build(this.select.Adapter);
 
-        this.select.TableList.ForEach(table => {
-          leftHand = leftHand.Replace("{"+table.ContextName+"}", this.select.Adapter.QuoteIdentifier(table.ContextName));
+        this.select.ContextList.ForEach(context => {
+          leftHand = leftHand.Replace("{"+context.Name+"}", this.select.Adapter.QuoteIdentifier(context.Name));
         });
 
         return String.Format(

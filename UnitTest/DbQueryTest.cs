@@ -105,15 +105,15 @@ namespace UnitTest
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop", "s").Columns("*");
+      select.RemoveContext("shop").From("shop", "s").Columns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("s").From("shop");
-      select.Table("shop").Columns("id");
+      select.RemoveContext("s").From("shop");
+      select.Context("shop").Columns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
@@ -121,21 +121,21 @@ namespace UnitTest
       );
 
       //SetColumns
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns("id");
+      select.RemoveContext("shop").From("shop").ClearColumns().Columns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns("id", "name");
+      select.RemoveContext("shop").From("shop").ClearColumns().Columns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
+      select.RemoveContext("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -143,28 +143,28 @@ namespace UnitTest
       );
 
       //Columns
-      select.RemoveTable("shop").From("shop").Columns("id");
+      select.RemoveContext("shop").From("shop").Columns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns("name");
+      select.Context("shop").Columns("name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").Columns("id", "name");
+      select.RemoveContext("shop").From("shop").Columns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").Columns(new String[] { "id", "name" });
+      select.RemoveContext("shop").From("shop").Columns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -172,29 +172,29 @@ namespace UnitTest
       );
 
       //ClearColumns
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
-      select.Table("shop").ClearColumns().Columns("*");
+      select.RemoveContext("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
+      select.Context("shop").ClearColumns().Columns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").ClearColumns().Columns("id");
+      select.Context("shop").ClearColumns().Columns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").ClearColumns().Columns("id");
+      select.Context("shop").ClearColumns().Columns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns("name");
+      select.Context("shop").Columns("name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -218,7 +218,7 @@ namespace UnitTest
 
       select.From("shop").Columns("*");
 
-      select.Table("shop").InnerJoin(
+      select.Context("shop").InnerJoin(
         "category",
         "{0}.category_id = {1}.id"
       ).Columns("*");
@@ -230,10 +230,10 @@ namespace UnitTest
       );
 
       //上書きなので順番が入れ替わるはず
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id = {1}.id");
+      select.Context("shop").InnerJoin("image", "{0}.main_image_id = {1}.id");
 
       //同じテーブルをJOINしてもAliasを与えなければ上書きになる
-      select.Table("shop").InnerJoin(
+      select.Context("shop").InnerJoin(
         "category",
         "{0}.category_id = {1}.id AND {1}.id = 1"
       ).Columns("*");
@@ -262,7 +262,7 @@ namespace UnitTest
         .InnerJoin("category", "{0}.category_id = {1}.id")
         .InnerJoin("category_type", "{0}.category_type_id = {1}.id");
 
-      select.Table("shop").Columns("*");
+      select.Context("shop").Columns("*");
 
       db.Command = select.Build();
 
@@ -316,11 +316,11 @@ namespace UnitTest
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop").Columns("*");
 
-      select.Table("shop")
+      select.Context("shop")
         .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
         .Columns("*");
 
-      select.Table("shop")
+      select.Context("shop")
         .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
         .Columns("*");
 
@@ -353,7 +353,7 @@ namespace UnitTest
        db.Command.CommandText
       );
 
-      select.Table("shop")
+      select.Context("shop")
         .ClearColumns()
         .Columns(new Dictionary<string, object>()
          { 
@@ -367,7 +367,7 @@ namespace UnitTest
        db.Command.CommandText
       );
 
-      select.Table("shop")
+      select.Context("shop")
         .ClearColumns()
         .Columns(new Dictionary<string, object>()
          { 
@@ -420,13 +420,13 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
+      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
+      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
+      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -436,13 +436,13 @@ namespace UnitTest
 
       select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
+      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
+      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
+      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
+      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
 
       select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 
@@ -478,7 +478,7 @@ namespace UnitTest
       );
 
       //テーブル名だけすり替える
-      select.RemoveTable("shop").From("category");
+      select.RemoveContext("shop").From("category");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -487,7 +487,7 @@ namespace UnitTest
       );
 
       //SetColumns
-      select.RemoveTable("category").From("shop");
+      select.RemoveContext("category").From("shop");
       select.ClearColumns().Columns("name", "category_id");
 
       db.Command = select.Build();
@@ -497,7 +497,7 @@ namespace UnitTest
       );
 
       //Column Dictinary
-      select.ClearColumns().RemoveTable("shop").From("shop");
+      select.ClearColumns().RemoveContext("shop").From("shop");
       select.Columns(new Dictionary<string, object>() { 
         {"shop_id", "id"},
         {"shop_name", "name"}
@@ -510,9 +510,9 @@ namespace UnitTest
       );
 
       //Column MAX
-      select.ClearColumns().RemoveTable("shop").From("shop");
+      select.ClearColumns().RemoveContext("shop").From("shop");
       select.Column(
-        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
+        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Context("shop").AppendAlias("id") + ")"),
         "max_id"
       );
 
@@ -605,7 +605,7 @@ namespace UnitTest
       select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
 
-      select.Table("shop").Where.Add("id", "1");
+      select.Context("shop").Where.Add("id", "1");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -719,7 +719,7 @@ namespace UnitTest
         .Column("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").InnerJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+      select.Context("shop").InnerJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -756,7 +756,7 @@ namespace UnitTest
         .Column("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").LeftJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+      select.Context("shop").LeftJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -793,7 +793,7 @@ namespace UnitTest
         .Column("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
+      select.Context("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
 
       db.Command = select.Build();
       Assert.Equal(
