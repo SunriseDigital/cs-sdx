@@ -44,6 +44,7 @@ namespace Sdx.Db
       var tableMeta = this.Meta;
 
       var tShop = select.From(tableMeta.Name, this.Alias);
+      tShop.setOrmTable(this);
 
       tableMeta.Columns.ForEach(columnName => {
         tShop.Column(columnName, columnName + "@" + this.ContextName);

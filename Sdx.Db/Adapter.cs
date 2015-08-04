@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.Collections.Generic;
 
 namespace Sdx.Db
 {
@@ -7,15 +8,21 @@ namespace Sdx.Db
   {
     private DbProviderFactory factory;
     private DbCommandBuilder builder;
+    private Dictionary<Namespace, string> namespaces;
 
     protected abstract DbProviderFactory GetFactory();
 
     public string ConnectionString { get; set; }
 
+    public enum Namespace {
+      Table
+    }
+
     public Adapter()
     {
       this.factory = this.GetFactory();
       this.builder = this.factory.CreateCommandBuilder();
+      this.namespaces = new Dictionary<Namespace, string>();
     }
 
     public DbConnection CreateConnection()
@@ -71,5 +78,24 @@ namespace Sdx.Db
     }
 
     internal abstract string AppendLimitQuery(string selectSql, int limit, int offset);
+
+    public Adapter SetNamespace(Namespace key, string value)
+    {
+      namespaces[key] = value;
+      return this;
+    }
+
+    public Sdx.Db.Table CreateTable(string name)
+    {
+      var className = this.namespaces[Namespace.Table] + "." + name;
+      var type = Sdx.Util.Reflection.GetType(className);
+
+      if(type == null)
+      {
+        throw new Exception("Missing class " + className);
+      }
+
+      return Activator.CreateInstance(type) as Sdx.Db.Table;
+    }
   }
 }

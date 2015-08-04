@@ -8,6 +8,8 @@ namespace Sdx.Db.Query
   {
     private Select select;
 
+    private Sdx.Db.Table ormTable;
+
     public Table(Select select)
     {
       this.select = select;
@@ -170,5 +172,12 @@ namespace Sdx.Db.Query
 
       return this;
     }
+
+    internal void setOrmTable(Sdx.Db.Table table)
+    {
+      this.ormTable = table;
+    }
+
+    public Sdx.Db.Table Orm { get { return this.ormTable; } }
   }
 }

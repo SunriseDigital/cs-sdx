@@ -65,5 +65,34 @@ namespace UnitTest
         {0}foo{1}.{0}sub_image_id{1} AS {0}sub_image_id@foo{1} 
       FROM {0}shop{1} AS {0}foo{1}"), command.CommandText);
     }
+
+    [Fact]
+    public void TestJoinTable()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunJoinTable(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunJoinTable(TestDb db)
+    {
+      Sdx.Db.Table.DefaultAdapter = db.Adapter;
+
+      //db.Adapter.SetNamespace(Sdx.Db.Adapter.Namespace.Table, "Test.Orm.Table");
+
+
+      //var tShop = db.Adapter.CreateTable("Shop");
+      //var select = tShop.Select();
+
+      //select.Table("shop").InnerJoin(db.Adapter.CreateTable("Category"));
+
+      var tShop = new Test.Orm.Table.Shop();
+      var select = tShop.Select();
+
+      Assert.Equal(typeof(Test.Orm.Table.Shop), select.Table("shop").Orm.GetType());
+
+    }
   }
 }

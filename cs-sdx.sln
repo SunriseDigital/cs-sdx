@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.DebugTool", "Sdx.DebugT
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{9B61905B-00A2-43FE-ACD2-9571A358215B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Util", "Sdx.Util\Sdx.Util.csproj", "{814A034D-4CDD-4DE6-9AA3-6FF1431ED11C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -34,6 +36,12 @@ Global
 		{9B61905B-00A2-43FE-ACD2-9571A358215B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B61905B-00A2-43FE-ACD2-9571A358215B}.TravisCI|Any CPU.ActiveCfg = TravisCI|Any CPU
 		{9B61905B-00A2-43FE-ACD2-9571A358215B}.TravisCI|Any CPU.Build.0 = TravisCI|Any CPU
+		{814A034D-4CDD-4DE6-9AA3-6FF1431ED11C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{814A034D-4CDD-4DE6-9AA3-6FF1431ED11C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{814A034D-4CDD-4DE6-9AA3-6FF1431ED11C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{814A034D-4CDD-4DE6-9AA3-6FF1431ED11C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{814A034D-4CDD-4DE6-9AA3-6FF1431ED11C}.TravisCI|Any CPU.ActiveCfg = Release|Any CPU
+		{814A034D-4CDD-4DE6-9AA3-6FF1431ED11C}.TravisCI|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
