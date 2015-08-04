@@ -48,9 +48,23 @@ namespace Sdx.Db.Query
       return joinContext;
     }
 
-    public Context InnerJoin(Select select, string condition, string alias = null)
+    public Context InnerJoin(Sdx.Db.Table target, string condition = null, string alias = null)
     {
-      return this.AddJoin(select, JoinType.Inner, condition, alias);
+      var context = this.AddJoin(target.Meta.Name, JoinType.Inner, condition, alias);
+
+      if(condition == null)
+      {
+        var relation = target.Meta.Relations[this.Name];
+        context.JoinCondition = relation.JoinCondition;
+      }
+
+      context.setTable(target);
+      return context;
+    }
+
+    public Context InnerJoin(Select target, string condition, string alias = null)
+    {
+      return this.AddJoin(target, JoinType.Inner, condition, alias);
     }
 
     public Context LeftJoin(Select target, string condition, string alias = null)

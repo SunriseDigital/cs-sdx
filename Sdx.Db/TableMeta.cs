@@ -9,5 +9,6 @@ namespace Sdx.Db
   {
     public string Name { get; set; }
     public List<string> Columns { get; set; }
+    public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; set; }
   }
 }

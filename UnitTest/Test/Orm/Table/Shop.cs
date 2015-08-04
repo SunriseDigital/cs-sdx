@@ -5,7 +5,7 @@ namespace Test.Orm.Table
 {
   class Shop : Sdx.Db.Table
   {
-    override protected Sdx.Db.TableMeta CreateMeta()
+    override protected Sdx.Db.TableMeta CreateTableMeta()
     {
       return new Sdx.Db.TableMeta()
       {
@@ -17,6 +17,17 @@ namespace Test.Orm.Table
           "category_id",
           "main_image_id",
           "sub_image_id"
+        },
+        Relations = new Dictionary<string, Relation>()
+        {
+          {
+            "category",
+            new Relation()
+            {
+              ForeignKey = "category_id",
+              ReferenceKey = "id"
+            }
+          }
         }
       };
     }

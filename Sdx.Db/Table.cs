@@ -1,16 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Sdx.Db
 {
   public abstract class Table
   {
+    public class Relation
+    {
+      public string TableName { get; set; }
+      public string ForeignKey { get; set; }
+      public string ReferenceKey { get; set; }
+      public string JoinCondition
+      {
+        get
+        {
+          return "{0}." + this.ReferenceKey + " = {1}." + this.ForeignKey;
+        }
+      }
+    }
+
     private static Dictionary<string, TableMeta> metaList;
     public Adapter Adapter { get; set; }
 
-    abstract protected TableMeta CreateMeta();
+    abstract protected TableMeta CreateTableMeta();
 
     public TableMeta Meta
     {
@@ -22,7 +34,7 @@ namespace Sdx.Db
           return metaList[className];
         }
 
-        var meta = this.CreateMeta();
+        var meta = this.CreateTableMeta();
         metaList[className] = meta;
         return meta;
       }

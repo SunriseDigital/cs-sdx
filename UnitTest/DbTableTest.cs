@@ -39,25 +39,25 @@ namespace UnitTest
 
       select.From(tShop);
 
-      var command = select.Build();
+      db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
         {0}shop{1}.{0}id{1} AS {0}id@shop{1}, 
         {0}shop{1}.{0}name{1} AS {0}name@shop{1}, 
         {0}shop{1}.{0}category_id{1} AS {0}category_id@shop{1}, 
         {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1} 
-      FROM {0}shop{1}"), command.CommandText);
+      FROM {0}shop{1}"), db.Command.CommandText);
 
       select = db.Adapter.CreateSelect();
       select.From(tShop, "foo");
-      command = select.Build();
+      db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
         {0}foo{1}.{0}id{1} AS {0}id@foo{1}, 
         {0}foo{1}.{0}name{1} AS {0}name@foo{1}, 
         {0}foo{1}.{0}category_id{1} AS {0}category_id@foo{1}, 
         {0}foo{1}.{0}main_image_id{1} AS {0}main_image_id@foo{1}, 
         {0}foo{1}.{0}sub_image_id{1} AS {0}sub_image_id@foo{1} 
-      FROM {0}shop{1} AS {0}foo{1}"), command.CommandText);
+      FROM {0}shop{1} AS {0}foo{1}"), db.Command.CommandText);
     }
 
     [Fact]
@@ -72,20 +72,45 @@ namespace UnitTest
 
     private void RunJoinTable(TestDb db)
     {
-
-      //db.Adapter.SetNamespace(Sdx.Db.Adapter.Namespace.Context, "Test.Context.Context");
-
-
-      //var tShop = db.Adapter.CreateTable("Shop");
-      //var select = tShop.Select();
-
-      //select.Context("shop").InnerJoin(db.Adapter.CreateTable("Category"));
-
       var select = db.Adapter.CreateSelect();
       select.From(new Test.Orm.Table.Shop());
 
       Assert.Equal(typeof(Test.Orm.Table.Shop), select.Context("shop").Table.GetType());
 
+      select.Context("shop").InnerJoin(new Test.Orm.Table.Category());
+
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT
+          {0}shop{1}.{0}id{1} AS {0}id@shop{1},
+          {0}shop{1}.{0}name{1} AS {0}name@shop{1},
+          {0}shop{1}.{0}category_id{1} AS {0}category_id@shop{1},
+          {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
+          {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+          {0}category{1}.{0}id{1} AS {0}id@category{1},
+          {0}category{1}.{0}name{1} AS {0}name@category{1},
+          {0}category{1}.{0}code{1} AS {0}code@category{1},
+          {0}category{1}.{0}category_type_id{1} AS {0}category_type_id@category{1}
+        FROM {0}shop{1} 
+        INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id"), db.Command.CommandText);
+
+      select = db.Adapter.CreateSelect();
+      select.From(new Test.Orm.Table.Shop());
+      select.Context("shop").InnerJoin(new Test.Orm.Table.Category(), "{0}.category_id = {1}.id AND {1}.id = 1");
+
+      //conditionの上書き
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT
+          {0}shop{1}.{0}id{1} AS {0}id@shop{1},
+          {0}shop{1}.{0}name{1} AS {0}name@shop{1},
+          {0}shop{1}.{0}category_id{1} AS {0}category_id@shop{1},
+          {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
+          {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+          {0}category{1}.{0}id{1} AS {0}id@category{1},
+          {0}category{1}.{0}name{1} AS {0}name@category{1},
+          {0}category{1}.{0}code{1} AS {0}code@category{1},
+          {0}category{1}.{0}category_type_id{1} AS {0}category_type_id@category{1}
+        FROM {0}shop{1} 
+        INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"), db.Command.CommandText);
     }
   }
 }
