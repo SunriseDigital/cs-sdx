@@ -53,7 +53,7 @@ namespace Sdx.Db.Query
 
       public Condition AddOr(Object column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison);
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
         return this;
       }
 
@@ -65,7 +65,31 @@ namespace Sdx.Db.Query
 
       public Condition Add(Object column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison);
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddRight(object column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddLeft(object column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
+        return this;
+      }
+
+      public Condition AddRightOr(object column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddLeftOr(object column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
         return this;
       }
 
@@ -80,18 +104,22 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private void AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
+      private void AddColumn(Object columnName, Object value, Logical logical, Comparison comparison, TableDetectMode mode)
       {
         var column = new Column(columnName);
-        column.Context = this.Context;
 
+        if(mode == TableDetectMode.Column)
+        {
+          column.Context = this.Context;
+        }
+        
         this.Add(new Holder
         {
           Column = column,
           Logical = logical,
           Comparison = comparison,
           Value = value,
-          TableDetectMode = TableDetectMode.Column
+          TableDetectMode = mode
         });
       }
 
@@ -217,37 +245,5 @@ namespace Sdx.Db.Query
       }
 
       public string Base { get; set; }
-
-      public Condition AddRight(object columnName, object value, Comparison comparison = Comparison.Equal)
-      {
-        var column = new Column(columnName);
-
-        this.Add(new Holder
-        {
-          Column = column,
-          Logical = Logical.And,
-          Comparison = comparison,
-          Value = value,
-          TableDetectMode = TableDetectMode.Right
-        });
-
-        return this;
-      }
-
-      public Condition AddLeft(object columnName, object value, Comparison comparison = Comparison.Equal)
-      {
-        var column = new Column(columnName);
-
-        this.Add(new Holder
-        {
-          Column = column,
-          Logical = Logical.And,
-          Comparison = comparison,
-          Value = value,
-          TableDetectMode = TableDetectMode.Left
-        });
-
-        return this;
-      }
     }
 }

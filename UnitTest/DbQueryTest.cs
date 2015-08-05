@@ -1212,6 +1212,50 @@ namespace UnitTest
       Assert.Equal("foo", db.Command.Parameters[0].Value);
       Assert.Equal("bar", db.Command.Parameters[1].Value);
       Assert.Equal("99", db.Command.Parameters[2].Value);
+
+      //InnerJoin Addtional include `OR` right
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop")
+        .InnerJoin(
+          "category",
+          db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+            .Add(
+              db.Adapter.CreateCondition()
+                .AddRight("id", "1")
+                .AddRightOr("id", "2")
+            )
+        )
+        .Columns("*");
+
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+        FROM {0}shop{1}
+        INNER JOIN {0}category{1}
+          ON {0}shop{1}.category_id = {0}category{1}.id
+            AND ({0}category{1}.{0}id{1} = @0 OR {0}category{1}.{0}id{1} = @1)"), db.Command.CommandText);
+
+      //InnerJoin Addtional include `OR` left
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop")
+        .InnerJoin(
+          "category",
+          db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+            .Add(
+              db.Adapter.CreateCondition()
+                .AddLeft("id", "1")
+                .AddLeftOr("id", "2")
+            )
+        )
+        .Columns("*");
+
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+        FROM {0}shop{1}
+        INNER JOIN {0}category{1}
+          ON {0}shop{1}.category_id = {0}category{1}.id
+            AND ({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)"), db.Command.CommandText);
     }
   }
 }
