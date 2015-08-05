@@ -229,7 +229,7 @@ namespace Sdx.Db.Query
       {
         joinString += " ON "
           + String.Format(
-            context.JoinCondition,
+            context.JoinCondition.Build(parameters, condCount),
             this.Adapter.QuoteIdentifier(context.ParentContext.Name),
             this.Adapter.QuoteIdentifier(context.Name)
           );
