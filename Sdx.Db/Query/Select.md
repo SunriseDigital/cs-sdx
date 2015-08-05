@@ -181,50 +181,63 @@ select
   .Column("*");
 
 Sdx.Db.Query.Context categoryContext = select.Context("shop")
-  .InnderJoin("category", "{0}.category_id = {1}.id")
+  .InnderJoin(
+    "category",
+    db.CreateCondition("{0}.category_id = {1}.id")
+      .AddRight("id", "1")
+  )
   .Column("*");
   
 DbCommand command = select.Build();
 ```
 
 ```sql
-SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].category_id = [category].id
+SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].category_id = [category].id AND [category].[id] = @0
+# DbCommand.Parameters["@0"] = "1";
 ```
 
-`Select.Context()`は既にJOINしたテーブル（FROM句も含む）の`Context`オブジェクトを取得します。また、`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Context`オブジェクトを返します。
+`Select.Context()`はFROM句、あるいはJOIN句のテーブルの`Context`オブジェクトを取得します。また、`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Context`オブジェクトを返します。
 
-`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件をstringで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。
+`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Sdx.Db.Query.Condition`のインスタンスで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。`Condition`にはJOIN条件の生成用に`AddLeft`と`AddRight`のメソッドがあり、それぞれ`{0}`、`{1}`に条件を追加できます。
 
-JOINの条件内のカラム名など、`{0}`/`{1}`を利用したテーブル名以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオーとしてください。
+`Condition`のコンストラクタに渡す条件内のカラム名など、`{0}`/`{1}`を利用したテーブル名以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオートしてください。
 
 ```c#
 var db = new Sdx.Db.SqlServerAdapter();
 ...
 
 select.Context("shop")
-  .InnerJoin("category", "{0}."+db.QuoteIdentifier(column)+" = {1}.id");
+  .InnerJoin("category", db.CreateCondition("{0}."+db.QuoteIdentifier(column)+" = {1}.id"));
 ```
 
 #### 同じテーブルをJOINする
 
-JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回した場合、上書きされます。
+JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回した場合、一度しかJOINは行われません。
 
 ```c#
 select.From("shop").Column("*");
 
+//まずはcategoryをJOIN
 select.Context("shop").InnerJoin(
   "category",
-  "{0}.category_id = {1}.id"
+  db.CreateCondition("{0}.category_id = {1}.id")
 );
 
+//次にはimageをJOIN
+select.Context("shop").InnerJoin(
+  "image",
+  db.CreateCondition("{0}.main_image_id = {1}.id")
+);
+
+//もう一度categoryをJOIN
 select.Context("shop").InnerJoin(
   "category",
-  "{0}.category_id = {1}.id AND {1}.id = 1"
+  db.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1")
 );
 db.Command = select.Build();
 ```
 
-上書きするので`category`のJOINの方が後ろに来ます。
+同じテーブルを同じ名前でJOINすると、上書きするので`category`のJOINの方が後ろに来ます。
 
 ```sql
 SELECT
@@ -238,7 +251,9 @@ FROM
     INNER JOIN
         [category]
     ON  [shop].category_id = [category].id
-    AND [category].id = 1
+    AND [category].[id] = @0
+
+# DbCommand.Paramters["@0"] = "1"
 ```
 
 
@@ -252,11 +267,11 @@ select
   .Column("*");
   
 select.Context("shop")
-  .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
+  .InnerJoin("image", db.CreateCondition("{0}.main_image_id = {1}.id"), "main_image")
   .Column("*");
 
 select.Context("shop")
-  .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
+  .InnerJoin("image", db.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image")
   .Column("*");
 ```
 
@@ -287,13 +302,13 @@ select
   .Column("*");
   
 select.Context("shop")
-  .LeftJoin("image", "{0}.main_image_id = {1}.id", "main_image");
+  .LeftJoin("image", db.CreateCondition("{0}.main_image_id = {1}.id"), "main_image");
 
 select.Context("shop")
-  .LeftJoin("image", "{0}.sub_image_id = {1}.id", "sub_image");
+  .LeftJoin("image", db.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image");
   
 select.Context("shop")
-  .InnerJoin("category", "{0}.category_id = {1}.id");
+  .InnerJoin("category", db.CreateCondition("{0}.category_id = {1}.id"));
 ```
 
 ```sql
@@ -439,7 +454,7 @@ AND [shop].[category_id] IN(
 
 #### ORを含むような複雑なWHERE句
 
-`Where.Add()`に`Where`をセットすると子供の`Where`はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
+`Where.Add()`に`Sdx.Db.Query.Condition`をセットすると子供のWhere句はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Sdx.Db.Query.Condition`は`Select.CreateCondition()`から生成可能です。
 
 ```c#
 var select = db.CreateSelect();
@@ -447,11 +462,11 @@ select.From("shop").Column("*");
 
 select.Where
   .Add(
-    select.CreateWhere()
+    select.CreateCondition()
       .Add("id", "3")
       .Add("id", "4")
   ).AddOr(
-    select.CreateWhere()
+    select.CreateCondition()
       .Add("id", "1")
       .AddOr("id", "2")
   );

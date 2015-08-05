@@ -220,7 +220,7 @@ namespace UnitTest
 
       select.Context("shop").InnerJoin(
         "category",
-        "{0}.category_id = {1}.id"
+        db.Adapter.CreateCondition("{0}.category_id = {1}.id")
       ).Columns("*");
 
       db.Command = select.Build();
@@ -230,12 +230,12 @@ namespace UnitTest
       );
 
       //上書きなので順番が入れ替わるはず
-      select.Context("shop").InnerJoin("image", "{0}.main_image_id = {1}.id");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id = {1}.id"));
 
       //同じテーブルをJOINしてもAliasを与えなければ上書きになる
       select.Context("shop").InnerJoin(
         "category",
-        "{0}.category_id = {1}.id AND {1}.id = 1"
+        db.Adapter.CreateCondition("{0}.category_id = {1}.id AND {1}.id = 1")
       ).Columns("*");
       db.Command = select.Build();
       Assert.Equal(
@@ -259,8 +259,8 @@ namespace UnitTest
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
-        .InnerJoin("category", "{0}.category_id = {1}.id")
-        .InnerJoin("category_type", "{0}.category_type_id = {1}.id");
+        .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
+        .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
 
       select.Context("shop").Columns("*");
 
@@ -290,8 +290,8 @@ namespace UnitTest
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .From("shop")
-        .InnerJoin("category", "{0}.category_id = {1}.id")
-        .InnerJoin("category_type", "{0}.category_type_id = {1}.id");
+        .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
+        .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
 
       db.Command = select.Build();
 
@@ -317,11 +317,11 @@ namespace UnitTest
       select.From("shop").Columns("*");
 
       select.Context("shop")
-        .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
+        .InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id = {1}.id"), "main_image")
         .Columns("*");
 
       select.Context("shop")
-        .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
+        .InnerJoin("image", db.Adapter.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image")
         .Columns("*");
 
       db.Command = select.Build();
@@ -397,7 +397,7 @@ namespace UnitTest
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop")
         .Column("*")
-        .LeftJoin("image", "{0}.main_image_id={1}.id");
+        .LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"));
 
       db.Command = select.Build();
       Assert.Equal(
@@ -420,13 +420,13 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
-      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
-      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
-      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image1");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image2");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image3");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image4");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image5");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image6");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image7");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -436,13 +436,13 @@ namespace UnitTest
 
       select = db.Adapter.CreateSelect();
       select.From("shop").Column("*");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
-      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
-      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
-      select.Context("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
-      select.Context("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image1");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image2");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image3");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image4");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image5");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image6");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image7");
 
       select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 
@@ -621,7 +621,7 @@ namespace UnitTest
       select.From("shop").Column("*");
 
       select.Where.Add(
-        select.CreateWhere()
+        db.Adapter.CreateCondition()
           .Add("id", "1")
           .AddOr("id", "2")
       );
@@ -642,11 +642,11 @@ namespace UnitTest
 
       select.Where
         .Add(
-          select.CreateWhere()
+          db.Adapter.CreateCondition()
             .Add("id", "3")
             .Add("id", "4")
         ).AddOr(
-          select.CreateWhere()
+          db.Adapter.CreateCondition()
             .Add("id", "1")
             .AddOr("id", "2")
         );
@@ -682,7 +682,7 @@ namespace UnitTest
         .Column("*")
         .InnerJoin(
           Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
-          "{0}.category_id = {1}.id",
+          db.Adapter.CreateCondition("{0}.category_id = {1}.id"),
           "sub_cat"
         );
 
@@ -719,7 +719,7 @@ namespace UnitTest
         .Column("id")
         .Where.Add("id", "2");
 
-      select.Context("shop").InnerJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+      select.Context("shop").InnerJoin(sub, db.Adapter.CreateCondition("{0}.category_id = {1}.id"), "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -756,7 +756,7 @@ namespace UnitTest
         .Column("id")
         .Where.Add("id", "2");
 
-      select.Context("shop").LeftJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+      select.Context("shop").LeftJoin(sub, db.Adapter.CreateCondition("{0}.category_id = {1}.id"), "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1096,6 +1096,153 @@ namespace UnitTest
 
       Assert.Equal(1, db.Command.Parameters.Count);
       Assert.Equal("2", db.Command.Parameters["@0"].Value);
+    }
+
+        [Fact]
+    public void TestJoinCondition()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunJoinCondition(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunJoinCondition(TestDb db)
+    {
+      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+
+      //InnerJoin
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop").InnerJoin(
+        "category",
+        db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+      ).Columns("*");
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+        FROM {0}shop{1} 
+        INNER JOIN {0}category{1} 
+          ON {0}shop{1}.category_id = {0}category{1}.id"), db.Command.CommandText);
+
+      Assert.Equal(0, db.Command.Parameters.Count);
+
+      //InnerJoin Additional String condition
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop").InnerJoin(
+        "category",
+        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1")
+      ).Columns("*");
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+        FROM {0}shop{1} 
+        INNER JOIN {0}category{1} 
+          ON {0}shop{1}.category_id = {0}category{1}.id 
+          AND {0}category{1}.{0}id{1} = @0"), db.Command.CommandText);
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+
+      //InnerJoin Additional Expr condition
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop").InnerJoin(
+        "category",
+        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight(Sdx.Db.Query.Expr.Wrap("id"), "1")
+      ).Columns("*");
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+        FROM {0}shop{1} 
+        INNER JOIN {0}category{1} 
+          ON {0}shop{1}.category_id = {0}category{1}.id 
+          AND {0}category{1}.id = @0"), db.Command.CommandText);
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+
+      //InnerJoin Additional Subquery
+      var sub = db.Adapter.CreateSelect();
+      sub.From("category").Column("id");
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop").InnerJoin(
+        "category",
+        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
+      ).Columns("*");
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.*
+        FROM {0}shop{1} 
+        INNER JOIN {0}category{1}
+          ON {0}shop{1}.category_id = {0}category{1}.id 
+            AND {0}category{1}.{0}id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1})"), db.Command.CommandText);
+
+      //InnerJoin Additional Subquery and parameter
+      sub = db.Adapter.CreateSelect();
+      sub.From("category").Column("id").Where.Add("code", "foo");
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*").Where.Add("name", "bar");
+      select.Context("shop").InnerJoin(
+        "category",
+        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
+      ).Columns("*").Where.Add("id", "99");
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.*
+        FROM {0}shop{1}
+        INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
+          AND {0}category{1}.{0}id{1} IN 
+            (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}code{1} = @0)
+        WHERE {0}shop{1}.{0}name{1} = @1 
+        AND {0}category{1}.{0}id{1} = @2"), db.Command.CommandText);
+
+      Assert.Equal(3, db.Command.Parameters.Count);
+      Assert.Equal("foo", db.Command.Parameters[0].Value);
+      Assert.Equal("bar", db.Command.Parameters[1].Value);
+      Assert.Equal("99", db.Command.Parameters[2].Value);
+
+      //InnerJoin Addtional include `OR` right
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop")
+        .InnerJoin(
+          "category",
+          db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+            .Add(
+              db.Adapter.CreateCondition()
+                .AddRight("id", "1")
+                .AddRightOr("id", "2")
+            )
+        )
+        .Columns("*");
+
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+        FROM {0}shop{1}
+        INNER JOIN {0}category{1}
+          ON {0}shop{1}.category_id = {0}category{1}.id
+            AND ({0}category{1}.{0}id{1} = @0 OR {0}category{1}.{0}id{1} = @1)"), db.Command.CommandText);
+
+      //InnerJoin Addtional include `OR` left
+      select = db.Adapter.CreateSelect();
+      select.From("shop").Columns("*");
+      select.Context("shop")
+        .InnerJoin(
+          "category",
+          db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+            .Add(
+              db.Adapter.CreateCondition()
+                .AddLeft("id", "1")
+                .AddLeftOr("id", "2")
+            )
+        )
+        .Columns("*");
+
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+        FROM {0}shop{1}
+        INNER JOIN {0}category{1}
+          ON {0}shop{1}.category_id = {0}category{1}.id
+            AND ({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)"), db.Command.CommandText);
     }
   }
 }

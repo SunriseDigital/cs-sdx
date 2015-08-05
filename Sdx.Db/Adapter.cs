@@ -46,9 +46,9 @@ namespace Sdx.Db
       return this.factory.CreateCommandBuilder();
     }
 
-    public Sdx.Db.Query.Select CreateSelect()
+    public Query.Select CreateSelect()
     {
-      return new Sdx.Db.Query.Select(this);
+      return new Query.Select(this);
     }
 
     public DbDataAdapter CreateDataAdapter()
@@ -56,11 +56,16 @@ namespace Sdx.Db
       return this.factory.CreateDataAdapter();
     }
 
+    public Query.Condition CreateCondition(string baseCond = null)
+    {
+      return new Query.Condition(baseCond);
+    }
+
     public string QuoteIdentifier(object obj)
     {
-      if (obj is Sdx.Db.Query.Expr)
+      if (obj is Query.Expr)
       {
-        return (obj as Sdx.Db.Query.Expr).ToString();
+        return (obj as Query.Expr).ToString();
       }
       else if(obj is string)
       {
@@ -68,7 +73,7 @@ namespace Sdx.Db
       }
       else
       {
-        throw new Exception("QuoteIdentifier support only Sdx.Db.Query.Expr or string, "+obj.GetType()+" given.");
+        throw new Exception("QuoteIdentifier support only Query.Expr or string, "+obj.GetType()+" given.");
       }
     }
 

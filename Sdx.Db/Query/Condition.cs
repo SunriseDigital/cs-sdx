@@ -8,16 +8,33 @@ namespace Sdx.Db.Query
 {
     public class Condition
     {
+      private enum TableDetectMode
+      {
+        Column, //Sdx.Db.Query.Column.Context
+        Left,   //{0}
+        Right   //{1}
+      }
+
       private class Holder
       {
         public Comparison Comparison { get; set; }
         public Logical Logical { get; set; }
         public Column Column { get; set; }
         public object Value { get; set; }
+        public TableDetectMode TableDetectMode { get; set; }
       }
 
       private List<Holder> wheres = new List<Holder>();
-      private Select select;
+
+      public Condition(string baseCond)
+      {
+        this.Base = baseCond;
+      }
+
+      public Condition()
+      {
+        
+      }
 
       internal int Count
       {
@@ -28,20 +45,21 @@ namespace Sdx.Db.Query
 
       internal Context Context { get; set; }
 
-      public Condition(Select select)
-      {
-        this.select = select;
-      }
-
       public Condition AddOr(Condition where)
       {
         this.AddWhere(where, Logical.Or);
         return this;
       }
 
-      public Condition AddOr(Object column, Object value, Comparison comparison = Comparison.Equal)
+      public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison);
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
         return this;
       }
 
@@ -51,9 +69,63 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public Condition Add(Object column, Object value, Comparison comparison = Comparison.Equal)
+      public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison);
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition Add(Expr column, Object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddRight(string column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddRight(Expr column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddLeft(string column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
+        return this;
+      }
+
+      public Condition AddLeft(Expr column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
+        return this;
+      }
+
+      public Condition AddRightOr(string column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddRightOr(Expr column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddLeftOr(string column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
+        return this;
+      }
+
+      public Condition AddLeftOr(Expr column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
         return this;
       }
 
@@ -68,20 +140,23 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      private Condition AddColumn(Object columnName, Object value, Logical logical, Comparison comparison)
+      private void AddColumn(Object columnName, Object value, Logical logical, Comparison comparison, TableDetectMode mode)
       {
         var column = new Column(columnName);
-        column.Context = this.Context;
 
+        if(mode == TableDetectMode.Column)
+        {
+          column.Context = this.Context;
+        }
+        
         this.Add(new Holder
         {
           Column = column,
           Logical = logical,
           Comparison = comparison,
-          Value = value
+          Value = value,
+          TableDetectMode = mode
         });
-
-        return this;
       }
 
       private void Add(Holder holder)
@@ -95,9 +170,14 @@ namespace Sdx.Db.Query
         this.wheres.Add(holder);
       }
 
-      internal string Build(DbParameterCollection parameters, Counter condCount)
+      internal string Build(Select select, DbParameterCollection parameters, Counter condCount)
       {
         string whereString = "";
+
+        if(this.Base != null)
+        {
+          whereString = this.Base;
+        }
 
         wheres.ForEach(holder =>
         {
@@ -109,11 +189,11 @@ namespace Sdx.Db.Query
           if (holder.Value is Condition)
           {
             Condition where = holder.Value as Condition;
-            whereString += where.Build(parameters, condCount);
+            whereString += where.Build(select, parameters, condCount);
           }
           else
           {
-            whereString += this.BuildValueConditionString(parameters, holder, condCount);
+            whereString += this.BuildValueConditionString(select, parameters, holder, condCount);
           }
         });
 
@@ -125,7 +205,7 @@ namespace Sdx.Db.Query
         return whereString;
       }
 
-      private string BuildValueConditionString(DbParameterCollection parameters, Holder cond, Counter condCount)
+      private string BuildValueConditionString(Select select, DbParameterCollection parameters, Holder cond, Counter condCount)
       {
         string rightHand;
         if (cond.Value is Expr)
@@ -135,8 +215,8 @@ namespace Sdx.Db.Query
         }
         else if (cond.Value is Select)
         {
-          Select select = (Select)cond.Value;
-          rightHand = "(" + select.BuildSelectString(parameters, condCount) + ")";
+          Select sub = (Select)cond.Value;
+          rightHand = "(" + sub.BuildSelectString(parameters, condCount) + ")";
         }
         //IEnumerable<>かどうかチェック。
         else if (!(cond.Value is string) && cond.Value.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
@@ -151,7 +231,7 @@ namespace Sdx.Db.Query
               inCond += ", ";
             }
             string holder = "@" + condCount.Value;
-            parameters.Add(this.select.Adapter.CreateParameter(holder, value.ToString()));
+            parameters.Add(select.Adapter.CreateParameter(holder, value.ToString()));
             inCond += holder;
             condCount.Incr();
           }
@@ -161,15 +241,25 @@ namespace Sdx.Db.Query
         else
         {
           rightHand = "@" + condCount.Value;
-          parameters.Add(this.select.Adapter.CreateParameter(rightHand, cond.Value.ToString()));
+          parameters.Add(select.Adapter.CreateParameter(rightHand, cond.Value.ToString()));
           condCount.Incr();
         }
 
-        var leftHand = cond.Column.Build(this.select.Adapter);
+        var leftHand = cond.Column.Build(select.Adapter);
 
-        this.select.ContextList.ForEach(context => {
-          leftHand = leftHand.Replace("{"+context.Name+"}", this.select.Adapter.QuoteIdentifier(context.Name));
+        select.ContextList.ForEach(context =>
+        {
+          leftHand = leftHand.Replace("{" + context.Name + "}", select.Adapter.QuoteIdentifier(context.Name));
         });
+
+        if (cond.TableDetectMode == TableDetectMode.Left)
+        {
+          leftHand = "{0}." + leftHand;
+        }
+        else if (cond.TableDetectMode == TableDetectMode.Right)
+        {
+          leftHand = "{1}." + leftHand;
+        }
 
         return String.Format(
           "{0}{1}{2}",
@@ -178,5 +268,7 @@ namespace Sdx.Db.Query
           rightHand
         );
       }
+
+      public string Base { get; set; }
     }
 }
