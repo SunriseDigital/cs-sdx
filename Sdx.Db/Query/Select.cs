@@ -102,7 +102,7 @@ namespace Sdx.Db.Query
       //カラムを組み立てる
       foreach (Context context in this.contextList.Where(context => context.Table != null))
       {
-        context.Table.Meta.Columns.ForEach(column => context.Column(column, column + "@" + context.Name));
+        context.Table.Columns.ForEach(column => context.Column(column.Target.ToString(), column.Name + "@" + context.Name));
       }
 
       var columnString = this.BuildColumsString();

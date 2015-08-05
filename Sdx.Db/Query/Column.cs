@@ -43,9 +43,22 @@ namespace Sdx.Db.Query
 
     public Order Order { get; set; }
 
-    public object Name
+    public object Target
     {
       get { return this.name; }
+    }
+
+    public string Name
+    {
+      get
+      {
+        if(this.Alias != null)
+        {
+          return this.Alias;
+        }
+
+        return this.name.ToString();
+      }
     }
 
     private string QuotedName(Adapter db)
