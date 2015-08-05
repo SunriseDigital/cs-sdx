@@ -102,6 +102,11 @@ namespace Sdx.Db.Query
         this.wheres.Add(holder);
       }
 
+      /// <summary>
+      /// ユニットテスト用。普通は使用しません。
+      /// </summary>
+      /// <param name="parameters"></param>
+      /// <returns></returns>
       public string Build(DbParameterCollection parameters)
       {
         var counter = new Counter();

@@ -48,9 +48,9 @@ namespace Sdx.Db.Query
       return joinContext;
     }
 
-    public Context InnerJoin(Sdx.Db.Table target, string condition = null, string alias = null)
+    public Context InnerJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
     {
-      var context = this.AddJoin(target.Meta.Name, JoinType.Inner, this.select.CreateCondition(condition), alias);
+      var context = this.AddJoin(target.Meta.Name, JoinType.Inner, condition, alias);
 
       if(condition == null)
       {
@@ -62,34 +62,24 @@ namespace Sdx.Db.Query
       return context;
     }
 
-    public Context InnerJoin(Select target, string condition, string alias = null)
+    public Context InnerJoin(Select target, Condition condition, string alias = null)
     {
-      return this.AddJoin(target, JoinType.Inner, this.select.CreateCondition(condition), alias);
+      return this.AddJoin(target, JoinType.Inner, condition, alias);
     }
 
-    public Context LeftJoin(Select target, string condition, string alias = null)
+    public Context LeftJoin(Select target, Condition condition, string alias = null)
     {
-      return this.AddJoin(target, JoinType.Left, this.select.CreateCondition(condition), alias);
+      return this.AddJoin(target, JoinType.Left, condition, alias);
     }
 
-    public Context InnerJoin(Expr target, string condition, string alias = null)
+    public Context InnerJoin(Expr target, Condition condition, string alias = null)
     {
-      return this.AddJoin(target, JoinType.Inner, this.select.CreateCondition(condition), alias);
+      return this.AddJoin(target, JoinType.Inner, condition, alias);
     }
 
-    public Context LeftJoin(Expr target, string condition, string alias = null)
+    public Context LeftJoin(Expr target, Condition condition, string alias = null)
     {
-      return this.AddJoin(target, JoinType.Left, this.select.CreateCondition(condition), alias);
-    }
-
-    public Context InnerJoin(string target, string condition, string alias = null)
-    {
-      return this.AddJoin(target, JoinType.Inner, this.select.CreateCondition(condition), alias);
-    }
-
-    public Context LeftJoin(string target, string condition, string alias = null)
-    {
-      return this.AddJoin(target, JoinType.Left, this.select.CreateCondition(condition), alias);
+      return this.AddJoin(target, JoinType.Left, condition, alias);
     }
 
     public Context InnerJoin(string target, Condition condition, string alias = null)

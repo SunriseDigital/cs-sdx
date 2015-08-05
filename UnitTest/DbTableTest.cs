@@ -95,7 +95,11 @@ namespace UnitTest
 
       select = db.Adapter.CreateSelect();
       select.From(new Test.Orm.Table.Shop());
-      select.Context("shop").InnerJoin(new Test.Orm.Table.Category(), "{0}.category_id = {1}.id AND {1}.id = 1");
+      select.Context("shop")
+        .InnerJoin(
+          new Test.Orm.Table.Category(),
+          select.CreateCondition("{0}.category_id = {1}.id AND {1}.id = 1")
+        );
 
       //conditionの上書き
       db.Command = select.Build();
