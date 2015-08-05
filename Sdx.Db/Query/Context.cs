@@ -55,7 +55,7 @@ namespace Sdx.Db.Query
       if(condition == null)
       {
         var relation = target.Meta.Relations[this.Name];
-        context.JoinCondition = this.select.CreateCondition(relation.JoinCondition);
+        context.JoinCondition = new Condition(relation.JoinCondition);
       }
 
       context.setTable(target);

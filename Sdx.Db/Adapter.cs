@@ -56,6 +56,11 @@ namespace Sdx.Db
       return this.factory.CreateDataAdapter();
     }
 
+    public Query.Condition CreateCondition(string baseCond = null)
+    {
+      return new Query.Condition(baseCond);
+    }
+
     public string QuoteIdentifier(object obj)
     {
       if (obj is Sdx.Db.Query.Expr)

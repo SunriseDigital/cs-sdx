@@ -25,7 +25,16 @@ namespace Sdx.Db.Query
       }
 
       private List<Holder> wheres = new List<Holder>();
-      private Select select;
+
+      public Condition(string baseCond)
+      {
+        this.Base = baseCond;
+      }
+
+      public Condition()
+      {
+        
+      }
 
       internal int Count
       {
@@ -35,11 +44,6 @@ namespace Sdx.Db.Query
       internal bool EnableBracket { get; set; }
 
       internal Context Context { get; set; }
-
-      public Condition(Select select)
-      {
-        this.select = select;
-      }
 
       public Condition AddOr(Condition where)
       {
@@ -107,13 +111,13 @@ namespace Sdx.Db.Query
       /// </summary>
       /// <param name="parameters"></param>
       /// <returns></returns>
-      public string Build(DbParameterCollection parameters)
+      public string Build(Select select, DbParameterCollection parameters)
       {
         var counter = new Counter();
-        return this.Build(parameters, counter);
+        return this.Build(select, parameters, counter);
       }
 
-      internal string Build(DbParameterCollection parameters, Counter condCount)
+      internal string Build(Select select, DbParameterCollection parameters, Counter condCount)
       {
         string whereString = "";
 
@@ -132,11 +136,11 @@ namespace Sdx.Db.Query
           if (holder.Value is Condition)
           {
             Condition where = holder.Value as Condition;
-            whereString += where.Build(parameters, condCount);
+            whereString += where.Build(select, parameters, condCount);
           }
           else
           {
-            whereString += this.BuildValueConditionString(parameters, holder, condCount);
+            whereString += this.BuildValueConditionString(select, parameters, holder, condCount);
           }
         });
 
@@ -148,7 +152,7 @@ namespace Sdx.Db.Query
         return whereString;
       }
 
-      private string BuildValueConditionString(DbParameterCollection parameters, Holder cond, Counter condCount)
+      private string BuildValueConditionString(Select select, DbParameterCollection parameters, Holder cond, Counter condCount)
       {
         string rightHand;
         if (cond.Value is Expr)
@@ -158,8 +162,8 @@ namespace Sdx.Db.Query
         }
         else if (cond.Value is Select)
         {
-          Select select = (Select)cond.Value;
-          rightHand = "(" + select.BuildSelectString(parameters, condCount) + ")";
+          Select sub = (Select)cond.Value;
+          rightHand = "(" + sub.BuildSelectString(parameters, condCount) + ")";
         }
         //IEnumerable<>かどうかチェック。
         else if (!(cond.Value is string) && cond.Value.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
@@ -174,7 +178,7 @@ namespace Sdx.Db.Query
               inCond += ", ";
             }
             string holder = "@" + condCount.Value;
-            parameters.Add(this.select.Adapter.CreateParameter(holder, value.ToString()));
+            parameters.Add(select.Adapter.CreateParameter(holder, value.ToString()));
             inCond += holder;
             condCount.Incr();
           }
@@ -184,14 +188,15 @@ namespace Sdx.Db.Query
         else
         {
           rightHand = "@" + condCount.Value;
-          parameters.Add(this.select.Adapter.CreateParameter(rightHand, cond.Value.ToString()));
+          parameters.Add(select.Adapter.CreateParameter(rightHand, cond.Value.ToString()));
           condCount.Incr();
         }
 
-        var leftHand = cond.Column.Build(this.select.Adapter);
+        var leftHand = cond.Column.Build(select.Adapter);
 
-        this.select.ContextList.ForEach(context => {
-          leftHand = leftHand.Replace("{"+context.Name+"}", this.select.Adapter.QuoteIdentifier(context.Name));
+        select.ContextList.ForEach(context =>
+        {
+          leftHand = leftHand.Replace("{" + context.Name + "}", select.Adapter.QuoteIdentifier(context.Name));
         });
 
         if (cond.TableDetectMode == TableDetectMode.Left)

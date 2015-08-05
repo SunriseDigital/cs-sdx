@@ -19,8 +19,8 @@ namespace Sdx.Db.Query
     {
       this.adapter = adapter;
       this.JoinOrder = JoinOrder.InnerFront;
-      this.where = new Condition(this);
-      this.having = new Condition(this);
+      this.where = new Condition();
+      this.having = new Condition();
 
       //intは0で初期化されてしまうのでセットされていない状態を識別するため（`LIMIT 0`を可能にするため）-1をセット
       this.Limit = -1;
@@ -149,7 +149,7 @@ namespace Sdx.Db.Query
       if (this.where.Count > 0)
       {
         selectString += " WHERE ";
-        selectString += this.where.Build(parameters, condCount);
+        selectString += this.where.Build(this, parameters, condCount);
       }
 
       //GROUP
@@ -173,7 +173,7 @@ namespace Sdx.Db.Query
       if(this.having.Count > 0)
       {
         selectString += " HAVING ";
-        selectString += this.having.Build(parameters, condCount);
+        selectString += this.having.Build(this, parameters, condCount);
       }
 
       //ORDER
@@ -229,7 +229,7 @@ namespace Sdx.Db.Query
       {
         joinString += " ON "
           + String.Format(
-            context.JoinCondition.Build(parameters, condCount),
+            context.JoinCondition.Build(this, parameters, condCount),
             this.Adapter.QuoteIdentifier(context.ParentContext.Name),
             this.Adapter.QuoteIdentifier(context.Name)
           );
@@ -371,13 +371,6 @@ namespace Sdx.Db.Query
         this.where.Context = null;
         return this.where;
       }
-    }
-
-    public Condition CreateCondition(string baseCond = null)
-    {
-      var condition = new Condition(this);
-      condition.Base = baseCond;
-      return condition;
     }
 
     /// <summary>

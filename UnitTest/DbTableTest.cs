@@ -98,7 +98,7 @@ namespace UnitTest
       select.Context("shop")
         .InnerJoin(
           new Test.Orm.Table.Category(),
-          select.CreateCondition("{0}.category_id = {1}.id AND {1}.id = 1")
+          db.Adapter.CreateCondition("{0}.category_id = {1}.id AND {1}.id = 1")
         );
 
       //conditionの上書き
