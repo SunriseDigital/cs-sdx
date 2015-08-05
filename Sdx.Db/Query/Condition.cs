@@ -51,7 +51,13 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public Condition AddOr(Object column, Object value, Comparison comparison = Comparison.Equal)
+      public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
         return this;
@@ -63,31 +69,61 @@ namespace Sdx.Db.Query
         return this;
       }
 
-      public Condition Add(Object column, Object value, Comparison comparison = Comparison.Equal)
+      public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
         return this;
       }
 
-      public Condition AddRight(object column, object value, Comparison comparison = Comparison.Equal)
+      public Condition Add(Expr column, Object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddRight(string column, object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
         return this;
       }
 
-      public Condition AddLeft(object column, object value, Comparison comparison = Comparison.Equal)
+      public Condition AddRight(Expr column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddLeft(string column, object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
         return this;
       }
 
-      public Condition AddRightOr(object column, object value, Comparison comparison = Comparison.Equal)
+      public Condition AddLeft(Expr column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
+        return this;
+      }
+
+      public Condition AddRightOr(string column, object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
         return this;
       }
 
-      public Condition AddLeftOr(object column, object value, Comparison comparison = Comparison.Equal)
+      public Condition AddRightOr(Expr column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
+        return this;
+      }
+
+      public Condition AddLeftOr(string column, object value, Comparison comparison = Comparison.Equal)
+      {
+        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
+        return this;
+      }
+
+      public Condition AddLeftOr(Expr column, object value, Comparison comparison = Comparison.Equal)
       {
         this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
         return this;
@@ -132,17 +168,6 @@ namespace Sdx.Db.Query
         }
 
         this.wheres.Add(holder);
-      }
-
-      /// <summary>
-      /// ユニットテスト用。普通は使用しません。
-      /// </summary>
-      /// <param name="parameters"></param>
-      /// <returns></returns>
-      public string Build(Select select, DbParameterCollection parameters)
-      {
-        var counter = new Counter();
-        return this.Build(select, parameters, counter);
       }
 
       internal string Build(Select select, DbParameterCollection parameters, Counter condCount)

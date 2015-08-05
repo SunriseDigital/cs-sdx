@@ -1112,19 +1112,6 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
 
-      //AddRight
-      select.From("shop").Columns("*");
-      var cond = db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1");
-      var command = select.Build();
-      Assert.Equal(db.Sql("{{0}}.category_id = {{1}}.id AND {{1}}.{0}id{1} = @0"), cond.Build(select, command.Parameters));
-
-      //AddLeft
-      select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
-      cond = db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddLeft("id", "1");
-      command = select.Build();
-      Assert.Equal(db.Sql("{{0}}.category_id = {{1}}.id AND {{0}}.{0}id{1} = @0"), cond.Build(select, command.Parameters));
-
       //InnerJoin
       select = db.Adapter.CreateSelect();
       select.From("shop").Columns("*");
