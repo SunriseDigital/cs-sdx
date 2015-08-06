@@ -1231,5 +1231,115 @@ namespace UnitTest
           ON {0}shop{1}.category_id = {0}category{1}.id
             AND ({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)"), db.Command.CommandText);
     }
+
+    [Fact]
+    public void TestSelectNestingWhere()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectNestingWhere(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectNestingWhere(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom("shop")
+        .AddColumn("*")
+        .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
+        .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
+
+      select.Context("shop").Where.Add(
+        db.Adapter.CreateCondition().Add(
+          db.Adapter.CreateCondition()
+            .Add("id" ,"1")
+            .AddOr("id", "2")
+        ).Add(
+          db.Adapter.CreateCondition()
+            .Add("id" ,"3")
+            .AddOr("id", "4")
+        )
+      );
+
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+                {0}shop{1}.*
+              FROM {0}shop{1}
+              INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
+              INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id
+              WHERE (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1) AND ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))"),
+       db.Command.CommandText
+      );
+
+      Assert.Equal(4, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters["@0"].Value);
+      Assert.Equal("2", db.Command.Parameters["@1"].Value);
+      Assert.Equal("3", db.Command.Parameters["@2"].Value);
+      Assert.Equal("4", db.Command.Parameters["@3"].Value);
+
+      select.Context("category").Where.Add(
+        db.Adapter.CreateCondition().Add(
+          db.Adapter.CreateCondition()
+            .Add("id", "5")
+            .AddOr("id", "6")
+        ).Add(
+          db.Adapter.CreateCondition()
+            .Add("id", "7")
+            .AddOr("id", "8")
+        )
+      );
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+                {0}shop{1}.*
+              FROM {0}shop{1}
+              INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
+              INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id
+              WHERE
+                (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)
+                AND
+                ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))
+              AND
+                (({0}category{1}.{0}id{1} = @4 OR {0}category{1}.{0}id{1} = @5)
+                AND
+                ({0}category{1}.{0}id{1} = @6 OR {0}category{1}.{0}id{1} = @7))"),
+       db.Command.CommandText
+      );
+      Assert.Equal(8, db.Command.Parameters.Count);
+      Assert.Equal("5", db.Command.Parameters["@4"].Value);
+      Assert.Equal("6", db.Command.Parameters["@5"].Value);
+      Assert.Equal("7", db.Command.Parameters["@6"].Value);
+      Assert.Equal("8", db.Command.Parameters["@7"].Value);
+
+      select.Context("category_type").Where.Add(
+        db.Adapter.CreateCondition()
+          .Add("id", "9")
+          .AddOr("id", "10")
+      );
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+                {0}shop{1}.*
+              FROM {0}shop{1}
+              INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
+              INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id
+              WHERE
+                (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)
+                AND
+                ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))
+              AND
+                (({0}category{1}.{0}id{1} = @4 OR {0}category{1}.{0}id{1} = @5)
+                AND
+                ({0}category{1}.{0}id{1} = @6 OR {0}category{1}.{0}id{1} = @7))
+              AND ({0}category_type{1}.{0}id{1} = @8 OR {0}category_type{1}.{0}id{1} = @9)"),
+       db.Command.CommandText
+      );
+      Assert.Equal(10, db.Command.Parameters.Count);
+      Assert.Equal("9", db.Command.Parameters["@8"].Value);
+      Assert.Equal("10", db.Command.Parameters["@9"].Value);
+    }
   }
 }

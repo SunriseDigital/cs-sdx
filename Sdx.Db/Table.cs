@@ -14,7 +14,7 @@ namespace Sdx.Db
       {
         get
         {
-          return "{0}." + this.ReferenceKey + " = {1}." + this.ForeignKey;
+          return "{0}." + this.ForeignKey + " = {1}." + this.ReferenceKey;
         }
       }
     }

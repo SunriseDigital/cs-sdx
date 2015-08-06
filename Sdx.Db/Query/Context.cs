@@ -48,13 +48,24 @@ namespace Sdx.Db.Query
       return joinContext;
     }
 
-    public Context InnerJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
+    private Table.Relation getRelationFromTable(Table target, string alias)
+    {
+      var targetContextName = alias == null ? target.Meta.Name : alias;
+      if (!this.Table.Meta.Relations.ContainsKey(targetContextName))
+      {
+        throw new Exception("Missing relation setting in " + this.Table.ToString() + " for " + targetContextName);
+      }
+
+      return this.Table.Meta.Relations[targetContextName];
+    }
+
+    public Context InnerJoin(Table target, Condition condition = null, string alias = null)
     {
       var context = this.AddJoin(target.Meta.Name, JoinType.Inner, condition, alias);
 
       if(condition == null)
       {
-        var relation = target.Meta.Relations[this.Name];
+        var relation = this.getRelationFromTable(target, alias);
         context.JoinCondition = new Condition(relation.JoinCondition);
       }
 
@@ -75,7 +86,7 @@ namespace Sdx.Db.Query
 
       if (condition == null)
       {
-        var relation = target.Meta.Relations[this.Name];
+        var relation = this.getRelationFromTable(target, alias);
         context.JoinCondition = new Condition(relation.JoinCondition);
       }
 

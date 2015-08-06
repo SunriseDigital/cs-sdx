@@ -72,6 +72,8 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Orm\Table\Category.cs" />
+    <Compile Include="Test\Orm\Table\CategoryType.cs" />
+    <Compile Include="Test\Orm\Table\Image.cs" />
     <Compile Include="Test\Orm\Table\Shop.cs" />
   </ItemGroup>
   <ItemGroup>

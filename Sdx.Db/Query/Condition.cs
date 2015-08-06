@@ -25,6 +25,7 @@ namespace Sdx.Db.Query
       }
 
       private List<Holder> wheres = new List<Holder>();
+      private List<Condition> childConditions = new List<Condition>();
 
       public Condition(string baseCond)
       {
@@ -45,102 +46,145 @@ namespace Sdx.Db.Query
 
       internal Context Context { get; set; }
 
-      public Condition AddOr(Condition where)
+      public Condition AddOr(Condition condition)
       {
-        this.AddWhere(where, Logical.Or);
+        this.AddWithCondition(condition, Logical.Or);
         return this;
       }
 
       public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
+        this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
         return this;
       }
 
       public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
+        this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
         return this;
       }
 
-      public Condition Add(Condition where)
+      public Condition Add(Condition condition)
       {
-        this.AddWhere(where, Logical.And);
+        this.AddWithCondition(condition, Logical.And);
         return this;
       }
 
       public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+        this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
         return this;
       }
 
       public Condition Add(Expr column, Object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+        this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
         return this;
       }
 
       public Condition AddRight(string column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
+        this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
         return this;
       }
 
       public Condition AddRight(Expr column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
+        this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
         return this;
       }
 
       public Condition AddLeft(string column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
+        this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
         return this;
       }
 
       public Condition AddLeft(Expr column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
+        this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
         return this;
       }
 
       public Condition AddRightOr(string column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
+        this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
         return this;
       }
 
       public Condition AddRightOr(Expr column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
+        this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
         return this;
       }
 
       public Condition AddLeftOr(string column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
+        this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
         return this;
       }
 
       public Condition AddLeftOr(Expr column, object value, Comparison comparison = Comparison.Equal)
       {
-        this.AddColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
+        this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
         return this;
       }
 
-      private Condition AddWhere(Condition where, Logical logical)
+      public Condition AddIsNullOr(string column)
       {
-        where.EnableBracket = true;
+        this.AddWithColumn(column, null, Logical.Or, Comparison.IsNull, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddIsNull(string column)
+      {
+        this.AddWithColumn(column, null, Logical.And, Comparison.IsNull, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddIsNotNullOr(string column)
+      {
+        this.AddWithColumn(column, null, Logical.Or, Comparison.IsNotNull, TableDetectMode.Column);
+        return this;
+      }
+
+      public Condition AddIsNotNull(string column)
+      {
+        this.AddWithColumn(column, null, Logical.And, Comparison.IsNotNull, TableDetectMode.Column);
+        return this;
+      }
+
+      private void FixContext(Context context)
+      {
+        this.Context = context;
+        this.wheres.ForEach(holder => {
+          if (holder.Column == null) return;
+          var contextName = context == null ? null : context.Name;
+          holder.Column.ContextName = contextName;
+        });
+
+        this.childConditions.ForEach(condition => {
+          condition.FixContext(context);
+        });
+      }
+
+      private void AddWithCondition(Condition condition, Logical logical)
+      {
+        condition.EnableBracket = true;
+        this.childConditions.Add(condition);
+        if (this.Context != null)
+        {
+          condition.FixContext(this.Context);
+        }
+        
         this.Add(new Holder
         {
-          Value = where,
+          Value = condition,
           Logical = logical
         });
-        return this;
       }
 
-      private void AddColumn(Object columnName, Object value, Logical logical, Comparison comparison, TableDetectMode mode)
+      private void AddWithColumn(Object columnName, Object value, Logical logical, Comparison comparison, TableDetectMode mode)
       {
         var column = new Column(columnName);
 
@@ -217,6 +261,10 @@ namespace Sdx.Db.Query
         {
           Select sub = (Select)cond.Value;
           rightHand = "(" + sub.BuildSelectString(parameters, condCount) + ")";
+        }
+        else if(cond.Comparison == Comparison.IsNull || cond.Comparison == Comparison.IsNotNull)
+        {
+          rightHand = "";
         }
         //IEnumerable<>かどうかチェック。
         else if (!(cond.Value is string) && cond.Value.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
