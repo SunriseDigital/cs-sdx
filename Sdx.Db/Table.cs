@@ -28,10 +28,9 @@ namespace Sdx.Db
 
     private static Dictionary<string, MetaData> metaList;
     public Adapter Adapter { get; set; }
+    private Query.Select select;
 
     abstract protected MetaData CreateTableMeta();
-
-    private Query.Select select;
 
     public MetaData Meta
     {
@@ -62,7 +61,7 @@ namespace Sdx.Db
       return this;
     }
 
-    private void _AddColumn(object columnName, string alias)
+    public Table AddColumn(object columnName, string alias = null)
     {
       if (this.ContextName == null)
       {
@@ -70,30 +69,19 @@ namespace Sdx.Db
       }
 
       alias = alias != null ? alias + "@" + this.ContextName : columnName + "@" + this.ContextName;
+      this.select.Context(this.ContextName).AddColumn(columnName, alias);
 
-      this.select.AddColumn(columnName, alias, this.ContextName);
-    }
-
-    public Table AddColumn(Query.Expr columnName, string alias = null)
-    {
-      this._AddColumn(columnName, alias);
       return this;
     }
 
-    public Table AddColumn(string columnName, string alias = null)
-    {
-      this._AddColumn(columnName, alias);
-      return this;
-    }
-
-    public Table SetColumns(params String[] columns)
+    public Table SetColumns(params object[] columns)
     {
       this.ClearColumns();
       this.AddColumns(columns);
       return this;
     }
 
-    public Table AddColumns(params String[] columns)
+    public Table AddColumns(params object[] columns)
     {
       foreach (var columnName in columns)
       {
@@ -118,7 +106,6 @@ namespace Sdx.Db
           this.AddColumn(columnName);
         });
       }
-
     }
   }
 }

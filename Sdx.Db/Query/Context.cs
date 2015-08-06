@@ -133,7 +133,12 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Context AddColumns(params String[] columns)
+    /// <summary>
+    /// エイリアスの付与はできません。
+    /// </summary>
+    /// <param name="columns">Sdx.Adapter.Query.Expr[]|String[] 配列の中にExprを混ぜられるようにobjectなってます。</param>
+    /// <returns></returns>
+    public Context AddColumns(params object[] columns)
     {
       foreach (var column in columns)
       {

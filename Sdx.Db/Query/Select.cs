@@ -283,7 +283,7 @@ namespace Sdx.Db.Query
     /// <summary>
     /// エイリアスの付与はできません。
     /// </summary>
-    /// <param contextName="columns">Sdx.Adapter.Query.Expr[]|String[]</param>
+    /// <param contextName="columns">Sdx.Adapter.Query.Expr[]|String[] 配列の中にExprを混ぜられるようにobjectなってます。</param>
     /// <returns></returns>
     public Select AddColumns(params object[] columns)
     {
@@ -300,12 +300,10 @@ namespace Sdx.Db.Query
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
-    public Select AddColumn(object columnName, string alias = null, string contextName = null)
+    public Select AddColumn(object columnName, string alias = null)
     {
-      Console.WriteLine(contextName);
       var column = new Column(columnName);
       column.Alias = alias;
-      column.ContextName = contextName;
       this.columns.Add(column);
       return this;
     }
