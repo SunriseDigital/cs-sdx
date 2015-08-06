@@ -56,9 +56,9 @@ namespace Sdx.Db.Query
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    public Context From(Sdx.Db.Table target, string alias = null)
+    public Context AddFrom(Sdx.Db.Table target, string alias = null)
     {
-      var context = this.AddFrom(target.Meta.Name, alias);
+      var context = this.CreateContext(target.Meta.Name, alias);
       context.Table = target;
       target.ContextName = context.Name;
       target.Select = this;
@@ -68,25 +68,25 @@ namespace Sdx.Db.Query
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    public Context From(Expr target, string alias = null)
+    public Context AddFrom(Expr target, string alias = null)
     {
-      return this.AddFrom(target, alias);
+      return this.CreateContext(target, alias);
     }
 
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    public Context From(String target, string alias = null)
+    public Context AddFrom(String target, string alias = null)
     {
-      return this.AddFrom(target, alias);
+      return this.CreateContext(target, alias);
     }
 
-    public Context From(Sdx.Db.Query.Select target, string alias = null)
+    public Context AddFrom(Sdx.Db.Query.Select target, string alias = null)
     {
-      return this.AddFrom(target, alias);
+      return this.CreateContext(target, alias);
     }
 
-    private Context AddFrom(object target, string alias)
+    private Context CreateContext(object target, string alias)
     {
       Context context = new Context(this);
       context.Alias = alias;
@@ -100,12 +100,6 @@ namespace Sdx.Db.Query
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
       string selectString = "SELECT";
-
-      //カラムを組み立てる
-      //foreach (Context context in this.contextList.Where(context => context.Table != null))
-      //{
-      //  context.Table.Columns.ForEach(column => context.Column(column.Target.ToString(), column.Name + "@" + context.Name));
-      //}
 
       var columnString = this.BuildColumsString();
       if (columnString.Length > 0)
@@ -122,7 +116,7 @@ namespace Sdx.Db.Query
         {
           fromString += ", ";
         }
-        fromString += this.buildJoinString(context, parameters, condCount);
+        fromString += this.BuildJoinString(context, parameters, condCount);
       }
 
       selectString += fromString;
@@ -132,19 +126,19 @@ namespace Sdx.Db.Query
       {
         foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner))
         {
-          selectString += this.buildJoinString(context, parameters, condCount);
+          selectString += this.BuildJoinString(context, parameters, condCount);
         }
 
         foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(context, parameters, condCount);
+          selectString += this.BuildJoinString(context, parameters, condCount);
         }
       }
       else
       {
         foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(context, parameters, condCount);
+          selectString += this.BuildJoinString(context, parameters, condCount);
         }
       }
 
@@ -202,7 +196,7 @@ namespace Sdx.Db.Query
       return selectString;
     }
 
-    private string buildJoinString(Context context, DbParameterCollection parameters, Counter condCount)
+    private string BuildJoinString(Context context, DbParameterCollection parameters, Counter condCount)
     {
       string joinString = "";
 
@@ -291,27 +285,12 @@ namespace Sdx.Db.Query
     /// </summary>
     /// <param contextName="columns">Sdx.Adapter.Query.Expr[]|String[]</param>
     /// <returns></returns>
-    public Select Columns(params object[] columns)
+    public Select AddColumns(params object[] columns)
     {
       foreach (var column in columns)
       {
-        this.Column(column);
+        this.AddColumn(column);
       }
-      return this;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param contextName="columns">エイリアスがKeyでカラムがValueのDictionary</param>
-    /// <returns></returns>
-    public Select Columns(Dictionary<string, object> columns)
-    {
-      foreach (var column in columns)
-      {
-        this.Column(column.Value, column.Key);
-      }
-
       return this;
     }
 
@@ -321,7 +300,7 @@ namespace Sdx.Db.Query
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
-    public Select Column(object columnName, string alias = null, string contextName = null)
+    public Select AddColumn(object columnName, string alias = null, string contextName = null)
     {
       Console.WriteLine(contextName);
       var column = new Column(columnName);
@@ -382,7 +361,7 @@ namespace Sdx.Db.Query
     /// </summary>
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <returns></returns>
-    public Select Group(object columnName)
+    public Select AddGroup(object columnName)
     {
       var column = new Column(columnName);
       this.groups.Add(column);
@@ -408,7 +387,7 @@ namespace Sdx.Db.Query
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="order"></param>
     /// <returns></returns>
-    public Select Order(object columnName, Order order)
+    public Select AddOrder(object columnName, Order order)
     {
       var column = new Column(columnName);
       column.Order = order;

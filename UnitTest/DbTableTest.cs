@@ -37,7 +37,7 @@ namespace UnitTest
       var tShop = new Test.Orm.Table.Shop();
       var select = db.Adapter.CreateSelect();
 
-      select.From(tShop);
+      select.AddFrom(tShop);
 
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
@@ -49,7 +49,7 @@ namespace UnitTest
       FROM {0}shop{1}"), db.Command.CommandText);
 
       select = db.Adapter.CreateSelect();
-      select.From(tShop, "foo");
+      select.AddFrom(tShop, "foo");
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
         {0}foo{1}.{0}id{1} AS {0}id@foo{1}, 
@@ -76,7 +76,7 @@ namespace UnitTest
       
       //Inner
       select = db.Adapter.CreateSelect();
-      select.From(new Test.Orm.Table.Shop());
+      select.AddFrom(new Test.Orm.Table.Shop());
 
       Assert.Equal(typeof(Test.Orm.Table.Shop), select.Context("shop").Table.GetType());
 
@@ -99,7 +99,7 @@ namespace UnitTest
       //Left
       select = db.Adapter.CreateSelect();
       select
-         .From(new Test.Orm.Table.Shop())
+         .AddFrom(new Test.Orm.Table.Shop())
          .LeftJoin(new Test.Orm.Table.Category());
 
       db.Command = select.Build();
@@ -117,7 +117,7 @@ namespace UnitTest
         LEFT JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id"), db.Command.CommandText);
 
       select = db.Adapter.CreateSelect();
-      select.From(new Test.Orm.Table.Shop());
+      select.AddFrom(new Test.Orm.Table.Shop());
       select.Context("shop")
         .InnerJoin(
           new Test.Orm.Table.Category(),
@@ -162,7 +162,7 @@ namespace UnitTest
 
       //simple set
       select = db.Adapter.CreateSelect();
-      select.From(new Test.Orm.Table.Shop()).Table.SetColumns("id");
+      select.AddFrom(new Test.Orm.Table.Shop()).Table.SetColumns("id");
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
         {0}shop{1}.{0}id{1} AS {0}id@shop{1}

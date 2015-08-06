@@ -133,16 +133,16 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Context Columns(params String[] columns)
+    public Context AddColumns(params String[] columns)
     {
       foreach (var column in columns)
       {
-        this.Column(column);
+        this.AddColumn(column);
       }
       return this;
     }
 
-    public Context Column(object columnName, string alias = null)
+    public Context AddColumn(object columnName, string alias = null)
     {
       var column = new Column(columnName);
       column.Alias = alias;
@@ -151,17 +151,17 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Context Columns(Dictionary<string, object> columns)
+    public Context AddColumns(Dictionary<string, object> columns)
     {
       foreach(var column in columns)
       {
-        this.Column(column.Value, column.Key);
+        this.AddColumn(column.Value, column.Key);
       }
 
       return this;
     }
 
-    public string AppendAlias(string column)
+    public string AppendName(string column)
     {
       return this.select.Adapter.QuoteIdentifier(this.Name) + "." + this.select.Adapter.QuoteIdentifier(column);
     }
@@ -198,7 +198,7 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Context Group(object columnName)
+    public Context AddGroup(object columnName)
     {
       var column = new Column(columnName);
       column.ContextName = this.Name;
@@ -206,7 +206,7 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Context Order(object columnName, Order order)
+    public Context AddOrder(object columnName, Order order)
     {
       var column = new Column(columnName);
       column.ContextName = this.Name;

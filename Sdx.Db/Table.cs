@@ -64,7 +64,7 @@ namespace Sdx.Db
 
       alias = alias != null ? alias + "@" + this.ContextName : columnName + "@" + this.ContextName;
 
-      this.select.Column(columnName, alias, this.ContextName);
+      this.select.AddColumn(columnName, alias, this.ContextName);
     }
 
     public Table AddColumn(Query.Expr columnName, string alias = null)
