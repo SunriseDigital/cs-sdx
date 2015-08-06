@@ -97,23 +97,23 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
 
-      //Column
-      select.From("shop").Columns("*");
+      //AddColumn
+      select.AddFrom("shop").AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveContext("shop").From("shop", "s").Columns("*");
+      select.RemoveContext("shop").AddFrom("shop", "s").AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveContext("s").From("shop");
-      select.Context("shop").Columns("id");
+      select.RemoveContext("s").AddFrom("shop");
+      select.Context("shop").AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
@@ -121,50 +121,50 @@ namespace UnitTest
       );
 
       //SetColumns
-      select.RemoveContext("shop").From("shop").ClearColumns().Columns("id");
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveContext("shop").From("shop").ClearColumns().Columns("id", "name");
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveContext("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      //Columns
-      select.RemoveContext("shop").From("shop").Columns("id");
+      //AddColumns
+      select.RemoveContext("shop").AddFrom("shop").AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Context("shop").Columns("name");
+      select.Context("shop").AddColumns("name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveContext("shop").From("shop").Columns("id", "name");
+      select.RemoveContext("shop").AddFrom("shop").AddColumns("id", "name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveContext("shop").From("shop").Columns(new String[] { "id", "name" });
+      select.RemoveContext("shop").AddFrom("shop").AddColumns(new String[] { "id", "name" });
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -172,29 +172,29 @@ namespace UnitTest
       );
 
       //ClearColumns
-      select.RemoveContext("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
-      select.Context("shop").ClearColumns().Columns("*");
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns(new String[] { "id", "name" });
+      select.Context("shop").ClearColumns().AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Context("shop").ClearColumns().Columns("id");
+      select.Context("shop").ClearColumns().AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Context("shop").ClearColumns().Columns("id");
+      select.Context("shop").ClearColumns().AddColumns("id");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Context("shop").Columns("name");
+      select.Context("shop").AddColumns("name");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -216,12 +216,12 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
 
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
 
       select.Context("shop").InnerJoin(
         "category",
         db.Adapter.CreateCondition("{0}.category_id = {1}.id")
-      ).Columns("*");
+      ).AddColumns("*");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -236,7 +236,7 @@ namespace UnitTest
       select.Context("shop").InnerJoin(
         "category",
         db.Adapter.CreateCondition("{0}.category_id = {1}.id AND {1}.id = 1")
-      ).Columns("*");
+      ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} ON {0}shop{1}.main_image_id = {0}image{1}.id INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
@@ -258,11 +258,11 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
+        .AddFrom("shop")
         .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
         .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
 
-      select.Context("shop").Columns("*");
+      select.Context("shop").AddColumns("*");
 
       db.Command = select.Build();
 
@@ -289,7 +289,7 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
+        .AddFrom("shop")
         .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
         .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
 
@@ -314,15 +314,15 @@ namespace UnitTest
     private void RunSelectSameTableInnerJoin(TestDb db)
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
 
       select.Context("shop")
         .InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id = {1}.id"), "main_image")
-        .Columns("*");
+        .AddColumns("*");
 
       select.Context("shop")
         .InnerJoin("image", db.Adapter.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image")
-        .Columns("*");
+        .AddColumns("*");
 
       db.Command = select.Build();
 
@@ -345,7 +345,7 @@ namespace UnitTest
     private void RunSelectColumnAlias(TestDb db)
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Column("id", "shop_id");
+      select.AddFrom("shop").AddColumn("id", "shop_id");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -355,7 +355,7 @@ namespace UnitTest
 
       select.Context("shop")
         .ClearColumns()
-        .Columns(new Dictionary<string, object>()
+        .AddColumns(new Dictionary<string, object>()
          { 
            {"shop_id", "id"},
            {"shop_name", "name"},
@@ -369,7 +369,7 @@ namespace UnitTest
 
       select.Context("shop")
         .ClearColumns()
-        .Columns(new Dictionary<string, object>()
+        .AddColumns(new Dictionary<string, object>()
          { 
            {"shop_id", "id"},
            {"shop_name", Sdx.Db.Query.Expr.Wrap("name")},
@@ -395,8 +395,8 @@ namespace UnitTest
     private void RunSelectLeftJoin(TestDb db)
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop")
-        .Column("*")
+      select.AddFrom("shop")
+        .AddColumn("*")
         .LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"));
 
       db.Command = select.Build();
@@ -419,7 +419,7 @@ namespace UnitTest
     private void RunSelectJoinOrder(TestDb db)
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select.AddFrom("shop").AddColumn("*");
       select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image1");
       select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image2");
       select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image3");
@@ -435,7 +435,7 @@ namespace UnitTest
       );
 
       select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select.AddFrom("shop").AddColumn("*");
       select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image1");
       select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image2");
       select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition("{0}.main_image_id={1}.id"), "image3");
@@ -468,8 +468,8 @@ namespace UnitTest
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
 
       //単純なAddColumns
-      select.From("shop");
-      select.Columns("id", "name");
+      select.AddFrom("shop");
+      select.AddColumns("id", "name");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -478,7 +478,7 @@ namespace UnitTest
       );
 
       //テーブル名だけすり替える
-      select.RemoveContext("shop").From("category");
+      select.RemoveContext("shop").AddFrom("category");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -487,8 +487,8 @@ namespace UnitTest
       );
 
       //SetColumns
-      select.RemoveContext("category").From("shop");
-      select.ClearColumns().Columns("name", "category_id");
+      select.RemoveContext("category").AddFrom("shop");
+      select.ClearColumns().AddColumns("name", "category_id");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -496,23 +496,10 @@ namespace UnitTest
        db.Command.CommandText
       );
 
-      //Column Dictinary
-      select.ClearColumns().RemoveContext("shop").From("shop");
-      select.Columns(new Dictionary<string, object>() { 
-        {"shop_id", "id"},
-        {"shop_name", "name"}
-      });
-
-      db.Command = select.Build();
-      Assert.Equal(
-       db.Sql("SELECT {0}id{1} AS {0}shop_id{1}, {0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
-       db.Command.CommandText
-      );
-
-      //Column MAX
-      select.ClearColumns().RemoveContext("shop").From("shop");
-      select.Column(
-        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Context("shop").AppendAlias("id") + ")"),
+      //AddColumn MAX
+      select.ClearColumns().RemoveContext("shop").AddFrom("shop");
+      select.AddColumn(
+        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Context("shop").AppendName("id") + ")"),
         "max_id"
       );
 
@@ -536,8 +523,8 @@ namespace UnitTest
     private void RunSelectMultipleFrom(TestDb db)
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
-      select.From("category");
+      select.AddFrom("shop").AddColumn("*");
+      select.AddFrom("category");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -587,7 +574,7 @@ namespace UnitTest
 
       //selectに対する呼び出し
       select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select.AddFrom("shop").AddColumn("*");
 
       select.Where.Add("id", "1");
 
@@ -603,7 +590,7 @@ namespace UnitTest
 
       //tableに対する呼び出し
       select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select.AddFrom("shop").AddColumn("*");
 
       select.Context("shop").Where.Add("id", "1");
 
@@ -618,7 +605,7 @@ namespace UnitTest
 
       //WhereのAdd
       select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select.AddFrom("shop").AddColumn("*");
 
       select.Where.Add(
         db.Adapter.CreateCondition()
@@ -638,7 +625,7 @@ namespace UnitTest
 
       //Where2つをORでつなぐ
       select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select.AddFrom("shop").AddColumn("*");
 
       select.Where
         .Add(
@@ -678,8 +665,8 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .InnerJoin(
           Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
           db.Adapter.CreateCondition("{0}.category_id = {1}.id"),
@@ -709,14 +696,14 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("category")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
       select.Context("shop").InnerJoin(sub, db.Adapter.CreateCondition("{0}.category_id = {1}.id"), "sub_cat");
@@ -746,14 +733,14 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("category")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
       select.Context("shop").LeftJoin(sub, db.Adapter.CreateCondition("{0}.category_id = {1}.id"), "sub_cat");
@@ -783,14 +770,14 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("category")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
       select.Context("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
@@ -820,11 +807,11 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
-      select.From(
+      select.AddFrom(
         Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
         "sub_cat"
       );
@@ -853,17 +840,17 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("category")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.From(sub, "sub_cat");
+      select.AddFrom(sub, "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -890,8 +877,8 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where
           .Add("id", new string[] { "1", "2" })
           .AddOr("id", new string[] { "3", "4" });
@@ -924,9 +911,9 @@ namespace UnitTest
       //TableにGroup
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("id")
-        .Group("id");
+        .AddFrom("shop")
+        .AddColumn("id")
+        .AddGroup("id");
 
       db.Command = select.Build();
       Assert.Equal(
@@ -951,11 +938,11 @@ namespace UnitTest
 
       //selectに直接
       select = db.Adapter.CreateSelect();
-      select.From("shop");
+      select.AddFrom("shop");
 
       select
-        .Column("id")
-        .Group("id");
+        .AddColumn("id")
+        .AddGroup("id");
 
       select.Having.Add(
         Sdx.Db.Query.Expr.Wrap("SUM(id)"),
@@ -987,10 +974,10 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*");
+        .AddFrom("shop")
+        .AddColumn("*");
 
-      select.Order("id", Sdx.Db.Query.Order.DESC);
+      select.AddOrder("id", Sdx.Db.Query.Order.DESC);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1056,9 +1043,9 @@ namespace UnitTest
     {
       var select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("*")
-        .Order("id", Sdx.Db.Query.Order.DESC);
+        .AddFrom("shop")
+        .AddColumn("*")
+        .AddOrder("id", Sdx.Db.Query.Order.DESC);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1083,9 +1070,9 @@ namespace UnitTest
     {
       var select = db.Adapter.CreateSelect();
       select
-        .From("shop")
-        .Column("id")
-        .Group("id")
+        .AddFrom("shop")
+        .AddColumn("id")
+        .AddGroup("id")
         .Having.Add("id", "2", Sdx.Db.Query.Comparison.GreaterEqual);
 
       db.Command = select.Build();
@@ -1114,11 +1101,11 @@ namespace UnitTest
 
       //InnerJoin
       select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
         "category",
         db.Adapter.CreateCondition("{0}.category_id = {1}.id")
-      ).Columns("*");
+      ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
         FROM {0}shop{1} 
@@ -1129,11 +1116,11 @@ namespace UnitTest
 
       //InnerJoin Additional String condition
       select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
         "category",
         db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1")
-      ).Columns("*");
+      ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
         FROM {0}shop{1} 
@@ -1146,11 +1133,11 @@ namespace UnitTest
 
       //InnerJoin Additional Expr condition
       select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
         "category",
         db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight(Sdx.Db.Query.Expr.Wrap("id"), "1")
-      ).Columns("*");
+      ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
         FROM {0}shop{1} 
@@ -1163,13 +1150,13 @@ namespace UnitTest
 
       //InnerJoin Additional Subquery
       var sub = db.Adapter.CreateSelect();
-      sub.From("category").Column("id");
+      sub.AddFrom("category").AddColumn("id");
       select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
         "category",
         db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
-      ).Columns("*");
+      ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.*
         FROM {0}shop{1} 
@@ -1179,13 +1166,13 @@ namespace UnitTest
 
       //InnerJoin Additional Subquery and parameter
       sub = db.Adapter.CreateSelect();
-      sub.From("category").Column("id").Where.Add("code", "foo");
+      sub.AddFrom("category").AddColumn("id").Where.Add("code", "foo");
       select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*").Where.Add("name", "bar");
+      select.AddFrom("shop").AddColumns("*").Where.Add("name", "bar");
       select.Context("shop").InnerJoin(
         "category",
         db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
-      ).Columns("*").Where.Add("id", "99");
+      ).AddColumns("*").Where.Add("id", "99");
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.*
         FROM {0}shop{1}
@@ -1202,7 +1189,7 @@ namespace UnitTest
 
       //InnerJoin Addtional include `OR` right
       select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
       select.Context("shop")
         .InnerJoin(
           "category",
@@ -1213,7 +1200,7 @@ namespace UnitTest
                 .AddRightOr("id", "2")
             )
         )
-        .Columns("*");
+        .AddColumns("*");
 
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
@@ -1224,7 +1211,7 @@ namespace UnitTest
 
       //InnerJoin Addtional include `OR` left
       select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
       select.Context("shop")
         .InnerJoin(
           "category",
@@ -1235,7 +1222,7 @@ namespace UnitTest
                 .AddLeftOr("id", "2")
             )
         )
-        .Columns("*");
+        .AddColumns("*");
 
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 

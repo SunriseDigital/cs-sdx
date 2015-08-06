@@ -8,6 +8,7 @@ namespace Sdx.Db.Query
   internal class Column
   {
     private object name;
+
     public Column(object columnName)
     {
       if(columnName is Expr)
@@ -32,14 +33,7 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Column(Expr columnName)
-    {
-      name = columnName;
-    }
-
     public string Alias { get; set; }
-
-    //public Context Context { get; set; }
 
     public string ContextName { get; set; }
 

@@ -19,14 +19,21 @@ namespace Sdx.Db
       }
     }
 
-    private static Dictionary<string, TableMeta> metaList;
+    public class MetaData
+    {
+      public string Name { get; set; }
+      public List<string> Columns { get; set; }
+      public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; set; }
+    }
+
+    private static Dictionary<string, MetaData> metaList;
     public Adapter Adapter { get; set; }
 
-    abstract protected TableMeta CreateTableMeta();
+    abstract protected MetaData CreateTableMeta();
 
     private Query.Select select;
 
-    public TableMeta Meta
+    public MetaData Meta
     {
       get
       {
@@ -45,13 +52,13 @@ namespace Sdx.Db
 
     static Table()
     {
-      Table.metaList = new Dictionary<string, TableMeta>();
+      Table.metaList = new Dictionary<string, MetaData>();
     }
 
 
     public Table ClearColumns()
     {
-      this.select.ClearColumns(this.Meta.Name);
+      this.select.ClearColumns(this.ContextName);
       return this;
     }
 
@@ -64,7 +71,7 @@ namespace Sdx.Db
 
       alias = alias != null ? alias + "@" + this.ContextName : columnName + "@" + this.ContextName;
 
-      this.select.Column(columnName, alias, this.ContextName);
+      this.select.AddColumn(columnName, alias, this.ContextName);
     }
 
     public Table AddColumn(Query.Expr columnName, string alias = null)
