@@ -63,7 +63,6 @@
     <Compile Include="SqlServerAdapter.cs" />
     <Compile Include="Query\Context.cs" />
     <Compile Include="Table.cs" />
-    <Compile Include="TableMeta.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Query\Condition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -5,9 +5,9 @@ namespace Test.Orm.Table
 {
   class Shop : Sdx.Db.Table
   {
-    override protected Sdx.Db.TableMeta CreateTableMeta()
+    override protected MetaData CreateTableMeta()
     {
-      return new Sdx.Db.TableMeta()
+      return new MetaData()
       {
         Name = "shop",
         Columns = new List<string>()
