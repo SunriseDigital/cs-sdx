@@ -169,12 +169,12 @@ namespace UnitTest
         FROM {0}shop{1}"), db.Command.CommandText);
 
       //add
-//      select.Context("shop").Table.AddColumns("name");
-//      db.Command = select.Build();
-//      Assert.Equal(db.Sql(@"SELECT
-//        {0}shop{1}.{0}id{1} AS {0}id@shop{1},
-//        {0}shop{1}.{0}name{1} AS {0}name@shop{1}
-//        FROM {0}shop{1}"), db.Command.CommandText);
+      select.Context("shop").Table.AddColumns("name");
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT
+        {0}shop{1}.{0}id{1} AS {0}id@shop{1},
+        {0}shop{1}.{0}name{1} AS {0}name@shop{1}
+        FROM {0}shop{1}"), db.Command.CommandText);
     }
   }
 }

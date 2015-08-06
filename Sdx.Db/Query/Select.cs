@@ -59,7 +59,9 @@ namespace Sdx.Db.Query
     public Context From(Sdx.Db.Table target, string alias = null)
     {
       var context = this.AddFrom(target.Meta.Name, alias);
-      context.setTable(target);
+      context.Table = target;
+      target.ContextName = context.Name;
+      target.Select = this;
       return context;
     }
 
@@ -100,10 +102,10 @@ namespace Sdx.Db.Query
       string selectString = "SELECT";
 
       //カラムを組み立てる
-      foreach (Context context in this.contextList.Where(context => context.Table != null))
-      {
-        context.Table.Columns.ForEach(column => context.Column(column.Target.ToString(), column.Name + "@" + context.Name));
-      }
+      //foreach (Context context in this.contextList.Where(context => context.Table != null))
+      //{
+      //  context.Table.Columns.ForEach(column => context.Column(column.Target.ToString(), column.Name + "@" + context.Name));
+      //}
 
       var columnString = this.BuildColumsString();
       if (columnString.Length > 0)
@@ -270,15 +272,15 @@ namespace Sdx.Db.Query
     /// </summary>
     /// <param contextName="context">Contextを渡すとそのテーブルのカラムのみをクリアします。</param>
     /// <returns></returns>
-    public Select ClearColumns(Context context = null)
+    public Select ClearColumns(string contextName = null)
     {
-      if (context == null)
+      if (contextName == null)
       {
         this.columns.Clear();
       }
       else
       {
-        this.columns.RemoveAll(column => column.Context != null && column.Context.Name == context.Name);
+        this.columns.RemoveAll(column => column.ContextName != null && column.ContextName == contextName);
       }
       
       return this;
@@ -319,10 +321,12 @@ namespace Sdx.Db.Query
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
-    public Select Column(object columnName, string alias = null)
+    public Select Column(object columnName, string alias = null, string contextName = null)
     {
+      Console.WriteLine(contextName);
       var column = new Column(columnName);
       column.Alias = alias;
+      column.ContextName = contextName;
       this.columns.Add(column);
       return this;
     }
@@ -357,7 +361,7 @@ namespace Sdx.Db.Query
 
       if (findIndex != -1)
       {
-        this.ClearColumns(this.contextList[findIndex]);
+        this.ClearColumns(this.contextList[findIndex].Name);
         this.contextList.RemoveAt(findIndex);
       }
 

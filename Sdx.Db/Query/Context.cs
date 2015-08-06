@@ -58,7 +58,9 @@ namespace Sdx.Db.Query
         context.JoinCondition = new Condition(relation.JoinCondition);
       }
 
-      context.setTable(target);
+      context.Table = target;
+      target.ContextName = context.Name;
+      target.Select = this.select;
       return context;
     }
 
@@ -77,7 +79,9 @@ namespace Sdx.Db.Query
         context.JoinCondition = new Condition(relation.JoinCondition);
       }
 
-      context.setTable(target);
+      context.Table = target;
+      target.ContextName = context.Name;
+      target.Select = this.select;
       return context;
     }
 
@@ -125,7 +129,7 @@ namespace Sdx.Db.Query
 
     public Context ClearColumns()
     {
-      this.select.ClearColumns(this);
+      this.select.ClearColumns(this.Name);
       return this;
     }
 
@@ -142,7 +146,7 @@ namespace Sdx.Db.Query
     {
       var column = new Column(columnName);
       column.Alias = alias;
-      column.Context = this;
+      column.ContextName = this.Name;
       this.select.ColumnList.Add(column);
       return this;
     }
@@ -197,7 +201,7 @@ namespace Sdx.Db.Query
     public Context Group(object columnName)
     {
       var column = new Column(columnName);
-      column.Context = this;
+      column.ContextName = this.Name;
       this.select.GroupList.Add(column);
       return this;
     }
@@ -205,18 +209,24 @@ namespace Sdx.Db.Query
     public Context Order(object columnName, Order order)
     {
       var column = new Column(columnName);
-      column.Context = this;
+      column.ContextName = this.Name;
       column.Order = order;
       this.select.OrderList.Add(column);
 
       return this;
     }
 
-    internal void setTable(Sdx.Db.Table table)
+    public Sdx.Db.Table Table 
     {
-      this.table = table;
-    }
+      get 
+      {
+        return this.table;
+      }
 
-    public Sdx.Db.Table Table { get { return this.table; } }
+      internal set
+      {
+        this.table = value;
+      }
+    }
   }
 }

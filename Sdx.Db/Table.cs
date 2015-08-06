@@ -24,7 +24,7 @@ namespace Sdx.Db
 
     abstract protected TableMeta CreateTableMeta();
 
-    private List<Query.Column> columns;
+    private Query.Select select;
 
     public TableMeta Meta
     {
@@ -48,26 +48,34 @@ namespace Sdx.Db
       Table.metaList = new Dictionary<string, TableMeta>();
     }
 
-    public Table()
-    {
-      this.columns = new List<Query.Column>();
-      this.Meta.Columns.ForEach(columnName => {
-        var column = new Query.Column(columnName);
-        this.columns.Add(column);
-      });
-    }
 
     public Table ClearColumns()
     {
-      this.columns.Clear();
+      this.select.ClearColumns(this.Meta.Name);
+      return this;
+    }
+
+    private void _AddColumn(object columnName, string alias)
+    {
+      if (this.ContextName == null)
+      {
+        throw new Exception("ContextName is null");
+      }
+
+      alias = alias != null ? alias + "@" + this.ContextName : columnName + "@" + this.ContextName;
+
+      this.select.Column(columnName, alias, this.ContextName);
+    }
+
+    public Table AddColumn(Query.Expr columnName, string alias = null)
+    {
+      this._AddColumn(columnName, alias);
       return this;
     }
 
     public Table AddColumn(string columnName, string alias = null)
     {
-      var column = new Query.Column(columnName);
-      column.Alias = alias;
-      this.columns.Add(column);
+      this._AddColumn(columnName, alias);
       return this;
     }
 
@@ -80,16 +88,30 @@ namespace Sdx.Db
 
     public Table AddColumns(params String[] columns)
     {
-      foreach (var column in columns)
+      foreach (var columnName in columns)
       {
-        this.AddColumn(column);
+        this.AddColumn(columnName);
       }
       return this;
     }
 
-    internal List<Query.Column> Columns
+    internal string ContextName { get; set; }
+
+    internal Query.Select Select
     {
-      get { return this.columns; }
+      get
+      {
+        return this.select;
+      }
+      set
+      {
+        this.select = value;
+        this.Meta.Columns.ForEach(columnName =>
+        {
+          this.AddColumn(columnName);
+        });
+      }
+
     }
   }
 }

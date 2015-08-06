@@ -144,9 +144,9 @@ namespace Sdx.Db.Query
       {
         var column = new Column(columnName);
 
-        if(mode == TableDetectMode.Column)
+        if (mode == TableDetectMode.Column && this.Context != null)
         {
-          column.Context = this.Context;
+          column.ContextName = this.Context.Name;
         }
         
         this.Add(new Holder
