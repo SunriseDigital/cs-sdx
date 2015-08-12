@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Collections;
 using System.Diagnostics;
 
-namespace Sdx.DebugTool
+namespace Sdx.Diagnostics
 {
   public class Debug
   {

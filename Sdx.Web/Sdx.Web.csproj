@@ -47,9 +47,9 @@
     <Compile Include="View.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sdx.DebugTool\Sdx.DebugTool.csproj">
+    <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
       <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
-      <Name>Sdx.DebugTool</Name>
+      <Name>Sdx.Diagnostics</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

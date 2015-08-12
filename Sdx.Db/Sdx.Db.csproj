@@ -67,14 +67,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sdx.DebugTool\Sdx.DebugTool.csproj">
-      <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
-      <Name>Sdx.DebugTool</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
+      <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
+      <Name>Sdx.Diagnostics</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -3,7 +3,7 @@ using System.Web;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace Sdx.DebugTool
+namespace Sdx.Diagnostics
 {
   public class DisplayHttpModule : IHttpModule
   {
