@@ -47,7 +47,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sdx.DebugTool\Sdx.DebugTool.csproj">

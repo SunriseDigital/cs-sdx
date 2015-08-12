@@ -30,7 +30,7 @@ public partial class TestInclude : Sdx.Web.UserControl
 
 ### 親ページ
 
-`Sdx.Web.Util.FindControl(Page page, string controlId)`でそのページで使用しているUserControlを取得可能です。`Vars`プロパティの`Set(string key, object value)`メソッドで変数をセットします。
+`Sdx.Web.UserControl.Find(Page page, string controlId)`でそのページで使用しているUserControlを取得可能です。`Vars`プロパティの`Set(string key, object value)`メソッドで変数をセットします。
 
 test.aspx.cs
 ```c#
@@ -79,9 +79,9 @@ test.aspx
     <title></title>
 </head>
 <body>
-  <% Sdx.Web.Util.FindControl(Page, "TestInclude1").Vars.Set("list", list); %>
-  <% Sdx.Web.Util.FindControl(Page, "TestInclude1").Vars.Set("listDic", listDic); %>
-  <% Sdx.Web.Util.FindControl(Page, "TestInclude2").Vars.Set("stringValue", stringValue); %>
+  <% Sdx.Web.UserControl.Find(Page, "TestInclude1").Vars.Set("list", list); %>
+  <% Sdx.Web.UserControl.Find(Page, "TestInclude1").Vars.Set("listDic", listDic); %>
+  <% Sdx.Web.UserControl.Find(Page, "TestInclude2").Vars.Set("stringValue", stringValue); %>
 
   <uc:TestInclude id="TestInclude1" runat="server" />
   <uc:TestInclude id="TestInclude2" runat="server" />
