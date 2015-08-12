@@ -66,7 +66,7 @@
     <Compile Include="BaseDbTest.cs" />
     <Compile Include="DbQueryTest.cs" />
     <Compile Include="DbTableTest.cs" />
-    <Compile Include="DebugToolTest.cs" />
+    <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
@@ -89,9 +89,9 @@
       <Project>{ed1e6ba0-37f0-46cf-a86a-231a6cd2178c}</Project>
       <Name>Sdx.Db</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sdx.DebugTool\Sdx.DebugTool.csproj">
+    <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
       <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
-      <Name>Sdx.DebugTool</Name>
+      <Name>Sdx.Diagnostics</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sdx.Util\Sdx.Util.csproj">
       <Project>{814a034d-4cdd-4de6-9aa3-6ff1431ed11c}</Project>

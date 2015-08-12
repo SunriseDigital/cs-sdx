@@ -254,7 +254,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
           Console.WriteLine("execDbCommand");
           foreach (DataRow row in dataset.Tables[0].Rows)
           {
-            Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+            Console.WriteLine(Sdx.Diagnostics.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
           }
         }
       });

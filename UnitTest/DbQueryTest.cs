@@ -552,7 +552,7 @@ namespace UnitTest
 
           foreach (DataRow row in dataset.Tables[0].Rows)
           {
-            Console.WriteLine(Sdx.DebugTool.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
+            Console.WriteLine(Sdx.Diagnostics.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
           }
         }
       }
