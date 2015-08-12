@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sdx.DebugTool;
+using Sdx.Diagnostics;
 
 using Xunit;
 using UnitTest.DummyClasses;
@@ -19,7 +19,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 namespace UnitTest
 {
   [TestClass]
-  public class DebugToolTest : BaseTest
+  public class DiagnosticsTest : BaseTest
   {
     [Fact]
     public void TestDumpString()
