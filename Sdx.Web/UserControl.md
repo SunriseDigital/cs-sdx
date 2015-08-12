@@ -68,7 +68,7 @@ public partial class test : System.Web.UI.Page
 ```
 
 `test.aspx`
-```asp.net
+```asp
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="test.aspx.cs" Inherits="test" %>
 <%@ Register TagPrefix="uc" TagName="TestInclude" Src="~\TestInclude.ascx" %>
 <!DOCTYPE html>
@@ -98,7 +98,7 @@ public partial class test : System.Web.UI.Page
 `ContainsKey(string key)`メソッドでキーの存在をチェック可能です。
 
 `TestInclude.ascx`
-```asp.net
+```asp
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="TestInclude.ascx.cs" Inherits="TestInclude" %>
 <h1>TestInclude</h1>
 
