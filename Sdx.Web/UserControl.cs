@@ -6,8 +6,16 @@ using System.Threading.Tasks;
 
 namespace Sdx.Web
 {
-    public class UserControl : System.Web.UI.UserControl
-    {
+  public class UserControl : System.Web.UI.UserControl
+  {
+    private Holder vars = new Holder();
 
+    public Holder Vars
+    {
+      get
+      {
+        return this.vars;
+      }
     }
+  }
 }
