@@ -97,7 +97,7 @@ test.aspx
 
 `ContainsKey(string key)`メソッドでキーの存在をチェック可能です。
 
-```c#
+```c#:TestInclude.ascx
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="TestInclude.ascx.cs" Inherits="TestInclude" %>
 <h1>TestInclude</h1>
 
