@@ -10,7 +10,7 @@
 
 変数のやり取りは`Sdx.Web.UserControl.Vars`プロパティを介して行いますので、`Sdx.Web.UserControl`を継承して作成します。`Vars`プロパティは`Sdx.Web.Holder`のインスタンスです。
 
-TestInclude.ascx.cs
+`TestInclude.ascx.cs`
 ```c#
 using System;
 using System.Collections.Generic;
@@ -32,7 +32,7 @@ public partial class TestInclude : Sdx.Web.UserControl
 
 `Sdx.Web.UserControl.Find(Page page, string controlId)`でそのページで使用しているUserControlを取得可能です。`Vars`プロパティの`Set(string key, object value)`メソッドで変数をセットします。
 
-test.aspx.cs
+`test.aspx.cs`
 ```c#
 using System;
 using System.Collections.Generic;
@@ -67,8 +67,8 @@ public partial class test : System.Web.UI.Page
 }
 ```
 
-test.aspx
-```c#
+`test.aspx`
+```asp
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="test.aspx.cs" Inherits="test" %>
 <%@ Register TagPrefix="uc" TagName="TestInclude" Src="~\TestInclude.ascx" %>
 <!DOCTYPE html>
@@ -97,7 +97,8 @@ test.aspx
 
 `ContainsKey(string key)`メソッドでキーの存在をチェック可能です。
 
-```c#
+`TestInclude.ascx`
+```asp
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="TestInclude.ascx.cs" Inherits="TestInclude" %>
 <h1>TestInclude</h1>
 
