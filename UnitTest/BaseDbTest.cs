@@ -104,7 +104,10 @@ namespace UnitTest
       Sdx.Db.Adapter factory = new Sdx.Db.MySqlAdapter();
 
       var masterCon = factory.CreateConnection();
-      String pwd = ConfigurationManager.AppSettings["MySqlRootPwd"];
+      String pwd = "";
+#if ON_VISUAL_STUDIO
+      pwd = ConfigurationManager.AppSettings["MySqlRootPwd"];
+#endif
       masterCon.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=" + pwd;
       using (masterCon)
       {
