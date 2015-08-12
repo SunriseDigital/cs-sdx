@@ -93,9 +93,9 @@ test.aspx
 
 `Sdx.Web.Holder`には`object Get(string key)`と`T As<T>(string key)`の取得用メソッドが有ります。
 
-`object Get(string key)`は存在しないキーで呼ぶとNULLが帰ります。`T As<T>(string key)`はキーが存在しない、あるいは`T`に変換できない場合、`T`のインスタンスを引数なしのコンストラクタで作成し返します。引数なしのコンストラクタが存在しない型の場合、例外が発生します。
+`object Get(string key)`は存在しないキーで呼ぶとNULLが帰ります。`T As<T>(string key)`はキーが存在しない、あるいは`T`に変換できない場合、`T`のインスタンスを引数なしのコンストラクタで作成し返します。引数なしのコンストラクタが存在しない型の場合、例外が発生しますので適宜`Get`と使い分けてください。
 
-`ContainsKey(string key)`メソッドでキーの存在をチェックします。
+`ContainsKey(string key)`メソッドでキーの存在をチェック可能です。
 
 ```c#
 <%@ Control Language="C#" AutoEventWireup="true" CodeFile="TestInclude.ascx.cs" Inherits="TestInclude" %>
