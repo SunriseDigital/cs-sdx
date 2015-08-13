@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
     <Compile Include="DbQueryTest.cs" />
+    <Compile Include="DbRecordTest.cs" />
     <Compile Include="DbTableTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
@@ -75,6 +76,7 @@
     <Compile Include="Test\Orm\Table\CategoryType.cs" />
     <Compile Include="Test\Orm\Table\Image.cs" />
     <Compile Include="Test\Orm\Table\Shop.cs" />
+    <Compile Include="Test\Shop.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

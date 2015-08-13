@@ -46,6 +46,12 @@ namespace Sdx.Db.Query
       get { return this.orders; }
     }
 
+    public Result Execute()
+    {
+      var result = new Result(this);
+      return result;
+    }
+
     internal List<Column> ColumnList
     {
       get { return this.columns; }

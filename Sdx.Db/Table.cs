@@ -22,6 +22,7 @@ namespace Sdx.Db
     public class MetaData
     {
       public string Name { get; set; }
+      public List<string> Pkeys { get; set; }
       public List<string> Columns { get; set; }
       public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; set; }
     }
