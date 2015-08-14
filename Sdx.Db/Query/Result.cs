@@ -80,7 +80,7 @@ namespace Sdx.Db.Query
     {
       Table table = this.select.Context(contextName).Table;
 
-      var dupCheckDic = new Dictionary<List<object>, Result>();
+      var dupCheckDic = new Dictionary<string, Result>();
       var resultList = new List<Result>();
       this.list.ForEach(row => {
         var pkeys = table.Meta.Pkeys;
@@ -89,13 +89,15 @@ namespace Sdx.Db.Query
           throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
         }
 
-        var key = this.buildPkeyValues(row, pkeys, contextName);
+        var key = this.buildUniqueKey(row, pkeys, contextName);
         Result result;
         if (!dupCheckDic.ContainsKey(key))
         {
           result = new Result();
           result.ContextName = contextName;
           result.Select = this.select;
+          resultList.Add(result);
+          dupCheckDic[key] = result;
         }
         else
         {
@@ -103,8 +105,6 @@ namespace Sdx.Db.Query
         }
 
         result.AddRow(row);
-
-        resultList.Add(result);
 
       });
 
@@ -116,15 +116,20 @@ namespace Sdx.Db.Query
       this.list.Add(row);
     }
 
-    private List<object> buildPkeyValues(Dictionary<string, object> row, List<string> pkeys, string contextName)
+    private string buildUniqueKey(Dictionary<string, object> row, List<string> pkeys, string contextName)
     {
-      var values = new List<object>();
+      var key = "";
 
       pkeys.ForEach(column => {
-        values.Add(row[column + "@" + contextName]);
+        if(key != "")
+        {
+          key += "@SDX_UNIQUE@";
+        }
+
+        key += row[column + "@" + contextName];
       });
 
-      return values;
+      return key;
     }
   }
 }

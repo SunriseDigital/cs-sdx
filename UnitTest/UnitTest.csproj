@@ -76,6 +76,7 @@
     <Compile Include="Test\Orm\Table\Area.cs" />
     <Compile Include="Test\Orm\Table\Category.cs" />
     <Compile Include="Test\Orm\Table\Image.cs" />
+    <Compile Include="Test\Orm\Table\Menu.cs" />
     <Compile Include="Test\Orm\Table\Shop.cs" />
     <Compile Include="Test\Shop.cs" />
   </ItemGroup>

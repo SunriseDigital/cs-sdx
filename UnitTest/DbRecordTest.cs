@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using UnitTest.DummyClasses;
+using System.Collections.Generic;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -54,16 +55,16 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestJoinOneMany()
+    public void TestJoinManyOne()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunJoinOneMany(db);
+        RunJoinManyOne(db);
         ExecSql(db);
       }
     }
 
-    private void RunJoinOneMany(TestDb db)
+    private void RunJoinManyOne(TestDb db)
     {
       var select = db.Adapter.CreateSelect();
 
@@ -87,7 +88,7 @@ namespace UnitTest
       var area = shops[0].Assemble("area")[0];
       Assert.Equal("新中野", area.GetString("name"));
 
-      //Assert.Equal("2", shops[1].GetString("id"));
+      Assert.Equal("2", shops[1].GetString("id"));
       Assert.Equal("エスペリア", shops[1].GetString("name"));
       Assert.Equal("3", shops[1].GetString("area_id"));
       Assert.Equal("", shops[1].GetString("main_image_id"));
@@ -95,6 +96,46 @@ namespace UnitTest
 
       area = shops[1].Assemble("area")[0];
       Assert.Equal("西麻布", area.GetString("name"));
+    }
+
+    [Fact]
+    public void TestJoinOneMany()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunJoinOneMany(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunJoinOneMany(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         ;
+
+      select.Context("shop")
+         .InnerJoin(new Test.Orm.Table.Menu())
+         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         ;
+
+      select.Context("shop")
+          .Where.Add("name", "天府舫");
+
+      var result = select.Execute();
+      var shops = result.Assemble("shop");
+
+      Assert.Equal(1, shops.Count);
+      Assert.Equal("天府舫", shops[0].GetString("name"));
+
+      var menuList = shops[0].Assemble("menu");
+      Assert.Equal(3, menuList.Count);
+      Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
+      Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));
+      Assert.Equal("牛肉の激辛水煮", menuList[2].GetString("name"));
     }
   }
 }

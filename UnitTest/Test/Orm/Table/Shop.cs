@@ -49,6 +49,14 @@ namespace Test.Orm.Table
               ForeignKey = "sub_image_id",
               ReferenceKey = "id"
             }
+          },
+          {
+            "menu",
+            new Relation()
+            {
+              ForeignKey = "id",
+              ReferenceKey = "shop_id"
+            }
           }
         }
       };
