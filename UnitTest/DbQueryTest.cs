@@ -534,7 +534,7 @@ namespace UnitTest
     }
 
     [Fact]
-    public void trySqlAction()
+    public void TrySqlAction()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
