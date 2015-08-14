@@ -17,16 +17,16 @@ namespace UnitTest
   public class DbRecordTest : BaseDbTest
   {
     [Fact]
-    public void FetchSimpleRecord()
+    public void TestSimpleResult()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunCreateSelect(db);
+        RunSimpleResult(db);
         ExecSql(db);
       }
     }
 
-    private void RunCreateSelect(TestDb db)
+    private void RunSimpleResult(TestDb db)
     {
       var tShop = new Test.Orm.Table.Shop();
       var select = db.Adapter.CreateSelect();
@@ -45,7 +45,6 @@ namespace UnitTest
         Assert.Equal("", shop.GetString("main_image_id"));
         Assert.Equal("", shop.GetString("sub_image_id"));
       });
-
     }
   }
 }
