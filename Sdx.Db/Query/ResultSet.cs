@@ -82,7 +82,7 @@ namespace Sdx.Db.Query
 
     public void ForEach(Action<Result> action)
     {
-      this.ForEach(action);
+      this.results.ForEach(action);
     }
   }
 }

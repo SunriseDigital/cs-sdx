@@ -45,7 +45,8 @@ namespace UnitTest
 
       Sdx.Db.Query.Result result = select.Execute();
       var shops = result.Group("shop");
-      shops.ForEach(shop => {
+      shops.ForEach(shop =>
+      {
         Assert.Equal("1", shop.GetString("id"));
         Assert.Equal("天祥", shop.GetString("name"));
         Assert.Equal("2", shop.GetString("area_id"));
