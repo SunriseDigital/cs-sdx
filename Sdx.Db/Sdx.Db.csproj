@@ -59,6 +59,7 @@
     <Compile Include="Adapter.cs" />
     <Compile Include="MySqlAdapter.cs" />
     <Compile Include="Query\Result.cs" />
+    <Compile Include="Query\ResultSet.cs" />
     <Compile Include="Query\Select.cs" />
     <Compile Include="Query\Column.cs" />
     <Compile Include="SqlServerAdapter.cs" />

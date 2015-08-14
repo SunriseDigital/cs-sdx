@@ -44,7 +44,7 @@ namespace UnitTest
       select.Limit = 1;
 
       Sdx.Db.Query.Result result = select.Execute();
-      var shops = result.Assemble("shop");
+      var shops = result.Group("shop");
       shops.ForEach(shop => {
         Assert.Equal("1", shop.GetString("id"));
         Assert.Equal("天祥", shop.GetString("name"));
@@ -76,7 +76,7 @@ namespace UnitTest
       select.Limit = 2;
 
       Sdx.Db.Query.Result result = select.Execute();
-      var shops = result.Assemble("shop");
+      var shops = result.Group("shop");
       Assert.Equal(2, shops.Count);
 
       Assert.Equal("1", shops[0].GetString("id"));
@@ -85,7 +85,7 @@ namespace UnitTest
       Assert.Equal("", shops[0].GetString("main_image_id"));
       Assert.Equal("", shops[0].GetString("sub_image_id"));
 
-      var area = shops[0].Assemble("area")[0];
+      var area = shops[0].Group("area")[0];
       Assert.Equal("新中野", area.GetString("name"));
 
       Assert.Equal("2", shops[1].GetString("id"));
@@ -94,7 +94,7 @@ namespace UnitTest
       Assert.Equal("", shops[1].GetString("main_image_id"));
       Assert.Equal("", shops[1].GetString("sub_image_id"));
 
-      area = shops[1].Assemble("area")[0];
+      area = shops[1].Group("area").First;
       Assert.Equal("西麻布", area.GetString("name"));
     }
 
@@ -126,12 +126,12 @@ namespace UnitTest
           .Where.Add("name", "天府舫");
 
       var result = select.Execute();
-      var shops = result.Assemble("shop");
+      var shops = result.Group("shop");
 
       Assert.Equal(1, shops.Count);
       Assert.Equal("天府舫", shops[0].GetString("name"));
 
-      var menuList = shops[0].Assemble("menu");
+      var menuList = shops[0].Group("menu");
       Assert.Equal(3, menuList.Count);
       Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
       Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));

@@ -76,60 +76,18 @@ namespace Sdx.Db.Query
       return newResult;
     }
 
-    public List<Result> Assemble(string contextName)
+    public ResultSet Group(string contextName)
     {
-      Table table = this.select.Context(contextName).Table;
+      var resultSet = new ResultSet();
+      resultSet.Build(this.list, this.select, contextName);
+      
 
-      var dupCheckDic = new Dictionary<string, Result>();
-      var resultList = new List<Result>();
-      this.list.ForEach(row => {
-        var pkeys = table.Meta.Pkeys;
-        if (pkeys == null)
-        {
-          throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
-        }
-
-        var key = this.buildUniqueKey(row, pkeys, contextName);
-        Result result;
-        if (!dupCheckDic.ContainsKey(key))
-        {
-          result = new Result();
-          result.ContextName = contextName;
-          result.Select = this.select;
-          resultList.Add(result);
-          dupCheckDic[key] = result;
-        }
-        else
-        {
-          result = dupCheckDic[key];
-        }
-
-        result.AddRow(row);
-
-      });
-
-      return resultList;
+      return resultSet;
     }
 
-    private void AddRow(Dictionary<string, object> row)
+    internal void AddRow(Dictionary<string, object> row)
     {
       this.list.Add(row);
-    }
-
-    private string buildUniqueKey(Dictionary<string, object> row, List<string> pkeys, string contextName)
-    {
-      var key = "";
-
-      pkeys.ForEach(column => {
-        if(key != "")
-        {
-          key += "@SDX_UNIQUE@";
-        }
-
-        key += row[column + "@" + contextName];
-      });
-
-      return key;
     }
   }
 }
