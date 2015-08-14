@@ -47,7 +47,7 @@ namespace UnitTest
       shops.ForEach(shop => {
         Assert.Equal("1", shop.GetString("id"));
         Assert.Equal("天祥", shop.GetString("name"));
-        Assert.Equal("1", shop.GetString("category_id"));
+        Assert.Equal("2", shop.GetString("area_id"));
         Assert.Equal("", shop.GetString("main_image_id"));
         Assert.Equal("", shop.GetString("sub_image_id"));
       });
@@ -70,7 +70,7 @@ namespace UnitTest
       select
          .AddFrom(new Test.Orm.Table.Shop())
          .AddOrder("id", Sdx.Db.Query.Order.ASC)
-         .InnerJoin(new Test.Orm.Table.Category())
+         .InnerJoin(new Test.Orm.Table.Area())
          ;
       select.Limit = 2;
 
@@ -80,23 +80,21 @@ namespace UnitTest
 
       Assert.Equal("1", shops[0].GetString("id"));
       Assert.Equal("天祥", shops[0].GetString("name"));
-      Assert.Equal("1", shops[0].GetString("category_id"));
+      Assert.Equal("2", shops[0].GetString("area_id"));
       Assert.Equal("", shops[0].GetString("main_image_id"));
       Assert.Equal("", shops[0].GetString("sub_image_id"));
 
-      var category = shops[0].Assemble("category")[0];
-      Assert.Equal("1", category.GetString("id"));
-      Assert.Equal("中華", category.GetString("name"));
+      var area = shops[0].Assemble("area")[0];
+      Assert.Equal("新中野", area.GetString("name"));
 
       //Assert.Equal("2", shops[1].GetString("id"));
       Assert.Equal("エスペリア", shops[1].GetString("name"));
-      Assert.Equal("2", shops[1].GetString("category_id"));
+      Assert.Equal("3", shops[1].GetString("area_id"));
       Assert.Equal("", shops[1].GetString("main_image_id"));
       Assert.Equal("", shops[1].GetString("sub_image_id"));
 
-      category = shops[1].Assemble("category")[0];
-      Assert.Equal("2", category.GetString("id"));
-      Assert.Equal("イタリアン", category.GetString("name"));
+      area = shops[1].Assemble("area")[0];
+      Assert.Equal("西麻布", area.GetString("name"));
     }
   }
 }

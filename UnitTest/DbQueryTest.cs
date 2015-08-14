@@ -49,8 +49,8 @@ namespace UnitTest
 
 
         DbCommand command = con.CreateCommand();
-        command.CommandText = "SELECT shop.name as name_shop, category.name as name_category FROM shop"
-          + " INNER JOIN category ON category.id = shop.category_id"
+        command.CommandText = "SELECT shop.name as name_shop, area.name as name_area FROM shop"
+          + " INNER JOIN area ON area.id = shop.area_id"
           + " WHERE shop.id = @shop@id"
           ;
 
@@ -64,7 +64,7 @@ namespace UnitTest
 
         Assert.Equal(1, dataset.Tables[0].Rows.Count);
         Assert.Equal("天祥", dataset.Tables[0].Rows[0]["name_shop"]);
-        Assert.Equal("中華", dataset.Tables[0].Rows[0]["name_category"]);
+        Assert.Equal("新中野", dataset.Tables[0].Rows[0]["name_area"]);
       }
     }
 
@@ -219,13 +219,13 @@ namespace UnitTest
       select.AddFrom("shop").AddColumns("*");
 
       select.Context("shop").InnerJoin(
-        "category",
-        db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+        "area",
+        db.Adapter.CreateCondition("{0}.area_id = {1}.id")
       ).AddColumns("*");
 
       db.Command = select.Build();
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id"),
+        db.Sql("SELECT {0}shop{1}.*, {0}area{1}.* FROM {0}shop{1} INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id"),
         db.Command.CommandText
       );
 
@@ -234,12 +234,12 @@ namespace UnitTest
 
       //同じテーブルをJOINしてもAliasを与えなければ上書きになる
       select.Context("shop").InnerJoin(
-        "category",
-        db.Adapter.CreateCondition("{0}.category_id = {1}.id AND {1}.id = 1")
+        "area",
+        db.Adapter.CreateCondition("{0}.area_id = {1}.id AND {1}.id = 1")
       ).AddColumns("*");
       db.Command = select.Build();
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} ON {0}shop{1}.main_image_id = {0}image{1}.id INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
+        db.Sql("SELECT {0}shop{1}.*, {0}area{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} ON {0}shop{1}.main_image_id = {0}image{1}.id INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id AND {0}area{1}.id = 1"),
         db.Command.CommandText
       );
     }
@@ -259,15 +259,15 @@ namespace UnitTest
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
-        .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
-        .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
+        .InnerJoin("area", db.Adapter.CreateCondition("{0}.area_id = {1}.id"))
+        .InnerJoin("large_area", db.Adapter.CreateCondition("{0}.large_area_id = {1}.id"));
 
       select.Context("shop").AddColumns("*");
 
       db.Command = select.Build();
 
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id"),
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id"),
         db.Command.CommandText
       );
     }
@@ -290,13 +290,13 @@ namespace UnitTest
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
-        .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
-        .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
+        .InnerJoin("area", db.Adapter.CreateCondition("{0}.area_id = {1}.id"))
+        .InnerJoin("large_area", db.Adapter.CreateCondition("{0}.large_area_id = {1}.id"));
 
       db.Command = select.Build();
 
       Assert.Equal(
-        db.Sql("SELECT FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id"),
+        db.Sql("SELECT FROM {0}shop{1} INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id"),
         db.Command.CommandText
       );
     }
@@ -356,7 +356,7 @@ namespace UnitTest
       select.Context("shop")
         .ClearColumns()
         .AddColumns(new Dictionary<string, object>()
-         { 
+         {
            {"shop_id", "id"},
            {"shop_name", "name"},
          });
@@ -370,7 +370,7 @@ namespace UnitTest
       select.Context("shop")
         .ClearColumns()
         .AddColumns(new Dictionary<string, object>()
-         { 
+         {
            {"shop_id", "id"},
            {"shop_name", Sdx.Db.Query.Expr.Wrap("name")},
          });
@@ -478,21 +478,21 @@ namespace UnitTest
       );
 
       //テーブル名だけすり替える
-      select.RemoveContext("shop").AddFrom("category");
+      select.RemoveContext("shop").AddFrom("area");
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}id{1}, {0}name{1} FROM {0}category{1}"),
+       db.Sql("SELECT {0}id{1}, {0}name{1} FROM {0}area{1}"),
        db.Command.CommandText
       );
 
       //SetColumns
-      select.RemoveContext("category").AddFrom("shop");
-      select.ClearColumns().AddColumns("name", "category_id");
+      select.RemoveContext("area").AddFrom("shop");
+      select.ClearColumns().AddColumns("name", "area_id");
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}name{1}, {0}category_id{1} FROM {0}shop{1}"),
+       db.Sql("SELECT {0}name{1}, {0}area_id{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
 
@@ -524,11 +524,11 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumn("*");
-      select.AddFrom("category");
+      select.AddFrom("area");
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, {0}category{1}"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, {0}area{1}"),
        db.Command.CommandText
       );
     }
@@ -540,7 +540,7 @@ namespace UnitTest
       {
         var con = db.Adapter.CreateConnection();
         var command = db.Adapter.CreateCommand();
-        command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)");
+        command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}area_id{1} IN (SELECT id FROM area WHERE id = 1)");
         using (con)
         {
           con.Open();
@@ -668,14 +668,14 @@ namespace UnitTest
         .AddFrom("shop")
         .AddColumn("*")
         .InnerJoin(
-          Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
-          db.Adapter.CreateCondition("{0}.category_id = {1}.id"),
+          Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
+          db.Adapter.CreateCondition("{0}.area_id = {1}.id"),
           "sub_cat"
         );
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM area WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.area_id = {0}sub_cat{1}.id"),
        db.Command.CommandText
       );
 
@@ -702,15 +702,15 @@ namespace UnitTest
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .AddFrom("category")
+        .AddFrom("area")
         .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Context("shop").InnerJoin(sub, db.Adapter.CreateCondition("{0}.category_id = {1}.id"), "sub_cat");
+      select.Context("shop").InnerJoin(sub, db.Adapter.CreateCondition("{0}.area_id = {1}.id"), "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.area_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -739,15 +739,15 @@ namespace UnitTest
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .AddFrom("category")
+        .AddFrom("area")
         .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Context("shop").LeftJoin(sub, db.Adapter.CreateCondition("{0}.category_id = {1}.id"), "sub_cat");
+      select.Context("shop").LeftJoin(sub, db.Adapter.CreateCondition("{0}.area_id = {1}.id"), "sub_cat");
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.area_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -776,15 +776,15 @@ namespace UnitTest
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .AddFrom("category")
+        .AddFrom("area")
         .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Context("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
+      select.Context("shop").Where.Add("area_id", sub, Sdx.Db.Query.Comparison.In);
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @0 AND {0}shop{1}.{0}category_id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @0 AND {0}shop{1}.{0}area_id{1} IN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @1)"),
        db.Command.CommandText
       );
 
@@ -812,13 +812,13 @@ namespace UnitTest
         .Where.Add("id", "1");
 
       select.AddFrom(
-        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
+        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
         "sub_cat"
       );
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM area WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @0"),
        db.Command.CommandText
       );
 
@@ -846,7 +846,7 @@ namespace UnitTest
 
       Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
-        .AddFrom("category")
+        .AddFrom("area")
         .AddColumn("id")
         .Where.Add("id", "2");
 
@@ -854,7 +854,7 @@ namespace UnitTest
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -1015,7 +1015,7 @@ namespace UnitTest
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100 OFFSET 10"),
         db
       );
-      
+
     }
 
     private void AssertCommandText(Type type, string expected, TestDb db)
@@ -1085,7 +1085,7 @@ namespace UnitTest
       Assert.Equal("2", db.Command.Parameters["@0"].Value);
     }
 
-        [Fact]
+    [Fact]
     public void TestJoinCondition()
     {
       foreach (TestDb db in this.CreateTestDbList())
@@ -1103,14 +1103,14 @@ namespace UnitTest
       select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
-        "category",
-        db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+        "area",
+        db.Adapter.CreateCondition("{0}.area_id = {1}.id")
       ).AddColumns("*");
       db.Command = select.Build();
-      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
         FROM {0}shop{1} 
-        INNER JOIN {0}category{1} 
-          ON {0}shop{1}.category_id = {0}category{1}.id"), db.Command.CommandText);
+        INNER JOIN {0}area{1} 
+          ON {0}shop{1}.area_id = {0}area{1}.id"), db.Command.CommandText);
 
       Assert.Equal(0, db.Command.Parameters.Count);
 
@@ -1118,15 +1118,15 @@ namespace UnitTest
       select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
-        "category",
-        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1")
+        "area",
+        db.Adapter.CreateCondition("{0}.area_id = {1}.id").AddRight("id", "1")
       ).AddColumns("*");
       db.Command = select.Build();
-      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
         FROM {0}shop{1} 
-        INNER JOIN {0}category{1} 
-          ON {0}shop{1}.category_id = {0}category{1}.id 
-          AND {0}category{1}.{0}id{1} = @0"), db.Command.CommandText);
+        INNER JOIN {0}area{1} 
+          ON {0}shop{1}.area_id = {0}area{1}.id 
+          AND {0}area{1}.{0}id{1} = @0"), db.Command.CommandText);
 
       Assert.Equal(1, db.Command.Parameters.Count);
       Assert.Equal("1", db.Command.Parameters[0].Value);
@@ -1135,52 +1135,52 @@ namespace UnitTest
       select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
-        "category",
-        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight(Sdx.Db.Query.Expr.Wrap("id"), "1")
+        "area",
+        db.Adapter.CreateCondition("{0}.area_id = {1}.id").AddRight(Sdx.Db.Query.Expr.Wrap("id"), "1")
       ).AddColumns("*");
       db.Command = select.Build();
-      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
         FROM {0}shop{1} 
-        INNER JOIN {0}category{1} 
-          ON {0}shop{1}.category_id = {0}category{1}.id 
-          AND {0}category{1}.id = @0"), db.Command.CommandText);
+        INNER JOIN {0}area{1} 
+          ON {0}shop{1}.area_id = {0}area{1}.id 
+          AND {0}area{1}.id = @0"), db.Command.CommandText);
 
       Assert.Equal(1, db.Command.Parameters.Count);
       Assert.Equal("1", db.Command.Parameters[0].Value);
 
       //InnerJoin Additional Subquery
       var sub = db.Adapter.CreateSelect();
-      sub.AddFrom("category").AddColumn("id");
+      sub.AddFrom("area").AddColumn("id");
       select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumns("*");
       select.Context("shop").InnerJoin(
-        "category",
-        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
+        "area",
+        db.Adapter.CreateCondition("{0}.area_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
       ).AddColumns("*");
       db.Command = select.Build();
-      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.*
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.*
         FROM {0}shop{1} 
-        INNER JOIN {0}category{1}
-          ON {0}shop{1}.category_id = {0}category{1}.id 
-            AND {0}category{1}.{0}id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1})"), db.Command.CommandText);
+        INNER JOIN {0}area{1}
+          ON {0}shop{1}.area_id = {0}area{1}.id 
+            AND {0}area{1}.{0}id{1} IN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1})"), db.Command.CommandText);
 
       //InnerJoin Additional Subquery and parameter
       sub = db.Adapter.CreateSelect();
-      sub.AddFrom("category").AddColumn("id").Where.Add("code", "foo");
+      sub.AddFrom("area").AddColumn("id").Where.Add("code", "foo");
       select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumns("*").Where.Add("name", "bar");
       select.Context("shop").InnerJoin(
-        "category",
-        db.Adapter.CreateCondition("{0}.category_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
+        "area",
+        db.Adapter.CreateCondition("{0}.area_id = {1}.id").AddRight("id", sub, Sdx.Db.Query.Comparison.In)
       ).AddColumns("*").Where.Add("id", "99");
       db.Command = select.Build();
-      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.*
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.*
         FROM {0}shop{1}
-        INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
-          AND {0}category{1}.{0}id{1} IN 
-            (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}code{1} = @0)
+        INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
+          AND {0}area{1}.{0}id{1} IN 
+            (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}code{1} = @0)
         WHERE {0}shop{1}.{0}name{1} = @1 
-        AND {0}category{1}.{0}id{1} = @2"), db.Command.CommandText);
+        AND {0}area{1}.{0}id{1} = @2"), db.Command.CommandText);
 
       Assert.Equal(3, db.Command.Parameters.Count);
       Assert.Equal("foo", db.Command.Parameters[0].Value);
@@ -1192,8 +1192,8 @@ namespace UnitTest
       select.AddFrom("shop").AddColumns("*");
       select.Context("shop")
         .InnerJoin(
-          "category",
-          db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+          "area",
+          db.Adapter.CreateCondition("{0}.area_id = {1}.id")
             .Add(
               db.Adapter.CreateCondition()
                 .AddRight("id", "1")
@@ -1203,19 +1203,19 @@ namespace UnitTest
         .AddColumns("*");
 
       db.Command = select.Build();
-      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
         FROM {0}shop{1}
-        INNER JOIN {0}category{1}
-          ON {0}shop{1}.category_id = {0}category{1}.id
-            AND ({0}category{1}.{0}id{1} = @0 OR {0}category{1}.{0}id{1} = @1)"), db.Command.CommandText);
+        INNER JOIN {0}area{1}
+          ON {0}shop{1}.area_id = {0}area{1}.id
+            AND ({0}area{1}.{0}id{1} = @0 OR {0}area{1}.{0}id{1} = @1)"), db.Command.CommandText);
 
       //InnerJoin Addtional include `OR` left
       select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumns("*");
       select.Context("shop")
         .InnerJoin(
-          "category",
-          db.Adapter.CreateCondition("{0}.category_id = {1}.id")
+          "area",
+          db.Adapter.CreateCondition("{0}.area_id = {1}.id")
             .Add(
               db.Adapter.CreateCondition()
                 .AddLeft("id", "1")
@@ -1225,10 +1225,10 @@ namespace UnitTest
         .AddColumns("*");
 
       db.Command = select.Build();
-      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}category{1}.* 
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
         FROM {0}shop{1}
-        INNER JOIN {0}category{1}
-          ON {0}shop{1}.category_id = {0}category{1}.id
+        INNER JOIN {0}area{1}
+          ON {0}shop{1}.area_id = {0}area{1}.id
             AND ({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)"), db.Command.CommandText);
     }
 
@@ -1248,17 +1248,17 @@ namespace UnitTest
       select
         .AddFrom("shop")
         .AddColumn("*")
-        .InnerJoin("category", db.Adapter.CreateCondition("{0}.category_id = {1}.id"))
-        .InnerJoin("category_type", db.Adapter.CreateCondition("{0}.category_type_id = {1}.id"));
+        .InnerJoin("area", db.Adapter.CreateCondition("{0}.area_id = {1}.id"))
+        .InnerJoin("large_area", db.Adapter.CreateCondition("{0}.large_area_id = {1}.id"));
 
       select.Context("shop").Where.Add(
         db.Adapter.CreateCondition().Add(
           db.Adapter.CreateCondition()
-            .Add("id" ,"1")
+            .Add("id", "1")
             .AddOr("id", "2")
         ).Add(
           db.Adapter.CreateCondition()
-            .Add("id" ,"3")
+            .Add("id", "3")
             .AddOr("id", "4")
         )
       );
@@ -1268,8 +1268,8 @@ namespace UnitTest
        db.Sql(@"SELECT
                 {0}shop{1}.*
               FROM {0}shop{1}
-              INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
-              INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id
+              INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
+              INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id
               WHERE (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1) AND ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))"),
        db.Command.CommandText
       );
@@ -1280,7 +1280,7 @@ namespace UnitTest
       Assert.Equal("3", db.Command.Parameters["@2"].Value);
       Assert.Equal("4", db.Command.Parameters["@3"].Value);
 
-      select.Context("category").Where.Add(
+      select.Context("area").Where.Add(
         db.Adapter.CreateCondition().Add(
           db.Adapter.CreateCondition()
             .Add("id", "5")
@@ -1296,16 +1296,16 @@ namespace UnitTest
        db.Sql(@"SELECT
                 {0}shop{1}.*
               FROM {0}shop{1}
-              INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
-              INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id
+              INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
+              INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id
               WHERE
                 (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)
                 AND
                 ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))
               AND
-                (({0}category{1}.{0}id{1} = @4 OR {0}category{1}.{0}id{1} = @5)
+                (({0}area{1}.{0}id{1} = @4 OR {0}area{1}.{0}id{1} = @5)
                 AND
-                ({0}category{1}.{0}id{1} = @6 OR {0}category{1}.{0}id{1} = @7))"),
+                ({0}area{1}.{0}id{1} = @6 OR {0}area{1}.{0}id{1} = @7))"),
        db.Command.CommandText
       );
       Assert.Equal(8, db.Command.Parameters.Count);
@@ -1314,7 +1314,7 @@ namespace UnitTest
       Assert.Equal("7", db.Command.Parameters["@6"].Value);
       Assert.Equal("8", db.Command.Parameters["@7"].Value);
 
-      select.Context("category_type").Where.Add(
+      select.Context("large_area").Where.Add(
         db.Adapter.CreateCondition()
           .Add("id", "9")
           .AddOr("id", "10")
@@ -1324,17 +1324,17 @@ namespace UnitTest
        db.Sql(@"SELECT
                 {0}shop{1}.*
               FROM {0}shop{1}
-              INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id
-              INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id
+              INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
+              INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id
               WHERE
                 (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)
                 AND
                 ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))
               AND
-                (({0}category{1}.{0}id{1} = @4 OR {0}category{1}.{0}id{1} = @5)
+                (({0}area{1}.{0}id{1} = @4 OR {0}area{1}.{0}id{1} = @5)
                 AND
-                ({0}category{1}.{0}id{1} = @6 OR {0}category{1}.{0}id{1} = @7))
-              AND ({0}category_type{1}.{0}id{1} = @8 OR {0}category_type{1}.{0}id{1} = @9)"),
+                ({0}area{1}.{0}id{1} = @6 OR {0}area{1}.{0}id{1} = @7))
+              AND ({0}large_area{1}.{0}id{1} = @8 OR {0}large_area{1}.{0}id{1} = @9)"),
        db.Command.CommandText
       );
       Assert.Equal(10, db.Command.Parameters.Count);

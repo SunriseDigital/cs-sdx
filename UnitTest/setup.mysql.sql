@@ -1,32 +1,32 @@
 ﻿CREATE TABLE shop (
   id int NOT NULL AUTO_INCREMENT,
   name varchar(100),
-  category_id int NOT NULL,
+  area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,
   PRIMARY KEY (id)
 );
 
-CREATE TABLE category (
-  id int NOT NULL AUTO_INCREMENT ,
-  name varchar(100),
-  code varchar(50),
-  category_type_id int NOT NULL,
+CREATE TABLE area (
+  id int NOT NULL AUTO_INCREMENT,
+  name varchar(50),
+  large_area_id int,
+  code varchar(50) NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE INDEX key_category_code (code ASC)
+  UNIQUE INDEX large_area_code (code ASC)
 );
 
-ALTER TABLE shop ADD FOREIGN KEY (category_id) REFERENCES category(id);
+ALTER TABLE shop ADD FOREIGN KEY (area_id) REFERENCES area(id);
 
-CREATE TABLE category_type (
+CREATE TABLE large_area (
   id int NOT NULL AUTO_INCREMENT ,
   name varchar(100),
-  code varchar(50),
+  code varchar(50) NOT NULL,
   PRIMARY KEY (id),
-  UNIQUE INDEX key_category_type_code (code ASC)
+  UNIQUE INDEX large_area_code (code ASC)
 );
 
-ALTER TABLE category ADD FOREIGN KEY (category_type_id) REFERENCES category_type(id);
+ALTER TABLE area ADD FOREIGN KEY (large_area_id) REFERENCES large_area(id);
 
 CREATE TABLE image (
   id int NOT NULL AUTO_INCREMENT,
@@ -48,17 +48,19 @@ CREATE TABLE menu (
 ALTER TABLE menu ADD FOREIGN KEY (shop_id) REFERENCES shop(id);
 
 -- ManyMany
-CREATE TABLE area (
-  id int NOT NULL AUTO_INCREMENT,
-  name varchar(50),
-  PRIMARY KEY (id)
+CREATE TABLE category (
+  id int NOT NULL AUTO_INCREMENT ,
+  name varchar(100),
+  code varchar(50),
+  PRIMARY KEY (id),
+  UNIQUE INDEX key_category_code (code ASC)
 );
 
-CREATE TABLE shop_area (
+CREATE TABLE shop_category (
   shop_id int,
-  area_id int,
-  PRIMARY KEY (shop_id, area_id)
+  category_id int,
+  PRIMARY KEY (shop_id, category_id)
 );
 
-ALTER TABLE shop_area ADD FOREIGN KEY (shop_id) REFERENCES shop(id);
-ALTER TABLE shop_area ADD FOREIGN KEY (area_id) REFERENCES area(id);
+ALTER TABLE shop_category ADD FOREIGN KEY (shop_id) REFERENCES shop(id);
+ALTER TABLE shop_category ADD FOREIGN KEY (category_id) REFERENCES category(id);

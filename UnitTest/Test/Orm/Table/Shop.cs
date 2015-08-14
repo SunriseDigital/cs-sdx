@@ -18,17 +18,17 @@ namespace Test.Orm.Table
         {
           "id",
           "name",
-          "category_id",
+          "area_id",
           "main_image_id",
           "sub_image_id"
         },
         Relations = new Dictionary<string, Relation>()
         {
           {
-            "category",
+            "area",
             new Relation()
             {
-              ForeignKey = "category_id",
+              ForeignKey = "area_id",
               ReferenceKey = "id"
             }
           },

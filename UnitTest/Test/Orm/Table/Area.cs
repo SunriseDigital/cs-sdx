@@ -3,22 +3,34 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class CategoryType : Sdx.Db.Table
+  class Area : Sdx.Db.Table
   {
     override protected MetaData CreateTableMeta()
     {
       return new MetaData()
       {
-        Name = "category_type",
+        Name = "area",
+        Pkeys = new List<string>()
+        {
+          "id"
+        },
         Columns = new List<string>()
         {
           "id",
           "name",
           "code",
+          "large_area_id"
         },
         Relations = new Dictionary<string, Relation>()
         {
-
+          {
+            "large_area",
+            new Relation()
+            {
+              ForeignKey = "large_area_id",
+              ReferenceKey = "id"
+            }
+          }
         }
       };
     }
