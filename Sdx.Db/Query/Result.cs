@@ -42,6 +42,18 @@ namespace Sdx.Db.Query
 
     internal string ContextName { get; set; }
 
+    internal Select Select
+    {
+      get
+      {
+        return this.select;
+      }
+      set
+      {
+        this.select = value;
+      }
+    }
+
     public string GetString(string key)
     {
       // TODO Implements for missing ContextName.
@@ -71,12 +83,19 @@ namespace Sdx.Db.Query
       var dupCheckDic = new Dictionary<List<object>, Result>();
       var resultList = new List<Result>();
       this.list.ForEach(row => {
-        var key = this.buildPkeyValues(row, table.Meta.Pkeys, contextName);
+        var pkeys = table.Meta.Pkeys;
+        if (pkeys == null)
+        {
+          throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
+        }
+
+        var key = this.buildPkeyValues(row, pkeys, contextName);
         Result result;
         if (!dupCheckDic.ContainsKey(key))
         {
           result = new Result();
           result.ContextName = contextName;
+          result.Select = this.select;
         }
         else
         {

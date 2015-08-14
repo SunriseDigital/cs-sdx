@@ -47,3 +47,36 @@ ALTER TABLE shop ADD CONSTRAINT fk_shop_main_image_id
 ALTER TABLE shop ADD CONSTRAINT fk_shop_sub_image_id
 　FOREIGN KEY (sub_image_id)
 　REFERENCES image(id);
+
+ -- OneMany
+CREATE TABLE menu (
+  id int IDENTITY ,
+  name nvarchar(50),
+  shop_id int,
+  CONSTRAINT pk_menu PRIMARY KEY CLUSTERED (id)
+);
+
+ALTER TABLE menu ADD CONSTRAINT fk_menu_shop_id
+　FOREIGN KEY (shop_id)
+　REFERENCES shop(id);
+
+ -- ManyMany
+CREATE TABLE area (
+  id int IDENTITY ,
+  name nvarchar(50),
+  CONSTRAINT pk_area PRIMARY KEY CLUSTERED (id)
+);
+
+CREATE TABLE shop_area (
+  shop_id int NOT NULL,
+  area_id int NOT NULL,
+  PRIMARY KEY (shop_id, area_id)
+);
+
+ALTER TABLE shop_area ADD CONSTRAINT fk_shop_area_shop_id
+　FOREIGN KEY (shop_id)
+　REFERENCES shop(id);
+
+ALTER TABLE shop_area ADD CONSTRAINT fk_shop_area_area_id
+　FOREIGN KEY (area_id)
+　REFERENCES area(id);

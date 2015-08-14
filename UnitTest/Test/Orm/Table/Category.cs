@@ -10,6 +10,10 @@ namespace Test.Orm.Table
       return new MetaData()
       {
         Name = "category",
+        Pkeys = new List<string>()
+        {
+          "id"
+        },
         Columns = new List<string>()
         {
           "id",
