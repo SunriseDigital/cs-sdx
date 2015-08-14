@@ -137,5 +137,48 @@ namespace UnitTest
       Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));
       Assert.Equal("牛肉の激辛水煮", menuList[2].GetString("name"));
     }
+
+    [Fact]
+    public void TestJoinManyMany()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunJoinManyMany(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunJoinManyMany(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop())
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .Where.Add("name", new List<string>() { "Terra Blue", "Freeve" })
+         ;
+
+      select.Context("shop").InnerJoin(new Test.Orm.Table.ShopCategory())
+         ;
+
+      select.Context("shop_category").InnerJoin(new Test.Orm.Table.Category())
+        .AddOrder("id", Sdx.Db.Query.Order.ASC);
+
+      var result = select.Execute();
+      var shops = result.Group("shop");
+
+      Assert.Equal(2, shops.Count);
+
+      Assert.Equal("Freeve", shops[0].GetString("name"));
+      Assert.Equal(3, shops[0].Group("shop_category").Count);
+      Assert.Equal("美容室", shops[0].Group("shop_category")[0].Group("category").First.GetString("name"));
+      Assert.Equal("ネイルサロン", shops[0].Group("shop_category")[1].Group("category").First.GetString("name"));
+      Assert.Equal("まつげエクステ", shops[0].Group("shop_category")[2].Group("category").First.GetString("name"));
+
+      Assert.Equal("Terra Blue", shops[1].GetString("name"));
+      Assert.Equal(2, shops[1].Group("shop_category").Count);
+      Assert.Equal("ネイルサロン", shops[0].Group("shop_category")[1].Group("category").First.GetString("name"));
+      Assert.Equal("まつげエクステ", shops[0].Group("shop_category")[2].Group("category").First.GetString("name"));
+
+    }
   }
 }

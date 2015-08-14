@@ -72,6 +72,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="Test\Orm\Table\ShopCategory.cs" />
     <Compile Include="Test\Orm\Table\LargeArea.cs" />
     <Compile Include="Test\Orm\Table\Area.cs" />
     <Compile Include="Test\Orm\Table\Category.cs" />
