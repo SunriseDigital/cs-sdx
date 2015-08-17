@@ -23,16 +23,16 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestCreateSelect()
+    public void TestFromTable()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunCreateSelect(db);
+        RunFromTable(db);
         ExecSql(db);
       }
     }
 
-    private void RunCreateSelect(TestDb db)
+    private void RunFromTable(TestDb db)
     {
       var tShop = new Test.Orm.Table.Shop();
       var select = db.Adapter.CreateSelect();
