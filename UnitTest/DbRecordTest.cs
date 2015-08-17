@@ -201,9 +201,12 @@ namespace UnitTest
 
       var shops = select.Execute<Test.Orm.Shop>("shop");
       var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area");
-      Assert.NotNull(areaSet);
       Assert.Equal(1, areaSet.Count);
       Assert.Equal("新中野", areaSet[0].GetString("name"));
+
+      var largeAreaSet = areaSet[0].GetRecordSet<Test.Orm.LargeArea>("large_area");
+      Assert.Equal(1, largeAreaSet.Count);
+      Assert.Equal("東京", largeAreaSet[0].GetString("name"));
     }
 
     [Fact]
@@ -245,6 +248,50 @@ namespace UnitTest
       Assert.Equal("牛肉の激辛水煮", menuSet[0].GetString("name"));
       Assert.Equal("麻婆豆腐", menuSet[1].GetString("name"));
       Assert.Equal("干し豆腐のサラダ", menuSet[2].GetString("name"));
+    }
+
+
+    [Fact]
+    public void TestNoJoinManyMany()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunNoJoinManyMany(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunNoJoinManyMany(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .Where.Add("name", "Freeve")
+         ;
+
+      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
+        "shop_category",
+        sel => { sel.AddOrder("category_id", Sdx.Db.Query.Order.ASC); }
+      );
+
+      Assert.Equal(3, shopCategorySet.Count);
+      Assert.Equal("美容室", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal("まつげエクステ", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+
+
+      shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
+        "shop_category",
+        sel => { sel.AddOrder("category_id", Sdx.Db.Query.Order.DESC); }
+      );
+
+      Assert.Equal(3, shopCategorySet.Count);
+      Assert.Equal("まつげエクステ", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal("美容室", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
     }
 
 

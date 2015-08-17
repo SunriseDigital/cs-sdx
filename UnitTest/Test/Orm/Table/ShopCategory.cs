@@ -34,6 +34,7 @@ namespace Test.Orm.Table
             "category",
             new Relation()
             {
+              Table = new Test.Orm.Table.Category(),
               ForeignKey = "category_id",
               ReferenceKey = "id"
             }

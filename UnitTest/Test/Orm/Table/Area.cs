@@ -27,6 +27,7 @@ namespace Test.Orm.Table
             "large_area",
             new Relation()
             {
+              Table = new Test.Orm.Table.LargeArea(),
               ForeignKey = "large_area_id",
               ReferenceKey = "id"
             }
