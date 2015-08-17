@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Sdx.Db.Query
+using Sdx.Db.Query;
+
+namespace Sdx.Db
 {
-  public class ResultSet
+  public class RecordSet<T> where T : Record, new()
   {
-    private List<Result> results = new List<Result>();
-    private Dictionary<string, Result> resultDic = new Dictionary<string, Result>();
+    private List<T> results = new List<T>();
+    private Dictionary<string, T> resultDic = new Dictionary<string, T>();
 
     internal void Build(List<Dictionary<string, object>> list, Select select, string contextName)
     {
@@ -20,10 +22,10 @@ namespace Sdx.Db.Query
         }
 
         var key = this.buildUniqueKey(row, pkeys, contextName);
-        Result result;
+        T result;
         if (!this.resultDic.ContainsKey(key))
         {
-          result = new Result();
+          result = new T();
           result.ContextName = contextName;
           result.Select = select;
           this.results.Add(result);
@@ -63,7 +65,7 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Result First
+    public T First
     {
       get
       {
@@ -71,7 +73,7 @@ namespace Sdx.Db.Query
       }
     }
 
-    public Result this[int key]
+    public T this[int key]
     {
       get
       {
@@ -80,7 +82,7 @@ namespace Sdx.Db.Query
     }
 
 
-    public void ForEach(Action<Result> action)
+    public void ForEach(Action<T> action)
     {
       this.results.ForEach(action);
     }

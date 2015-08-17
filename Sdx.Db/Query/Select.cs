@@ -46,7 +46,7 @@ namespace Sdx.Db.Query
       get { return this.orders; }
     }
 
-    public ResultSet Execute(string contextName)
+    public RecordSet<T> Execute<T>(string contextName) where T : Record, new()
     {
       var command = this.Build();
 
@@ -70,7 +70,7 @@ namespace Sdx.Db.Query
         }
       }
 
-      var resultSet = new ResultSet();
+      var resultSet = new RecordSet<T>();
       resultSet.Build(list, this, contextName);
       return resultSet;
     }
@@ -271,6 +271,12 @@ namespace Sdx.Db.Query
 
       return command;
     }
+
+    public bool HasContext(string contextName)
+    {
+      return true;
+    }
+
 
     /// <summary>
     /// From及びJoinしたテーブルの中からcontextNameのテーブルを探し返す

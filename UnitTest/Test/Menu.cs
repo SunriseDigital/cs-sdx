@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Test.Orm
 {
-  public class Shop : Sdx.Db.Record
+  public class Menu : Sdx.Db.Record
   {
   }
 }
