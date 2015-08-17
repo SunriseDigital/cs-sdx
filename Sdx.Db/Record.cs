@@ -52,9 +52,9 @@ namespace Sdx.Db
       else
       {
         var table = this.select.Context(this.ContextName).Table;
-        if (table.Meta.Relations.ContainsKey(contextName))
+        if (table.TableMeta.Relations.ContainsKey(contextName))
         {
-          var relations = table.Meta.Relations[contextName];
+          var relations = table.TableMeta.Relations[contextName];
           var db = this.select.Adapter;
           var select = db.CreateSelect();
           select.AddFrom(relations.Table)

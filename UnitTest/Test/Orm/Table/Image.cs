@@ -5,9 +5,11 @@ namespace Test.Orm.Table
 {
   class Image : Sdx.Db.Table
   {
-    override protected MetaData CreateTableMeta()
+    public static new Sdx.Db.TableMeta Meta { get; private set; }
+
+    static Image()
     {
-      return new MetaData()
+      Meta = new Sdx.Db.TableMeta()
       {
         Name = "image",
         Columns = new List<string>()

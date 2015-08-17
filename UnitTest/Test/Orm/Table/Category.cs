@@ -5,9 +5,11 @@ namespace Test.Orm.Table
 {
   class Category : Sdx.Db.Table
   {
-    override protected MetaData CreateTableMeta()
+    public static new Sdx.Db.TableMeta Meta { get; private set; }
+
+    static Category()
     {
-      return new MetaData()
+      Meta = new Sdx.Db.TableMeta()
       {
         Name = "category",
         Pkeys = new List<string>()

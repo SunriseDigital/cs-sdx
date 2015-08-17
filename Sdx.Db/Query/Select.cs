@@ -89,7 +89,7 @@ namespace Sdx.Db.Query
     /// </summary>
     public Context AddFrom(Sdx.Db.Table target, string alias = null)
     {
-      var context = this.CreateContext(target.Meta.Name, alias);
+      var context = this.CreateContext(target.TableMeta.Name, alias);
       context.Table = target;
       target.ContextName = context.Name;
       target.Select = this;

@@ -15,7 +15,7 @@ namespace Sdx.Db
       Table table = select.Context(contextName).Table;
 
       list.ForEach(row => {
-        var pkeys = table.Meta.Pkeys;
+        var pkeys = table.TableMeta.Pkeys;
         if (pkeys == null)
         {
           throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");

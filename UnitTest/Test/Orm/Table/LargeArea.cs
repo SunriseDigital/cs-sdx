@@ -5,9 +5,11 @@ namespace Test.Orm.Table
 {
   class LargeArea : Sdx.Db.Table
   {
-    override protected MetaData CreateTableMeta()
+    public static new Sdx.Db.TableMeta Meta { get; private set; }
+
+    static LargeArea()
     {
-      return new MetaData()
+      Meta = new Sdx.Db.TableMeta()
       {
         Name = "large_area",
         Pkeys = new List<string>()

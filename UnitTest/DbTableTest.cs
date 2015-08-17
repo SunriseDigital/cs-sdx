@@ -23,6 +23,15 @@ namespace UnitTest
     }
 
     [Fact]
+    public void TestTableMeta()
+    {
+      var tShop = new Test.Orm.Table.Shop();
+      Console.WriteLine(Test.Orm.Table.Shop.Meta.Relations);
+      Console.WriteLine((tShop.GetType().GetProperty("Meta").GetValue(null, null) as Sdx.Db.TableMeta).Relations.Count);
+    }
+
+
+    [Fact]
     public void TestFromTable()
     {
       foreach (TestDb db in this.CreateTestDbList())

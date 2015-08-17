@@ -50,18 +50,18 @@ namespace Sdx.Db.Query
 
     private Table.Relation getRelationFromTable(Table target, string alias)
     {
-      var targetContextName = alias == null ? target.Meta.Name : alias;
-      if (!this.Table.Meta.Relations.ContainsKey(targetContextName))
+      var targetContextName = alias == null ? target.TableMeta.Name : alias;
+      if (!this.Table.TableMeta.Relations.ContainsKey(targetContextName))
       {
         throw new Exception("Missing relation setting in " + this.Table.ToString() + " for " + targetContextName);
       }
 
-      return this.Table.Meta.Relations[targetContextName];
+      return this.Table.TableMeta.Relations[targetContextName];
     }
 
     public Context InnerJoin(Table target, Condition condition = null, string alias = null)
     {
-      var context = this.AddJoin(target.Meta.Name, JoinType.Inner, condition, alias);
+      var context = this.AddJoin(target.TableMeta.Name, JoinType.Inner, condition, alias);
 
       if(condition == null)
       {
@@ -82,7 +82,7 @@ namespace Sdx.Db.Query
 
     public Context LeftJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
     {
-      var context = this.AddJoin(target.Meta.Name, JoinType.Left, condition, alias);
+      var context = this.AddJoin(target.TableMeta.Name, JoinType.Left, condition, alias);
 
       if (condition == null)
       {

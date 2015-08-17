@@ -26,42 +26,29 @@ namespace Sdx.Db
       }
     }
 
-    public class MetaData
-    {
-      public string Name { get; set; }
-      public List<string> Pkeys { get; set; }
-      public List<string> Columns { get; set; }
-      public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; set; }
-    }
-
-    private static Dictionary<string, MetaData> metaList;
     public Adapter Adapter { get; set; }
     private Query.Select select;
 
-    abstract protected MetaData CreateTableMeta();
-
-    public MetaData Meta
+    public TableMeta TableMeta
     {
       get
       {
-        //cache in static var.
-        var className = this.GetType().ToString();
-        if(metaList.ContainsKey(className))
+        var prop = this.GetType().GetProperty("Meta");
+        if (prop == null)
         {
-          return metaList[className];
+          throw new Exception("You must declare Meta property");
         }
 
-        var meta = this.CreateTableMeta();
-        metaList[className] = meta;
-        return meta;
+        var tableMeta = prop.GetValue(null, null) as TableMeta;
+
+        if(tableMeta == null)
+        {
+          throw new Exception("You must initialize Table Meta");
+        }
+
+        return tableMeta;
       }
     }
-
-    static Table()
-    {
-      Table.metaList = new Dictionary<string, MetaData>();
-    }
-
 
     public Table ClearColumns()
     {
@@ -112,7 +99,7 @@ namespace Sdx.Db
       set
       {
         this.select = value;
-        this.Meta.Columns.ForEach(columnName =>
+        this.TableMeta.Columns.ForEach(columnName =>
         {
           this.AddColumn(columnName);
         });
