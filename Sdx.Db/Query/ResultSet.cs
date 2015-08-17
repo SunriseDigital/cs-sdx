@@ -46,7 +46,7 @@ namespace Sdx.Db.Query
       pkeys.ForEach(column => {
         if (key != "")
         {
-          key += "@SDX_UNIQUE@";
+          key += "%%SDX%%";
         }
 
         key += row[column + "@" + contextName];
