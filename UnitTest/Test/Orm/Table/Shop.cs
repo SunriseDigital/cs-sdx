@@ -26,48 +26,43 @@ namespace Test.Orm.Table
         {
           {
             "area",
-            new Relation()
-            {
-              Table = new Test.Orm.Table.Area(),
-              ForeignKey = "area_id",
-              ReferenceKey = "id"
-            }
+            new Relation(
+              new Test.Orm.Table.Area(),
+              "area_id",
+              "id"
+            )
           },
           {
             "main_image",
-            new Relation()
-            {
-              Table = new Test.Orm.Table.Image(),
-              ForeignKey = "main_image_id",
-              ReferenceKey = "id"
-            }
+            new Relation(
+              new Test.Orm.Table.Image(),
+              "main_image_id",
+              "id"
+            )
           },
           {
             "sub_image",
-            new Relation()
-            {
-              Table = new Test.Orm.Table.Image(),
-              ForeignKey = "sub_image_id",
-              ReferenceKey = "id"
-            }
+            new Relation(
+              new Test.Orm.Table.Image(),
+              "sub_image_id",
+              "id"
+            )
           },
           {
             "menu",
-            new Relation()
-            {
-              Table = new Test.Orm.Table.Menu(),
-              ForeignKey = "id",
-              ReferenceKey = "shop_id"
-            }
+            new Relation(
+              new Test.Orm.Table.Menu(),
+              "id",
+              "shop_id"
+            )
           },
           {
             "shop_category",
-            new Relation()
-            {
-              Table = new Test.Orm.Table.ShopCategory(),
-              ForeignKey = "id",
-              ReferenceKey = "shop_id"
-            }
+            new Relation(
+              new Test.Orm.Table.ShopCategory(),
+              "id",
+              "shop_id"
+            )
           }
         }
       };

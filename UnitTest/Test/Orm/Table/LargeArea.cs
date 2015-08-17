@@ -24,11 +24,11 @@ namespace Test.Orm.Table
         {
           {
             "area",
-            new Relation()
-            {
-              ForeignKey = "id",
-              ReferenceKey = "large_area_id"
-            }
+            new Relation(
+              new Test.Orm.Table.ShopCategory(),
+              "id",
+              "large_area_id"
+            )
           }
         }
       };
