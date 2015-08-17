@@ -84,7 +84,7 @@ namespace UnitTest
       Assert.Equal("", shops[0].GetString("main_image_id"));
       Assert.Equal("", shops[0].GetString("sub_image_id"));
 
-      var area = shops[0].Group<Test.Orm.Area>("area")[0];
+      var area = shops[0].GetRecordSet<Test.Orm.Area>("area")[0];
       Assert.Equal("新中野", area.GetString("name"));
 
       Assert.Equal("2", shops[1].GetString("id"));
@@ -93,7 +93,7 @@ namespace UnitTest
       Assert.Equal("", shops[1].GetString("main_image_id"));
       Assert.Equal("", shops[1].GetString("sub_image_id"));
 
-      area = shops[1].Group<Test.Orm.Area>("area").First;
+      area = shops[1].GetRecordSet<Test.Orm.Area>("area").First;
       Assert.Equal("西麻布", area.GetString("name"));
     }
 
@@ -129,7 +129,7 @@ namespace UnitTest
       Assert.Equal(1, shops.Count);
       Assert.Equal("天府舫", shops[0].GetString("name"));
 
-      var menuList = shops[0].Group<Test.Orm.Menu>("menu");
+      var menuList = shops[0].GetRecordSet<Test.Orm.Menu>("menu");
       Assert.Equal(3, menuList.Count);
       Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
       Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));
@@ -166,16 +166,44 @@ namespace UnitTest
       Assert.Equal(2, shops.Count);
 
       Assert.Equal("Freeve", shops[0].GetString("name"));
-      Assert.Equal(3, shops[0].Group<Test.Orm.ShopCategory>("shop_category").Count);
-      Assert.Equal("美容室", shops[0].Group<Test.Orm.ShopCategory>("shop_category")[0].Group<Test.Orm.Category>("category").First.GetString("name"));
-      Assert.Equal("ネイルサロン", shops[0].Group<Test.Orm.ShopCategory>("shop_category")[1].Group<Test.Orm.Category>("category").First.GetString("name"));
-      Assert.Equal("まつげエクステ", shops[0].Group<Test.Orm.ShopCategory>("shop_category")[2].Group<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal(3, shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category").Count);
+      Assert.Equal("美容室", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[0].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal("ネイルサロン", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal("まつげエクステ", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
 
       Assert.Equal("Terra Blue", shops[1].GetString("name"));
-      Assert.Equal(2, shops[1].Group<Test.Orm.ShopCategory>("shop_category").Count);
-      Assert.Equal("ネイルサロン", shops[0].Group<Test.Orm.ShopCategory>("shop_category")[1].Group<Test.Orm.Category>("category").First.GetString("name"));
-      Assert.Equal("まつげエクステ", shops[0].Group<Test.Orm.ShopCategory>("shop_category")[2].Group<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal(2, shops[1].GetRecordSet<Test.Orm.ShopCategory>("shop_category").Count);
+      Assert.Equal("ネイルサロン", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+      Assert.Equal("まつげエクステ", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
 
+    }
+
+    [Fact]
+    public void TestNoJoinManyOne()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunNoJoinManyOne(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunNoJoinManyOne(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         ;
+
+      select.Limit = 1;
+
+      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area");
+      Assert.NotNull(areaSet);
+      Assert.Equal(1, areaSet.Count);
+      Assert.Equal("新中野", areaSet[0].GetString("name"));
     }
 
 

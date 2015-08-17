@@ -41,41 +41,38 @@ namespace Sdx.Db
       return "";
     }
 
-
-    //public Record Filter<T>(string contextName) where T : Record, new()
-    //{
-    //  Record newResult = new T();
-    //  Console.WriteLine(this.select.Context(contextName));
-      
-    //  return newResult;
-    //}
-
-    public RecordSet<T> Group<T>(string contextName) where T : Record, new()
+    public RecordSet<T> GetRecordSet<T>(string contextName) where T : Record, new()
     {
-      var resultSet = new RecordSet<T>();
-      resultSet.Build(this.list, this.select, contextName);
-      
+      if (this.select != null)
+      {
+        if (this.select.HasContext(contextName))
+        {
+          var resultSet = new RecordSet<T>();
+          resultSet.Build(this.list, this.select, contextName);
+          return resultSet;
+        }
+        else
+        {
+          var table = this.select.Context(this.ContextName).Table;
+          if (table.Meta.Relations.ContainsKey(contextName))
+          {
+            var relations = table.Meta.Relations[contextName];
+            var db = this.select.Adapter;
+            var select = db.CreateSelect();
+            select.AddFrom(relations.Table)
+              .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
-      return resultSet;
+            return select.Execute<T>(contextName);
+          }
+        }
+      }
+
+      return null;
     }
 
     internal void AddRow(Dictionary<string, object> row)
     {
       this.list.Add(row);
     }
-
-    //public ResultSet GetResultSet(string contextName)
-    //{
-    //  if (this.select != null)
-    //  {
-    //    if (this.select.HasContext(contextName))
-    //    {
-    //      return this.Group(contextName);
-    //    }
-    //  }
-
-      
-
-    //}
   }
 }

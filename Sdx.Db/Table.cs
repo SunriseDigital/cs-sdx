@@ -7,7 +7,8 @@ namespace Sdx.Db
   {
     public class Relation
     {
-      public string TableName { get; set; }
+      //TODO mutableなクラスに変更する
+      public Table Table { get; set; }
       public string ForeignKey { get; set; }
       public string ReferenceKey { get; set; }
       public string JoinCondition

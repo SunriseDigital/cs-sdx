@@ -50,12 +50,14 @@ namespace Sdx.Db.Query
     {
       var command = this.Build();
 
+      //TODO adapterに移動
       //まずはListを生成
       var list = new List<Dictionary<string, object>>();
       using (var con = this.Adapter.CreateConnection())
       {
         con.Open();
         command.Connection = con;
+        Console.WriteLine(command.CommandText);
         var reader = command.ExecuteReader();
         var schemaTable = reader.GetSchemaTable();
         while (reader.Read())
@@ -274,7 +276,12 @@ namespace Sdx.Db.Query
 
     public bool HasContext(string contextName)
     {
-      return true;
+      int findIndex = this.contextList.FindIndex(context =>
+      {
+        return context.Name == contextName;
+      });
+
+      return findIndex != -1;
     }
 
 

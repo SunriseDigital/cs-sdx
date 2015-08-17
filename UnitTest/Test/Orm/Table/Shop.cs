@@ -28,6 +28,7 @@ namespace Test.Orm.Table
             "area",
             new Relation()
             {
+              Table = new Test.Orm.Table.Area(),
               ForeignKey = "area_id",
               ReferenceKey = "id"
             }
@@ -36,7 +37,7 @@ namespace Test.Orm.Table
             "main_image",
             new Relation()
             {
-              TableName = "image",
+              Table = new Test.Orm.Table.Image(),
               ForeignKey = "main_image_id",
               ReferenceKey = "id"
             }
@@ -45,7 +46,7 @@ namespace Test.Orm.Table
             "sub_image",
             new Relation()
             {
-              TableName = "image",
+              Table = new Test.Orm.Table.Image(),
               ForeignKey = "sub_image_id",
               ReferenceKey = "id"
             }
@@ -54,6 +55,7 @@ namespace Test.Orm.Table
             "menu",
             new Relation()
             {
+              Table = new Test.Orm.Table.Menu(),
               ForeignKey = "id",
               ReferenceKey = "shop_id"
             }
@@ -62,6 +64,7 @@ namespace Test.Orm.Table
             "shop_category",
             new Relation()
             {
+              Table = new Test.Orm.Table.ShopCategory(),
               ForeignKey = "id",
               ReferenceKey = "shop_id"
             }
