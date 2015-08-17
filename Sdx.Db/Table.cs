@@ -7,9 +7,16 @@ namespace Sdx.Db
   {
     public class Relation
     {
-      public string TableName { get; set; }
-      public string ForeignKey { get; set; }
-      public string ReferenceKey { get; set; }
+      public Relation(Table table, string foreignKey, string referenceKey)
+      {
+        this.Table = table;
+        this.ForeignKey = foreignKey;
+        this.ReferenceKey = referenceKey;
+      }
+
+      public Table Table { get; private set; }
+      public string ForeignKey { get; private set; }
+      public string ReferenceKey { get; private set; }
       public string JoinCondition
       {
         get
@@ -22,6 +29,7 @@ namespace Sdx.Db
     public class MetaData
     {
       public string Name { get; set; }
+      public List<string> Pkeys { get; set; }
       public List<string> Columns { get; set; }
       public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; set; }
     }

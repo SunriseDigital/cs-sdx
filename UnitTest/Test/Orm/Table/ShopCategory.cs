@@ -3,31 +3,39 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Category : Sdx.Db.Table
+  class ShopCategory : Sdx.Db.Table
   {
     override protected MetaData CreateTableMeta()
     {
       return new MetaData()
       {
-        Name = "category",
+        Name = "shop_category",
         Pkeys = new List<string>()
         {
-          "id"
+          "shop_id",
+          "category_id"
         },
         Columns = new List<string>()
         {
-          "id",
-          "name",
-          "code",
+          "shop_id",
+          "category_id"
         },
         Relations = new Dictionary<string, Relation>()
         {
           {
-            "shop_category",
+            "shop",
             new Relation(
-              new Test.Orm.Table.ShopCategory(),
-              "id",
-              "category_id"
+              new Test.Orm.Table.Shop(),
+              "shop_id",
+              "id"
+            )
+          },
+          {
+            "category",
+            new Relation(
+              new Test.Orm.Table.Category(),
+              "category_id",
+              "id"
             )
           }
         }

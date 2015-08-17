@@ -46,6 +46,37 @@ namespace Sdx.Db.Query
       get { return this.orders; }
     }
 
+    public RecordSet<T> Execute<T>(string contextName) where T : Record, new()
+    {
+      var command = this.Build();
+
+      //TODO adapterに移動
+      //まずはListを生成
+      var list = new List<Dictionary<string, object>>();
+      using (var con = this.Adapter.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        Console.WriteLine(command.CommandText);
+        var reader = command.ExecuteReader();
+        var schemaTable = reader.GetSchemaTable();
+        while (reader.Read())
+        {
+          var row = new Dictionary<string, object>();
+          for (var i = 0; i < reader.FieldCount; i++)
+          {
+            row[reader.GetName(i)] = reader.GetValue(i);
+          }
+
+          list.Add(row);
+        }
+      }
+
+      var resultSet = new RecordSet<T>();
+      resultSet.Build(list, this, contextName);
+      return resultSet;
+    }
+
     internal List<Column> ColumnList
     {
       get { return this.columns; }
@@ -242,6 +273,17 @@ namespace Sdx.Db.Query
 
       return command;
     }
+
+    public bool HasContext(string contextName)
+    {
+      int findIndex = this.contextList.FindIndex(context =>
+      {
+        return context.Name == contextName;
+      });
+
+      return findIndex != -1;
+    }
+
 
     /// <summary>
     /// From及びJoinしたテーブルの中からcontextNameのテーブルを探し返す

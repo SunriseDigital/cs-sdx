@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Category : Sdx.Db.Table
+  class Menu : Sdx.Db.Table
   {
     override protected MetaData CreateTableMeta()
     {
       return new MetaData()
       {
-        Name = "category",
+        Name = "menu",
         Pkeys = new List<string>()
         {
           "id"
@@ -18,16 +18,16 @@ namespace Test.Orm.Table
         {
           "id",
           "name",
-          "code",
+          "shop_id"
         },
         Relations = new Dictionary<string, Relation>()
         {
           {
-            "shop_category",
+            "shop",
             new Relation(
-              new Test.Orm.Table.ShopCategory(),
-              "id",
-              "category_id"
+              new Test.Orm.Table.Shop(),
+              "shop_id",
+              "id"
             )
           }
         }

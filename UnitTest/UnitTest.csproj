@@ -65,16 +65,26 @@
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
     <Compile Include="DbQueryTest.cs" />
+    <Compile Include="DbRecordTest.cs" />
     <Compile Include="DbTableTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="Test\Orm\LargeArea.cs" />
+    <Compile Include="Test\Orm\Category.cs" />
+    <Compile Include="Test\Orm\ShopCategory.cs" />
+    <Compile Include="Test\Orm\Menu.cs" />
+    <Compile Include="Test\Orm\Table\ShopCategory.cs" />
+    <Compile Include="Test\Orm\Table\LargeArea.cs" />
+    <Compile Include="Test\Orm\Table\Area.cs" />
     <Compile Include="Test\Orm\Table\Category.cs" />
-    <Compile Include="Test\Orm\Table\CategoryType.cs" />
     <Compile Include="Test\Orm\Table\Image.cs" />
+    <Compile Include="Test\Orm\Table\Menu.cs" />
     <Compile Include="Test\Orm\Table\Shop.cs" />
+    <Compile Include="Test\Orm\Area.cs" />
+    <Compile Include="Test\Orm\Shop.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

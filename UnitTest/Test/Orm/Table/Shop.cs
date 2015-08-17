@@ -10,41 +10,59 @@ namespace Test.Orm.Table
       return new MetaData()
       {
         Name = "shop",
+        Pkeys = new List<string>()
+        {
+          "id"
+        },
         Columns = new List<string>()
         {
           "id",
           "name",
-          "category_id",
+          "area_id",
           "main_image_id",
           "sub_image_id"
         },
         Relations = new Dictionary<string, Relation>()
         {
           {
-            "category",
-            new Relation()
-            {
-              ForeignKey = "category_id",
-              ReferenceKey = "id"
-            }
+            "area",
+            new Relation(
+              new Test.Orm.Table.Area(),
+              "area_id",
+              "id"
+            )
           },
           {
             "main_image",
-            new Relation()
-            {
-              TableName = "image",
-              ForeignKey = "main_image_id",
-              ReferenceKey = "id"
-            }
+            new Relation(
+              new Test.Orm.Table.Image(),
+              "main_image_id",
+              "id"
+            )
           },
           {
             "sub_image",
-            new Relation()
-            {
-              TableName = "image",
-              ForeignKey = "sub_image_id",
-              ReferenceKey = "id"
-            }
+            new Relation(
+              new Test.Orm.Table.Image(),
+              "sub_image_id",
+              "id"
+            )
+          },
+          {
+            "menu",
+            new Relation(
+              new Test.Orm.Table.Menu(),
+              "id",
+              "shop_id"
+            )
+          },
+          {
+            "shop_category",
+            new Relation(
+              new Test.Orm.Table.ShopCategory(),
+              "id",
+              "shop_id"
+            )
           }
         }
       };
