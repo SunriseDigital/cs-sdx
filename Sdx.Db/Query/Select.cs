@@ -46,10 +46,33 @@ namespace Sdx.Db.Query
       get { return this.orders; }
     }
 
-    public Result Execute()
+    public ResultSet Execute(string contextName)
     {
-      var result = new Result(this);
-      return result;
+      var command = this.Build();
+
+      //まずはListを生成
+      var list = new List<Dictionary<string, object>>();
+      using (var con = this.Adapter.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        var reader = command.ExecuteReader();
+        var schemaTable = reader.GetSchemaTable();
+        while (reader.Read())
+        {
+          var row = new Dictionary<string, object>();
+          for (var i = 0; i < reader.FieldCount; i++)
+          {
+            row[reader.GetName(i)] = reader.GetValue(i);
+          }
+
+          list.Add(row);
+        }
+      }
+
+      var resultSet = new ResultSet();
+      resultSet.Build(list, this, contextName);
+      return resultSet;
     }
 
     internal List<Column> ColumnList

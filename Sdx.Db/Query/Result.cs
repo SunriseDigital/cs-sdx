@@ -12,34 +12,6 @@ namespace Sdx.Db.Query
 
     private List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
 
-    public Result()
-    {
-
-    }
-
-    internal Result(Select select):base()
-    {
-      this.select = select;
-      var command = this.select.Build();
-      using (var con = this.select.Adapter.CreateConnection())
-      {
-        con.Open();
-        command.Connection = con;
-        var reader = command.ExecuteReader();
-        var schemaTable = reader.GetSchemaTable();
-        while (reader.Read())
-        {
-          var row = new Dictionary<string, object>();
-          for (var i = 0; i < reader.FieldCount; i++)
-          {
-            row[reader.GetName(i)] = reader.GetValue(i);
-          }
-
-          list.Add(row);
-        }
-      }
-    }
-
     internal string ContextName { get; set; }
 
     internal Select Select

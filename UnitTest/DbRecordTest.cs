@@ -43,8 +43,7 @@ namespace UnitTest
          .AddOrder("id", Sdx.Db.Query.Order.ASC);
       select.Limit = 1;
 
-      Sdx.Db.Query.Result result = select.Execute();
-      var shops = result.Group("shop");
+      var shops = select.Execute("shop");
       shops.ForEach(shop =>
       {
         Assert.Equal("1", shop.GetString("id"));
@@ -76,8 +75,7 @@ namespace UnitTest
          ;
       select.Limit = 2;
 
-      Sdx.Db.Query.Result result = select.Execute();
-      var shops = result.Group("shop");
+      var shops = select.Execute("shop");
       Assert.Equal(2, shops.Count);
 
       Assert.Equal("1", shops[0].GetString("id"));
@@ -126,8 +124,7 @@ namespace UnitTest
       select.Context("shop")
           .Where.Add("name", "天府舫");
 
-      var result = select.Execute();
-      var shops = result.Group("shop");
+      var shops = select.Execute("shop");
 
       Assert.Equal(1, shops.Count);
       Assert.Equal("天府舫", shops[0].GetString("name"));
@@ -164,8 +161,7 @@ namespace UnitTest
       select.Context("shop_category").InnerJoin(new Test.Orm.Table.Category())
         .AddOrder("id", Sdx.Db.Query.Order.ASC);
 
-      var result = select.Execute();
-      var shops = result.Group("shop");
+      var shops = select.Execute("shop");
 
       Assert.Equal(2, shops.Count);
 
