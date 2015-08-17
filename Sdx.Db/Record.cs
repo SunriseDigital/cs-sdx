@@ -41,33 +41,35 @@ namespace Sdx.Db
       return "";
     }
 
-    public RecordSet<T> GetRecordSet<T>(string contextName) where T : Record, new()
+    public RecordSet<T> GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
     {
-      if (this.select != null)
+      if (selectHook == null && this.select.HasContext(contextName))
       {
-        if (this.select.HasContext(contextName))
-        {
-          var resultSet = new RecordSet<T>();
-          resultSet.Build(this.list, this.select, contextName);
-          return resultSet;
-        }
-        else
-        {
-          var table = this.select.Context(this.ContextName).Table;
-          if (table.Meta.Relations.ContainsKey(contextName))
-          {
-            var relations = table.Meta.Relations[contextName];
-            var db = this.select.Adapter;
-            var select = db.CreateSelect();
-            select.AddFrom(relations.Table)
-              .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
-
-            return select.Execute<T>(contextName);
-          }
-        }
+        var resultSet = new RecordSet<T>();
+        resultSet.Build(this.list, this.select, contextName);
+        return resultSet;
       }
+      else
+      {
+        var table = this.select.Context(this.ContextName).Table;
+        if (table.Meta.Relations.ContainsKey(contextName))
+        {
+          var relations = table.Meta.Relations[contextName];
+          var db = this.select.Adapter;
+          var select = db.CreateSelect();
+          select.AddFrom(relations.Table)
+            .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
-      return null;
+          if (selectHook != null)
+          {
+            selectHook.Invoke(select);
+          }
+
+          return select.Execute<T>(contextName);
+        }
+
+        throw new Exception("Missing relation setting for " + contextName);
+      }
     }
 
     internal void AddRow(Dictionary<string, object> row)

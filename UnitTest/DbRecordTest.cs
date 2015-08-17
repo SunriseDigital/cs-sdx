@@ -206,6 +206,47 @@ namespace UnitTest
       Assert.Equal("新中野", areaSet[0].GetString("name"));
     }
 
+    [Fact]
+    public void TestNoJoinOneMany()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunNoJoinOneMany(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunNoJoinOneMany(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .Where.Add("name", "天府舫")
+         ;
+
+      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
+        "menu",
+        sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Query.Order.ASC); }
+      );
+      Assert.Equal(3, menuSet.Count);
+      Assert.Equal("干し豆腐のサラダ", menuSet[0].GetString("name"));
+      Assert.Equal("麻婆豆腐", menuSet[1].GetString("name"));
+      Assert.Equal("牛肉の激辛水煮", menuSet[2].GetString("name"));
+
+      //ORDERをひっくり返す
+      menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
+        "menu",
+        sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Query.Order.DESC); }
+      );
+      Assert.Equal(3, menuSet.Count);
+      Assert.Equal("牛肉の激辛水煮", menuSet[0].GetString("name"));
+      Assert.Equal("麻婆豆腐", menuSet[1].GetString("name"));
+      Assert.Equal("干し豆腐のサラダ", menuSet[2].GetString("name"));
+    }
+
 
   }
 }
