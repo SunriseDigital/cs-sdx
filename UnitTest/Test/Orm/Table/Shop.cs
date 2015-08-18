@@ -9,14 +9,13 @@ namespace Test.Orm.Table
 
     static Shop()
     {
-      Meta =  new Sdx.Db.TableMeta()
-      {
-        Name = "shop",
-        Pkeys = new List<string>()
+      Meta =  new Sdx.Db.TableMeta(
+        name: "shop",
+        pkeys: new List<string>()
         {
           "id"
         },
-        Columns = new List<string>()
+        columns: new List<string>()
         {
           "id",
           "name",
@@ -24,7 +23,7 @@ namespace Test.Orm.Table
           "main_image_id",
           "sub_image_id"
         },
-        Relations = new Dictionary<string, Relation>()
+        relations: new Dictionary<string, Relation>()
         {
           {
             "area",
@@ -67,7 +66,7 @@ namespace Test.Orm.Table
             )
           }
         }
-      };
+      );
     }
   }
 }

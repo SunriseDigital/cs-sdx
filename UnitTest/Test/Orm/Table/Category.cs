@@ -9,20 +9,19 @@ namespace Test.Orm.Table
 
     static Category()
     {
-      Meta = new Sdx.Db.TableMeta()
-      {
-        Name = "category",
-        Pkeys = new List<string>()
+      Meta = new Sdx.Db.TableMeta(
+        name: "category",
+        pkeys: new List<string>()
         {
           "id"
         },
-        Columns = new List<string>()
+        columns: new List<string>()
         {
           "id",
           "name",
           "code",
         },
-        Relations = new Dictionary<string, Relation>()
+        relations: new Dictionary<string, Relation>()
         {
           {
             "shop_category",
@@ -33,7 +32,7 @@ namespace Test.Orm.Table
             )
           }
         }
-      };
+      );
     }
   }
 }

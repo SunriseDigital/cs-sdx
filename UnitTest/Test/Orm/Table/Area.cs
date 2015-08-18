@@ -9,21 +9,20 @@ namespace Test.Orm.Table
 
     static Area()
     {
-      Meta = new Sdx.Db.TableMeta()
-      {
-        Name = "area",
-        Pkeys = new List<string>()
+      Meta = new Sdx.Db.TableMeta(
+        name: "area",
+        pkeys: new List<string>()
         {
           "id"
         },
-        Columns = new List<string>()
+        columns: new List<string>()
         {
           "id",
           "name",
           "code",
           "large_area_id"
         },
-        Relations = new Dictionary<string, Relation>()
+        relations: new Dictionary<string, Relation>()
         {
           {
             "large_area",
@@ -34,7 +33,7 @@ namespace Test.Orm.Table
             )
           }
         }
-      };
+      );
     }
   }
 }

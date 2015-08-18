@@ -9,20 +9,19 @@ namespace Test.Orm.Table
 
     static Menu()
     {
-      Meta = new Sdx.Db.TableMeta()
-      {
-        Name = "menu",
-        Pkeys = new List<string>()
+      Meta = new Sdx.Db.TableMeta(
+        name: "menu",
+        pkeys: new List<string>()
         {
           "id"
         },
-        Columns = new List<string>()
+        columns: new List<string>()
         {
           "id",
           "name",
           "shop_id"
         },
-        Relations = new Dictionary<string, Relation>()
+        relations: new Dictionary<string, Relation>()
         {
           {
             "shop",
@@ -33,7 +32,7 @@ namespace Test.Orm.Table
             )
           }
         }
-      };
+      );
     }
   }
 }

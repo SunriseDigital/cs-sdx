@@ -9,19 +9,19 @@ namespace Test.Orm.Table
 
     static Image()
     {
-      Meta = new Sdx.Db.TableMeta()
-      {
-        Name = "image",
-        Columns = new List<string>()
+      Meta = new Sdx.Db.TableMeta(
+        name: "image",
+        pkeys: new List<string>(),
+        columns: new List<string>()
         {
           "id",
           "path"
         },
-        Relations = new Dictionary<string, Relation>()
+        relations: new Dictionary<string, Relation>()
         {
 
         }
-      };
+      );
     }
   }
 }

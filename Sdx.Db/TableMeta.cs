@@ -3,11 +3,23 @@ using System.Collections.Generic;
 
 namespace Sdx.Db
 {
+  /// <summary>
+  /// テーブルの名前や保持するカラム、他テーブルとの関係といったテーブルの情報を保持するクラス。
+  /// 各Tableクラスのstaticなプロパティ、Metaに保持され、普遍なので複数生成する必要のないクラス。
+  /// </summary>
   public class TableMeta
   {
-    public string Name { get; set; }
-    public List<string> Pkeys { get; set; }
-    public List<string> Columns { get; set; }
-    public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; set; }
+    public TableMeta(string name, List<string> pkeys, List<string> columns, Dictionary<string, Sdx.Db.Table.Relation> relations)
+    {
+      this.Name = name;
+      this.Pkeys = pkeys;
+      this.Columns = columns;
+      this.Relations = relations;
+    }
+
+    public string Name { get; private set; }
+    public List<string> Pkeys { get; private set; }
+    public List<string> Columns { get; private set; }
+    public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; private set; }
   }
 }

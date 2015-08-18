@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 namespace Sdx.Db
 {
+  /// <summary>
+  /// SelectにおいてTableを表現するオブジェクト。メタ情報としてカラムや他テーブルとの関連情報を保持し、SELECTにセットする。
+  /// またテーブルに付与されたエイリアス名を保持し、Recordに必要なカラム名のエイリアス生成も行う。
+  /// </summary>
   public abstract class Table
   {
     public class Relation
