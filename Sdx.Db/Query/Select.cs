@@ -57,9 +57,7 @@ namespace Sdx.Db.Query
       {
         con.Open();
         command.Connection = con;
-        Console.WriteLine(command.CommandText);
         var reader = command.ExecuteReader();
-        var schemaTable = reader.GetSchemaTable();
         while (reader.Read())
         {
           var row = new Dictionary<string, object>();
