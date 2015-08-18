@@ -44,6 +44,7 @@ namespace UnitTest
       select.Limit = 1;
 
       var shops = select.Execute<Test.Orm.Shop>("shop");
+      Assert.Equal(1, shops.Count);
       shops.ForEach(shop =>
       {
         Assert.Equal("1", shop.GetString("id"));

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 
 using Sdx.Db.Query;
 
@@ -10,38 +11,63 @@ namespace Sdx.Db
     private List<T> results = new List<T>();
     private Dictionary<string, T> resultDic = new Dictionary<string, T>();
 
+    internal void Build(DbDataReader reader, Select select, string contextName)
+    {
+      Table table = select.Context(contextName).Table;
+      var pkeys = table.TableMeta.Pkeys;
+      if (pkeys == null)
+      {
+        throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
+      }
+
+      while (reader.Read())
+      {
+        var row = new Dictionary<string, object>();
+        for (var i = 0; i < reader.FieldCount; i++)
+        {
+          row[reader.GetName(i)] = reader.GetValue(i);
+        }
+
+        this.BuildResults(select, row, pkeys, contextName);
+      }
+    }
+
     internal void Build(List<Dictionary<string, object>> list, Select select, string contextName)
     {
       Table table = select.Context(contextName).Table;
+      var pkeys = table.TableMeta.Pkeys;
+      if (pkeys == null)
+      {
+        throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
+      }
 
       list.ForEach(row => {
-        var pkeys = table.TableMeta.Pkeys;
-        if (pkeys == null)
-        {
-          throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
-        }
-
-        var key = this.buildUniqueKey(row, pkeys, contextName);
-        T result;
-        if (!this.resultDic.ContainsKey(key))
-        {
-          result = new T();
-          result.ContextName = contextName;
-          result.Select = select;
-          this.results.Add(result);
-          this.resultDic[key] = result;
-        }
-        else
-        {
-          result = this.resultDic[key];
-        }
-
-        result.AddRow(row);
-
+        this.BuildResults(select, row, pkeys, contextName);
       });
     }
 
-    private string buildUniqueKey(Dictionary<string, object> row, List<string> pkeys, string contextName)
+    private void BuildResults(Select select, Dictionary<string, object>  row, List<string> pkeys, string contextName)
+    {
+      var key = this.BuildUniqueKey(row, pkeys, contextName);
+      T result;
+      if (!this.resultDic.ContainsKey(key))
+      {
+        result = new T();
+        result.ContextName = contextName;
+        result.Select = select;
+        this.results.Add(result);
+        this.resultDic[key] = result;
+      }
+      else
+      {
+        result = this.resultDic[key];
+      }
+
+      result.AddRow(row);
+    }
+
+
+    private string BuildUniqueKey(Dictionary<string, object> row, List<string> pkeys, string contextName)
     {
       var key = "";
 

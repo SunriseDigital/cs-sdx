@@ -51,27 +51,15 @@ namespace Sdx.Db.Query
       var command = this.Build();
 
       //TODO adapterに移動
-      //まずはListを生成
-      var list = new List<Dictionary<string, object>>();
+      var resultSet = new RecordSet<T>();
       using (var con = this.Adapter.CreateConnection())
       {
         con.Open();
         command.Connection = con;
         var reader = command.ExecuteReader();
-        while (reader.Read())
-        {
-          var row = new Dictionary<string, object>();
-          for (var i = 0; i < reader.FieldCount; i++)
-          {
-            row[reader.GetName(i)] = reader.GetValue(i);
-          }
-
-          list.Add(row);
-        }
+        resultSet.Build(reader, this, contextName);
       }
 
-      var resultSet = new RecordSet<T>();
-      resultSet.Build(list, this, contextName);
       return resultSet;
     }
 
