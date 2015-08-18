@@ -46,6 +46,15 @@ namespace Sdx.Db.Query
       get { return this.orders; }
     }
 
+    /// <summary>
+    /// SQLを実行しRecordSetを生成して返します。
+    /// </summary>
+    /// <typeparam name="T">Recordのクラスを指定</typeparam>
+    /// <param name="contextName">
+    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
+    /// 結果のレコードセットは一つのテーブル<T>に関連づくので必須になります。
+    /// </param>
+    /// <returns></returns>
     public RecordSet<T> Execute<T>(string contextName) where T : Record, new()
     {
       var command = this.Build();
