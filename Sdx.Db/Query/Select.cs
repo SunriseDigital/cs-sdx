@@ -52,14 +52,31 @@ namespace Sdx.Db.Query
     /// <typeparam name="T">Recordのクラスを指定</typeparam>
     /// <param name="contextName">
     /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
-    /// 結果のレコードセットは一つのテーブル<T>に関連づくので必須になります。
+    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> Execute<T>(string contextName) where T : Record, new()
+    public RecordSet<T> Execute<T>(string contextName = null) where T : Record, new()
     {
       var command = this.Build();
 
-      //TODO adapterに移動
+      if (contextName == null)
+      {
+        var prop = typeof(T).GetProperty("Meta");
+        if (prop == null)
+        {
+          throw new NotImplementedException("Missing Meta property in " + typeof(T));
+        }
+
+        var meta = prop.GetValue(null, null) as TableMeta;
+        if (meta == null)
+        {
+          throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
+        }
+
+        contextName = meta.Name;
+      }
+
+      //TODO 問い合わせの処理はログを残したいのでadapterに移動
       var resultSet = new RecordSet<T>();
       using (var con = this.Adapter.CreateConnection())
       {

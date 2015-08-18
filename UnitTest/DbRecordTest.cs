@@ -43,7 +43,7 @@ namespace UnitTest
          .AddOrder("id", Sdx.Db.Query.Order.ASC);
       select.Limit = 1;
 
-      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shops = select.Execute<Test.Orm.Shop>();
       Assert.Equal(1, shops.Count);
       shops.ForEach(shop =>
       {
@@ -76,7 +76,7 @@ namespace UnitTest
          ;
       select.Limit = 2;
 
-      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shops = select.Execute<Test.Orm.Shop>();
       Assert.Equal(2, shops.Count);
 
       Assert.Equal("1", shops[0].GetString("id"));
@@ -125,7 +125,7 @@ namespace UnitTest
       select.Context("shop")
           .Where.Add("name", "天府舫");
 
-      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shops = select.Execute<Test.Orm.Shop>();
 
       Assert.Equal(1, shops.Count);
       Assert.Equal("天府舫", shops[0].GetString("name"));
@@ -162,7 +162,7 @@ namespace UnitTest
       select.Context("shop_category").InnerJoin(new Test.Orm.Table.Category())
         .AddOrder("id", Sdx.Db.Query.Order.ASC);
 
-      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shops = select.Execute<Test.Orm.Shop>();
 
       Assert.Equal(2, shops.Count);
 
@@ -200,7 +200,7 @@ namespace UnitTest
 
       select.Limit = 1;
 
-      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shops = select.Execute<Test.Orm.Shop>();
       var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area");
       Assert.Equal(1, areaSet.Count);
       Assert.Equal("新中野", areaSet[0].GetString("name"));
@@ -230,7 +230,7 @@ namespace UnitTest
          .Where.Add("name", "天府舫")
          ;
 
-      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shops = select.Execute<Test.Orm.Shop>();
       var menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
         "menu",
         sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Query.Order.ASC); }
@@ -272,7 +272,7 @@ namespace UnitTest
          .Where.Add("name", "Freeve")
          ;
 
-      var shops = select.Execute<Test.Orm.Shop>("shop");
+      var shops = select.Execute<Test.Orm.Shop>();
       var shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
         "shop_category",
         sel => { sel.AddOrder("category_id", Sdx.Db.Query.Order.ASC); }
