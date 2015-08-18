@@ -74,6 +74,7 @@
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Orm\LargeArea.cs" />
     <Compile Include="Test\Orm\Category.cs" />
+    <Compile Include="Test\Orm\Image.cs" />
     <Compile Include="Test\Orm\ShopCategory.cs" />
     <Compile Include="Test\Orm\Menu.cs" />
     <Compile Include="Test\Orm\Table\ShopCategory.cs" />

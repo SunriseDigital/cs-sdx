@@ -7,5 +7,11 @@ namespace Test.Orm
 {
   public class Area : Sdx.Db.Record
   {
+    public static Sdx.Db.TableMeta Meta { get; private set; }
+
+    static Area()
+    {
+      Meta = Test.Orm.Table.Area.Meta;
+    }
   }
 }

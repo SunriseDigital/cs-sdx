@@ -10,18 +10,18 @@ namespace Test.Orm.Table
     static Category()
     {
       Meta = new Sdx.Db.TableMeta(
-        name: "category",
-        pkeys: new List<string>()
+        "category",
+        new List<string>()
         {
           "id"
         },
-        columns: new List<string>()
+        new List<string>()
         {
           "id",
           "name",
           "code",
         },
-        relations: new Dictionary<string, Relation>()
+        new Dictionary<string, Relation>()
         {
           {
             "shop_category",
@@ -31,7 +31,9 @@ namespace Test.Orm.Table
               "category_id"
             )
           }
-        }
+        },
+        typeof(Test.Orm.Category),
+        typeof(Test.Orm.Table.Category)
       );
     }
   }

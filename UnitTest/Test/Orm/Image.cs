@@ -5,13 +5,14 @@ using System.Text;
 
 namespace Test.Orm
 {
-  public class ShopCategory : Sdx.Db.Record
+  public class Image : Sdx.Db.Record
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 
-    static ShopCategory()
+    static Image()
     {
-      Meta = Test.Orm.Table.ShopCategory.Meta;
+      Meta = Test.Orm.Table.Image.Meta;
     }
   }
 }
+      

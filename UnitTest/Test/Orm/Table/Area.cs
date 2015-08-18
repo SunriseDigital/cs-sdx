@@ -10,19 +10,19 @@ namespace Test.Orm.Table
     static Area()
     {
       Meta = new Sdx.Db.TableMeta(
-        name: "area",
-        pkeys: new List<string>()
+        "area",
+        new List<string>()
         {
           "id"
         },
-        columns: new List<string>()
+        new List<string>()
         {
           "id",
           "name",
           "code",
           "large_area_id"
         },
-        relations: new Dictionary<string, Relation>()
+        new Dictionary<string, Relation>()
         {
           {
             "large_area",
@@ -32,7 +32,9 @@ namespace Test.Orm.Table
               "id"
             )
           }
-        }
+        },
+        typeof(Test.Orm.Area),
+        typeof(Test.Orm.Table.Area)
       );
     }
   }

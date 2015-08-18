@@ -10,17 +10,19 @@ namespace Test.Orm.Table
     static Image()
     {
       Meta = new Sdx.Db.TableMeta(
-        name: "image",
-        pkeys: new List<string>(),
-        columns: new List<string>()
+        "image",
+        new List<string>(),
+        new List<string>()
         {
           "id",
           "path"
         },
-        relations: new Dictionary<string, Relation>()
+        new Dictionary<string, Relation>()
         {
 
-        }
+        },
+        typeof(Test.Orm.Image),
+        typeof(Test.Orm.Table.Image)
       );
     }
   }

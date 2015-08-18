@@ -10,18 +10,18 @@ namespace Test.Orm.Table
     static Menu()
     {
       Meta = new Sdx.Db.TableMeta(
-        name: "menu",
-        pkeys: new List<string>()
+        "menu",
+        new List<string>()
         {
           "id"
         },
-        columns: new List<string>()
+        new List<string>()
         {
           "id",
           "name",
           "shop_id"
         },
-        relations: new Dictionary<string, Relation>()
+        new Dictionary<string, Relation>()
         {
           {
             "shop",
@@ -31,7 +31,9 @@ namespace Test.Orm.Table
               "id"
             )
           }
-        }
+        },
+        typeof(Test.Orm.Menu),
+        typeof(Test.Orm.Table.Menu)
       );
     }
   }
