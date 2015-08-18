@@ -153,10 +153,8 @@ namespace UnitTest
 
       select.AddFrom(new Test.Orm.Table.Shop())
         .AddOrder("id", Sdx.Db.Query.Order.ASC)
-        .Where.Add("name", new List<string>() { "Terra Blue", "Freeve" })
-         ;
-
-      select.Context("shop").InnerJoin(new Test.Orm.Table.ShopCategory())
+        .Where.Add("name", new List<string>() { "Terra Blue", "Freeve" }).Context
+        .InnerJoin(new Test.Orm.Table.ShopCategory())
          ;
 
       select.Context("shop_category").InnerJoin(new Test.Orm.Table.Category())

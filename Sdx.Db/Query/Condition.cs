@@ -44,7 +44,7 @@ namespace Sdx.Db.Query
 
       internal bool EnableBracket { get; set; }
 
-      internal Context Context { get; set; }
+      public Context Context { get; internal set; }
 
       public Condition AddOr(Condition condition)
       {
