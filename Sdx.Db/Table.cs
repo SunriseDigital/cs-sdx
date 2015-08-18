@@ -7,14 +7,14 @@ namespace Sdx.Db
   {
     public class Relation
     {
-      public Relation(Table table, string foreignKey, string referenceKey)
+      public Relation(Type tableType, string foreignKey, string referenceKey)
       {
-        this.Table = table;
+        this.TableType = tableType;
         this.ForeignKey = foreignKey;
         this.ReferenceKey = referenceKey;
       }
 
-      public Table Table { get; private set; }
+      public Type TableType { get; private set; }
       public string ForeignKey { get; private set; }
       public string ReferenceKey { get; private set; }
       public string JoinCondition

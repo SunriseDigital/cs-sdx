@@ -5,7 +5,7 @@ namespace Test.Orm.Table
 {
   class Menu : Sdx.Db.Table
   {
-    public static new Sdx.Db.TableMeta Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static Menu()
     {
@@ -27,7 +27,7 @@ namespace Test.Orm.Table
           {
             "shop",
             new Relation(
-              new Test.Orm.Table.Shop(),
+              typeof(Test.Orm.Table.Shop),
               "shop_id",
               "id"
             )

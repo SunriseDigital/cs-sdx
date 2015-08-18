@@ -5,7 +5,7 @@ namespace Test.Orm.Table
 {
   class Area : Sdx.Db.Table
   {
-    public static new Sdx.Db.TableMeta Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static Area()
     {
@@ -28,7 +28,7 @@ namespace Test.Orm.Table
           {
             "large_area",
             new Relation(
-              new Test.Orm.Table.LargeArea(),
+              typeof(Test.Orm.Table.LargeArea),
               "large_area_id",
               "id"
             )

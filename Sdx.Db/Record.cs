@@ -57,7 +57,7 @@ namespace Sdx.Db
           var relations = table.TableMeta.Relations[contextName];
           var db = this.select.Adapter;
           var select = db.CreateSelect();
-          select.AddFrom(relations.Table)
+          select.AddFrom((Table)Activator.CreateInstance(relations.TableType))
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
           if (selectHook != null)

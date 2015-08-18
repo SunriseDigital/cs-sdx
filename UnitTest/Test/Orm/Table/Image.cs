@@ -5,7 +5,7 @@ namespace Test.Orm.Table
 {
   class Image : Sdx.Db.Table
   {
-    public static new Sdx.Db.TableMeta Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static Image()
     {

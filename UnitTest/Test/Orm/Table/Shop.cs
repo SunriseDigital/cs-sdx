@@ -5,7 +5,7 @@ namespace Test.Orm.Table
 {
   class Shop : Sdx.Db.Table
   {
-    public static new Sdx.Db.TableMeta Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static Shop()
     {
@@ -29,7 +29,7 @@ namespace Test.Orm.Table
           {
             "area",
             new Relation(
-              new Test.Orm.Table.Area(),
+              typeof(Test.Orm.Table.Area),
               "area_id",
               "id"
             )
@@ -37,7 +37,7 @@ namespace Test.Orm.Table
           {
             "main_image",
             new Relation(
-              new Test.Orm.Table.Image(),
+              typeof(Test.Orm.Table.Image),
               "main_image_id",
               "id"
             )
@@ -45,7 +45,7 @@ namespace Test.Orm.Table
           {
             "sub_image",
             new Relation(
-              new Test.Orm.Table.Image(),
+              typeof(Test.Orm.Table.Image),
               "sub_image_id",
               "id"
             )
@@ -53,7 +53,7 @@ namespace Test.Orm.Table
           {
             "menu",
             new Relation(
-              new Test.Orm.Table.Menu(),
+              typeof(Test.Orm.Table.Menu),
               "id",
               "shop_id"
             )
@@ -61,7 +61,7 @@ namespace Test.Orm.Table
           {
             "shop_category",
             new Relation(
-              new Test.Orm.Table.ShopCategory(),
+              typeof(Test.Orm.Table.ShopCategory),
               "id",
               "shop_id"
             )
