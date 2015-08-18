@@ -12,7 +12,7 @@ namespace Sdx.Db
     public MetaData(
       string name,
       List<string> pkeys,
-      List<string> columns,
+      List<Table.Column> columns,
       Dictionary<string, Sdx.Db.Table.Relation> relations,
       Type recordType,
       Type tableType
@@ -37,7 +37,7 @@ namespace Sdx.Db
 
     public string Name { get; private set; }
     public List<string> Pkeys { get; private set; }
-    public List<string> Columns { get; private set; }
+    public List<Table.Column> Columns { get; private set; }
     public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; private set; }
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }

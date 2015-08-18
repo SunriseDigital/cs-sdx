@@ -15,12 +15,12 @@ namespace Test.Orm.Table
         {
           "id"
         },
-        new List<string>()
+        new List<Column>()
         {
-          "id",
-          "name",
-          "code",
-          "large_area_id"
+          new Column("id"),
+          new Column("name"),
+          new Column("code"),
+          new Column("large_area_id"),
         },
         new Dictionary<string, Relation>()
         {

@@ -16,10 +16,10 @@ namespace Test.Orm.Table
           "shop_id",
           "category_id"
         },
-        new List<string>()
+        new List<Column>()
         {
-          "shop_id",
-          "category_id"
+          new Column("shop_id"),
+          new Column("category_id"),
         },
         new Dictionary<string, Relation>()
         {

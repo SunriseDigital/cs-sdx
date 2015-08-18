@@ -15,11 +15,11 @@ namespace Test.Orm.Table
         {
           "id"
         },
-        new List<string>()
+        new List<Column>()
         {
-          "id",
-          "name",
-          "shop_id"
+          new Column("id"),
+          new Column("name"),
+          new Column("shop_id"),
         },
         new Dictionary<string, Relation>()
         {

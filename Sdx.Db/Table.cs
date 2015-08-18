@@ -30,6 +30,16 @@ namespace Sdx.Db
       }
     }
 
+    public class Column
+    {
+      public Column(string name)
+      {
+        this.Name = name;
+      }
+
+      public string Name { get; private set; }
+    }
+
     public Adapter Adapter { get; set; }
     private Query.Select select;
 
@@ -102,9 +112,9 @@ namespace Sdx.Db
       set
       {
         this.select = value;
-        this.OwnMeta.Columns.ForEach(columnName =>
+        this.OwnMeta.Columns.ForEach(column =>
         {
-          this.AddColumn(columnName);
+          this.AddColumn(column.Name);
         });
       }
     }
