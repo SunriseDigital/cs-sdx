@@ -7,7 +7,7 @@ namespace Test.Orm
 {
   public class LargeArea : Sdx.Db.Record
   {
-    public static Sdx.Db.TableMeta Meta { get; private set; }
+    public static Sdx.Db.MetaData Meta { get; private set; }
 
     static LargeArea()
     {

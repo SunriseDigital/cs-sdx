@@ -14,7 +14,7 @@ namespace Sdx.Db
     internal void Build(DbDataReader reader, Select select, string contextName)
     {
       Table table = select.Context(contextName).Table;
-      var pkeys = table.TableMeta.Pkeys;
+      var pkeys = table.OwnMeta.Pkeys;
       if (pkeys == null)
       {
         throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
@@ -35,7 +35,7 @@ namespace Sdx.Db
     internal void Build(List<Dictionary<string, object>> list, Select select, string contextName)
     {
       Table table = select.Context(contextName).Table;
-      var pkeys = table.TableMeta.Pkeys;
+      var pkeys = table.OwnMeta.Pkeys;
       if (pkeys == null)
       {
         throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");

@@ -28,6 +28,26 @@ namespace Sdx.Db
       }
     }
 
+    public MetaData OwnMeta
+    {
+      get
+      {
+        var prop = this.GetType().GetProperty("Meta");
+        if (prop == null)
+        {
+          throw new NotImplementedException("Missing Meta property in " + this.GetType());
+        }
+
+        var meta = prop.GetValue(null, null) as MetaData;
+        if (meta == null)
+        {
+          throw new NotImplementedException("Initialize TableMeta for " + this.GetType());
+        }
+
+        return meta;
+      }
+    }
+
     public string GetString(string key)
     {
       // TODO Implements for missing ContextName.
@@ -52,9 +72,9 @@ namespace Sdx.Db
       else
       {
         var table = this.select.Context(this.ContextName).Table;
-        if (table.TableMeta.Relations.ContainsKey(contextName))
+        if (table.OwnMeta.Relations.ContainsKey(contextName))
         {
-          var relations = table.TableMeta.Relations[contextName];
+          var relations = table.OwnMeta.Relations[contextName];
           var db = this.select.Adapter;
           var select = db.CreateSelect();
           select.AddFrom((Table)Activator.CreateInstance(relations.TableType))

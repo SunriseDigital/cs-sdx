@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Web", "Sdx.Web\Sdx.Web.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Diagnostics", "Sdx.Diagnostics\Sdx.Diagnostics.csproj", "{E015CB03-532E-4789-BAC5-E6542AED9F14}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx", "Sdx\Sdx.csproj", "{6D96E419-E1CB-4E22-9004-58949F8E2DD2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,6 +52,12 @@ Global
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.TravisCI|Any CPU.ActiveCfg = TravisCI|Any CPU
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.TravisCI|Any CPU.Build.0 = TravisCI|Any CPU
+		{6D96E419-E1CB-4E22-9004-58949F8E2DD2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D96E419-E1CB-4E22-9004-58949F8E2DD2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D96E419-E1CB-4E22-9004-58949F8E2DD2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D96E419-E1CB-4E22-9004-58949F8E2DD2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D96E419-E1CB-4E22-9004-58949F8E2DD2}.TravisCI|Any CPU.ActiveCfg = Release|Any CPU
+		{6D96E419-E1CB-4E22-9004-58949F8E2DD2}.TravisCI|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

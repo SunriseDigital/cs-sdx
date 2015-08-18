@@ -65,7 +65,7 @@
     <Compile Include="SqlServerAdapter.cs" />
     <Compile Include="Query\Context.cs" />
     <Compile Include="Table.cs" />
-    <Compile Include="TableMeta.cs" />
+    <Compile Include="MetaData.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="Query\Condition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -74,6 +74,10 @@
     <ProjectReference Include="..\Sdx.Util\Sdx.Util.csproj">
       <Project>{814a034d-4cdd-4de6-9aa3-6ff1431ed11c}</Project>
       <Name>Sdx.Util</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sdx\Sdx.csproj">
+      <Project>{6d96e419-e1cb-4e22-9004-58949f8e2dd2}</Project>
+      <Name>Sdx</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

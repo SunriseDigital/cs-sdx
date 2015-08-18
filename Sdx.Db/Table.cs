@@ -33,24 +33,23 @@ namespace Sdx.Db
     public Adapter Adapter { get; set; }
     private Query.Select select;
 
-    public TableMeta TableMeta
+    public MetaData OwnMeta
     {
       get
       {
         var prop = this.GetType().GetProperty("Meta");
         if (prop == null)
         {
-          throw new Exception("You must declare Meta property");
+          throw new NotImplementedException("Missing Meta property in " + this.GetType());
         }
 
-        var tableMeta = prop.GetValue(null, null) as TableMeta;
-
-        if(tableMeta == null)
+        var meta = prop.GetValue(null, null) as MetaData;
+        if (meta == null)
         {
-          throw new Exception("You must initialize Table Meta");
+          throw new NotImplementedException("Initialize TableMeta for " + this.GetType());
         }
 
-        return tableMeta;
+        return meta;
       }
     }
 
@@ -103,7 +102,7 @@ namespace Sdx.Db
       set
       {
         this.select = value;
-        this.TableMeta.Columns.ForEach(columnName =>
+        this.OwnMeta.Columns.ForEach(columnName =>
         {
           this.AddColumn(columnName);
         });

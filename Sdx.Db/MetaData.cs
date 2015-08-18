@@ -7,9 +7,9 @@ namespace Sdx.Db
   /// テーブルの名前や保持するカラム、他テーブルとの関係といったテーブルの情報を保持するクラス。
   /// 各Tableクラスのstaticなプロパティ、Metaに保持され、普遍なので複数生成する必要のないクラス。
   /// </summary>
-  public class TableMeta
+  public class MetaData
   {
-    public TableMeta(
+    public MetaData(
       string name,
       List<string> pkeys,
       List<string> columns,
@@ -21,7 +21,17 @@ namespace Sdx.Db
       this.Pkeys = pkeys;
       this.Columns = columns;
       this.Relations = relations;
+
+      if (!typeof(Sdx.Db.Record).IsAssignableFrom(recordType))
+      {
+        throw new InvalidTypeException(recordType + " is not Sdx.Db.Record subclass");
+      }
       this.RecordType = recordType;
+
+      if (!typeof(Sdx.Db.Table).IsAssignableFrom(tableType))
+      {
+        throw new InvalidTypeException(tableType + "is not Sdx.Db.Table subclass");
+      }
       this.TableType = tableType;
     }
 

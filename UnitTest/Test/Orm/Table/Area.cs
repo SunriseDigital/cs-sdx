@@ -5,11 +5,11 @@ namespace Test.Orm.Table
 {
   class Area : Sdx.Db.Table
   {
-    public static Sdx.Db.TableMeta Meta { get; private set; }
+    public static Sdx.Db.MetaData Meta { get; private set; }
 
     static Area()
     {
-      Meta = new Sdx.Db.TableMeta(
+      Meta = new Sdx.Db.MetaData(
         "area",
         new List<string>()
         {

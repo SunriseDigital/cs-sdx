@@ -67,7 +67,7 @@ namespace Sdx.Db.Query
           throw new NotImplementedException("Missing Meta property in " + typeof(T));
         }
 
-        var meta = prop.GetValue(null, null) as TableMeta;
+        var meta = prop.GetValue(null, null) as MetaData;
         if (meta == null)
         {
           throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
@@ -101,7 +101,7 @@ namespace Sdx.Db.Query
     /// </summary>
     public Context AddFrom(Sdx.Db.Table target, string alias = null)
     {
-      var context = this.CreateContext(target.TableMeta.Name, alias);
+      var context = this.CreateContext(target.OwnMeta.Name, alias);
       context.Table = target;
       target.ContextName = context.Name;
       target.Select = this;
