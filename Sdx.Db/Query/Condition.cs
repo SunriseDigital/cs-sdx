@@ -26,15 +26,6 @@ namespace Sdx.Db.Query
     private List<Holder> wheres = new List<Holder>();
     private List<Condition> childConditions = new List<Condition>();
 
-    public Condition(string baseCond)
-    {
-      this.Base = baseCond;
-    }
-
-    public Condition()
-    {
-
-    }
 
     internal int Count
     {
@@ -225,11 +216,6 @@ namespace Sdx.Db.Query
     {
       string whereString = "";
 
-      if (this.Base != null)
-      {
-        whereString = this.Base;
-      }
-
       wheres.ForEach(holder =>
       {
         if (whereString.Length > 0)
@@ -322,8 +308,6 @@ namespace Sdx.Db.Query
         rightHand
         );
     }
-
-    public string Base { get; set; }
 
     public Condition Add(Column left, object right, Comparison comparison = Comparison.Equal)
     {
