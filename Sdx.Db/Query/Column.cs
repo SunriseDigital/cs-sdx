@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Db.Query
 {
-  internal class Column
+  public class Column
   {
     private object name;
 
@@ -31,6 +31,11 @@ namespace Sdx.Db.Query
       {
         throw new Exception("columnName support only Sdx.Db.Query.Expr or string, " + columnName.GetType() + " given.");
       }
+    }
+
+    public Column(object columnName, string contextName) : this(columnName)
+    {
+      this.ContextName = contextName;
     }
 
     public string Alias { get; set; }
