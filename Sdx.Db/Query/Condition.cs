@@ -7,18 +7,12 @@ namespace Sdx.Db.Query
 {
   public class Condition
   {
-    private enum TableDetectMode
-    {
-      Column, //Sdx.Db.Query.Column.Context
-    }
-
     private class Holder
     {
       public Comparison Comparison { get; set; }
       public Logical Logical { get; set; }
       public Column Column { get; set; }
       public object Value { get; set; }
-      public TableDetectMode TableDetectMode { get; set; }
     }
 
     private List<Holder> wheres = new List<Holder>();
@@ -42,13 +36,13 @@ namespace Sdx.Db.Query
 
     public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
+      this.AddWithColumn(column, value, Logical.Or, comparison);
       return this;
     }
 
     public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Column);
+      this.AddWithColumn(column, value, Logical.Or, comparison);
       return this;
     }
 
@@ -60,37 +54,37 @@ namespace Sdx.Db.Query
 
     public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+      this.AddWithColumn(column, value, Logical.And, comparison);
       return this;
     }
 
     public Condition Add(Expr column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Column);
+      this.AddWithColumn(column, value, Logical.And, comparison);
       return this;
     }
 
     public Condition AddIsNull(string column)
     {
-      this.AddWithColumn(column, null, Logical.And, Comparison.IsNull, TableDetectMode.Column);
+      this.AddWithColumn(column, null, Logical.And, Comparison.IsNull);
       return this;
     }
 
     public Condition AddIsNotNullOr(string column)
     {
-      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNotNull, TableDetectMode.Column);
+      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNotNull);
       return this;
     }
 
     public Condition AddIsNotNull(string column)
     {
-      this.AddWithColumn(column, null, Logical.And, Comparison.IsNotNull, TableDetectMode.Column);
+      this.AddWithColumn(column, null, Logical.And, Comparison.IsNotNull);
       return this;
     }
 
     public Condition AddIsNullOr(string column)
     {
-      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNull, TableDetectMode.Column);
+      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNull);
       return this;
     }
 
@@ -124,14 +118,14 @@ namespace Sdx.Db.Query
       });
     }
 
-    private void AddWithColumn(Object columnName, Object value, Logical logical, Comparison comparison, TableDetectMode mode)
+    private void AddWithColumn(Object columnName, Object value, Logical logical, Comparison comparison)
     {
       Column column;
       if (!(columnName is Column))
       {
         column = new Column(columnName);
 
-        if (mode == TableDetectMode.Column && this.Context != null)
+        if (this.Context != null)
         {
           column.ContextName = this.Context.Name;
         }
@@ -147,7 +141,6 @@ namespace Sdx.Db.Query
         Logical = logical,
         Comparison = comparison,
         Value = value,
-        TableDetectMode = mode
       });
     }
 
@@ -252,13 +245,13 @@ namespace Sdx.Db.Query
 
     public Condition Add(Column left, object right, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(left, right, Logical.And, comparison, TableDetectMode.Column);
+      this.AddWithColumn(left, right, Logical.And, comparison);
       return this;
     }
 
     public Condition AddOr(Column left, object right, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(left, right, Logical.Or, comparison, TableDetectMode.Column);
+      this.AddWithColumn(left, right, Logical.Or, comparison);
       return this;
     }
   }
