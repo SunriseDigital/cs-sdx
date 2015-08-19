@@ -125,7 +125,7 @@ namespace UnitTest
             .Add(
               new Sdx.Db.Query.Column("area_id", "shop"),
               new Sdx.Db.Query.Column("id", "area")
-            ).AddRight("id", "3")
+            ).Add(new Sdx.Db.Query.Column("id", "area"), "3")
         );
 
       //conditionの上書き

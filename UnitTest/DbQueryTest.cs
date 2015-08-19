@@ -1322,8 +1322,8 @@ namespace UnitTest
               new Sdx.Db.Query.Column("id", "area")
             ).Add(
               db.Adapter.CreateCondition()
-                .AddRight("id", "1")
-                .AddRightOr("id", "2")
+                .Add(new Sdx.Db.Query.Column("id", "area"), "1")
+                .AddOr(new Sdx.Db.Query.Column("id", "area"), "2")
             )
         )
         .AddColumns("*");
@@ -1347,8 +1347,8 @@ namespace UnitTest
               new Sdx.Db.Query.Column("id", "area")
             ).Add(
               db.Adapter.CreateCondition()
-                .AddLeft("id", "1")
-                .AddLeftOr("id", "2")
+                .Add(new Sdx.Db.Query.Column("id", "shop"), "1")
+                .AddOr(new Sdx.Db.Query.Column("id", "shop"), "2")
             )
         )
         .AddColumns("*");

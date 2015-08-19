@@ -10,8 +10,6 @@ namespace Sdx.Db.Query
     private enum TableDetectMode
     {
       Column, //Sdx.Db.Query.Column.Context
-      Left,   //{0}
-      Right,  //{1}
     }
 
     private class Holder
@@ -72,60 +70,6 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Condition AddRight(string column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
-      return this;
-    }
-
-    public Condition AddRight(Expr column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Right);
-      return this;
-    }
-
-    public Condition AddLeft(string column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
-      return this;
-    }
-
-    public Condition AddLeft(Expr column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.And, comparison, TableDetectMode.Left);
-      return this;
-    }
-
-    public Condition AddRightOr(string column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
-      return this;
-    }
-
-    public Condition AddRightOr(Expr column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Right);
-      return this;
-    }
-
-    public Condition AddLeftOr(string column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
-      return this;
-    }
-
-    public Condition AddLeftOr(Expr column, object value, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(column, value, Logical.Or, comparison, TableDetectMode.Left);
-      return this;
-    }
-
-    public Condition AddIsNullOr(string column)
-    {
-      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNull, TableDetectMode.Column);
-      return this;
-    }
-
     public Condition AddIsNull(string column)
     {
       this.AddWithColumn(column, null, Logical.And, Comparison.IsNull, TableDetectMode.Column);
@@ -141,6 +85,12 @@ namespace Sdx.Db.Query
     public Condition AddIsNotNull(string column)
     {
       this.AddWithColumn(column, null, Logical.And, Comparison.IsNotNull, TableDetectMode.Column);
+      return this;
+    }
+
+    public Condition AddIsNullOr(string column)
+    {
+      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNull, TableDetectMode.Column);
       return this;
     }
 
@@ -291,15 +241,6 @@ namespace Sdx.Db.Query
       }
 
       var leftHand = cond.Column.Build(select.Adapter);
-
-      if (cond.TableDetectMode == TableDetectMode.Left)
-      {
-        leftHand = "{0}." + leftHand;
-      }
-      else if (cond.TableDetectMode == TableDetectMode.Right)
-      {
-        leftHand = "{1}." + leftHand;
-      }
 
       return String.Format(
         "{0}{1}{2}",
