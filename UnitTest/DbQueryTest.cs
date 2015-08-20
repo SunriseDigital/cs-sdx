@@ -1075,7 +1075,7 @@ namespace UnitTest
        db.Command.CommandText
       );
 
-      select.Limit = 100;
+      select.SetLimit(100);
       db.Command = select.Build();
 
       this.AssertCommandText(
@@ -1090,8 +1090,7 @@ namespace UnitTest
         db
       );
 
-      select.Limit = 100;
-      select.Offset = 10;
+      select.SetLimit(100, 10);
       db.Command = select.Build();
 
       this.AssertCommandText(

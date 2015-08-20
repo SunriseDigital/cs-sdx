@@ -428,9 +428,17 @@ namespace Sdx.Db.Query
       }
     }
 
-    public int Limit { get; set; }
+    private int Limit { get; set; }
 
-    public int Offset { get; set; }
+    private int Offset { get; set; }
+
+    public Select SetLimit(int limit, int offset = 0)
+    {
+      this.Limit = limit;
+      this.Offset = offset;
+      return this;
+    }
+
 
     /// <summary>
     /// 繰り返しコールすると繰り返し追加します。

@@ -41,7 +41,7 @@ namespace UnitTest
       select
          .AddFrom(tShop)
          .AddOrder("id", Sdx.Db.Query.Order.ASC);
-      select.Limit = 1;
+      select.SetLimit(1);
 
       var shops = select.Execute<Test.Orm.Shop>();
       Assert.Equal(1, shops.Count);
@@ -74,7 +74,7 @@ namespace UnitTest
          .AddOrder("id", Sdx.Db.Query.Order.ASC)
          .InnerJoin(new Test.Orm.Table.Area())
          ;
-      select.Limit = 2;
+      select.SetLimit(2);
 
       var shops = select.Execute<Test.Orm.Shop>();
       Assert.Equal(2, shops.Count);
@@ -196,7 +196,7 @@ namespace UnitTest
          .AddOrder("id", Sdx.Db.Query.Order.ASC)
          ;
 
-      select.Limit = 1;
+      select.SetLimit(1);
 
       var shops = select.Execute<Test.Orm.Shop>();
       var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area");
