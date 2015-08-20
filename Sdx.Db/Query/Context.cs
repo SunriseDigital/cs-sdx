@@ -66,7 +66,11 @@ namespace Sdx.Db.Query
       if(condition == null)
       {
         var relation = this.getRelationFromTable(target, alias);
-        context.JoinCondition = new Condition(relation.JoinCondition);
+        context.JoinCondition = new Condition();
+        context.JoinCondition.Add(
+          new Column(relation.ForeignKey, this.Name),
+          new Column(relation.ReferenceKey, alias == null ? target.OwnMeta.Name : alias)
+        );
       }
 
       context.Table = target;
@@ -87,7 +91,11 @@ namespace Sdx.Db.Query
       if (condition == null)
       {
         var relation = this.getRelationFromTable(target, alias);
-        context.JoinCondition = new Condition(relation.JoinCondition);
+        context.JoinCondition = new Condition();
+        context.JoinCondition.Add(
+          new Column(relation.ForeignKey, this.Name),
+          new Column(relation.ReferenceKey, alias == null ? target.OwnMeta.Name : alias)
+        );
       }
 
       context.Table = target;

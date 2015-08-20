@@ -58,7 +58,6 @@ namespace Sdx.Db.Query
     public RecordSet<T> Execute<T>(string contextName = null) where T : Record, new()
     {
       var command = this.Build();
-
       if (contextName == null)
       {
         var prop = typeof(T).GetProperty("Meta");

@@ -94,7 +94,7 @@ namespace UnitTest
           {0}area{1}.{0}code{1} AS {0}code@area{1},
           {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1}
         FROM {0}shop{1} 
-        INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id"), db.Command.CommandText);
+        INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"), db.Command.CommandText);
 
       //Left
       select = db.Adapter.CreateSelect();
@@ -114,15 +114,18 @@ namespace UnitTest
           {0}area{1}.{0}code{1} AS {0}code@area{1},
           {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1}
         FROM {0}shop{1} 
-        LEFT JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id"), db.Command.CommandText);
+        LEFT JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"), db.Command.CommandText);
 
       select = db.Adapter.CreateSelect();
       select.AddFrom(new Test.Orm.Table.Shop());
       select.Context("shop")
         .InnerJoin(
           new Test.Orm.Table.Area(),
-          db.Adapter.CreateCondition("{0}.area_id = {1}.id")
-            .AddRight("id", "3")
+          db.Adapter.CreateCondition()
+            .Add(
+              new Sdx.Db.Query.Column("area_id", "shop"),
+              new Sdx.Db.Query.Column("id", "area")
+            ).Add(new Sdx.Db.Query.Column("id", "area"), "3")
         );
 
       //conditionの上書き
@@ -139,7 +142,7 @@ namespace UnitTest
           {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1}
         FROM {0}shop{1} 
         INNER JOIN {0}area{1}
-          ON {0}shop{1}.area_id = {0}area{1}.id
+          ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
             AND {0}area{1}.{0}id{1} = @0"), db.Command.CommandText);
 
       Assert.Equal(1, db.Command.Parameters.Count);
@@ -220,10 +223,10 @@ namespace UnitTest
         {0}sub_image{1}.{0}id{1} AS {0}id@sub_image{1},
         {0}sub_image{1}.{0}path{1} AS {0}path@sub_image{1}
         FROM {0}shop{1}
-        INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
-        INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id
-        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.main_image_id = {0}main_image{1}.id
-        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.sub_image_id = {0}sub_image{1}.id"), db.Command.CommandText);
+        INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+        INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}
+        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.{0}main_image_id{1} = {0}main_image{1}.{0}id{1}
+        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.{0}sub_image_id{1} = {0}sub_image{1}.{0}id{1}"), db.Command.CommandText);
 
       select.Context("shop").Where.Add("id", "1");
       db.Command = select.Build();
@@ -245,10 +248,10 @@ namespace UnitTest
         {0}sub_image{1}.{0}id{1} AS {0}id@sub_image{1},
         {0}sub_image{1}.{0}path{1} AS {0}path@sub_image{1}
         FROM {0}shop{1}
-        INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
-        INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id
-        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.main_image_id = {0}main_image{1}.id
-        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.sub_image_id = {0}sub_image{1}.id
+        INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+        INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}
+        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.{0}main_image_id{1} = {0}main_image{1}.{0}id{1}
+        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.{0}sub_image_id{1} = {0}sub_image{1}.{0}id{1}
         WHERE {0}shop{1}.{0}id{1} = @0"), db.Command.CommandText);
 
       Assert.Equal(1, db.Command.Parameters.Count);
@@ -274,10 +277,10 @@ namespace UnitTest
         {0}sub_image{1}.{0}id{1} AS {0}id@sub_image{1},
         {0}sub_image{1}.{0}path{1} AS {0}path@sub_image{1}
         FROM {0}shop{1}
-        INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
-        INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id
-        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.main_image_id = {0}main_image{1}.id
-        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.sub_image_id = {0}sub_image{1}.id
+        INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+        INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}
+        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.{0}main_image_id{1} = {0}main_image{1}.{0}id{1}
+        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.{0}sub_image_id{1} = {0}sub_image{1}.{0}id{1}
         WHERE {0}shop{1}.{0}id{1} = @0
         AND {0}area{1}.{0}code{1} = @1"), db.Command.CommandText);
       Assert.Equal(2, db.Command.Parameters.Count);
@@ -307,10 +310,10 @@ namespace UnitTest
         {0}sub_image{1}.{0}id{1} AS {0}id@sub_image{1},
         {0}sub_image{1}.{0}path{1} AS {0}path@sub_image{1}
         FROM {0}shop{1}
-        INNER JOIN {0}area{1} ON {0}shop{1}.area_id = {0}area{1}.id
-        INNER JOIN {0}large_area{1} ON {0}area{1}.large_area_id = {0}large_area{1}.id
-        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.main_image_id = {0}main_image{1}.id
-        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.sub_image_id = {0}sub_image{1}.id
+        INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+        INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}
+        INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.{0}main_image_id{1} = {0}main_image{1}.{0}id{1}
+        LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.{0}sub_image_id{1} = {0}sub_image{1}.{0}id{1}
         WHERE {0}shop{1}.{0}id{1} = @0
         AND {0}area{1}.{0}code{1} = @1
         AND ({0}sub_image{1}.{0}id{1} = @2 OR {0}sub_image{1}.{0}id{1} IS NULL)"), db.Command.CommandText);
