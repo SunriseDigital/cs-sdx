@@ -2,6 +2,7 @@
 using System.Data.Common;
 using System.Collections.Generic;
 
+
 namespace Sdx.Db
 {
   public abstract class Adapter
@@ -12,7 +13,7 @@ namespace Sdx.Db
     protected abstract DbProviderFactory GetFactory();
 
     public string ConnectionString { get; set; }
-
+    public Profiler Profiler { get; set; }
 
     public Adapter()
     {
@@ -54,6 +55,24 @@ namespace Sdx.Db
     public DbDataAdapter CreateDataAdapter()
     {
       return this.factory.CreateDataAdapter();
+    }
+
+    public DbDataReader ExecuteReader(DbCommand command)
+    {
+      QueryLog query = null;
+      if (this.Profiler != null)
+      {
+        query = this.Profiler.Begin(command);
+      }
+
+      var reader = command.ExecuteReader();
+
+      if (query != null)
+      {
+        query.End();
+      }
+
+      return reader;
     }
 
     public Query.Condition CreateCondition()

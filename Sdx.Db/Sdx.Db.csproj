@@ -53,6 +53,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Profiler.cs" />
+    <Compile Include="QueryLog.cs" />
     <Compile Include="Query\Counter.cs" />
     <Compile Include="Query\Enums.cs" />
     <Compile Include="Query\Expr.cs" />
