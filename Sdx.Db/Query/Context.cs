@@ -140,7 +140,7 @@ namespace Sdx.Db.Query
       return this.AddJoin(target, JoinType.Left, condition, alias);
     }
 
-    internal Context ParentContext { get; private set; }
+    public Context ParentContext { get; private set; }
 
     internal Condition JoinCondition { get; private set; }
 

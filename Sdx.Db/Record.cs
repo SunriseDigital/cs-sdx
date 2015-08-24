@@ -61,6 +61,17 @@ namespace Sdx.Db
       return "";
     }
 
+    public T GetRecord<T>(string contextName) where T : Record, new()
+    {
+      var records = this.GetRecordSet<T>(contextName);
+      if (records.Count == 0)
+      {
+        return null;
+      }
+
+      return records[0];
+    }
+
     public RecordSet<T> GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
     {
       if (selectHook == null && this.select.HasContext(contextName))

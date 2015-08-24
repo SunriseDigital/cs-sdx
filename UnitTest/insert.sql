@@ -32,3 +32,8 @@ INSERT INTO menu (name, shop_id) VALUES ('干し豆腐のサラダ', (SELECT id 
 INSERT INTO menu (name, shop_id) VALUES ('麻婆豆腐', (SELECT id FROM shop WHERE name = '天府舫'));
 INSERT INTO menu (name, shop_id) VALUES ('牛肉の激辛水煮', (SELECT id FROM shop WHERE name = '天府舫'));
 
+INSERT INTO image (path) VALUES ('/freeve/main.jpq'); 
+INSERT INTO image (path) VALUES ('/freeve/sub.jpq'); 
+
+UPDATE shop SET main_image_id = (SELECT id FROM image WHERE path = '/freeve/main.jpq') WHERE shop.name = 'Freeve';
+UPDATE shop SET sub_image_id = (SELECT id FROM image WHERE path = '/freeve/sub.jpq') WHERE shop.name = 'Freeve';

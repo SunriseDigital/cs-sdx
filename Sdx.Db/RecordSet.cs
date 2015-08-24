@@ -41,6 +41,11 @@ namespace Sdx.Db
         throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
       }
 
+      if (pkeys.Count == 0)
+      {
+        throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
+      }
+
       list.ForEach(row => {
         this.BuildResults(select, row, pkeys, contextName);
       });
@@ -48,6 +53,22 @@ namespace Sdx.Db
 
     private void BuildResults(Select select, Dictionary<string, object>  row, List<string> pkeys, string contextName)
     {
+      //対象テーブルの主キーがNULLの場合（LEFTJOINの時）、関係ない行なのでスルーする
+      var exists = true;
+      pkeys.ForEach(column =>
+      {
+        if(row[column + "@" + contextName] is DBNull)
+        {
+          exists = false;
+          return;
+        }
+      });
+
+      if (!exists)
+      {
+        return;
+      }
+
       var key = this.BuildUniqueKey(row, pkeys, contextName);
       T result;
       if (!this.resultDic.ContainsKey(key))

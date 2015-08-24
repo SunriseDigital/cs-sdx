@@ -161,7 +161,7 @@ namespace UnitTest
 
       select.AddFrom(new Test.Orm.Table.Shop())
         .AddOrder("id", Sdx.Db.Query.Order.ASC)
-        .Where.Add("name", new List<string>() { "Terra Blue", "Freeve" }).Context
+        .Where.Add("name", new List<string>() { "ビーナスラッシュ", "Freeve" }).Context
         .InnerJoin(new Test.Orm.Table.ShopCategory())
          ;
 
@@ -180,7 +180,7 @@ namespace UnitTest
       Assert.Equal("まつげエクステ", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
-      Assert.Equal("Terra Blue", shops[1].GetString("name"));
+      Assert.Equal("ビーナスラッシュ", shops[1].GetString("name"));
       Assert.Equal(2, shops[1].GetRecordSet<Test.Orm.ShopCategory>("shop_category").Count);
       Assert.Equal("ネイルサロン", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
       Assert.Equal("まつげエクステ", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
@@ -317,6 +317,68 @@ namespace UnitTest
       Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
       Assert.Equal("美容室", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
       Assert.Equal(9, db.Adapter.Profiler.Queries.Count);
+    }
+
+    [Fact]
+    public void TestSameTableLeftJoinNotNull()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSameTableLeftJoinNotNull(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSameTableLeftJoinNotNull(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .LeftJoin(new Test.Orm.Table.Image(), "main_image").ParentContext
+         .LeftJoin(new Test.Orm.Table.Image(), "sub_image").ParentContext
+         .Where.Add("name", "Freeve");
+
+      var shops = select.Execute<Test.Orm.Shop>();
+      Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
+
+      Assert.Equal(1, shops.Count);
+
+      Assert.Equal("/freeve/main.jpq", shops[0].GetRecord<Test.Orm.Image>("main_image").GetString("path"));
+      Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
+
+      Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord<Test.Orm.Image>("sub_image").GetString("path"));
+      Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
+    }
+
+    [Fact]
+    public void TestSameTableLeftJoinNull()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSameTableLeftJoinNull(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSameTableLeftJoinNull(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .LeftJoin(new Test.Orm.Table.Image(), "main_image").ParentContext
+         .LeftJoin(new Test.Orm.Table.Image(), "sub_image").ParentContext
+         .Where.Add("name", "ビーナスラッシュ");
+
+      var shops = select.Execute<Test.Orm.Shop>();
+      Assert.Equal(1, shops.Count);
+
+      Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image"));
+      Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
+
+      Assert.Null(shops[0].GetRecord<Test.Orm.Image>("sub_image"));
+      Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
     }
   }
 }

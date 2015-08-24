@@ -11,7 +11,10 @@ namespace Test.Orm.Table
     {
       Meta = new Sdx.Db.MetaData(
         "image",
-        new List<string>(),
+        new List<string>()
+        {
+          "id"
+        },
         new List<Column>()
         {
           new Column("id"),
