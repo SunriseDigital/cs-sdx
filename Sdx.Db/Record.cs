@@ -88,14 +88,14 @@ namespace Sdx.Db
           var relations = table.OwnMeta.Relations[contextName];
           var db = this.select.Adapter;
           var select = db.CreateSelect();
-          select.AddFrom((Table)Activator.CreateInstance(relations.TableType))
+          select.AddFrom((Table)Activator.CreateInstance(relations.TableType), contextName)
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
           if (selectHook != null)
           {
             selectHook.Invoke(select);
           }
-
+          
           return select.Execute<T>(contextName);
         }
 

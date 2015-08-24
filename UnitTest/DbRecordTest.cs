@@ -380,5 +380,63 @@ namespace UnitTest
       Assert.Null(shops[0].GetRecord<Test.Orm.Image>("sub_image"));
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
     }
+
+    [Fact]
+    public void TestSameTableNoJoinNotNull()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSameTableNoJoinNotNull(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSameTableNoJoinNotNull(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .Where.Add("name", "Freeve");
+
+      var shops = select.Execute<Test.Orm.Shop>();
+      Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
+
+      Assert.Equal(1, shops.Count);
+
+      Assert.Equal("/freeve/main.jpq", shops[0].GetRecord<Test.Orm.Image>("main_image").GetString("path"));
+      Assert.Equal(2, db.Adapter.Profiler.Queries.Count);
+
+      Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord<Test.Orm.Image>("sub_image").GetString("path"));
+      Assert.Equal(3, db.Adapter.Profiler.Queries.Count);
+    }
+
+    [Fact]
+    public void TestSameTableNoJoinNull()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSameTableNoJoinNull(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSameTableNoJoinNull(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .Where.Add("name", "ビーナスラッシュ");
+
+      var shops = select.Execute<Test.Orm.Shop>();
+      Assert.Equal(1, shops.Count);
+
+      Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image"));
+      Assert.Equal(2, db.Adapter.Profiler.Queries.Count);
+
+      Assert.Null(shops[0].GetRecord<Test.Orm.Image>("sub_image"));
+      Assert.Equal(3, db.Adapter.Profiler.Queries.Count);
+    }
   }
 }
