@@ -81,7 +81,7 @@ namespace Sdx.Db.Query
       {
         con.Open();
         command.Connection = con;
-        var reader = command.ExecuteReader();
+        var reader = this.Adapter.ExecuteReader(command);
         resultSet.Build(reader, this, contextName);
       }
 
