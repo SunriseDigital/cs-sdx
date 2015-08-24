@@ -62,6 +62,7 @@ namespace UnitTest
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.SqlServerAdapter();
+      testDb.Adapter.Profiler = new Sdx.Db.Query.Profiler();
       testDb.Adapter.ConnectionString = DbQueryTest.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
@@ -70,6 +71,7 @@ namespace UnitTest
 
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.MySqlAdapter();
+      testDb.Adapter.Profiler = new Sdx.Db.Query.Profiler();
       testDb.Adapter.ConnectionString = DbQueryTest.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
