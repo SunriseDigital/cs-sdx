@@ -13,7 +13,7 @@ namespace Sdx.Db
     protected abstract DbProviderFactory GetFactory();
 
     public string ConnectionString { get; set; }
-    public Profiler Profiler { get; set; }
+    public Query.Profiler Profiler { get; set; }
 
     public Adapter()
     {
@@ -59,7 +59,7 @@ namespace Sdx.Db
 
     public DbDataReader ExecuteReader(DbCommand command)
     {
-      QueryLog query = null;
+      Query.Log query = null;
       if (this.Profiler != null)
       {
         query = this.Profiler.Begin(command);

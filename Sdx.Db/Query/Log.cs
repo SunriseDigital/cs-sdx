@@ -3,9 +3,9 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace Sdx.Db
+namespace Sdx.Db.Query
 {
-  public class QueryLog
+  public class Log
   {
     private string commandText;
     private Dictionary<string, object> parameters = new Dictionary<string, object>();
@@ -16,7 +16,7 @@ namespace Sdx.Db
     /// </summary>
     private int maxParameterKeyLength = 0;
 
-    public QueryLog()
+    public Log()
     {
       this.stopwatch = new Stopwatch();
     }
@@ -25,7 +25,7 @@ namespace Sdx.Db
     /// コマンドが書き換えられてもQueryLogは影響を受けないようにコピーします。
     /// </summary>
     /// <param name="command"></param>
-    public QueryLog(DbCommand command) : this()
+    public Log(DbCommand command) : this()
     {
       this.commandText = command.CommandText;
 

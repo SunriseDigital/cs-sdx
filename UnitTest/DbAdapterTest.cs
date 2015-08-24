@@ -27,7 +27,7 @@ namespace UnitTest
     {
       var db = this.CreateTestDbList()[0].Adapter;
 
-      db.Profiler = new Sdx.Db.Profiler();
+      db.Profiler = new Sdx.Db.Query.Profiler();
 
       var command = db.CreateCommand();
       command.CommandText = "SELECT * FROM shop WHERE id > @id";

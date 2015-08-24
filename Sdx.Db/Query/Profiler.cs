@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 
-namespace Sdx.Db
+namespace Sdx.Db.Query
 {
   public class Profiler
   {
@@ -11,9 +11,9 @@ namespace Sdx.Db
       
     }
 
-    List<QueryLog> queries = new List<QueryLog>();
+    List<Log> queries = new List<Log>();
 
-    public List<QueryLog> Queries
+    public List<Log> Queries
     {
       get
       {
@@ -21,9 +21,9 @@ namespace Sdx.Db
       }
     }
 
-    internal QueryLog Begin(DbCommand command)
+    internal Log Begin(DbCommand command)
     {
-      var query = new QueryLog(command);
+      var query = new Log(command);
       this.queries.Add(query);
       query.Begin();
       return query;
