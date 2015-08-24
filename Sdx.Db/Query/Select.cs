@@ -46,6 +46,18 @@ namespace Sdx.Db.Query
       get { return this.orders; }
     }
 
+    public T FetchRecord<T>() where T : Record, new()
+    {
+      var resultSet = this.FetchRecordSet<T>();
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
     /// <summary>
     /// SQLを実行しRecordSetを生成して返します。
     /// </summary>
@@ -55,7 +67,7 @@ namespace Sdx.Db.Query
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> Execute<T>(string contextName = null) where T : Record, new()
+    public RecordSet<T> FetchRecordSet<T>(string contextName = null) where T : Record, new()
     {
       var command = this.Build();
       if (contextName == null)

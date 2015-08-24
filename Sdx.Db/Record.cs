@@ -14,6 +14,8 @@ namespace Sdx.Db
 
     private List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
 
+    private Dictionary<string, object> recordCache = new Dictionary<string, object>();
+
     internal string ContextName { get; set; }
 
     internal Select Select
@@ -72,12 +74,46 @@ namespace Sdx.Db
       return records[0];
     }
 
+    public Record ClearRecordCache(string contextName = null)
+    {
+      if (contextName != null)
+      {
+        if (this.recordCache.ContainsKey(contextName))
+        {
+          this.recordCache.Remove(contextName);
+        }
+      }
+      else
+      {
+        this.recordCache.Clear();
+      }
+
+      return this;
+    }
+
     public RecordSet<T> GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
     {
-      if (selectHook == null && this.select.HasContext(contextName))
+      if (this.recordCache.ContainsKey(contextName))
       {
+        if (selectHook != null)
+        {
+          throw new ArgumentException("You must clear record cache, before use selectHook.");
+        }
+
+        return (RecordSet<T>)this.recordCache[contextName];
+      }
+
+      if (this.select.HasContext(contextName))
+      {
+        if (selectHook != null)
+        {
+          throw new ArgumentException("You can't use selectHook, because already joined " + contextName + " context.");
+        }
+
         var resultSet = new RecordSet<T>();
         resultSet.Build(this.list, this.select, contextName);
+        //キャッシュする
+        this.recordCache[contextName] = resultSet;
         return resultSet;
       }
       else
@@ -95,8 +131,10 @@ namespace Sdx.Db
           {
             selectHook.Invoke(select);
           }
-          
-          return select.Execute<T>(contextName);
+          var resultSet = select.FetchRecordSet<T>(contextName);
+          //キャッシュする
+          this.recordCache[contextName] = resultSet;
+          return resultSet;
         }
 
         throw new Exception("Missing relation setting for " + contextName);
