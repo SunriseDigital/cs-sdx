@@ -167,6 +167,7 @@ DROP DATABASE [sdxtest]
         }
         catch (DbException e)
         {
+          Console.WriteLine(e.Message);
           //do nothing
         }
 
@@ -179,6 +180,7 @@ DROP DATABASE [sdxtest]
         }
         catch (DbException e)
         {
+          Console.WriteLine(e.Message);
           //do nothing
         }
 
