@@ -73,7 +73,7 @@ namespace Sdx.Db
     {
       get
       {
-        return Sdx.Diagnostics.Debug.FormatStopwatchTicks(this.ElapsedTime, 10);
+        return Sdx.Diagnostics.Debug.FormatStopwatchTicks(this.ElapsedTime);
       }
     }
 

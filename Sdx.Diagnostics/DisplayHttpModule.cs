@@ -75,7 +75,7 @@ namespace Sdx.Diagnostics
 
     private String formatTicks(long ticks)
     {
-      return Debug.FormatStopwatchTicks(ticks, 8);
+      return Debug.FormatStopwatchTicks(ticks);
     }
   }
 }
