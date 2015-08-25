@@ -69,7 +69,6 @@ namespace Sdx.Db.Query
     /// <returns></returns>
     public RecordSet<T> FetchRecordSet<T>(string contextName = null) where T : Record, new()
     {
-      var command = this.Build();
       if (contextName == null)
       {
         var prop = typeof(T).GetProperty("Meta");
@@ -87,7 +86,7 @@ namespace Sdx.Db.Query
         contextName = meta.Name;
       }
 
-      //TODO 問い合わせの処理はログを残したいのでadapterに移動
+      var command = this.Build();
       var resultSet = new RecordSet<T>();
       using (var con = this.Adapter.CreateConnection())
       {

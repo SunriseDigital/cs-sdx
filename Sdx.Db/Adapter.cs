@@ -98,4 +98,6 @@ namespace Sdx.Db
 
     internal abstract string AppendLimitQuery(string selectSql, int limit, int offset);
   }
+
+
 }

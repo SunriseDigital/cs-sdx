@@ -68,7 +68,6 @@
     <Compile Include="Query\Context.cs" />
     <Compile Include="Table.cs" />
     <Compile Include="MetaData.cs" />
-    <Compile Include="Util.cs" />
     <Compile Include="Query\Condition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
