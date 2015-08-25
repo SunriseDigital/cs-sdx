@@ -69,21 +69,6 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestUtilCommandToSql()
-    {
-      SqlCommand cmd;
-
-      cmd = new SqlCommand("SELECT * FROM user WHERE city = @City");
-      cmd.Parameters.AddWithValue("@City", "東京");
-      Assert.Equal("SELECT * FROM user WHERE city = '東京'", Sdx.Db.Util.CommandToSql(cmd));
-
-      cmd = new SqlCommand("SELECT * FROM user WHERE city = @City AND city_code = @CityCode");
-      cmd.Parameters.AddWithValue("@City", "東京");
-      cmd.Parameters.AddWithValue("@CityCode", "tokyo");
-      Assert.Equal("SELECT * FROM user WHERE city = '東京' AND city_code = 'tokyo'", Sdx.Db.Util.CommandToSql(cmd));
-    }
-
-    [Fact]
     public void TestSelectSimple()
     {
       foreach (TestDb db in this.CreateTestDbList())
@@ -617,23 +602,9 @@ namespace UnitTest
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        var con = db.Adapter.CreateConnection();
         var command = db.Adapter.CreateCommand();
         command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}area_id{1} IN (SELECT id FROM area WHERE id = 1)");
-        using (con)
-        {
-          con.Open();
-          command.Connection = con;
-          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
-          DataSet dataset = new DataSet();
-          adapter.SelectCommand = command;
-          adapter.Fill(dataset);
-
-          foreach (DataRow row in dataset.Tables[0].Rows)
-          {
-            Console.WriteLine(Sdx.Diagnostics.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
-          }
-        }
+        this.ExecCommand(command, db.Adapter);
       }
     }
 

@@ -248,23 +248,30 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       db.Commands.ForEach(command =>
       {
-        DbConnection con = db.Adapter.CreateConnection();
-        using (con)
-        {
-          con.Open();
-          command.Connection = con;
-          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
-          DataSet dataset = new DataSet();
-          adapter.SelectCommand = command;
-          adapter.Fill(dataset);
-
-          Console.WriteLine("execDbCommand");
-          foreach (DataRow row in dataset.Tables[0].Rows)
-          {
-            Console.WriteLine(Sdx.Diagnostics.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
-          }
-        }
+        this.ExecCommand(command, db.Adapter);
       });
+    }
+
+    protected void ExecCommand(DbCommand command, Sdx.Db.Adapter adapter)
+    {
+      using (var con = adapter.CreateConnection())
+      {
+        command.Connection = con;
+        con.Open();
+        
+        Console.WriteLine("execDbCommand");
+        var reader = adapter.ExecuteReader(command);
+        while (reader.Read())
+        {
+          var row = new Dictionary<string, object>();
+          for (var i = 0; i < reader.FieldCount; i++)
+          {
+            row[reader.GetName(i)] = reader.GetValue(i);
+          }
+
+          Console.WriteLine(Sdx.Diagnostics.Debug.Dump(row));
+        }
+      }
     }
   }
 }
