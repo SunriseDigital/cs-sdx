@@ -48,29 +48,14 @@ namespace Sdx.Db.Query
       return joinContext;
     }
 
-    private Table.Relation getRelationFromTable(Table target, string alias)
-    {
-      var targetContextName = alias == null ? target.OwnMeta.Name : alias;
-      if (!this.Table.OwnMeta.Relations.ContainsKey(targetContextName))
-      {
-        throw new Exception("Missing relation setting in " + this.Table.ToString() + " for " + targetContextName);
-      }
-
-      return this.Table.OwnMeta.Relations[targetContextName];
-    }
-
     public Context InnerJoin(Table target, Condition condition = null, string alias = null)
     {
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Inner, condition, alias);
 
       if(condition == null)
       {
-        var relation = this.getRelationFromTable(target, alias);
-        context.JoinCondition = new Condition();
-        context.JoinCondition.Add(
-          new Column(relation.ForeignKey, this.Name),
-          new Column(relation.ReferenceKey, alias == null ? target.OwnMeta.Name : alias)
-        );
+        var contextName = alias == null ? target.OwnMeta.Name : alias;
+        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(contextName);
       }
 
       context.Table = target;
@@ -90,12 +75,8 @@ namespace Sdx.Db.Query
 
       if (condition == null)
       {
-        var relation = this.getRelationFromTable(target, alias);
-        context.JoinCondition = new Condition();
-        context.JoinCondition.Add(
-          new Column(relation.ForeignKey, this.Name),
-          new Column(relation.ReferenceKey, alias == null ? target.OwnMeta.Name : alias)
-        );
+        var contextName = alias == null ? target.OwnMeta.Name : alias;
+        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(contextName);
       }
 
       context.Table = target;

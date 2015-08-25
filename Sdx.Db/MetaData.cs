@@ -41,5 +41,23 @@ namespace Sdx.Db
     public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; private set; }
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }
+
+    public Query.Condition CreateJoinCondition(string contextName)
+    {
+      var cond = new Query.Condition();
+
+      if(!this.Relations.ContainsKey(contextName))
+      {
+        throw new KeyNotFoundException("Missing " + contextName + " relation in " + this.TableType);
+      }
+
+      var relation = this.Relations[contextName];
+      cond.Add(
+        new Query.Column(relation.ForeignKey, this.Name),
+        new Query.Column(relation.ReferenceKey, contextName)
+      );
+
+      return cond;
+    }
   }
 }
