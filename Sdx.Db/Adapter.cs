@@ -97,7 +97,58 @@ namespace Sdx.Db
     }
 
     internal abstract string AppendLimitQuery(string selectSql, int limit, int offset);
+
+    public T FetchRecord<T>(Query.Select select) where T : Record, new()
+    {
+      var resultSet = this.FetchRecordSet<T>(select);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
+    /// <summary>
+    /// SQLを実行しRecordSetを生成して返します。
+    /// </summary>
+    /// <typeparam name="T">Recordのクラスを指定</typeparam>
+    /// <param name="contextName">
+    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
+    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
+    /// </param>
+    /// <returns></returns>
+    public RecordSet<T> FetchRecordSet<T>(Query.Select select, string contextName = null) where T : Record, new()
+    {
+      if (contextName == null)
+      {
+        var prop = typeof(T).GetProperty("Meta");
+        if (prop == null)
+        {
+          throw new NotImplementedException("Missing Meta property in " + typeof(T));
+        }
+
+        var meta = prop.GetValue(null, null) as MetaData;
+        if (meta == null)
+        {
+          throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
+        }
+
+        contextName = meta.Name;
+      }
+
+      var command = select.Build();
+      var resultSet = new RecordSet<T>();
+      using (var con = this.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        var reader = this.ExecuteReader(command);
+        resultSet.Build(reader, select, contextName);
+      }
+
+      return resultSet;
+    }
   }
-
-
 }

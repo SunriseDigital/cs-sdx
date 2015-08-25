@@ -43,7 +43,7 @@ namespace UnitTest
          .AddOrder("id", Sdx.Db.Query.Order.ASC);
       select.SetLimit(1);
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, shops.Count);
       shops.ForEach(shop =>
       {
@@ -76,7 +76,7 @@ namespace UnitTest
          ;
       select.SetLimit(2);
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
       Assert.Equal(2, shops.Count);
@@ -131,7 +131,7 @@ namespace UnitTest
       select.Context("shop")
           .Where.Add("name", "天府舫");
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
       Assert.Equal(1, shops.Count);
@@ -168,7 +168,7 @@ namespace UnitTest
       select.Context("shop_category").InnerJoin(new Test.Orm.Table.Category())
         .AddOrder("id", Sdx.Db.Query.Order.ASC);
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
       Assert.Equal(2, shops.Count);
@@ -208,7 +208,7 @@ namespace UnitTest
 
       select.SetLimit(1);
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
       var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area");
@@ -244,7 +244,7 @@ namespace UnitTest
          .Where.Add("name", "天府舫")
          ;
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
       var menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
         "menu",
@@ -291,7 +291,7 @@ namespace UnitTest
          .Where.Add("name", "Freeve")
          ;
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
       var shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
         "shop_category",
@@ -339,7 +339,7 @@ namespace UnitTest
          .LeftJoin(new Test.Orm.Table.Image(), "sub_image").ParentContext
          .Where.Add("name", "Freeve");
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
       Assert.Equal(1, shops.Count);
@@ -371,7 +371,7 @@ namespace UnitTest
          .LeftJoin(new Test.Orm.Table.Image(), "sub_image").ParentContext
          .Where.Add("name", "ビーナスラッシュ");
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, shops.Count);
 
       Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image"));
@@ -399,7 +399,7 @@ namespace UnitTest
          .AddFrom(new Test.Orm.Table.Shop())
          .Where.Add("name", "Freeve");
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
       Assert.Equal(1, shops.Count);
@@ -429,7 +429,7 @@ namespace UnitTest
          .AddFrom(new Test.Orm.Table.Shop())
          .Where.Add("name", "ビーナスラッシュ");
 
-      var shops = select.FetchRecordSet<Test.Orm.Shop>();
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
       Assert.Equal(1, shops.Count);
 
       Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image"));
@@ -457,7 +457,7 @@ namespace UnitTest
          .AddFrom(new Test.Orm.Table.Shop())
          .Where.Add("name", "天府舫");
 
-      var shop = select.FetchRecord<Test.Orm.Shop>();
+      var shop = db.Adapter.FetchRecord<Test.Orm.Shop>(select);
       Assert.True(shop is Test.Orm.Shop);
       Assert.Equal(1, db.Adapter.Profiler.Queries.Count);
 
@@ -502,12 +502,11 @@ namespace UnitTest
 
       //Tableを使ってないと、MetaDataが取れないので主キーがわからず組み立てられない。
       Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-        var shop = select.FetchRecord<Test.Orm.Shop>();
+        var shop = db.Adapter.FetchRecord<Test.Orm.Shop>(select);
       }));
 
       Assert.IsType<InvalidOperationException>(ex);
       Assert.Equal("Use Sdx.Db.Table, if you want to get Record.", ex.Message);
-
     }
   }
 }

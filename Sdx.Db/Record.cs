@@ -131,7 +131,7 @@ namespace Sdx.Db
           {
             selectHook.Invoke(select);
           }
-          var resultSet = select.FetchRecordSet<T>(contextName);
+          var resultSet = db.FetchRecordSet<T>(select, contextName);
           //キャッシュする
           this.recordCache[contextName] = resultSet;
           return resultSet;
