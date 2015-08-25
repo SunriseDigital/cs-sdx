@@ -123,6 +123,8 @@ namespace Sdx.Db
     /// <returns></returns>
     public RecordSet<T> FetchRecordSet<T>(Query.Select select) where T : Record, new()
     {
+      select.Adapter = this;
+
       var prop = typeof(T).GetProperty("Meta");
       if (prop == null)
       {
