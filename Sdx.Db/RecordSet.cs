@@ -14,6 +14,11 @@ namespace Sdx.Db
     internal void Build(DbDataReader reader, Select select, string contextName)
     {
       Table table = select.Context(contextName).Table;
+      if(table == null)
+      {
+        throw new InvalidOperationException("Use Sdx.Db.Table, if you want to get Record.");
+      }
+
       var pkeys = table.OwnMeta.Pkeys;
       if (pkeys == null)
       {

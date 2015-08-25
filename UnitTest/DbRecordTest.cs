@@ -475,5 +475,39 @@ namespace UnitTest
       Assert.Equal(3, db.Adapter.Profiler.Queries.Count);
       Assert.NotEqual(area2, area3);
     }
+
+    [Fact]
+    public void TestRecordNoTable()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunRecordNoTable(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunRecordNoTable(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+
+      select
+         .AddFrom("shop")
+         .AddColumn("id", "name")
+         .Where.Add("name", "天府舫");
+
+      select.Context("shop").InnerJoin(
+        "menu",
+        Test.Orm.Shop.Meta.CreateJoinCondition("menu")
+      );
+
+      //Tableを使ってないと、MetaDataが取れないので主キーがわからず組み立てられない。
+      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        var shop = select.FetchRecord<Test.Orm.Shop>();
+      }));
+
+      Assert.IsType<InvalidOperationException>(ex);
+      Assert.Equal("Use Sdx.Db.Table, if you want to get Record.", ex.Message);
+
+    }
   }
 }
