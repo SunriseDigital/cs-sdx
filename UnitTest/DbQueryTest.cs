@@ -1507,5 +1507,45 @@ namespace UnitTest
       Assert.Equal("9", db.Command.Parameters["@8"].Value);
       Assert.Equal("10", db.Command.Parameters["@9"].Value);
     }
+
+    [Fact]
+    public void TestSelectHavingSubquery()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectHavingSubquery(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectHavingSubquery(TestDb db)
+    {
+      var sub = new Sdx.Db.Query.Select();
+      sub
+        .AddFrom("shop_category")
+        .AddColumn("shop_Id")
+        .Where.Add("category_id", 3);
+
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom("shop")
+        .AddColumn("id")
+        .AddGroup("id")
+        .Having.Add("id", sub, Sdx.Db.Query.Comparison.In);
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+         {0}shop{1}.{0}id{1}
+        FROM {0}shop{1} 
+        GROUP BY {0}shop{1}.{0}id{1} 
+        HAVING {0}shop{1}.{0}id{1} IN (SELECT {0}shop_category{1}.{0}shop_Id{1} FROM {0}shop_category{1} WHERE {0}shop_category{1}.{0}category_id{1} = @0)"),
+       db.Command.CommandText
+      );
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("3", db.Command.Parameters["@0"].Value);
+    }
   }
 }
