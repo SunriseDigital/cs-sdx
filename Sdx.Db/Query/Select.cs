@@ -67,24 +67,21 @@ namespace Sdx.Db.Query
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(string contextName = null) where T : Record, new()
+    public RecordSet<T> FetchRecordSet<T>() where T : Record, new()
     {
-      if (contextName == null)
+      var prop = typeof(T).GetProperty("Meta");
+      if (prop == null)
       {
-        var prop = typeof(T).GetProperty("Meta");
-        if (prop == null)
-        {
-          throw new NotImplementedException("Missing Meta property in " + typeof(T));
-        }
-
-        var meta = prop.GetValue(null, null) as MetaData;
-        if (meta == null)
-        {
-          throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
-        }
-
-        contextName = meta.Name;
+        throw new NotImplementedException("Missing Meta property in " + typeof(T));
       }
+
+      var meta = prop.GetValue(null, null) as MetaData;
+      if (meta == null)
+      {
+        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
+      }
+
+      var contextName = meta.Name;
 
       var command = this.Build();
       var resultSet = new RecordSet<T>();

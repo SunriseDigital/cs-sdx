@@ -124,14 +124,14 @@ namespace Sdx.Db
           var relations = table.OwnMeta.Relations[contextName];
           var db = this.select.Adapter;
           var select = db.CreateSelect();
-          select.AddFrom((Table)Activator.CreateInstance(relations.TableType), contextName)
+          select.AddFrom((Table)Activator.CreateInstance(relations.TableType))
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
           if (selectHook != null)
           {
             selectHook.Invoke(select);
           }
-          var resultSet = select.FetchRecordSet<T>(contextName);
+          var resultSet = select.FetchRecordSet<T>();
           //キャッシュする
           this.recordCache[contextName] = resultSet;
           return resultSet;
