@@ -36,7 +36,7 @@ namespace UnitTest
     private void RunSimpleResult(TestDb db)
     {
       var tShop = new Test.Orm.Table.Shop();
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(tShop)
@@ -67,7 +67,7 @@ namespace UnitTest
 
     private void RunJoinManyOne(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -116,7 +116,7 @@ namespace UnitTest
 
     private void RunJoinOneMany(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -157,7 +157,7 @@ namespace UnitTest
 
     private void RunJoinManyMany(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select.AddFrom(new Test.Orm.Table.Shop())
         .AddOrder("id", Sdx.Db.Query.Order.ASC)
@@ -199,7 +199,7 @@ namespace UnitTest
 
     private void RunNoJoinManyOne(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -236,7 +236,7 @@ namespace UnitTest
 
     private void RunNoJoinOneMany(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -283,7 +283,7 @@ namespace UnitTest
 
     private void RunNoJoinManyMany(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -331,7 +331,7 @@ namespace UnitTest
 
     private void RunSameTableLeftJoinNotNull(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -363,7 +363,7 @@ namespace UnitTest
 
     private void RunSameTableLeftJoinNull(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -393,7 +393,7 @@ namespace UnitTest
 
     private void RunSameTableNoJoinNotNull(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -423,7 +423,7 @@ namespace UnitTest
 
     private void RunSameTableNoJoinNull(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -451,7 +451,7 @@ namespace UnitTest
 
     private void RunRecordCache(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
@@ -488,7 +488,7 @@ namespace UnitTest
 
     private void RunRecordNoTable(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select
          .AddFrom("shop")

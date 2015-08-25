@@ -47,13 +47,6 @@ namespace Sdx.Db
       return this.factory.CreateCommandBuilder();
     }
 
-    public Query.Select CreateSelect()
-    {
-      var select = new Query.Select();
-      select.Adapter = this;
-      return select;
-    }
-
     public DbDataAdapter CreateDataAdapter()
     {
       return this.factory.CreateDataAdapter();

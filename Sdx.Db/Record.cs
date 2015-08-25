@@ -122,17 +122,18 @@ namespace Sdx.Db
         if (table.OwnMeta.Relations.ContainsKey(contextName))
         {
           var relations = table.OwnMeta.Relations[contextName];
-          var db = this.select.Adapter;
-          var select = db.CreateSelect();
-          select.AddFrom((Table)Activator.CreateInstance(relations.TableType))
+
+          var sel = new Select();
+          sel.Adapter = this.select.Adapter;
+          sel.AddFrom((Table)Activator.CreateInstance(relations.TableType))
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
           if (selectHook != null)
           {
-            selectHook.Invoke(select);
+            selectHook.Invoke(sel);
           }
 
-          var resultSet = db.FetchRecordSet<T>(select);
+          var resultSet = this.select.Adapter.FetchRecordSet<T>(sel);
 
           //キャッシュする
           this.recordCache[contextName] = resultSet;

@@ -35,10 +35,12 @@ namespace UnitTest
     private void RunFromTable(TestDb db)
     {
       var tShop = new Test.Orm.Table.Shop();
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
 
       select.AddFrom(tShop);
 
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
         {0}shop{1}.{0}id{1} AS {0}id@shop{1}, 
@@ -48,8 +50,10 @@ namespace UnitTest
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1} 
       FROM {0}shop{1}"), db.Command.CommandText);
 
-      select = db.Adapter.CreateSelect();
+      select = new Sdx.Db.Query.Select();
       select.AddFrom(tShop, "foo");
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT 
         {0}foo{1}.{0}id{1} AS {0}id@foo{1}, 
@@ -75,13 +79,15 @@ namespace UnitTest
       Sdx.Db.Query.Select select;
 
       //Inner
-      select = db.Adapter.CreateSelect();
+      select = new Sdx.Db.Query.Select();
       select.AddFrom(new Test.Orm.Table.Shop());
 
       Assert.Equal(typeof(Test.Orm.Table.Shop), select.Context("shop").Table.GetType());
 
       select.Context("shop").InnerJoin(new Test.Orm.Table.Area());
 
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
           {0}shop{1}.{0}id{1} AS {0}id@shop{1},
@@ -97,11 +103,13 @@ namespace UnitTest
         INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"), db.Command.CommandText);
 
       //Left
-      select = db.Adapter.CreateSelect();
+      select = new Sdx.Db.Query.Select();
       select
          .AddFrom(new Test.Orm.Table.Shop())
          .LeftJoin(new Test.Orm.Table.Area());
 
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
           {0}shop{1}.{0}id{1} AS {0}id@shop{1},
@@ -116,7 +124,7 @@ namespace UnitTest
         FROM {0}shop{1} 
         LEFT JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"), db.Command.CommandText);
 
-      select = db.Adapter.CreateSelect();
+      select = new Sdx.Db.Query.Select();
       select.AddFrom(new Test.Orm.Table.Shop());
       select.Context("shop")
         .InnerJoin(
@@ -129,6 +137,8 @@ namespace UnitTest
         );
 
       //conditionの上書き
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
           {0}shop{1}.{0}id{1} AS {0}id@shop{1},
@@ -164,8 +174,10 @@ namespace UnitTest
       Sdx.Db.Query.Select select;
 
       //simple set
-      select = db.Adapter.CreateSelect();
+      select = new Sdx.Db.Query.Select();
       select.AddFrom(new Test.Orm.Table.Shop()).Table.SetColumns("id");
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
         {0}shop{1}.{0}id{1} AS {0}id@shop{1}
@@ -173,6 +185,8 @@ namespace UnitTest
 
       //add
       select.Context("shop").Table.AddColumns("name");
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
         {0}shop{1}.{0}id{1} AS {0}id@shop{1},
@@ -194,7 +208,7 @@ namespace UnitTest
     {
       Sdx.Db.Query.Select select;
 
-      select = db.Adapter.CreateSelect();
+      select = new Sdx.Db.Query.Select();
 
       select
           .AddFrom(new Test.Orm.Table.Shop())
@@ -204,6 +218,8 @@ namespace UnitTest
       select.Context("shop").InnerJoin(new Test.Orm.Table.Image(), "main_image");
       select.Context("shop").LeftJoin(new Test.Orm.Table.Image(), "sub_image");
 
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
         {0}shop{1}.{0}id{1} AS {0}id@shop{1},
@@ -229,6 +245,8 @@ namespace UnitTest
         LEFT JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.{0}sub_image_id{1} = {0}sub_image{1}.{0}id{1}"), db.Command.CommandText);
 
       select.Context("shop").Where.Add("id", "1");
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
         {0}shop{1}.{0}id{1} AS {0}id@shop{1},
@@ -258,6 +276,8 @@ namespace UnitTest
       Assert.Equal("1", db.Command.Parameters["@0"].Value);
 
       select.Context("area").Where.Add("code", "foo");
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
         {0}shop{1}.{0}id{1} AS {0}id@shop{1},
@@ -291,6 +311,8 @@ namespace UnitTest
          .Add("id", "10")
          .AddIsNullOr("id")
       );
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(db.Sql(@"SELECT
         {0}shop{1}.{0}id{1} AS {0}id@shop{1},
