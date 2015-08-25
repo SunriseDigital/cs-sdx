@@ -7,7 +7,6 @@ namespace Sdx.Db.Query
 {
   public class Select
   {
-    private Adapter adapter;
     private List<Context> contextList = new List<Context>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
@@ -15,9 +14,8 @@ namespace Sdx.Db.Query
     private Condition where;
     private Condition having;
 
-    internal Select(Adapter adapter)
+    public Select()
     {
-      this.adapter = adapter;
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Condition();
       this.having = new Condition();
@@ -26,10 +24,7 @@ namespace Sdx.Db.Query
       this.Limit = -1;
     }
 
-    internal Adapter Adapter
-    {
-      get { return this.adapter; }
-    }
+    public Adapter Adapter { get; set; }
 
     internal List<Context> ContextList
     {
@@ -159,7 +154,7 @@ namespace Sdx.Db.Query
             groupString += ", ";
           }
 
-          groupString += column.Build(this.adapter);
+          groupString += column.Build(this.Adapter);
         });
 
         selectString += " GROUP BY " + groupString;
@@ -181,7 +176,7 @@ namespace Sdx.Db.Query
           {
             orderString += ", ";
           }
-          orderString += column.Build(this.adapter) + " " + column.Order.SqlString();
+          orderString += column.Build(this.Adapter) + " " + column.Order.SqlString();
         });
 
         selectString += " ORDER BY " + orderString;
@@ -190,7 +185,7 @@ namespace Sdx.Db.Query
       //LIMIT/OFFSET
       if(this.Limit > -1)
       {
-        selectString = this.adapter.AppendLimitQuery(selectString, this.Limit, this.Offset);
+        selectString = this.Adapter.AppendLimitQuery(selectString, this.Limit, this.Offset);
       }
 
       return selectString;
@@ -208,6 +203,11 @@ namespace Sdx.Db.Query
       if (context.Target is Select)
       {
         Select select = context.Target as Select;
+        if (select.Adapter == null)
+        {
+          select.Adapter = this.Adapter;
+        }
+        
         string subquery = select.BuildSelectString(parameters, condCount);
         joinString += "(" + subquery + ")";
       }
@@ -236,7 +236,7 @@ namespace Sdx.Db.Query
 
     public DbCommand Build()
     {
-      DbCommand command = this.adapter.CreateCommand();
+      DbCommand command = this.Adapter.CreateCommand();
       var condCount = new Counter();
       command.CommandText = this.BuildSelectString(command.Parameters, condCount);
 
@@ -329,7 +329,7 @@ namespace Sdx.Db.Query
           result += ", ";
         }
 
-        result += column.Build(this.adapter);
+        result += column.Build(this.Adapter);
       });
 
       return result;

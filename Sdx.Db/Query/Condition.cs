@@ -200,6 +200,10 @@ namespace Sdx.Db.Query
       else if (cond.Value is Select)
       {
         Select sub = (Select)cond.Value;
+        if(sub.Adapter == null)
+        {
+          sub.Adapter = select.Adapter;
+        }
         rightHand = "(" + sub.BuildSelectString(parameters, condCount) + ")";
       }
       else if (cond.Comparison == Comparison.IsNull || cond.Comparison == Comparison.IsNotNull)

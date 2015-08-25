@@ -49,7 +49,9 @@ namespace Sdx.Db
 
     public Query.Select CreateSelect()
     {
-      return new Query.Select(this);
+      var select = new Query.Select();
+      select.Adapter = this;
+      return select;
     }
 
     public DbDataAdapter CreateDataAdapter()
