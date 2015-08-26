@@ -24,6 +24,11 @@ namespace Sdx.Db.Query
       this.Limit = -1;
     }
 
+    public Select(Adapter adapter) : this()
+    {
+      this.Adapter = adapter;
+    }
+
     public Adapter Adapter { get; set; }
 
     internal List<Context> ContextList
@@ -236,6 +241,11 @@ namespace Sdx.Db.Query
 
     public DbCommand Build()
     {
+      if (this.Adapter == null)
+      {
+        throw new InvalidOperationException("Missing adapter, Set before Build.");
+      }
+
       DbCommand command = this.Adapter.CreateCommand();
       var condCount = new Counter();
       command.CommandText = this.BuildSelectString(command.Parameters, condCount);

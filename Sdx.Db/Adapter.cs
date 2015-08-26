@@ -144,5 +144,65 @@ namespace Sdx.Db
 
       return resultSet;
     }
+
+    public List<Dictionary<string, object>> FetchDictionaryList(Query.Select select)
+    {
+      select.Adapter = this;
+      return this.FetchDictionaryList(select.Build());
+    }
+
+    public List<Dictionary<string, object>> FetchDictionaryList(DbCommand command)
+    {
+      var list = new List<Dictionary<string, object>>();
+
+      using (var con = this.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        var reader = this.ExecuteReader(command);
+        while (reader.Read())
+        {
+          var row = new Dictionary<string, object>();
+          for (var i = 0; i < reader.FieldCount; i++)
+          {
+            row[reader.GetName(i)] = reader.GetValue(i);
+          }
+
+          list.Add(row);
+        }
+      }
+
+      return list;
+    }
+
+    public List<KeyValuePair<object, object>> FetchKeyValuePairList(Query.Select select)
+    {
+      select.Adapter = this;
+      return this.FetchKeyValuePairList(select.Build());
+    }
+
+    public List<KeyValuePair<object, object>> FetchKeyValuePairList(DbCommand command)
+    {
+      var list = new List<KeyValuePair<object, object>>();
+
+      using (var con = this.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        var reader = this.ExecuteReader(command);
+        while (reader.Read())
+        {
+          var row = new KeyValuePair<object, object>(
+            reader.GetValue(0),
+            reader.GetValue(1)
+          );
+
+          list.Add(row);
+        }
+      }
+
+      return list;
+    }
+
   }
 }

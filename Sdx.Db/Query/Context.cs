@@ -19,6 +19,14 @@ namespace Sdx.Db.Query
 
     public string Alias { get; internal set; }
 
+    public Select Select
+    {
+      get
+      {
+        return this.select;
+      }
+    }
+
     public string Name
     {
       get 
