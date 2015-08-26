@@ -133,8 +133,8 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      var list = db.Adapter.FetchKeyValuePairList(sel.Build());
-      Assert.IsType<List<KeyValuePair<object, object>>>(list);
+      var list = db.Adapter.FetchKeyValuePairList<int, string>(sel.Build());
+      Assert.IsType<List<KeyValuePair<int, string>>>(list);
       Assert.Equal(2, list.Count);
       Assert.Equal(1, list[0].Key);
       Assert.Equal("天祥", list[0].Value);
@@ -151,8 +151,8 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      list = db.Adapter.FetchKeyValuePairList(sel);
-      Assert.IsType<List<KeyValuePair<object, object>>>(list);
+      list = db.Adapter.FetchKeyValuePairList<int, string>(sel);
+      Assert.IsType<List<KeyValuePair<int, string>>>(list);
       Assert.Equal(2, list.Count);
       Assert.Equal(3, list[0].Key);
       Assert.Equal("天府舫", list[0].Value);
