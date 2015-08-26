@@ -145,15 +145,15 @@ namespace Sdx.Db
       return resultSet;
     }
 
-    public List<Dictionary<string, object>> FetchDictionaryList(Query.Select select)
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select)
     {
       select.Adapter = this;
-      return this.FetchDictionaryList(select.Build());
+      return this.FetchDictionaryList<T>(select.Build());
     }
 
-    public List<Dictionary<string, object>> FetchDictionaryList(DbCommand command)
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
     {
-      var list = new List<Dictionary<string, object>>();
+      var list = new List<Dictionary<string, T>>();
 
       using (var con = this.CreateConnection())
       {
@@ -162,10 +162,10 @@ namespace Sdx.Db
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
-          var row = new Dictionary<string, object>();
+          var row = new Dictionary<string, T>();
           for (var i = 0; i < reader.FieldCount; i++)
           {
-            row[reader.GetName(i)] = reader.GetValue(i);
+            row[reader.GetName(i)] = this.castDbValue<T>(reader.GetValue(i));
           }
 
           list.Add(row);

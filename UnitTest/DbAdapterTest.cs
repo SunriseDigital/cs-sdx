@@ -91,11 +91,11 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      var list = db.Adapter.FetchDictionaryList(sel.Build());
-      Assert.IsType<List<Dictionary<string, object>>>(list);
+      var list = db.Adapter.FetchDictionaryList<string>(sel.Build());
+      Assert.IsType<List<Dictionary<string, string>>>(list);
       Assert.Equal(2, list.Count);
       Assert.Equal("天祥", list[0]["name"]);
-      Assert.Equal("", list[0]["main_image_id"].ToString());
+      Assert.Equal("", list[0]["main_image_id"]);
       Assert.Equal("エスペリア", list[1]["name"]);
 
       sel = new Sdx.Db.Query.Select();
@@ -107,8 +107,8 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      list = db.Adapter.FetchDictionaryList(sel);
-      Assert.IsType<List<Dictionary<string, object>>>(list);
+      list = db.Adapter.FetchDictionaryList<string>(sel);
+      Assert.IsType<List<Dictionary<string, string>>>(list);
       Assert.Equal(2, list.Count);
       Assert.Equal("天府舫", list[0]["name"]);
       Assert.Equal("Freeve", list[1]["name"]);
