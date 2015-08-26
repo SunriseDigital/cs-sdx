@@ -204,5 +204,39 @@ namespace Sdx.Db
       return list;
     }
 
+    public List<T> FetchList<T>(Query.Select select)
+    {
+      select.Adapter = this;
+      return this.FetchList<T>(select.Build());
+    }
+
+    public List<T> FetchList<T>(DbCommand command)
+    {
+      var list = new List<T>();
+      using (var con = this.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        var reader = this.ExecuteReader(command);
+        while (reader.Read())
+        {
+          list.Add(this.castDbValue<T>(reader.GetValue(0)));
+        }
+      }
+
+      return list;
+    }
+
+    private T castDbValue<T>(object value)
+    {
+      if (typeof(T) == typeof(string))
+      {
+        return (T)(object)value.ToString();
+      }
+      else
+      {
+        return (T)value;
+      }
+    }
   }
 }

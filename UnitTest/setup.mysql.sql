@@ -4,6 +4,7 @@
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,
+  created_at datetime NOT NULL,
   PRIMARY KEY (id)
 );
 

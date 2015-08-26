@@ -146,7 +146,7 @@ namespace UnitTest
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
-        .AddColumns("id", "name", "main_image_id")
+        .AddColumns("id", "name", "main_image_id")//最初の二つ以外は無視
         .AddOrder("id", Sdx.Db.Query.Order.ASC)
         .SetLimit(2)
         ;
@@ -158,6 +158,78 @@ namespace UnitTest
       Assert.Equal("天府舫", list[0].Value);
       Assert.Equal(4, list[1].Key);
       Assert.Equal("Freeve", list[1].Value);
+    }
+
+    [Fact]
+    public void TestFetchList()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchList(db);
+      }
+    }
+
+    private void RunFetchList(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom("shop").Select
+        .AddColumns("name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      var list = db.Adapter.FetchList<string>(sel.Build());
+      Assert.IsType<List<string>>(list);
+      Assert.Equal(2, list.Count);
+      Assert.Equal("天祥", list[0]);
+      Assert.Equal("エスペリア", list[1]);
+
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("name", "main_image_id")//最初１つ以外は無視
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      list = db.Adapter.FetchList<string>(sel);
+      Assert.IsType<List<string>>(list);
+      Assert.Equal(2, list.Count);
+      Assert.Equal("天府舫", list[0]);
+      Assert.Equal("Freeve", list[1]);
+
+      //int
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 4, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      var intList = db.Adapter.FetchList<int>(sel);
+      Assert.IsType<List<int>>(intList);
+      Assert.Equal(2, intList.Count);
+      Assert.Equal(5, intList[0]);
+      Assert.Equal(6, intList[1]);
+
+      //datetime
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .AddColumns("created_at")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC).Select
+        .SetLimit(2)
+        ;
+
+      var datetimes = db.Adapter.FetchList<DateTime>(sel);
+      Assert.IsType<List<DateTime>>(datetimes);
+      Assert.Equal(2, datetimes.Count);
+      Assert.Equal("2015-01-01 12:30:00", datetimes[0].ToString("yyyy-MM-dd HH:mm:ss"));
+      Assert.Equal("2015-01-02 12:30:00", datetimes[1].ToString("yyyy-MM-dd HH:mm:ss"));
     }
   }
 }

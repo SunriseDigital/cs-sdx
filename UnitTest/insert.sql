@@ -8,12 +8,12 @@ INSERT INTO area (name, code, large_area_id) VALUES ('渋谷', 'sibuya', (SELECT
 INSERT INTO area (name, code, large_area_id) VALUES ('矢場町', 'yabacho', (SELECT id FROM large_area WHERE code = 'aichi'));
 
 
-INSERT INTO shop (name, area_id) VALUES ('天祥', (SELECT id FROM area WHERE name = '新中野'));
-INSERT INTO shop (name, area_id) VALUES ('エスペリア', (SELECT id FROM area WHERE name = '西麻布'));
-INSERT INTO shop (name, area_id) VALUES ('天府舫', (SELECT id FROM area WHERE name = '新宿'));
-INSERT INTO shop (name, area_id) VALUES ('Freeve', (SELECT id FROM area WHERE name = '渋谷'));
-INSERT INTO shop (name, area_id) VALUES ('ビーナスラッシュ', (SELECT id FROM area WHERE name = '渋谷'));
-INSERT INTO shop (name, area_id) VALUES ('味仙', (SELECT id FROM area WHERE name = '矢場町'));
+INSERT INTO shop (name, created_at, area_id) VALUES ('天祥', '2015-01-01 12:30:00', (SELECT id FROM area WHERE name = '新中野'));
+INSERT INTO shop (name, created_at, area_id) VALUES ('エスペリア', '2015-01-02 12:30:00', (SELECT id FROM area WHERE name = '西麻布'));
+INSERT INTO shop (name, created_at, area_id) VALUES ('天府舫', '2015-01-03 12:30:00', (SELECT id FROM area WHERE name = '新宿'));
+INSERT INTO shop (name, created_at, area_id) VALUES ('Freeve', '2015-01-04 12:30:00', (SELECT id FROM area WHERE name = '渋谷'));
+INSERT INTO shop (name, created_at, area_id) VALUES ('ビーナスラッシュ', '2015-01-05 12:30:00', (SELECT id FROM area WHERE name = '渋谷'));
+INSERT INTO shop (name, created_at, area_id) VALUES ('味仙', '2015-01-06 12:30:00', (SELECT id FROM area WHERE name = '矢場町'));
 
 INSERT INTO category (name, code) VALUES ('中華', 'chinese');
 INSERT INTO category (name, code) VALUES ('イタリアン', 'italian');
