@@ -76,7 +76,7 @@ namespace Sdx.Db
         throw new Exception("ContextName is null");
       }
 
-      alias = alias != null ? alias + "@" + this.ContextName : columnName + "@" + this.ContextName;
+      alias = Record.BuildColumnAliasWithContextName(alias != null ? alias : columnName.ToString(), this.ContextName);
       this.select.Context(this.ContextName).AddColumn(columnName, alias);
 
       return this;

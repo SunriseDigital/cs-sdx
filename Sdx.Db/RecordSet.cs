@@ -62,7 +62,7 @@ namespace Sdx.Db
       var exists = true;
       pkeys.ForEach(column =>
       {
-        if(row[column + "@" + contextName] is DBNull)
+        if (row[Record.BuildColumnAliasWithContextName(column, contextName)] is DBNull)
         {
           exists = false;
           return;
@@ -103,7 +103,7 @@ namespace Sdx.Db
           key += "%%SDX%%";
         }
 
-        key += row[column + "@" + contextName];
+        key += row[Record.BuildColumnAliasWithContextName(column, contextName)];
       });
 
       return key;

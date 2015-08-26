@@ -52,9 +52,7 @@ namespace Sdx.Db
 
     public string GetString(string key)
     {
-      // TODO Implements for missing ContextName.
-
-      key = key + "@" + this.ContextName;
+      key = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if (this.list[0].ContainsKey(key))
       {
         return this.list[0][key].ToString();
@@ -147,6 +145,11 @@ namespace Sdx.Db
     internal void AddRow(Dictionary<string, object> row)
     {
       this.list.Add(row);
+    }
+
+    internal static string BuildColumnAliasWithContextName(string columnName, string contextName)
+    {
+      return columnName + "@" + contextName;
     }
   }
 }
