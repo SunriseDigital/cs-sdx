@@ -249,6 +249,34 @@ namespace Sdx.Db
       return default(T);
     }
 
+    public Dictionary<string, T> FetchDictionary<T>(Query.Select select)
+    {
+      select.Adapter = this;
+      return this.FetchDictionary<T>(select.Build());
+    }
+
+    public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
+    {
+      var dic = new Dictionary<string, T>();
+      using (var con = this.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        var reader = this.ExecuteReader(command);
+        while (reader.Read())
+        {
+          for (var i = 0; i < reader.FieldCount; i++)
+          {
+            dic[reader.GetName(i)] = this.castDbValue<T>(reader.GetValue(i));
+          }
+
+          break;
+        }
+      }
+
+      return dic;
+    }
+
     private T castDbValue<T>(object value)
     {
       if (typeof(T) == typeof(string))

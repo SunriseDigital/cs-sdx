@@ -285,5 +285,46 @@ namespace UnitTest
       Assert.IsType<DateTime>(dtValue);
       Assert.Equal("2015-01-04 12:30:00", dtValue.ToString("yyyy-MM-dd HH:mm:ss"));
     }
+
+    [Fact]
+    public void TestFetchDictionary()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchDictionary(db);
+      }
+    }
+
+    private void RunFetchDictionary(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom("shop").Select
+        .AddColumns("id", "name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      var strDic = db.Adapter.FetchDictionary<string>(sel.Build());
+      Assert.IsType<Dictionary<string, string>>(strDic);
+      Assert.Equal("1", strDic["id"]);
+      Assert.Equal("天祥", strDic["name"]);
+      Assert.Equal("", strDic["main_image_id"]);
+
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("id", "name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      var objDic = db.Adapter.FetchDictionary<object>(sel);
+      Assert.IsType<Dictionary<string, object>>(objDic);
+      Assert.Equal(3, objDic["id"]);
+      Assert.Equal("天府舫", objDic["name"]);
+      Assert.IsType<DBNull>(objDic["main_image_id"]);
+    }
   }
 }
