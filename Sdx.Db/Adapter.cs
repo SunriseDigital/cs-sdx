@@ -227,6 +227,28 @@ namespace Sdx.Db
       return list;
     }
 
+    public T FetchOne<T>(Query.Select select)
+    {
+      select.Adapter = this;
+      return this.FetchOne<T>(select.Build());
+    }
+
+    public T FetchOne<T>(DbCommand command)
+    {
+      using (var con = this.CreateConnection())
+      {
+        con.Open();
+        command.Connection = con;
+        var reader = this.ExecuteReader(command);
+        while (reader.Read())
+        {
+          return this.castDbValue<T>(reader.GetValue(0));
+        }
+      }
+
+      return default(T);
+    }
+
     private T castDbValue<T>(object value)
     {
       if (typeof(T) == typeof(string))

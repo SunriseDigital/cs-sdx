@@ -231,5 +231,59 @@ namespace UnitTest
       Assert.Equal("2015-01-01 12:30:00", datetimes[0].ToString("yyyy-MM-dd HH:mm:ss"));
       Assert.Equal("2015-01-02 12:30:00", datetimes[1].ToString("yyyy-MM-dd HH:mm:ss"));
     }
+
+    [Fact]
+    public void TestFetchOne()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchOne(db);
+      }
+    }
+
+    private void RunFetchOne(TestDb db)
+    {
+      //int
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom("shop").Select
+        .AddColumns("id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)//２行目以降は無視
+        ;
+
+      var intValue = db.Adapter.FetchOne<int>(sel.Build());
+      Assert.IsType<int>(intValue);
+      Assert.Equal(1, intValue);
+
+      //string
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("name", "main_image_id")//二つ目以降は無視
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      var strValue = db.Adapter.FetchOne<string>(sel);
+      Assert.IsType<string>(strValue);
+      Assert.Equal("天府舫", strValue);
+
+
+      //string
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 3, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("created_at", "main_image_id")//二つ目以降は無視
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      var dtValue = db.Adapter.FetchOne<DateTime>(sel);
+      Assert.IsType<DateTime>(dtValue);
+      Assert.Equal("2015-01-04 12:30:00", dtValue.ToString("yyyy-MM-dd HH:mm:ss"));
+    }
   }
 }
