@@ -196,6 +196,8 @@ SELECT [shop].* FROM, [area].* [shop] INNER JOIN [area] ON [shop].area_id = [are
 
 `InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Sdx.Db.Query.Condition`のインスタンスで渡します。`Condition`は`*** = @@@`の様な条件式を生成する汎用的なクラスです。`Condition`にはJOIN条件の条件の他にWhere句やHaving句の生成にも利用されます。JOIN条件でよく使用する`column_name1 = column_name2`の式を生成するには、`Sdx.Db.Query.Column`のインスタンスを両方の引数に設定してください。
 
+※ `Condition`の生成には本来`Adapter`は必要ではありません。`Adapter.CreateCondition()`は`(new Sdx.Db.Query.Condition()).Add(...`と記述しなくてもいいようにするためのショートカットです。識別子のクオートには`Select.Adapter`が使用されます。
+
 
 #### 同じテーブルをJOINする
 
