@@ -186,7 +186,7 @@ select
   .AddColumn("*");
 
 Sdx.Db.Query.Context categoryContext = select.Context("shop")
-  .InnderJoin(
+  .InnerJoin(
     "category",
     db.CreateCondition("{0}.category_id = {1}.id")
       .AddRight("id", "1")
