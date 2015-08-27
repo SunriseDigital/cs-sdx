@@ -10,5 +10,4 @@
 
 ## Classes
 
-* [Adapter](Adapter.md)
-* [Util](Util.md)
+* [Record](Record.md)
