@@ -349,7 +349,7 @@ var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
 select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 ```
 
-#### JOIN時のfluent syntax
+#### JOINのfluent syntaxについて
 
 InnerJoin/LeftJoinの返り値は、メソッドの呼び出しでJOINしたテーブルの`Context`なので、注意して下さい。
 
@@ -535,6 +535,19 @@ OR
 # DbCommand.Parameters["@1"] = 4
 # DbCommand.Parameters["@2"] = 1
 # DbCommand.Parameters["@3"] = 2
+```
+
+#### Whereのfluent syntaxについて
+
+Where.Add系メソッドは続けて条件を付与できるようにするため、自分自身を返します。`Context`にアクセスする時は`Context`プロパティを利用してください。
+
+```c#
+select.AddFrom("shop")
+  .Where.Add("id", 1).Context
+  .InnerJoin("area", db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("area_id", "shop"),
+    new Sdx.Db.Query.Column("id", "area")
+  ));
 ```
 
 <br><br><br>
