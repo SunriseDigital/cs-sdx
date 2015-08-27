@@ -503,7 +503,7 @@ AND [shop].[area_id] IN(
 
 #### ORを含むような複雑なWHERE句
 
-`Where.Add()`に`Sdx.Db.Query.Condition`をセットすると子供のWhere句はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Sdx.Db.Query.Condition`は`Select.CreateCondition()`から生成可能です。
+`Where.Add()`に`Sdx.Db.Query.Condition`をセットすると子供のWhere句はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Sdx.Db.Query.Condition`は`Adapter.CreateCondition()`から生成可能です。
 
 ```c#
 var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
@@ -511,11 +511,11 @@ select.AddFrom("shop").AddColumn("*");
 
 select.Where
   .Add(
-    select.CreateCondition()
+    select.Adapter.CreateCondition()
       .Add("id", "3")
       .Add("id", "4")
   ).AddOr(
-    select.CreateCondition()
+    select.Adapter.CreateCondition()
       .Add("id", "1")
       .AddOr("id", "2")
   );
