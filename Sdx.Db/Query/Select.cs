@@ -279,7 +279,7 @@ namespace Sdx.Db.Query
         }
       }
 
-      throw new Exception("Missing " + contextName + " context.");
+      throw new InvalidOperationException("Missing " + contextName + " context.");
     }
 
     /// <summary>

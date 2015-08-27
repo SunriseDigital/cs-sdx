@@ -138,7 +138,7 @@ namespace Sdx.Db
           return resultSet;
         }
 
-        throw new Exception("Missing relation setting for " + contextName);
+        throw new NotImplementedException("Missing relation setting for " + contextName);
       }
     }
 

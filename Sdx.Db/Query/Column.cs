@@ -29,7 +29,7 @@ namespace Sdx.Db.Query
       }
       else
       {
-        throw new Exception("columnName support only Sdx.Db.Query.Expr or string, " + columnName.GetType() + " given.");
+        throw new NotSupportedException("columnName support only Sdx.Db.Query.Expr or string, " + columnName.GetType() + " given.");
       }
     }
 
