@@ -140,7 +140,7 @@ SELECT [s].* FROM [shop] AS [s];
 
 #### カラムのエイリアス
 
-カラムにエイリアスを指定する方法は`Select.AddColumn`の第二引数にエイリアス名を渡す方法と`Select.AddColumns`に`Dictionary<string, object>`を渡す方法と2つあります。
+カラムにエイリアスを指定する方法は`Select.AddColumn`の第二引数にエイリアス名を渡します。`Select.AddColumns`ではエイリアスの付与ができません。
 
 まずは`Select.AddColumn`
 
@@ -153,21 +153,6 @@ select.AddFrom("shop")
   ;
 DbCommand command = select.Build();
 ```
-
-`Select.AddColumns`に`Dictionary<string, object>`を渡す。
-
-```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
-
-select.AddFrom("shop").AddColumns(new Dictionary<string, object>(){
-  {"shop_id", "id"},
-  {"shop_name", "name"},
-});
-
-DbCommand command = select.Build();
-```
-
-エイリアスが`Dictionary`のキーになりますので気をつけてください。
 
 ```sql
 SELECT [shop].[id] AS [shop_id], [shop].[name] AS [shop_name] FROM [shop];
