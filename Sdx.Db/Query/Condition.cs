@@ -149,7 +149,7 @@ namespace Sdx.Db.Query
       if (holder.Logical == Logical.Or && this.wheres.Count == 0)
       {
         //一番最初のWhereがOrで足されたということは何かプログラマーの意図と違うことが起こってるはず。
-        throw new Exception("Illegal logical operation for the first where condition `" + holder.Logical.SqlString() + "`");
+        throw new InvalidOperationException("Illegal logical operation for the first where condition `" + holder.Logical.SqlString() + "`");
       }
 
       this.wheres.Add(holder);

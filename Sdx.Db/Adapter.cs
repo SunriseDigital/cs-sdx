@@ -87,7 +87,7 @@ namespace Sdx.Db
       }
       else
       {
-        throw new Exception("QuoteIdentifier support only Query.Expr or string, "+obj.GetType()+" given.");
+        throw new NotSupportedException("QuoteIdentifier support only Query.Expr or string, "+obj.GetType()+" given.");
       }
     }
 

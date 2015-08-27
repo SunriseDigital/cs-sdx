@@ -24,13 +24,13 @@ namespace Sdx.Db
 
       if (!typeof(Sdx.Db.Record).IsAssignableFrom(recordType))
       {
-        throw new InvalidTypeException(recordType + " is not Sdx.Db.Record subclass");
+        throw new NotSupportedException(recordType + " is not Sdx.Db.Record subclass");
       }
       this.RecordType = recordType;
 
       if (!typeof(Sdx.Db.Table).IsAssignableFrom(tableType))
       {
-        throw new InvalidTypeException(tableType + "is not Sdx.Db.Table subclass");
+        throw new NotSupportedException(tableType + "is not Sdx.Db.Table subclass");
       }
       this.TableType = tableType;
     }

@@ -22,7 +22,7 @@ namespace Sdx.Db
       var pkeys = table.OwnMeta.Pkeys;
       if (pkeys == null)
       {
-        throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
+        throw new NotImplementedException("Missing Pkeys setting in " + table.ToString() + ".Meta");
       }
 
       while (reader.Read())
@@ -43,12 +43,12 @@ namespace Sdx.Db
       var pkeys = table.OwnMeta.Pkeys;
       if (pkeys == null)
       {
-        throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
+        throw new NotImplementedException("Missing Pkeys setting in " + table.ToString() + ".Meta");
       }
 
       if (pkeys.Count == 0)
       {
-        throw new Exception("Missing Pkeys setting in " + table.ToString() + ".Meta");
+        throw new NotImplementedException("Missing Pkeys setting in " + table.ToString() + ".Meta");
       }
 
       list.ForEach(row => {
