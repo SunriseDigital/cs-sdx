@@ -40,13 +40,13 @@ SELECT * FROM [shop];
 
 ```c#
 select.AddFrom("shop");
-select.AddFrom("category");
+select.AddFrom("area");
 select.AddColumn("*");
 DbCommand command = select.Build();
 ```
 
 ```sql
-SELECT * FROM [shop], [category];
+SELECT * FROM [shop], [area];
 ```
 
 #### テーブルを指定したカラムの追加
@@ -100,7 +100,7 @@ var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
 select.AddFrom("shop")
   .AddColumn("id")
   .AddColumn("name")
-  .AddColumn("category_id");
+  .AddColumn("area_id");
 ```
 
 #### クオートを回避する
@@ -170,11 +170,17 @@ select
   .AddFrom("shop")
   .AddColumn("*");
 
-Sdx.Db.Query.Context categoryContext = select.Context("shop")
+Sdx.Db.Query.Context areaContext = select.Context("shop")
   .InnerJoin(
-    "category",
-    db.CreateCondition("{0}.category_id = {1}.id")
-      .AddRight("id", "1")
+    "area",
+    db.CreateCondition().Add(
+      new Sdx.Db.Query.Column("area_id", "shop"),
+      new Sdx.Db.Query.Column("id", "area")
+    )
+    .Add(
+      new Sdx.Db.Query.Column("id", "area"),
+      "1"
+    )
   )
   .AddColumn("*");
 
@@ -182,23 +188,14 @@ DbCommand command = select.Build();
 ```
 
 ```sql
-SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].category_id = [category].id AND [category].[id] = @0
+SELECT [shop].* FROM, [area].* [shop] INNER JOIN [area] ON [shop].area_id = [area].id AND [area].[id] = @0
 # DbCommand.Parameters["@0"] = "1";
 ```
 
-`Select.Context()`はFROM句、あるいはJOIN句のテーブルの`Context`オブジェクトを取得します。また、`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Context`オブジェクトを返します。
+`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Context`オブジェクトを返します。`Select.Context()`はFROM句、あるいはJOIN句のテーブルの`Context`オブジェクトを取得するメソッドです。
 
-`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Sdx.Db.Query.Condition`のインスタンスで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。`Condition`にはJOIN条件の生成用に`AddLeft`と`AddRight`のメソッドがあり、それぞれ`{0}`、`{1}`に条件を追加できます。
+`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Condition`のインスタンスで渡します。`Sdx.Db.Query.Condition`は`*** = @@@`の様な条件式を生成する汎用的なクラスです。`column_name1 = column_name2`の式を生成するには、`Sdx.Db.Query.Column`を追加います。`Condition`にはJOIN条件の条件の他にWhere句やHaving句の生成にも利用されます。
 
-`Condition`のコンストラクタに渡す条件内のカラム名など、`{0}`/`{1}`を利用したテーブル名以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオートしてください。
-
-```c#
-var db = new Sdx.Db.SqlServerAdapter();
-...
-
-select.Context("shop")
-  .InnerJoin("category", db.CreateCondition("{0}."+db.QuoteIdentifier(column)+" = {1}.id"));
-```
 
 #### 同じテーブルをJOINする
 
@@ -207,41 +204,54 @@ JOINするエイリアス名（テーブル名）は一つの`Select`の中で�
 ```c#
 select.AddFrom("shop").AddColumn("*");
 
-//まずはcategoryをJOIN
+//まずはareaをJOIN
 select.Context("shop").InnerJoin(
-  "category",
-  db.CreateCondition("{0}.category_id = {1}.id")
+  "area",
+  db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("area_id", "shop"),
+    new Sdx.Db.Query.Column("id", "area")
+  )
 );
 
 //次にはimageをJOIN
 select.Context("shop").InnerJoin(
   "image",
-  db.CreateCondition("{0}.main_image_id = {1}.id")
+  db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("main_image_id", "shop"),
+    new Sdx.Db.Query.Column("id", "image")
+  )
 );
 
-//もう一度categoryをJOIN
+//もう一度areaをJOIN
 select.Context("shop").InnerJoin(
-  "category",
-  db.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1")
+  "area",
+  db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("area_id", "shop"),
+    new Sdx.Db.Query.Column("id", "area")
+  )
+  .Add(
+    new Sdx.Db.Query.Column("id", "area"),
+    1
+  )
 );
 db.Command = select.Build();
 ```
 
-同じテーブルを同じ名前でJOINすると、上書きするので`category`のJOINの方が後ろに来ます。
+同じテーブルを同じ名前でJOINすると、上書きするので`area`のJOINの方が後ろに来ます。
 
 ```sql
 SELECT
     [shop].*,
-    [category].*
+    [area].*
 FROM
     [shop]
     INNER JOIN
         [image]
     ON  [shop].main_image_id = [image].image_id
     INNER JOIN
-        [category]
-    ON  [shop].category_id = [category].id
-    AND [category].[id] = @0
+        [area]
+    ON  [shop].area_id = [area].id
+    AND [area].[id] = @0
 
 # DbCommand.Paramters["@0"] = "1"
 ```
@@ -257,11 +267,17 @@ select
   .AddColumn("*");
 
 select.Context("shop")
-  .InnerJoin("image", db.CreateCondition("{0}.main_image_id = {1}.id"), "main_image")
+  .InnerJoin("image", db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("main_image_id", "shop"),
+    new Sdx.Db.Query.Column("id", "image")
+  ), "main_image")
   .AddColumn("*");
 
 select.Context("shop")
-  .InnerJoin("image", db.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image")
+  .InnerJoin("image", db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("sub_image_id", "shop"),
+    new Sdx.Db.Query.Column("id", "image")
+  ), "sub_image")
   .AddColumn("*");
 ```
 
@@ -292,13 +308,22 @@ select
   .AddColumn("*");
 
 select.Context("shop")
-  .LeftJoin("image", db.CreateCondition("{0}.main_image_id = {1}.id"), "main_image");
+  .LeftJoin("image", db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("main_image_id", "shop"),
+    new Sdx.Db.Query.Column("id", "image")
+  ), "main_image");
 
 select.Context("shop")
-  .LeftJoin("image", db.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image");
+  .LeftJoin("image", db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("sub_image_id", "shop"),
+    new Sdx.Db.Query.Column("id", "image")
+  ), "sub_image");
 
 select.Context("shop")
-  .InnerJoin("category", db.CreateCondition("{0}.category_id = {1}.id"));
+  .InnerJoin("area", db.CreateCondition().Add(
+    new Sdx.Db.Query.Column("area_id", "shop"),
+    new Sdx.Db.Query.Column("id", "area")
+  ));
 ```
 
 ```sql
@@ -307,8 +332,8 @@ SELECT
 FROM
     [shop]
     INNER JOIN
-        [category]
-    ON  [shop].category_id = [category].id
+        [area]
+    ON  [shop].area_id = [area].id
     LEFT JOIN
         [image] AS [main_image]
     ON  [shop].main_image_id = [main_image].id
@@ -415,11 +440,11 @@ select
 
 var sub = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
 sub
-  .AddFrom("category")
+  .AddFrom("area")
   .AddColumn("id")
   .Where.Add("id", "2");
 
-select.Context("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
+select.Context("shop").Where.Add("area_id", sub, Sdx.Db.Query.Comparison.In);
 ```
 
 ```sql
@@ -429,13 +454,13 @@ FROM
     [shop]
 WHERE
     [shop].[id] = @0
-AND [shop].[category_id] IN(
+AND [shop].[area_id] IN(
         SELECT
-            [category].[id]
+            [area].[id]
         FROM
-            [category]
+            [area]
         WHERE
-            [category].[id] = @1
+            [area].[id] = @1
     )
 
 # DbCommand.Parameters["@0"] = 1
