@@ -640,9 +640,10 @@ select
   .AddColumn("*");
 
 select.AddOrder("id", Sdx.Db.Query.AddOrder.DESC);
-select.Limit = 10;
-select.Offset = 20;
+select.SetLimit(10, 20);
 ```
+
+最初の引数がLIMIT句、2番めの引数がOFFSET句です。OFFSETは省略可能です。
 
 ```sql
 # SqlServer
