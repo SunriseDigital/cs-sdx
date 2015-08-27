@@ -70,7 +70,7 @@ DbCommand command = select.Build();
 SELECT [shop].* FROM [shop];
 ```
 
-複数のカラムを追加する`Columns`メソッドもあります。`Columns`は可変引数を受け付けます。
+複数のカラムを追加する`AddColumns`メソッドもあります。`AddColumns`は可変引数を受け付けます。
 
 ```c#
 var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
