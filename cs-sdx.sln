@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Express 14 for Windows Desktop
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Express 2013 for Web
+VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Db", "Sdx.Db\Sdx.Db.csproj", "{ED1E6BA0-37F0-46CF-A86A-231A6CD2178C}"
 EndProject
@@ -10,6 +10,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Web", "Sdx.Web\Sdx.Web.csproj", "{A91E7E02-005E-4329-97AE-38DCFD6A2493}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Diagnostics", "Sdx.Diagnostics\Sdx.Diagnostics.csproj", "{E015CB03-532E-4789-BAC5-E6542AED9F14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Api", "Sdx.Api\Sdx.Api.csproj", "{19093C40-48E1-46DE-8FEF-B6BDC839CAAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -42,6 +44,12 @@ Global
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.TravisCI|Any CPU.ActiveCfg = TravisCI|Any CPU
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.TravisCI|Any CPU.Build.0 = TravisCI|Any CPU
+		{19093C40-48E1-46DE-8FEF-B6BDC839CAAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{19093C40-48E1-46DE-8FEF-B6BDC839CAAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{19093C40-48E1-46DE-8FEF-B6BDC839CAAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{19093C40-48E1-46DE-8FEF-B6BDC839CAAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{19093C40-48E1-46DE-8FEF-B6BDC839CAAF}.TravisCI|Any CPU.ActiveCfg = Release|Any CPU
+		{19093C40-48E1-46DE-8FEF-B6BDC839CAAF}.TravisCI|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
