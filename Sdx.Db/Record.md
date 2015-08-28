@@ -21,7 +21,6 @@
 基本的な設定です。テーブルクラス自体は各SELECTの中でJOINに利用され、JOIN時のデータを保有するため、複数生成されるクラスです。テーブルの定義自体はユニークなものなので`Sdx.Db.MetaData`クラスのインスタンスとしてstaticなプロパティに保持します。本来はテーブル同士の関係も定義しますが、話を単純にするため、最初の例では省略します。
 
 ```c#
-using System;
 using System.Collections.Generic;
 
 namespace Test.Orm.Table
@@ -67,3 +66,25 @@ namespace Test.Orm.Table
 1. レコードクラスのタイプ
 1. テーブルクラスのタイプ
 
+#### レコードクラス
+
+レコードクラスからもテーブル定義にアクセスできるようするためstaticなプロパティが必要です。
+
+```c#
+namespace Test.Orm
+{
+  public class Shop : Sdx.Db.Record
+  {
+    public static Sdx.Db.MetaData Meta { get; private set; }
+
+    static Shop()
+    {
+      Meta = Test.Orm.Table.Shop.Meta;
+    }
+  }
+}
+```
+
+#### リレーションを貼る
+
+`shop`は複数の`menu`を持っています。
