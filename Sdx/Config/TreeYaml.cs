@@ -16,6 +16,9 @@ namespace Sdx.Config
       yamlData = new Dictionary<string, YamlNode>();
     }
 
+    private List<Tree> listCache;
+    private Dictionary<string, Tree> treeCache = new Dictionary<string, Tree>();
+
     private YamlNode BaseNode { get; set; }
 
     private YamlNode FindTargetNode(List<string> paths)
@@ -68,6 +71,11 @@ namespace Sdx.Config
     {
       get
       {
+        if(this.listCache != null)
+        {
+          return this.listCache;
+        }
+
         if (this.BaseNode == null)
         {
           throw new InvalidCastException("This is root node.");
@@ -78,23 +86,29 @@ namespace Sdx.Config
           throw new InvalidCastException("Target is not List");
         }
 
-        var list = new List<Tree>();
+        this.listCache = new List<Tree>();
         foreach (var node in ((YamlSequenceNode)this.BaseNode))
         {
           var row = new TreeYaml();
           row.BaseNode = node;
-          list.Add(row);
+          this.listCache.Add(row);
         }
 
-        return list;
+        return this.listCache;
       }
     }
 
     protected override Tree Get(List<string> paths)
     {
-      var tree = new TreeYaml();
-      tree.BaseNode = this.FindTargetNode(paths);
-      return tree;
+      var ckey = String.Join(".", paths);
+      if(!this.treeCache.ContainsKey(ckey))
+      {
+        var tree = new TreeYaml();
+        tree.BaseNode = this.FindTargetNode(paths);
+        this.treeCache[ckey] = tree;
+      }
+      
+      return this.treeCache[ckey];
     }
 
     private YamlNode LoadYaml(string fileKey)

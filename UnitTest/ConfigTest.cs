@@ -18,7 +18,7 @@ namespace UnitTest
 {
   [TestClass]
   public class ConfigTest : BaseTest
-  { 
+  {
     [Fact]
     public void TestYaml()
     {
@@ -35,11 +35,10 @@ namespace UnitTest
       Assert.Equal("foo", strList[0].Value);
       Assert.Equal("bar", strList[1].Value);
       Assert.Equal("foobar", strList[2].Value);
-      foreach(var item in strList)
+      foreach (var item in strList)
       {
         //foreachできるかどうかのテストなので、何もAssertしない。
       }
-
 
       Assert.Equal("マルチバイト\"文字中\"のクオート", config.Get("test.multi-string").Value);
       Assert.Equal("マルチバイト文字の複数行\nマルチバイト文字の二行目\n", config.Get("test.bill-to.street").Value);
@@ -60,6 +59,35 @@ namespace UnitTest
       Assert.Equal("value4", innerDicList[0].Get("list-dic-key2").Value);
       Assert.Equal("value5", innerDicList[1].Get("list-dic-key1").Value);
       Assert.Equal("value6", innerDicList[1].Get("list-dic-key2").Value);
+    }
+
+    [Fact]
+    public void TestAssertMemoryCache()
+    {
+      Sdx.Config.Tree config = new Sdx.Config.TreeYaml();
+      config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
+
+      var testReceipt = config.Get("test.receipt");
+      Assert.Equal(testReceipt, config.Get("test.receipt"));
+
+      var nestedDic = config.Get("test.nested-dic");
+      Assert.Equal(nestedDic, config.Get("test.nested-dic"));
+
+      //経由先が別なのでキャッシュされたものとは違ってしまう。
+      Assert.NotEqual(nestedDic.Get("inner-dic.key1"), config.Get("test.nested-dic.inner-dic.key1"));
+
+      var clonedList = new List<Sdx.Config.Tree>();
+      foreach (var tree in nestedDic.Get("inner-str-list"))
+      {
+        clonedList.Add(tree);
+      }
+
+      var index = 0;
+      foreach (var tree in nestedDic.Get("inner-str-list"))
+      {
+        Assert.Equal(clonedList[index], tree);
+        ++index;
+      }
     }
   }
 }

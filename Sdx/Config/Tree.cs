@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Sdx.Config
 {
-  public abstract class Tree : IEnumerable<Tree>
+  public abstract class Tree
   {
     ///////////////////////////////////////////////////////////////
     public string BaseDir { get; set; }
@@ -62,11 +62,6 @@ namespace Sdx.Config
     }
 
     public IEnumerator<Tree> GetEnumerator()
-    {
-      return ((IEnumerable<Tree>)List).GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
     {
       return ((IEnumerable<Tree>)List).GetEnumerator();
     }
