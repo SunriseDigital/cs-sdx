@@ -8,62 +8,14 @@ namespace Sdx.Config
 {
   public abstract class Tree : IEnumerable<Tree>
   {
-
-
-    public abstract List<string> StrListValue { get; }
-
-    protected abstract string GetString(List<string> paths);
-
-    protected abstract Dictionary<string, string> GetStrDic(List<string> paths);
-
-    protected abstract List<Tree> GetTreeList(List<string> paths);
-
-    protected abstract List<string> GetStrList(List<string> paths);
-
-    protected abstract Dictionary<string, Tree> GetTreeDic(List<string> paths);
-
-    public String GetString(string path)
-    {
-      var paths = this.SplitPath(path);
-      return GetString(paths);
-    }
-
-    public Dictionary<string, string> GetStrDic(string path)
-    {
-      var paths = this.SplitPath(path);
-      return GetStrDic(paths);
-    }
-
-    public List<Tree> GetTreeList(string path)
-    {
-      var paths = this.SplitPath(path);
-      return GetTreeList(paths);
-    }
-
-    public List<string> GetStrList(string path)
-    {
-      var paths = this.SplitPath(path);
-      return GetStrList(paths);
-    }
-
-    public Dictionary<string, Tree> GetTreeDic(string path)
-    {
-      var paths = this.SplitPath(path);
-      return GetTreeDic(paths);
-    }
-
     ///////////////////////////////////////////////////////////////
     public string BaseDir { get; set; }
 
-    /// <summary>
-    /// ネストした辞書を取得するときGetTreeDicを使うが、このTreeは辞書の場合とStringの場合とListの場合がある。
-    /// 辞書に関してはGet系メソッドで取得できるがString/Listの場合はキーがないのでGet系メソッドでは取得できないため
-    /// Value/StrListValue/TreeListValueで値を取得する
-    /// </summary>
-    /// <returns></returns>
     public abstract string Value { get; }
 
     public abstract List<Tree> List { get; }
+
+    protected abstract Tree Get(List<string> paths);
 
     private List<string> SplitPath(string path)
     {
@@ -102,9 +54,6 @@ namespace Sdx.Config
 
       return paths;
     }
-
-    
-    protected abstract Tree Get(List<string> paths);
 
     public Tree Get(string path)
     {
