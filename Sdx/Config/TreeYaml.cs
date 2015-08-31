@@ -16,9 +16,9 @@ namespace Sdx.Config
       yamlData = new Dictionary<string, YamlNode>();
     }
 
-    internal YamlNode BaseNode { get; set; }
+    private YamlNode BaseNode { get; set; }
 
-    private YamlNode DetectTargetNode(List<string> paths)
+    private YamlNode FindTargetNode(List<string> paths)
     {
       YamlNode target;
       if (this.BaseNode == null)
@@ -93,7 +93,7 @@ namespace Sdx.Config
     protected override Tree Get(List<string> paths)
     {
       var tree = new TreeYaml();
-      tree.BaseNode = this.DetectTargetNode(paths);
+      tree.BaseNode = this.FindTargetNode(paths);
       return tree;
     }
 
