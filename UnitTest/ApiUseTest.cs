@@ -14,7 +14,7 @@ using System;
 namespace UnitTest
 {
   [TestClass]
-  public class TestTemplate : BaseTest
+  public class ApiTest : BaseTest
   {
     [ClassInitialize]
     public static void InitilizeClass(TestContext context)
@@ -44,14 +44,13 @@ namespace UnitTest
 
     override public void FixtureSetUp()
     {
-      TestTemplate.InitilizeClass(null);
-      //ここのクラス名は適宜書き換えてください。
+      ApiTest.InitilizeClass(null);
       //MSTestのFixtureSetUpがstaticじゃないとだめだったのでこのような構造になってます。
     }
 
     override public void FixtureTearDown()
     {
-      TestTemplate.CleanupClass();
+      ApiTest.CleanupClass();
       //@see FixtureSetUp
     }
 
