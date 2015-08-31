@@ -12,12 +12,12 @@ namespace Sdx.Config
     /// <summary>
     /// ネストした辞書を取得するときGetTreeDicを使うが、このTreeは辞書の場合とStringの場合とListの場合がある。
     /// 辞書に関してはGet系メソッドで取得できるがString/Listの場合はキーがないのでGet系メソッドでは取得できないため
-    /// ToString/ToTreeListで値を取得する
+    /// StringValue/StrListValue/TreeListValueで値を取得する
     /// </summary>
     /// <returns></returns>
-    public abstract new string ToString();
+    public abstract string StringValue { get; }
 
-    public abstract List<string> ToStrList();
+    public abstract List<string> StrListValue { get; }
 
     protected abstract string GetString(List<string> paths);
 

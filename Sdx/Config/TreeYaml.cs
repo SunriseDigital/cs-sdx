@@ -49,13 +49,18 @@ namespace Sdx.Config
     {
       var target = this.DetectTargetNode(paths);
 
+      return this.BuildStringFrom(target);
+    }
+
+    private string BuildStringFrom(YamlNode target)
+    {
       if (!(target is YamlScalarNode))
       {
         throw new InvalidCastException("Target is not string.");
-        
+
       }
 
-      return target.ToString();
+      return ((YamlScalarNode) target).Value;
     }
 
     protected override Dictionary<string, string> GetStrDic(List<string> paths)
@@ -145,24 +150,30 @@ namespace Sdx.Config
       return dic;
     }
 
-    public override string ToString()
+    public override string StringValue
     {
-      if(this.BaseNode == null)
+      get
       {
-        return this.GetType().ToString();
-      }
+        if (this.BaseNode == null)
+        {
+          throw new InvalidCastException("This is root node.");
+        }
 
-      return this.BaseNode.ToString();
+        return this.BuildStringFrom(this.BaseNode);
+      }
     }
 
-    public override List<string> ToStrList()
+    public override List<string> StrListValue
     {
-      if (this.BaseNode == null)
+      get
       {
-        return new List<string>();
-      }
+        if (this.BaseNode == null)
+        {
+          throw new InvalidCastException("This is root node.");
+        }
 
-      return this.BuildListFrom(this.BaseNode);
+        return this.BuildListFrom(this.BaseNode);
+      }
     }
 
     private YamlNode LoadYaml(string fileKey)

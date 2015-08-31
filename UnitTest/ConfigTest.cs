@@ -45,11 +45,11 @@ namespace UnitTest
       Assert.Equal("マルチバイト文字の複数行\nマルチバイト文字の二行目\n", config.GetString("test.bill-to.street"));
 
       var nestedDic = config.GetTreeDic("test.nested-dic");
-      Assert.Equal("普通の文字列", nestedDic["plane-string"].ToString());
+      Assert.Equal("普通の文字列", nestedDic["plane-string"].StringValue);
       Assert.Equal("value1", nestedDic["inner-dic"].GetString("key1"));
       Assert.Equal("value2", nestedDic["inner-dic"].GetString("key2"));
 
-      var innerList = nestedDic["inner-str-list"].ToStrList();
+      var innerList = nestedDic["inner-str-list"].StrListValue;
       Assert.Equal(2, innerList.Count);
       Assert.Equal("listval1", innerList[0]);
       Assert.Equal("listval2", innerList[1]);
