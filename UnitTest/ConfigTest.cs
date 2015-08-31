@@ -48,6 +48,11 @@ namespace UnitTest
       Assert.Equal("普通の文字列", nestedDic["plane-string"].ToString());
       Assert.Equal("value1", nestedDic["inner-dic"].GetString("key1"));
       Assert.Equal("value2", nestedDic["inner-dic"].GetString("key2"));
+
+      var innerList = nestedDic["inner-str-list"].ToStrList();
+      Assert.Equal(2, innerList.Count);
+      Assert.Equal("listval1", innerList[0]);
+      Assert.Equal("listval2", innerList[1]);
     }
   }
 }

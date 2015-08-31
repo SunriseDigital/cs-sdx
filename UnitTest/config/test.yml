@@ -39,4 +39,6 @@ nested-dic:
   inner-dic:
     key1:       value1
     key2:       value2
-
+  inner-str-list:
+    - listval1
+    - listval2

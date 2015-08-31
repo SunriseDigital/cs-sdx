@@ -17,6 +17,8 @@ namespace Sdx.Config
     /// <returns></returns>
     public abstract new string ToString();
 
+    public abstract List<string> ToStrList();
+
     protected abstract string GetString(List<string> paths);
 
     protected abstract Dictionary<string, string> GetStrDic(List<string> paths);

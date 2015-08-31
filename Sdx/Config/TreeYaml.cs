@@ -105,6 +105,11 @@ namespace Sdx.Config
     {
       var target = this.DetectTargetNode(paths);
 
+      return this.BuildListFrom(target);
+    }
+
+    private List<string> BuildListFrom(YamlNode target)
+    {
       if (!(target is YamlSequenceNode))
       {
         throw new InvalidCastException("Target is not List");
@@ -148,6 +153,16 @@ namespace Sdx.Config
       }
 
       return this.BaseNode.ToString();
+    }
+
+    public override List<string> ToStrList()
+    {
+      if (this.BaseNode == null)
+      {
+        return new List<string>();
+      }
+
+      return this.BuildListFrom(this.BaseNode);
     }
 
     private YamlNode LoadYaml(string fileKey)
