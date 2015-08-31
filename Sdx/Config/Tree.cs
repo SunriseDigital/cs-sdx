@@ -19,6 +19,8 @@ namespace Sdx.Config
 
     public abstract List<string> StrListValue { get; }
 
+    public abstract List<Tree> TreeListValue { get; }
+
     protected abstract string GetString(List<string> paths);
 
     protected abstract Dictionary<string, string> GetStrDic(List<string> paths);

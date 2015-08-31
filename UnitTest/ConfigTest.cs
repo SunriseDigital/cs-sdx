@@ -53,6 +53,13 @@ namespace UnitTest
       Assert.Equal(2, innerList.Count);
       Assert.Equal("listval1", innerList[0]);
       Assert.Equal("listval2", innerList[1]);
+
+      var innerDicList = nestedDic["inner-dic-list"].TreeListValue;
+      Assert.Equal(2, innerDicList.Count);
+      Assert.Equal("value3", innerDicList[0].GetString("list-dic-key1"));
+      Assert.Equal("value4", innerDicList[0].GetString("list-dic-key2"));
+      Assert.Equal("value5", innerDicList[1].GetString("list-dic-key1"));
+      Assert.Equal("value6", innerDicList[1].GetString("list-dic-key2"));
     }
   }
 }

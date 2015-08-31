@@ -42,3 +42,10 @@ nested-dic:
   inner-str-list:
     - listval1
     - listval2
+  inner-dic-list:
+    -
+      list-dic-key1: value3
+      list-dic-key2: value4
+    -
+      list-dic-key1: value5
+      list-dic-key2: value6

@@ -90,6 +90,11 @@ namespace Sdx.Config
     {
       var target = this.DetectTargetNode(paths);
 
+      return this.BuildListTreeFrom(target);
+    }
+
+    private List<Tree> BuildListTreeFrom(YamlNode target)
+    {
       if (!(target is YamlSequenceNode))
       {
         throw new InvalidCastException("Target is not List");
@@ -173,6 +178,19 @@ namespace Sdx.Config
         }
 
         return this.BuildListFrom(this.BaseNode);
+      }
+    }
+
+    public override List<Tree> TreeListValue
+    {
+      get
+      {
+        if (this.BaseNode == null)
+        {
+          throw new InvalidCastException("This is root node.");
+        }
+
+        return this.BuildListTreeFrom(this.BaseNode);
       }
     }
 
