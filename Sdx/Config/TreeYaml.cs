@@ -18,7 +18,7 @@ namespace Sdx.Config
 
     internal YamlNode BaseNode { get; set; }
 
-    protected override object GetData<T>(List<string> paths)
+    private YamlNode DetectTargetNode(List<string> paths)
     {
       YamlNode target;
       if (this.BaseNode == null)
@@ -37,86 +37,87 @@ namespace Sdx.Config
         target = this.BaseNode;
       }
 
-      foreach(var key in paths)
+      foreach (var key in paths)
       {
         target = ((YamlMappingNode)target).Children[new YamlScalarNode(key)];
       }
 
-      var targetType = typeof(T);
-      if (targetType == typeof(string))
-      {
-        if(target is YamlScalarNode)
-        {
-          return target.ToString();
-        }
-
-        throw new InvalidCastException("Target is not string.");
-      }
-      else if (targetType == typeof(DateTime))
-      {
-        if (target is YamlScalarNode)
-        {
-          return Convert.ToDateTime(target.ToString());
-        }
-
-        throw new InvalidCastException("Target is not DateTime.");
-      }
-      else if (targetType == typeof(Dictionary<string, string>))
-      {
-        if (target is YamlMappingNode)
-        {
-          var dic = new Dictionary<string, string>();
-          foreach(var entry in ((YamlMappingNode) target).Children)
-          {
-            if(!(entry.Value is YamlScalarNode))
-            {
-              throw new InvalidCastException(entry.Key + " value is not string.");
-            }
-
-            dic[entry.Key.ToString()] = entry.Value.ToString();
-          }
-
-          return dic;
-        }
-
-        throw new InvalidCastException("Target is not Dictionary.");
-      }
-      else if (targetType == typeof(List<Tree>))
-      {
-        if(target is YamlSequenceNode)
-        {
-          var list = new List<Tree>();
-          foreach(var node in ((YamlSequenceNode)target))
-          {
-            var row = new TreeYaml();
-            row.BaseNode = node;
-            list.Add(row);
-          }
-
-          return list;
-        }
-
-        throw new InvalidCastException("Target is not List");
-      }
-      else if(targetType == typeof(List<string>))
-      {
-        if (target is YamlSequenceNode)
-        {
-          var list = new List<string>();
-          foreach (YamlScalarNode node in ((YamlSequenceNode)target))
-          {
-            list.Add(node.ToString());
-          }
-
-          return list;
-        }
-
-        throw new InvalidCastException("Target is not List");
-      }
-
       return target;
     }
-    
+
+    protected override string GetString(List<string> paths)
+    {
+      var target = this.DetectTargetNode(paths);
+
+      if (!(target is YamlScalarNode))
+      {
+        throw new InvalidCastException("Target is not string.");
+        
+      }
+
+      return target.ToString();
+    }
+
+    protected override Dictionary<string, string> GetStrDic(List<string> paths)
+    {
+      var target = this.DetectTargetNode(paths);
+
+      if (!(target is YamlMappingNode))
+      {
+        throw new InvalidCastException("Target is not Dictionary.");
+      }
+
+      var dic = new Dictionary<string, string>();
+      foreach (var entry in ((YamlMappingNode)target).Children)
+      {
+        if (!(entry.Value is YamlScalarNode))
+        {
+          throw new InvalidCastException(entry.Key + " value is not string.");
+        }
+
+        dic[entry.Key.ToString()] = entry.Value.ToString();
+      }
+
+      return dic;
+    }
+
+    protected override List<Tree> GetTreeList(List<string> paths)
+    {
+      var target = this.DetectTargetNode(paths);
+
+      if (!(target is YamlSequenceNode))
+      {
+        throw new InvalidCastException("Target is not List");
+      }
+
+      var list = new List<Tree>();
+      foreach (var node in ((YamlSequenceNode)target))
+      {
+        var row = new TreeYaml();
+        row.BaseNode = node;
+        list.Add(row);
+      }
+
+      return list;
+    }
+
+    protected override List<string> GetStrList(List<string> paths)
+    {
+      var target = this.DetectTargetNode(paths);
+
+      if (!(target is YamlSequenceNode))
+      {
+        throw new InvalidCastException("Target is not List");
+      }
+
+      var list = new List<string>();
+      foreach (YamlScalarNode node in ((YamlSequenceNode)target))
+      {
+        list.Add(node.ToString());
+      }
+
+      return list;
+    }
 
     private YamlNode LoadYaml(string fileKey)
     {

@@ -9,17 +9,48 @@ namespace Sdx.Config
   {
     public string BaseDir { get; set; }
 
-    protected abstract object GetData<T>(List<string> paths);
+    protected abstract string GetString(List<string> paths);
 
-    public T Get<T>(string path)
+    protected abstract Dictionary<string, string> GetStrDic(List<string> paths);
+
+    protected abstract List<Tree> GetTreeList(List<string> paths);
+
+    protected abstract List<string> GetStrList(List<string> paths);
+
+    public String GetString(string path)
+    {
+      var paths = this.SplitPath(path);
+      return GetString(paths);
+    }
+
+    public Dictionary<string, string> GetStrDic(string path)
+    {
+      var paths = this.SplitPath(path);
+      return GetStrDic(paths);
+    }
+
+    public List<Tree> GetTreeList(string path)
+    {
+      var paths = this.SplitPath(path);
+      return GetTreeList(paths);
+    }
+
+    public List<string> GetStrList(string path)
+    {
+      var paths = this.SplitPath(path);
+      return GetStrList(paths);
+    }
+
+
+    private List<string> SplitPath(string path)
     {
       var paths = new List<string>();
       var index = 0;
       //`..`と二つ重ねると`.`を表現できるようにするため
       string prevForEscaped = null;
-      foreach(var chunk in path.Split('.'))
+      foreach (var chunk in path.Split('.'))
       {
-        if(chunk == "")
+        if (chunk == "")
         {
           var prevKey = index - 1;
           if (paths.Count > index)
@@ -33,9 +64,9 @@ namespace Sdx.Config
           }
 
         }
-        else if(prevForEscaped != null)
+        else if (prevForEscaped != null)
         {
-          paths.Add(prevForEscaped + "."+ chunk);
+          paths.Add(prevForEscaped + "." + chunk);
           prevForEscaped = null;
 
         }
@@ -46,20 +77,7 @@ namespace Sdx.Config
         ++index;
       }
 
-      //if (!this.data.ContainsKey(paths[0]))
-      //{
-      //  this.data[paths[0]] = this.LoadData(paths[0]);
-      //}
-
-      //var target = this.data[paths[0]];
-      //foreach(var key in paths)
-      //{
-      //  target = target.Get(key);
-      //}
-
-
-
-      return (T)this.GetData<T>(paths);
+      return paths;
     }
   }
 }

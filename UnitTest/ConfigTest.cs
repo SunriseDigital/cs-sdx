@@ -25,22 +25,21 @@ namespace UnitTest
       Sdx.Config.Tree config = new Sdx.Config.TreeYaml();
       config.BaseDir = Path.GetFullPath(".") + @"\config";
 
-      Assert.Equal("Oz-Ware Purchase Invoice", config.Get<string>("test.receipt"));
-      Assert.Equal("2007/08/06", config.Get<DateTime>("test.date").ToString("yyyy/MM/dd"));
+      Assert.Equal("Oz-Ware Purchase Invoice", config.GetString("test.receipt"));
+      //Assert.Equal("2007/08/06", config.Get<DateTime>("test.date").ToString("yyyy/MM/dd"));
 
-      var strDic = config.Get<Dictionary<string, string>>("test.customer");
+      var strDic = config.GetStrDic("test.customer");
       Assert.Equal("Dorothy", strDic["given"]);
 
-      var treeList = config.Get<List<Sdx.Config.Tree>>("test.items");
+      var treeList = config.GetTreeList("test.items");
       Assert.Equal(2, treeList.Count);
-      Assert.Equal("A4786", treeList[0].Get<string>("part_no"));
+      Assert.Equal("A4786", treeList[0].GetString("part_no"));
 
-      var strList = config.Get<List<string>>("test.list");
+      var strList = config.GetStrList("test.list");
       Assert.Equal(3, strList.Count);
       Assert.Equal("foo", strList[0]);
       Assert.Equal("bar", strList[1]);
       Assert.Equal("foobar", strList[2]);
-
     }
   }
 }
