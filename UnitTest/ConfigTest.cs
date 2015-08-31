@@ -23,7 +23,7 @@ namespace UnitTest
     public void TestYaml()
     {
       Sdx.Config.Tree config = new Sdx.Config.TreeYaml();
-      config.BaseDir = Path.GetFullPath(".") + @"\config";
+      config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar +"config";
 
       Assert.Equal("Oz-Ware Purchase Invoice", config.GetString("test.receipt"));
       //Assert.Equal("2007/08/06", config.Get<DateTime>("test.date").ToString("yyyy/MM/dd"));
