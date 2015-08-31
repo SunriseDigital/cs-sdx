@@ -40,6 +40,9 @@ namespace UnitTest
       Assert.Equal("foo", strList[0]);
       Assert.Equal("bar", strList[1]);
       Assert.Equal("foobar", strList[2]);
+
+      Assert.Equal("マルチバイト\"文字中\"のクオート", config.GetString("test.multi_string"));
+      Assert.Equal("マルチバイト文字の複数行\nマルチバイト文字の二行目\n", config.GetString("test.bill-to.street"));
     }
   }
 }
