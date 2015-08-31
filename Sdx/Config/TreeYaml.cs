@@ -155,7 +155,7 @@ namespace Sdx.Config
       return dic;
     }
 
-    public override string StringValue
+    public override string Value
     {
       get
       {
@@ -181,7 +181,7 @@ namespace Sdx.Config
       }
     }
 
-    public override List<Tree> TreeListValue
+    public override List<Tree> List
     {
       get
       {
@@ -205,6 +205,13 @@ namespace Sdx.Config
       yaml.Load(input);
 
       return yaml.Documents[0].RootNode;
+    }
+
+    protected override Tree Get(List<string> paths)
+    {
+      var tree = new TreeYaml();
+      tree.BaseNode = this.DetectTargetNode(paths);
+      return tree;
     }
   }
 }
