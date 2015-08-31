@@ -119,6 +119,37 @@ namespace Sdx.Config
       return list;
     }
 
+    protected override Dictionary<string, Tree> GetTreeDic(List<string> paths)
+    {
+      var target = this.DetectTargetNode(paths);
+
+      if (!(target is YamlMappingNode))
+      {
+        throw new InvalidCastException("Target is not Dictionary.");
+      }
+
+      var dic = new Dictionary<string, Tree>();
+      foreach (var entry in ((YamlMappingNode)target).Children)
+      {
+        var row = new TreeYaml();
+        row.BaseNode = entry.Value;
+
+        dic[entry.Key.ToString()] = row;
+      }
+
+      return dic;
+    }
+
+    public override string ToString()
+    {
+      if(this.BaseNode == null)
+      {
+        return this.GetType().ToString();
+      }
+
+      return this.BaseNode.ToString();
+    }
+
     private YamlNode LoadYaml(string fileKey)
     {
       var path = this.BaseDir + Path.DirectorySeparatorChar + fileKey + ".yml";

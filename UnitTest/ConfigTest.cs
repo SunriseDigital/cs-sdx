@@ -41,8 +41,13 @@ namespace UnitTest
       Assert.Equal("bar", strList[1]);
       Assert.Equal("foobar", strList[2]);
 
-      Assert.Equal("マルチバイト\"文字中\"のクオート", config.GetString("test.multi_string"));
+      Assert.Equal("マルチバイト\"文字中\"のクオート", config.GetString("test.multi-string"));
       Assert.Equal("マルチバイト文字の複数行\nマルチバイト文字の二行目\n", config.GetString("test.bill-to.street"));
+
+      var nestedDic = config.GetTreeDic("test.nested-dic");
+      Assert.Equal("普通の文字列", nestedDic["plane-string"].ToString());
+      Assert.Equal("value1", nestedDic["inner-dic"].GetString("key1"));
+      Assert.Equal("value2", nestedDic["inner-dic"].GetString("key2"));
     }
   }
 }

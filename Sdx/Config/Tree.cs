@@ -9,6 +9,14 @@ namespace Sdx.Config
   {
     public string BaseDir { get; set; }
 
+    /// <summary>
+    /// ネストした辞書を取得するときGetTreeDicを使うが、このTreeは辞書の場合とStringの場合とListの場合がある。
+    /// 辞書に関してはGet系メソッドで取得できるがString/Listの場合はキーがないのでGet系メソッドでは取得できないため
+    /// ToString/ToTreeListで値を取得する
+    /// </summary>
+    /// <returns></returns>
+    public abstract new string ToString();
+
     protected abstract string GetString(List<string> paths);
 
     protected abstract Dictionary<string, string> GetStrDic(List<string> paths);
@@ -16,6 +24,8 @@ namespace Sdx.Config
     protected abstract List<Tree> GetTreeList(List<string> paths);
 
     protected abstract List<string> GetStrList(List<string> paths);
+
+    protected abstract Dictionary<string, Tree> GetTreeDic(List<string> paths);
 
     public String GetString(string path)
     {
@@ -41,6 +51,11 @@ namespace Sdx.Config
       return GetStrList(paths);
     }
 
+    public Dictionary<string, Tree> GetTreeDic(string path)
+    {
+      var paths = this.SplitPath(path);
+      return GetTreeDic(paths);
+    }
 
     private List<string> SplitPath(string path)
     {

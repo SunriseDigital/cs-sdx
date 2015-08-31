@@ -32,4 +32,11 @@ specialDelivery:  >
 
 list: [foo, bar, foobar]
 
-multi_string: マルチバイト"文字中"のクオート
+multi-string: マルチバイト"文字中"のクオート
+
+nested-dic:
+  plane-string: 普通の文字列
+  inner-dic:
+    key1:       value1
+    key2:       value2
+
