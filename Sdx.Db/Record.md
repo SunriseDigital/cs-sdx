@@ -47,7 +47,7 @@ namespace Test.Orm.Table
         },
         new Dictionary<string, Relation>()
         {
-
+          //他テーブルとの関係を設定します。
         },
         typeof(Test.Orm.Shop),
         typeof(Test.Orm.Table.Category)
@@ -87,4 +87,56 @@ namespace Test.Orm
 
 #### リレーションを貼る
 
-`shop`は複数の`menu`を持っています。
+`shop`は複数の`menu`を持っています。この関係を設定してみます。
+
+```c#
+using System.Collections.Generic;
+
+namespace Test.Orm.Table
+{
+  class Shop : Sdx.Db.Table
+  {
+    public static Sdx.Db.MetaData Meta { get; private set; }
+
+    static Shop()
+    {
+      Meta =  new Sdx.Db.MetaData(
+        "shop",
+        new List<string>()
+        {
+          "id"
+        },
+        new List<Column>()
+        {
+          new Column("id"),
+          new Column("name"),
+          new Column("area_id"),
+          new Column("main_image_id"),
+          new Column("sub_image_id"),
+        },
+        new Dictionary<string, Relation>()
+        {
+          {
+            "menu",
+            new Relation(
+              typeof(Test.Orm.Table.Menu),
+              "id",
+              "shop_id"
+            )
+          }
+        },
+        typeof(Test.Orm.Shop),
+        typeof(Test.Orm.Table.Category)
+      );
+    }
+  }
+}
+```
+
+`Sdx.Db.Table.Relation`のインスタンスで関連を設定します。コンストラクタの引数は下記のようになっています。
+
+1. テーブルクラスのType
+1. 自分自身の参照カラム。`shop.id`になります。
+1. 相手テーブルの参照ラカム。`menu.shop_id`です。
+
+このようにして、テーブル同士の関係を設定していきます。ユニットテストのクラス様々な設定を確認できますので参考にしてください。
