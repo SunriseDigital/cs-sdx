@@ -164,16 +164,6 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Context AddColumns(Dictionary<string, object> columns)
-    {
-      foreach(var column in columns)
-      {
-        this.AddColumn(column.Value, column.Key);
-      }
-
-      return this;
-    }
-
     public string AppendName(string column)
     {
       return this.select.Adapter.QuoteIdentifier(this.Name) + "." + this.select.Adapter.QuoteIdentifier(column);
