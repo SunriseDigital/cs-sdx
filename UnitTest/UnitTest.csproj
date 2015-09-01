@@ -63,15 +63,27 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConfigTest.cs" />
     <Compile Include="DbQueryTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="Test\Config\Dir.cs" />
+    <Compile Include="Test\Config\Dir2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="config\dir2\foo.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\dir\foo.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\test.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="user.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -86,6 +98,10 @@
     <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
       <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
       <Name>Sdx.Diagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sdx\Sdx.csproj">
+      <Project>{ed186d94-5ab8-4707-b0a8-60fbd4237d2d}</Project>
+      <Name>Sdx</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -102,6 +118,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
