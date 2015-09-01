@@ -98,5 +98,27 @@ namespace UnitTest
 
       Assert.Equal("hoge", config.Get("dir/foo.bar").Value);
     }
+
+    [Fact]
+    public void TestSubclass()
+    {
+      //test of `dir`
+      var config = new Test.Config.Dir();
+      Assert.True(config.BaseDir.EndsWith("config"+Path.DirectorySeparatorChar+"dir"));
+
+      var fooConfig = config.Get("foo");
+      Assert.Equal("hoge", fooConfig.Get("bar").Value);
+      Assert.Equal("foo", fooConfig.Get("dic.key1").Value);
+      Assert.Equal("bar", fooConfig.Get("dic.key2").Value);
+
+      //test of `dir2`
+      var config2 = new Test.Config.Dir2();
+      Assert.True(config2.BaseDir.EndsWith("config" + Path.DirectorySeparatorChar + "dir2"));
+
+      var fooConfig2 = config2.Get("foo");
+      Assert.Equal("hoge2", fooConfig2.Get("bar").Value);
+      Assert.Equal("foo2", fooConfig2.Get("dic.key1").Value);
+      Assert.Equal("bar2", fooConfig2.Get("dic.key2").Value);
+    }
   }
 }

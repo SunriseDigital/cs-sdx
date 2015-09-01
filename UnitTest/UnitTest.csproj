@@ -70,9 +70,14 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="Test\Config\Dir.cs" />
+    <Compile Include="Test\Config\Dir2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="config\dir2\foo.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="config\dir\foo.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -27,12 +27,16 @@ namespace Sdx.Config
       if (this.BaseNode == null)
       {
         var fileKey = paths[0];
-        if (!yamlData.ContainsKey(fileKey))
+        var path = this.BaseDir
+          + Path.DirectorySeparatorChar
+          + fileKey.Replace('/', Path.DirectorySeparatorChar)
+          + ".yml";
+        if (!yamlData.ContainsKey(path))
         {
-          yamlData[fileKey] = this.LoadYaml(fileKey);
+          yamlData[path] = this.LoadYaml(path);
         }
 
-        target = yamlData[fileKey];
+        target = yamlData[path];
         paths.RemoveAt(0);
       }
       else
@@ -111,18 +115,15 @@ namespace Sdx.Config
       return this.treeCache[ckey];
     }
 
-    private YamlNode LoadYaml(string fileKey)
+    private YamlNode LoadYaml(string path)
     {
-      var path = this.BaseDir
-        + Path.DirectorySeparatorChar 
-        + fileKey.Replace('/', Path.DirectorySeparatorChar) 
-        + ".yml";
-      var fs = new FileStream(path, FileMode.Open);
-      var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
-
-
-      var yaml = new YamlStream();
-      yaml.Load(input);
+      YamlStream yaml;
+      using (var fs = new FileStream(path, FileMode.Open))
+      {
+        var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
+        yaml = new YamlStream();
+        yaml.Load(input);
+      }
 
       return yaml.Documents[0].RootNode;
     }
