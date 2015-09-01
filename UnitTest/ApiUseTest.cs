@@ -16,45 +16,6 @@ namespace UnitTest
   [TestClass]
   public class ApiTest : BaseTest
   {
-    [ClassInitialize]
-    public static void InitilizeClass(TestContext context)
-    {
-      Console.WriteLine("FixtureSetUp");
-      //最初のテストメソッドを実行する前に一回だけ実行したい処理はここ
-    }
-
-    [ClassCleanup]
-    public static void CleanupClass()
-    {
-      Console.WriteLine("FixtureTearDown");
-      //全てのテストメソッドが実行された後一回だけ実行する処理はここ
-    }
-
-    override protected void SetUp()
-    {
-      Console.WriteLine("SetUp");
-      //各テストメソッドの前に実行する処理はここ
-    }
-
-    override protected void TearDown()
-    {
-      Console.WriteLine("TearDown");
-      //各テストメソッドの後に実行する処理はここ
-    }
-
-    override public void FixtureSetUp()
-    {
-      ApiTest.InitilizeClass(null);
-      //MSTestのFixtureSetUpがstaticじゃないとだめだったのでこのような構造になってます。
-    }
-
-    override public void FixtureTearDown()
-    {
-      ApiTest.CleanupClass();
-      //@see FixtureSetUp
-    }
-
-
     [Fact]
     public void TestMethod1()
     {
