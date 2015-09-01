@@ -21,20 +21,19 @@ namespace UnitTest
     {
       Console.WriteLine("TestMethod1");
 
-      String ApiName = "api-name";
-      Sdx.Api.Json Api = new Sdx.Api.Json(ApiName);
+      Sdx.Api.Json api = new Sdx.Api.Json("http://example.com/path/to/api");
 
-      String Token = "asdfghjkl";
+      string token = "asdfghjkl";
 
       //リクエストに必要な条件をセットする
-      Api
-        ->SetClientId(1)
-        ->SetShopId(1234)
-        ->SetAccessToken(Token)
+      api
+        .Set("client_id", 1)
+        .Set("shop_id", 1234)
+        .Set("access_token", token)
         ;
 
       //結果配列を取得する
-      var Resp = Api->GetResponse();
+      var resp = api.GetResponse();
     }
 
     [Fact]
