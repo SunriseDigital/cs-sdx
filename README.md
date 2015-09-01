@@ -5,6 +5,7 @@
 
 ## modules
 
+* [Sdx](Sdx)
 * [Sdx.Db](Sdx.Db)
 * [Sdx.DebugTool](Sdx.DebugTool)
 * [Sdx.Web](Sdx.Web)

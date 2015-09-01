@@ -1,0 +1,51 @@
+﻿receipt:    Oz-Ware Purchase Invoice
+date:        2007-08-06
+customer:
+  given:   Dorothy
+  family:  Gale
+
+items:
+  - part_no:   A4786
+    descrip:   Water Bucket (Filled)
+    price:     1.47
+    quantity:  4
+
+  - part_no:   E1628
+    descrip:   High Heeled ""Ruby"" Slippers
+    price:     100.27
+    quantity:  1
+
+bill-to:  &id001
+  street: |
+          マルチバイト文字の複数行
+          マルチバイト文字の二行目
+  city:   East Westville
+  state:  KS
+
+ship-to:  *id001
+
+specialDelivery:  >
+  Follow the Yellow Brick
+  Road to the Emerald City.
+  Pay no attention to the
+  man behind the curtain.
+
+list: [foo, bar, foobar]
+
+multi-string: マルチバイト"文字中"のクオート
+
+nested-dic:
+  plane-string: 普通の文字列
+  inner-dic:
+    key1:       value1
+    key2:       value2
+  inner-str-list:
+    - listval1
+    - listval2
+  inner-dic-list:
+    -
+      list-dic-key1: value3
+      list-dic-key2: value4
+    -
+      list-dic-key1: value5
+      list-dic-key2: value6

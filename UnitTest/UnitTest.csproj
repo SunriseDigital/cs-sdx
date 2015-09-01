@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
     <Compile Include="DbAdapterTest.cs" />
+    <Compile Include="ConfigTest.cs" />
     <Compile Include="DbQueryTest.cs" />
     <Compile Include="DbRecordTest.cs" />
     <Compile Include="DbTableTest.cs" />
@@ -87,9 +88,20 @@
     <Compile Include="Test\Orm\Table\Shop.cs" />
     <Compile Include="Test\Orm\Area.cs" />
     <Compile Include="Test\Orm\Shop.cs" />
+    <Compile Include="Test\Config\Dir.cs" />
+    <Compile Include="Test\Config\Dir2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="config\dir2\foo.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\dir\foo.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\test.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="user.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -105,9 +117,9 @@
       <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
       <Name>Sdx.Diagnostics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sdx.Util\Sdx.Util.csproj">
-      <Project>{814a034d-4cdd-4de6-9aa3-6ff1431ed11c}</Project>
-      <Name>Sdx.Util</Name>
+    <ProjectReference Include="..\Sdx\Sdx.csproj">
+      <Project>{ed186d94-5ab8-4707-b0a8-60fbd4237d2d}</Project>
+      <Name>Sdx</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
