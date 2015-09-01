@@ -20,6 +20,21 @@ namespace UnitTest
     public void TestMethod1()
     {
       Console.WriteLine("TestMethod1");
+
+      String ApiName = "api-name";
+      Sdx.Api.Json Api = new Sdx.Api.Json(ApiName);
+
+      String Token = "asdfghjkl";
+
+      //リクエストに必要な条件をセットする
+      Api
+        ->SetClientId(1)
+        ->SetShopId(1234)
+        ->SetAccessToken(Token)
+        ;
+
+      //結果配列を取得する
+      var Resp = Api->GetResponse();
     }
 
     [Fact]
