@@ -15,7 +15,7 @@ namespace Sdx.Config
 
     public abstract List<Tree> List { get; }
 
-    protected abstract Tree Get(List<string> paths);
+    protected abstract Tree Get(string path, List<string> paths);
 
     private List<string> SplitPath(string path)
     {
@@ -58,7 +58,7 @@ namespace Sdx.Config
     public Tree Get(string path)
     {
       var paths = this.SplitPath(path);
-      return Get(paths);
+      return Get(path, paths);
     }
 
     public IEnumerator<Tree> GetEnumerator()

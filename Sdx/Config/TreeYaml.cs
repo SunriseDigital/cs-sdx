@@ -24,13 +24,17 @@ namespace Sdx.Config
     private YamlNode FindTargetNode(List<string> paths)
     {
       YamlNode target;
+
       if (this.BaseNode == null)
       {
+        //ファイル名を含むルートの場合
         var fileKey = paths[0];
         var path = this.BaseDir
           + Path.DirectorySeparatorChar
           + fileKey.Replace('/', Path.DirectorySeparatorChar)
           + ".yml";
+
+        //一度読み込んだYamlはメモリにキャッシュ
         if (!yamlData.ContainsKey(path))
         {
           yamlData[path] = this.LoadYaml(path);
@@ -102,17 +106,16 @@ namespace Sdx.Config
       }
     }
 
-    protected override Tree Get(List<string> paths)
+    protected override Tree Get(string path, List<string> paths)
     {
-      var ckey = String.Join(".", paths);
-      if(!this.treeCache.ContainsKey(ckey))
+      if(!this.treeCache.ContainsKey(path))
       {
         var tree = new TreeYaml();
         tree.BaseNode = this.FindTargetNode(paths);
-        this.treeCache[ckey] = tree;
+        this.treeCache[path] = tree;
       }
       
-      return this.treeCache[ckey];
+      return this.treeCache[path];
     }
 
     private YamlNode LoadYaml(string path)
