@@ -89,5 +89,14 @@ namespace UnitTest
         ++index;
       }
     }
+
+    [Fact]
+    public void TestDirectory()
+    {
+      Sdx.Config.Tree config = new Sdx.Config.TreeYaml();
+      config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
+
+      Assert.Equal("hoge", config.Get("dir/foo.bar").Value);
+    }
   }
 }

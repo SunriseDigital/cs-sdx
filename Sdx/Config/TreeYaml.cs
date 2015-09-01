@@ -113,7 +113,10 @@ namespace Sdx.Config
 
     private YamlNode LoadYaml(string fileKey)
     {
-      var path = this.BaseDir + Path.DirectorySeparatorChar + fileKey + ".yml";
+      var path = this.BaseDir
+        + Path.DirectorySeparatorChar 
+        + fileKey.Replace('/', Path.DirectorySeparatorChar) 
+        + ".yml";
       var fs = new FileStream(path, FileMode.Open);
       var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
 
