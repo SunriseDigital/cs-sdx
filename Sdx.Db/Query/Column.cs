@@ -5,9 +5,10 @@ using System.Text;
 
 namespace Sdx.Db.Query
 {
-  internal class Column
+  public class Column
   {
     private object name;
+
     public Column(object columnName)
     {
       if(columnName is Expr)
@@ -28,24 +29,37 @@ namespace Sdx.Db.Query
       }
       else
       {
-        throw new Exception("columnName support only Sdx.Db.Query.Expr or string, " + columnName.GetType() + " given.");
+        throw new NotSupportedException("columnName support only Sdx.Db.Query.Expr or string, " + columnName.GetType() + " given.");
       }
     }
 
-    public Column(Expr columnName)
+    public Column(object columnName, string contextName) : this(columnName)
     {
-      name = columnName;
+      this.ContextName = contextName;
     }
 
     public string Alias { get; set; }
 
-    public Table Table { get; set; }
+    public string ContextName { get; set; }
 
     public Order Order { get; set; }
 
-    public object Name
+    public object Target
     {
       get { return this.name; }
+    }
+
+    public string Name
+    {
+      get
+      {
+        if(this.Alias != null)
+        {
+          return this.Alias;
+        }
+
+        return this.name.ToString();
+      }
     }
 
     private string QuotedName(Adapter db)
@@ -63,9 +77,9 @@ namespace Sdx.Db.Query
     internal string Build(Adapter db)
     {
       var sql = "";
-      if(this.Table != null)
+      if(this.ContextName != null)
       {
-        sql = db.QuoteIdentifier(this.Table.ContextName) + "." + this.QuotedName(db);
+        sql = db.QuoteIdentifier(this.ContextName) + "." + this.QuotedName(db);
       }
       else
       {

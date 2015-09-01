@@ -7,33 +7,33 @@ namespace Sdx.Db.Query
 {
   public class Select
   {
-    private Adapter adapter;
-    private List<Table> tables = new List<Table>();
+    private List<Context> contextList = new List<Context>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
     private Condition where;
     private Condition having;
 
-    internal Select(Adapter adapter)
+    public Select()
     {
-      this.adapter = adapter;
       this.JoinOrder = JoinOrder.InnerFront;
-      this.where = new Condition(this);
-      this.having = new Condition(this);
+      this.where = new Condition();
+      this.having = new Condition();
 
       //intは0で初期化されてしまうのでセットされていない状態を識別するため（`LIMIT 0`を可能にするため）-1をセット
       this.Limit = -1;
     }
 
-    internal Adapter Adapter
+    public Select(Adapter adapter) : this()
     {
-      get { return this.adapter; }
+      this.Adapter = adapter;
     }
 
-    internal List<Table> TableList
+    public Adapter Adapter { get; set; }
+
+    internal List<Context> ContextList
     {
-      get { return this.tables; }
+      get { return this.contextList; }
     }
 
     internal List<Column> GroupList
@@ -56,37 +56,67 @@ namespace Sdx.Db.Query
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="contextName">Sdx.Db.Query.Expr|String</param>
-    /// <param contextName="alias"></param>
-    /// <returns></returns>
-    public Table From(object tableName, string alias = null)
+    public Context AddFrom(Sdx.Db.Table target, string alias = null)
     {
-      Table from = new Table(this);
-      from.Name = tableName;
-      from.Alias = alias;
-      from.JoinType = JoinType.From;
+      var context = this.CreateContext(target.OwnMeta.Name, alias);
+      context.Table = target;
+      target.ContextName = context.Name;
+      target.Select = this;
+      return context;
+    }
 
-      this.tables.Add(from);
+    /// <summary>
+    /// From句を追加。繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    public Context AddFrom(Expr target, string alias = null)
+    {
+      return this.CreateContext(target, alias);
+    }
 
-      return from;
+    /// <summary>
+    /// From句を追加。繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    public Context AddFrom(String target, string alias = null)
+    {
+      return this.CreateContext(target, alias);
+    }
+
+    public Context AddFrom(Sdx.Db.Query.Select target, string alias = null)
+    {
+      return this.CreateContext(target, alias);
+    }
+
+    private Context CreateContext(object target, string alias)
+    {
+      Context context = new Context(this);
+      context.Alias = alias;
+      context.JoinType = JoinType.From;
+      context.Target = target;
+      this.contextList.Add(context);
+
+      return context;
     }
 
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
-      string selectString = "SELECT ";
+      string selectString = "SELECT";
 
-      //カラムを組み立てる
-      selectString += this.BuildColumsString() + " FROM ";
+      var columnString = this.BuildColumsString();
+      if (columnString.Length > 0)
+      {
+        selectString += " " + columnString;
+      }
+      selectString += " FROM ";
 
       //FROMを追加
       var fromString = "";
-      foreach (Table table in this.tables.Where(t => t.JoinType == JoinType.From))
+      foreach (Context context in this.contextList.Where(t => t.JoinType == JoinType.From))
       {
         if (fromString != "")
         {
           fromString += ", ";
         }
-        fromString += this.buildJoinString(table, parameters, condCount);
+        fromString += this.BuildJoinString(context, parameters, condCount);
       }
 
       selectString += fromString;
@@ -94,28 +124,28 @@ namespace Sdx.Db.Query
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner))
         {
-          selectString += this.buildJoinString(table, parameters, condCount);
+          selectString += this.BuildJoinString(context, parameters, condCount);
         }
 
-        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Left))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(table, parameters, condCount);
+          selectString += this.BuildJoinString(context, parameters, condCount);
         }
       }
       else
       {
-        foreach (var table in this.tables.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          selectString += this.buildJoinString(table, parameters, condCount);
+          selectString += this.BuildJoinString(context, parameters, condCount);
         }
       }
 
       if (this.where.Count > 0)
       {
         selectString += " WHERE ";
-        selectString += this.where.Build(parameters, condCount);
+        selectString += this.where.Build(this, parameters, condCount);
       }
 
       //GROUP
@@ -129,7 +159,7 @@ namespace Sdx.Db.Query
             groupString += ", ";
           }
 
-          groupString += column.Build(this.adapter);
+          groupString += column.Build(this.Adapter);
         });
 
         selectString += " GROUP BY " + groupString;
@@ -139,7 +169,7 @@ namespace Sdx.Db.Query
       if(this.having.Count > 0)
       {
         selectString += " HAVING ";
-        selectString += this.having.Build(parameters, condCount);
+        selectString += this.having.Build(this, parameters, condCount);
       }
 
       //ORDER
@@ -151,7 +181,7 @@ namespace Sdx.Db.Query
           {
             orderString += ", ";
           }
-          orderString += column.Build(this.adapter) + " " + column.Order.SqlString();
+          orderString += column.Build(this.Adapter) + " " + column.Order.SqlString();
         });
 
         selectString += " ORDER BY " + orderString;
@@ -160,44 +190,49 @@ namespace Sdx.Db.Query
       //LIMIT/OFFSET
       if(this.Limit > -1)
       {
-        selectString = this.adapter.AppendLimitQuery(selectString, this.Limit, this.Offset);
+        selectString = this.Adapter.AppendLimitQuery(selectString, this.Limit, this.Offset);
       }
 
       return selectString;
     }
 
-    private string buildJoinString(Table table, DbParameterCollection parameters, Counter condCount)
+    private string BuildJoinString(Context context, DbParameterCollection parameters, Counter condCount)
     {
       string joinString = "";
 
-      if (table.JoinType != JoinType.From)
+      if (context.JoinType != JoinType.From)
       {
-        joinString += " " + table.JoinType.SqlString() + " ";
+        joinString += " " + context.JoinType.SqlString() + " ";
       }
 
-      if (table.Name is Select)
+      if (context.Target is Select)
       {
-        Select select = table.Name as Select;
+        Select select = context.Target as Select;
+        if (select.Adapter == null)
+        {
+          select.Adapter = this.Adapter;
+        }
+        
         string subquery = select.BuildSelectString(parameters, condCount);
         joinString += "(" + subquery + ")";
       }
       else
       {
-        joinString += this.Adapter.QuoteIdentifier(table.Name);
+        joinString += this.Adapter.QuoteIdentifier(context.Target);
       }
 
-      if (table.Alias != null)
+      if (context.Alias != null)
       {
-        joinString += " AS " + this.Adapter.QuoteIdentifier(table.ContextName);
+        joinString += " AS " + this.Adapter.QuoteIdentifier(context.Name);
       }
 
-      if (table.JoinCondition != null)
+      if (context.JoinCondition != null)
       {
         joinString += " ON "
           + String.Format(
-            table.JoinCondition,
-            this.Adapter.QuoteIdentifier(table.ParentTable.ContextName),
-            this.Adapter.QuoteIdentifier(table.ContextName)
+            context.JoinCondition.Build(this, parameters, condCount),
+            this.Adapter.QuoteIdentifier(context.ParentContext.Name),
+            this.Adapter.QuoteIdentifier(context.Name)
           );
       }
 
@@ -206,45 +241,61 @@ namespace Sdx.Db.Query
 
     public DbCommand Build()
     {
-      DbCommand command = this.adapter.CreateCommand();
+      if (this.Adapter == null)
+      {
+        throw new InvalidOperationException("Missing adapter, Set before Build.");
+      }
+
+      DbCommand command = this.Adapter.CreateCommand();
       var condCount = new Counter();
       command.CommandText = this.BuildSelectString(command.Parameters, condCount);
 
       return command;
     }
 
+    public bool HasContext(string contextName)
+    {
+      int findIndex = this.contextList.FindIndex(context =>
+      {
+        return context.Name == contextName;
+      });
+
+      return findIndex != -1;
+    }
+
+
     /// <summary>
     /// From及びJoinしたテーブルの中からcontextNameのテーブルを探し返す
     /// </summary>
     /// <param name="contextName"></param>
     /// <returns></returns>
-    public Table Table(string contextName)
+    public Context Context(string contextName)
     {
-      foreach (Table table in this.tables)
+      foreach (Context context in this.contextList)
       {
-        if (table.ContextName == contextName)
+        if (context.Name == contextName)
         {
-          return table;
+          return context;
         }
       }
 
-      throw new Exception("Missing " + contextName + " table current context.");
+      throw new InvalidOperationException("Missing " + contextName + " context.");
     }
 
     /// <summary>
     /// 追加したカラムをクリアする。
     /// </summary>
-    /// <param contextName="table">Tableを渡すとそのテーブルのカラムのみをクリアします。</param>
+    /// <param contextName="context">Contextを渡すとそのテーブルのカラムのみをクリアします。</param>
     /// <returns></returns>
-    public Select ClearColumns(Table table = null)
+    public Select ClearColumns(string contextName = null)
     {
-      if (table == null)
+      if (contextName == null)
       {
         this.columns.Clear();
       }
       else
       {
-        this.columns.RemoveAll(column => column.Table != null && column.Table.ContextName == table.ContextName);
+        this.columns.RemoveAll(column => column.ContextName != null && column.ContextName == contextName);
       }
       
       return this;
@@ -253,13 +304,13 @@ namespace Sdx.Db.Query
     /// <summary>
     /// エイリアスの付与はできません。
     /// </summary>
-    /// <param contextName="columns">Sdx.Db.Query.Expr[]|String[]</param>
+    /// <param contextName="columns">Sdx.Adapter.Query.Expr[]|String[] 配列の中にExprを混ぜられるようにobjectなってます。</param>
     /// <returns></returns>
-    public Select Columns(params object[] columns)
+    public Select AddColumns(params object[] columns)
     {
       foreach (var column in columns)
       {
-        this.Column(column);
+        this.AddColumn(column);
       }
       return this;
     }
@@ -267,25 +318,10 @@ namespace Sdx.Db.Query
     /// <summary>
     /// 
     /// </summary>
-    /// <param contextName="columns">エイリアスがKeyでカラムがValueのDictionary</param>
-    /// <returns></returns>
-    public Select Columns(Dictionary<string, object> columns)
-    {
-      foreach (var column in columns)
-      {
-        this.Column(column.Value, column.Key);
-      }
-
-      return this;
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
-    public Select Column(object columnName, string alias = null)
+    public Select AddColumn(object columnName, string alias = null)
     {
       var column = new Column(columnName);
       column.Alias = alias;
@@ -303,7 +339,7 @@ namespace Sdx.Db.Query
           result += ", ";
         }
 
-        result += column.Build(this.adapter);
+        result += column.Build(this.Adapter);
       });
 
       return result;
@@ -314,17 +350,17 @@ namespace Sdx.Db.Query
     /// </summary>
     /// <param contextName="contextName"></param>
     /// <returns></returns>
-    public Select RemoveTable(string contextName)
+    public Select RemoveContext(string contextName)
     {
-      int findIndex = this.tables.FindIndex(jt =>
+      int findIndex = this.contextList.FindIndex(jt =>
       {
-        return jt.ContextName == contextName;
+        return jt.Name == contextName;
       });
 
       if (findIndex != -1)
       {
-        this.ClearColumns(this.tables[findIndex]);
-        this.tables.RemoveAt(findIndex);
+        this.ClearColumns(this.contextList[findIndex].Name);
+        this.contextList.RemoveAt(findIndex);
       }
 
       return this;
@@ -334,22 +370,17 @@ namespace Sdx.Db.Query
     {
       get
       {
-        this.where.Table = null;
+        this.where.Context = null;
         return this.where;
       }
-    }
-
-    public Condition CreateWhere()
-    {
-      return new Condition(this);
     }
 
     /// <summary>
     /// 繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <returns></returns>
-    public Select Group(object columnName)
+    public Select AddGroup(object columnName)
     {
       var column = new Column(columnName);
       this.groups.Add(column);
@@ -360,22 +391,30 @@ namespace Sdx.Db.Query
     {
       get
       {
-        this.having.Table = null;
+        this.having.Context = null;
         return this.having;
       }
     }
 
-    public int Limit { get; set; }
+    private int Limit { get; set; }
 
-    public int Offset { get; set; }
+    private int Offset { get; set; }
+
+    public Select SetLimit(int limit, int offset = 0)
+    {
+      this.Limit = limit;
+      this.Offset = offset;
+      return this;
+    }
+
 
     /// <summary>
     /// 繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="columnName">Sdx.Db.Query.Expr|String</param>
+    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="order"></param>
     /// <returns></returns>
-    public Select Order(object columnName, Order order)
+    public Select AddOrder(object columnName, Order order)
     {
       var column = new Column(columnName);
       column.Order = order;

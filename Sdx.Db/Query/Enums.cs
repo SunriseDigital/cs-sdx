@@ -8,23 +8,23 @@ namespace Sdx.Db.Query
     DESC
   }
 
-  public enum JoinType
+  internal enum JoinType
   {
     From,
     Inner,
     Left
   };
 
+  internal enum Logical
+  {
+    And,
+    Or
+  }
+
   public enum JoinOrder
   {
     InnerFront,
     Natural
-  }
-
-  public enum Logical
-  {
-    And,
-    Or
   }
 
   public enum Comparison
@@ -39,7 +39,9 @@ namespace Sdx.Db.Query
     Like,
     NotLike,
     In,
-    NotIn
+    NotIn,
+    IsNull,
+    IsNotNull
   }
 
   internal static class Enumns
@@ -63,7 +65,9 @@ namespace Sdx.Db.Query
           " LIKE ",
           " NOT LIKE ",
           " IN ",
-          " NOT IN "
+          " NOT IN ",
+          " IS NULL",
+          " IS NOT NULL"
         };
       return strings[(int)comp];
     }

@@ -20,12 +20,12 @@ using System.Data.Common;
 var db = new Sdx.Db.SqlServerAdapter();
 var select = db.CreateSelect();
 
-select.From("shop");
-select.Column("*");
+select.AddFrom("shop");
+select.AddColumn("*");
 DbCommand command = select.Build();
 ```
 
-`Select.From()`でテーブル名を指定し、`Select.Column`でカラムを追加します。
+`Select.AddFrom()`でテーブル名を指定し、`Select.AddColumn`でカラムを追加します。
 
 
 `DbCommand.CommandText`は下記のようになります。
@@ -34,12 +34,12 @@ DbCommand command = select.Build();
 SELECT * FROM [shop];
 ```
 
-`Select.From()`は複数回呼ぶと追加されていきます。
+`Select.AddFrom()`は複数回呼ぶと追加されていきます。
 
 ```c#
-select.From("shop");
-select.From("category");
-select.Column("*");
+select.AddFrom("shop");
+select.AddFrom("category");
+select.AddColumn("*");
 DbCommand command = select.Build();
 ```
 
@@ -52,12 +52,12 @@ SELECT * FROM [shop], [category];
 ```c#
 var select = db.CreateSelect();
 
-Sdx.Db.Query.Table shopTable = select.From("shop");
-shopTable.Column("*");
+Sdx.Db.Query.Context shopContext = select.AddFrom("shop");
+shopContext.AddColumn("*");
 DbCommand command = select.Build();
 ```
 
-`Select.From()`は指定したテーブルの`Sdx.Db.Query.Table`オブジェクトを返します。`Table.Column()`でカラムを追加するとテーブルを指定してカラムを追加することが可能です。
+`Select.AddFrom()`は指定したテーブルの`Sdx.Db.Query.Context`オブジェクトを返します。`Context.AddColumn()`でカラムを追加するとテーブルを指定してカラムを追加することが可能です。
 
 生成されるSQLは以下のようになります。
 
@@ -70,11 +70,11 @@ SELECT [shop].* FROM [shop];
 ```c#
 var select = db.CreateSelect();
 
-Sdx.Db.Query.Table shopTable =  select.From("shop");
+Sdx.Db.Query.Context shopContext =  select.AddFrom("shop");
 
-shopTable.Columns("id", "name");
+shopContext.AddColumns("id", "name");
 //あるいは
-//shopTable.Columns(new string[](){"id", "name"});
+//shopContext.AddColumns(new string[](){"id", "name"});
 
 DbCommand command = select.Build();
 ```
@@ -92,10 +92,10 @@ SELECT [shop].[id], [shop].[name] FROM [shop];
 ```c#
 var select = db.CreateSelect();
 
-select.From("shop")
-  .Column("id")
-  .Column("name")
-  .Column("category_id");
+select.AddFrom("shop")
+  .AddColumn("id")
+  .AddColumn("name")
+  .AddColumn("category_id");
 ```
 
 #### クオートを回避する
@@ -109,8 +109,8 @@ SELECT MAX(shop.id) FROM [shop]
 その時は`Sdx.Db.Query.Expr`で`string`をラッピングして追加してください。
 
 ```c#
-select.From("shop");
-select.Column(
+select.AddFrom("shop");
+select.AddColumn(
   Sdx.Db.Query.Expr.Wrap("MAX(shop.id)")
 );
 ```
@@ -123,7 +123,7 @@ select.Column(
 ```c#
 var select = db.CreateSelect();
 
-select.From("shop", "s").Column("*");
+select.AddFrom("shop", "s").AddColumn("*");
 DbCommand command = select.Build();
 ```
 
@@ -135,26 +135,26 @@ SELECT [s].* FROM [shop] AS [s];
 
 #### カラムのエイリアス
 
-カラムにエイリアスを指定する方法は`Select.Column`の第二引数にエイリアス名を渡す方法と`Select.Columns`に`Dictionary<string, object>`を渡す方法と2つあります。
+カラムにエイリアスを指定する方法は`Select.AddColumn`の第二引数にエイリアス名を渡す方法と`Select.AddColumns`に`Dictionary<string, object>`を渡す方法と2つあります。
 
-まずは`Select.Column`
+まずは`Select.AddColumn`
 
 ```c#
 var select = db.CreateSelect();
 
-select.From("shop")
-  .Column("id", "shop_id")
-  .Column("name", "shop_name")
+select.AddFrom("shop")
+  .AddColumn("id", "shop_id")
+  .AddColumn("name", "shop_name")
   ;
 DbCommand command = select.Build();
 ```
 
-`Select.Columns`に`Dictionary<string, object>`を渡す。
+`Select.AddColumns`に`Dictionary<string, object>`を渡す。
 
 ```c#
 var select = db.CreateSelect();
 
-select.From("shop").Columns(new Dictionary<string, object>(){
+select.AddFrom("shop").AddColumns(new Dictionary<string, object>(){
   {"shop_id", "id"},
   {"shop_name", "name"},
 });
@@ -171,60 +171,73 @@ SELECT [shop].[id] AS [shop_id], [shop].[name] AS [shop_name] FROM [shop];
 <br><br><br>
 ### JOIN
 
-JOINは`Sdx.Db.Query.Table`の`InnerJoin`あるいは`LeftJoin`を使用します。
+JOINは`Sdx.Db.Query.Context`の`InnerJoin`あるいは`LeftJoin`を使用します。
 
 ```c#
 var select = db.CreateSelect();
 
 select
-  .From("shop")
-  .Column("*");
+  .AddFrom("shop")
+  .AddColumn("*");
 
-Sdx.Db.Query.Table categoryTable = select.Table("shop")
-  .InnderJoin("category", "{0}.category_id = {1}.id")
-  .Column("*");
+Sdx.Db.Query.Context categoryContext = select.Context("shop")
+  .InnderJoin(
+    "category",
+    db.CreateCondition("{0}.category_id = {1}.id")
+      .AddRight("id", "1")
+  )
+  .AddColumn("*");
   
 DbCommand command = select.Build();
 ```
 
 ```sql
-SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].category_id = [category].id
+SELECT [shop].* FROM, [category].* [shop] INNER JOIN [category] ON [shop].category_id = [category].id AND [category].[id] = @0
+# DbCommand.Parameters["@0"] = "1";
 ```
 
-`Select.Table()`は既にJOINしたテーブル（FROM句も含む）の`Table`オブジェクトを取得します。また、`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Table`オブジェクトを返します。
+`Select.Context()`はFROM句、あるいはJOIN句のテーブルの`Context`オブジェクトを取得します。また、`InnerJoin`/`LeftJoin`はJOINしたテーブルの`Context`オブジェクトを返します。
 
-`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件をstringで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。
+`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Sdx.Db.Query.Condition`のインスタンスで渡します。string中の`{0}`はクオートされた呼び出し元テーブル（上記の場合`shop`）、`{1}`はクオートされた引数のテーブル（上記の場合`category`）に置換されます。`Condition`にはJOIN条件の生成用に`AddLeft`と`AddRight`のメソッドがあり、それぞれ`{0}`、`{1}`に条件を追加できます。
 
-JOINの条件内のカラム名など、`{0}`/`{1}`を利用したテーブル名以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオーとしてください。
+`Condition`のコンストラクタに渡す条件内のカラム名など、`{0}`/`{1}`を利用したテーブル名以外のテキストはクオートされません。動的な`string`を連結する場合などは、必ず自前でクオートしてください。
 
 ```c#
 var db = new Sdx.Db.SqlServerAdapter();
 ...
 
-select.Table("shop")
-  .InnerJoin("category", "{0}."+db.QuoteIdentifier(column)+" = {1}.id");
+select.Context("shop")
+  .InnerJoin("category", db.CreateCondition("{0}."+db.QuoteIdentifier(column)+" = {1}.id"));
 ```
 
 #### 同じテーブルをJOINする
 
-JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回した場合、上書きされます。
+JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回した場合、一度しかJOINは行われません。
 
 ```c#
-select.From("shop").Column("*");
+select.AddFrom("shop").AddColumn("*");
 
-select.Table("shop").InnerJoin(
+//まずはcategoryをJOIN
+select.Context("shop").InnerJoin(
   "category",
-  "{0}.category_id = {1}.id"
+  db.CreateCondition("{0}.category_id = {1}.id")
 );
 
-select.Table("shop").InnerJoin(
+//次にはimageをJOIN
+select.Context("shop").InnerJoin(
+  "image",
+  db.CreateCondition("{0}.main_image_id = {1}.id")
+);
+
+//もう一度categoryをJOIN
+select.Context("shop").InnerJoin(
   "category",
-  "{0}.category_id = {1}.id AND {1}.id = 1"
+  db.CreateCondition("{0}.category_id = {1}.id").AddRight("id", "1")
 );
 db.Command = select.Build();
 ```
 
-上書きするので`category`のJOINの方が後ろに来ます。
+同じテーブルを同じ名前でJOINすると、上書きするので`category`のJOINの方が後ろに来ます。
 
 ```sql
 SELECT
@@ -238,7 +251,9 @@ FROM
     INNER JOIN
         [category]
     ON  [shop].category_id = [category].id
-    AND [category].id = 1
+    AND [category].[id] = @0
+
+# DbCommand.Paramters["@0"] = "1"
 ```
 
 
@@ -248,16 +263,16 @@ FROM
 var select = db.CreateSelect();
 
 select
-  .From("shop")
-  .Column("*");
+  .AddFrom("shop")
+  .AddColumn("*");
   
-select.Table("shop")
-  .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
-  .Column("*");
+select.Context("shop")
+  .InnerJoin("image", db.CreateCondition("{0}.main_image_id = {1}.id"), "main_image")
+  .AddColumn("*");
 
-select.Table("shop")
-  .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
-  .Column("*");
+select.Context("shop")
+  .InnerJoin("image", db.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image")
+  .AddColumn("*");
 ```
 
 ```sql
@@ -283,17 +298,17 @@ FROM
 var select = db.CreateSelect();
 
 select
-  .From("shop")
-  .Column("*");
+  .AddFrom("shop")
+  .AddColumn("*");
   
-select.Table("shop")
-  .LeftJoin("image", "{0}.main_image_id = {1}.id", "main_image");
+select.Context("shop")
+  .LeftJoin("image", db.CreateCondition("{0}.main_image_id = {1}.id"), "main_image");
 
-select.Table("shop")
-  .LeftJoin("image", "{0}.sub_image_id = {1}.id", "sub_image");
+select.Context("shop")
+  .LeftJoin("image", db.CreateCondition("{0}.sub_image_id = {1}.id"), "sub_image");
   
-select.Table("shop")
-  .InnerJoin("category", "{0}.category_id = {1}.id");
+select.Context("shop")
+  .InnerJoin("category", db.CreateCondition("{0}.category_id = {1}.id"));
 ```
 
 ```sql
@@ -322,7 +337,7 @@ select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 <br><br><br>
 ### WHERE句
 
-`Select` `Table`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Condition`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
+`Select` `Context`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Condition`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
 
 `Condition`は`Add`というメソッドを持っていて、これでWhere句をセットしていきます。
 
@@ -359,7 +374,7 @@ public enum Comparison
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").Column("*");
+select.AddFrom("shop").AddColumn("*");
 select.Where.Add("id", "1");
 ```
 
@@ -370,12 +385,12 @@ SELECT [shop].* FROM [shop] WHERE [id] = @0;
 ※プレイスホルダは0から順番に`@数字`がふられます。
 
 
-#### Table.Whereに対する呼び出し
+#### Context.Whereに対する呼び出し
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").Column("*");
-select.Table("shop").Where.Add("id", "1");
+select.AddFrom("shop").AddColumn("*");
+select.Context("shop").Where.Add("id", "1");
 ```
 
 ```sql
@@ -389,8 +404,8 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").Column("*");
-select.Table("shop").Where.Add("id", new string[] { "1", "2" });
+select.AddFrom("shop").AddColumn("*");
+select.Context("shop").Where.Add("id", new string[] { "1", "2" });
 ```
 
 ```sql
@@ -404,17 +419,17 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
 ```c#
 var select = db.CreateSelect();
 select
-  .From("shop")
-  .Column("*")
+  .AddFrom("shop")
+  .AddColumn("*")
   .Where.Add("id", "1");
 
 var sub = db.CreateSelect();
 sub
-  .From("category")
-  .Column("id")
+  .AddFrom("category")
+  .AddColumn("id")
   .Where.Add("id", "2");
 
-select.Table("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
+select.Context("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
 ```
 
 ```sql
@@ -439,19 +454,19 @@ AND [shop].[category_id] IN(
 
 #### ORを含むような複雑なWHERE句
 
-`Where.Add()`に`Where`をセットすると子供の`Where`はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Where`は`Select.CreateWhere()`から生成可能です。
+`Where.Add()`に`Sdx.Db.Query.Condition`をセットすると子供のWhere句はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Sdx.Db.Query.Condition`は`Select.CreateCondition()`から生成可能です。
 
 ```c#
 var select = db.CreateSelect();
-select.From("shop").Column("*");
+select.AddFrom("shop").AddColumn("*");
 
 select.Where
   .Add(
-    select.CreateWhere()
+    select.CreateCondition()
       .Add("id", "3")
       .Add("id", "4")
   ).AddOr(
-    select.CreateWhere()
+    select.CreateCondition()
       .Add("id", "1")
       .AddOr("id", "2")
   );
@@ -476,31 +491,31 @@ OR
 <br><br><br>
 ### ORDER句
 
-ORDER句は`Select.Order()`、`Table.Order`で行います。`Table`の方はカラムにテーブル名が付与されます。`Order()`は2番めの引数に`Sdx.Db.Query.Order`enumを渡して`ASC`あるいは`DESC`を指定します。
+ORDER句は`Select.AddOrder()`、`Context.AddOrder`で行います。`Context`の方はカラムにテーブル名が付与されます。`Order()`は2番めの引数に`Sdx.Db.Query.AddOrder`enumを渡して`ASC`あるいは`DESC`を指定します。
 
-#### Select.Order()
+#### Select.AddOrder()
 
 ```c#
 var select = db.CreateSelect();
 select
-  .From("shop")
-  .Column("*");
+  .AddFrom("shop")
+  .AddColumn("*");
 
-select.Order("id", Sdx.Db.Query.Order.DESC);
+select.AddOrder("id", Sdx.Db.Query.AddOrder.DESC);
 ```
 
 ```sql
 SELECT [shop].* FROM [shop] ORDER BY [id] DESC
 ```
 
-#### Table.Order()
+#### Context.AddOrder()
 
 ```c#
 var select = db.CreateSelect();
 select
-  .From("shop")
-  .Column("*")
-  .Order("id", Sdx.Db.Query.Order.ASC);
+  .AddFrom("shop")
+  .AddColumn("*")
+  .AddOrder("id", Sdx.Db.Query.AddOrder.ASC);
 ```
 
 ```sql
@@ -510,16 +525,16 @@ SELECT [shop].* FROM [shop] ORDER BY [shop].[id] ASC
 <br><br><br>
 ### GROUP/HAVING句
 
-GROUP句はORDER句同様、`Select.Group()`/`Table.Group()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Table.Having`プロパティに対して操作を行います。
+GROUP句はORDER句同様、`Select.AddGroup()`/`Context.AddGroup()`があります。HAVING句はWHERE句と同様に、`Select.Having`あるいは`Context.Having`プロパティに対して操作を行います。
 
-#### Select.Group()/Select.Having
+#### Select.AddGroup()/Select.Having
 ```c#
 select = db.CreateSelect();
-select.From("shop");
+select.AddFrom("shop");
 
 select
-  .Column("id")
-  .Group("id")
+  .AddColumn("id")
+  .AddGroup("id")
   .Having.Add(
     Sdx.Db.Query.Expr.Wrap("SUM(shop.id)"),
     10,
@@ -533,13 +548,13 @@ SELECT [id] FROM [shop] GROUP BY [id] HAVING SUM(shop.id) >= @0
 # DbCommand.Parameters["@0"] = 10
 ```
 
-#### Table.Group()/Table.Having
+#### Context.AddGroup()/Context.Having
 ```c#
 select = db.CreateSelect();
 select
-  .From("shop")
-  .Column("id")
-  .Group("id")
+  .AddFrom("shop")
+  .AddColumn("id")
+  .AddGroup("id")
   .Having.Add("id", "2", Sdx.Db.Query.Comparison.GreaterEqual);
 ```
 
@@ -557,10 +572,10 @@ LIMIT/OFFSET句は`Select.Limit`/`Select.Offset`のプロパティにセット�
 ```c#
 var select = db.CreateSelect();
 select
-  .From("shop")
-  .Column("*");
+  .AddFrom("shop")
+  .AddColumn("*");
 
-select.Order("id", Sdx.Db.Query.Order.DESC);
+select.AddOrder("id", Sdx.Db.Query.AddOrder.DESC);
 select.Limit = 10;
 select.Offset = 20;
 ```

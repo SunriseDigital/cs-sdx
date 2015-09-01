@@ -4,20 +4,20 @@ namespace Sdx.Db.Query
 {
   public class Expr
   {
-    private string unquotedValue;
-    private Expr(string unquotedValue)
+    private object unquotedValue;
+    private Expr(object unquotedValue)
     {
       this.unquotedValue = unquotedValue;
     }
 
-    public static Expr Wrap(string unquotedValue)
+    public static Expr Wrap(object unquotedValue)
     {
       return new Sdx.Db.Query.Expr(unquotedValue);
     }
 
     public override string ToString()
     {
-      return this.unquotedValue;
+      return this.unquotedValue.ToString();
     }
   }
 }

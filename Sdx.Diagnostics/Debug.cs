@@ -136,5 +136,19 @@ namespace Sdx.Diagnostics
       sw.Start();
       HttpContext.Current.Items.Add(requestTimerKey, sw);
     }
+
+    public static string FormatStopwatchTicks(Int64 ticks, int precision = 8)
+    {
+      double result = (double)ticks / Stopwatch.Frequency;
+      if (result == 0.0)
+      {
+        return "0";
+      }
+      else
+      {
+        return result.ToString("N" + precision.ToString());
+      }
+    }
+
   }
 }

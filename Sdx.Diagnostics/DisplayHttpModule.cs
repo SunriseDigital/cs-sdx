@@ -75,12 +75,7 @@ namespace Sdx.Diagnostics
 
     private String formatTicks(long ticks)
     {
-      double result = (double)ticks / Stopwatch.Frequency;
-      if(result == 0.0){
-        return "0";
-      }else {
-        return result.ToString("N8");
-      }
+      return Debug.FormatStopwatchTicks(ticks);
     }
   }
 }
