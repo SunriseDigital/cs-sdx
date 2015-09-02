@@ -50,15 +50,19 @@ namespace Sdx.Db
       }
     }
 
+    public object GetValue(string key)
+    {
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
+      if(!this.list[0].ContainsKey(keyWithContext))
+      {
+        throw new KeyNotFoundException("Missing " + keyWithContext + " key.");
+      }
+      return this.list[0][keyWithContext];
+    }
+
     public string GetString(string key)
     {
-      key = Record.BuildColumnAliasWithContextName(key, this.ContextName);
-      if (this.list[0].ContainsKey(key))
-      {
-        return this.list[0][key].ToString();
-      }
-
-      return "";
+      return this.GetValue(key).ToString();
     }
 
     public T GetRecord<T>(string contextName) where T : Record, new()
