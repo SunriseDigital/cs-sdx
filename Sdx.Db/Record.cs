@@ -30,7 +30,7 @@ namespace Sdx.Db
       }
     }
 
-    public MetaData OwnMeta
+    public TableMeta OwnMeta
     {
       get
       {
@@ -40,7 +40,7 @@ namespace Sdx.Db
           throw new NotImplementedException("Missing Meta property in " + this.GetType());
         }
 
-        var meta = prop.GetValue(null, null) as MetaData;
+        var meta = prop.GetValue(null, null) as TableMeta;
         if (meta == null)
         {
           throw new NotImplementedException("Initialize TableMeta for " + this.GetType());

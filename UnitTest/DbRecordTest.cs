@@ -508,5 +508,36 @@ namespace UnitTest
       Assert.IsType<InvalidOperationException>(ex);
       Assert.Equal("Use Sdx.Db.Table, if you want to get Record.", ex.Message);
     }
+
+    [Fact]
+    public void TestChangeColumn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunChangeColumn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunChangeColumn(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+
+      select.AddFrom(new Test.Orm.Table.Shop())
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .ClearColumns()
+        .Table.AddColumns("id", "name").Select
+        .SetLimit(2);
+
+      select.Adapter = db.Adapter;
+
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+
+      Assert.Equal("天祥", shops[0].GetString("name"));
+      Assert.Equal("エスペリア", shops[1].GetString("name"));
+
+      Assert.Equal("", shops[0].GetString("area_id"));
+      Assert.Equal("", shops[1].GetString("area_id"));
+    }
   }
 }

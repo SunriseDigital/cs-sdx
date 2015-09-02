@@ -7,9 +7,9 @@ namespace Sdx.Db
   /// テーブルの名前や保持するカラム、他テーブルとの関係といったテーブルの情報を保持するクラス。
   /// 各Tableクラスのstaticなプロパティ、Metaに保持され、普遍なので複数生成する必要のないクラス。
   /// </summary>
-  public class MetaData
+  public class TableMeta
   {
-    public MetaData(
+    public TableMeta(
       string name,
       List<string> pkeys,
       List<Table.Column> columns,
