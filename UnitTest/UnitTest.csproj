@@ -80,6 +80,10 @@
     <None Include="user.config.tpl" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sdx.Api\Sdx.Api.csproj">
+      <Project>{19093c40-48e1-46de-8fef-b6bdc839caaf}</Project>
+      <Name>Sdx.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sdx.Db\Sdx.Db.csproj">
       <Project>{ed1e6ba0-37f0-46cf-a86a-231a6cd2178c}</Project>
       <Name>Sdx.Db</Name>
