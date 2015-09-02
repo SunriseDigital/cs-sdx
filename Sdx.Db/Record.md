@@ -140,3 +140,10 @@ namespace Test.Orm.Table
 1. 相手テーブルの参照ラカム。`menu.shop_id`です。
 
 このようにして、テーブル同士の関係を設定していきます。[ユニットテストのテーブルクラス](../UnitTest/Test/Orm/Table)で様々な設定を確認できますので参考にしてください。
+
+
+
+<br><br><br>
+### SELECTの組み立て
+
+
