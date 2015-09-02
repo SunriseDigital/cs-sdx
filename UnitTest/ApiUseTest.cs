@@ -23,17 +23,16 @@ namespace UnitTest
 
       Sdx.Api.Json api = new Sdx.Api.Json("http://example.com/path/to/api");
 
-      string token = "asdfghjkl";
-
       //リクエストに必要な条件をセットする
       api
+        .SetMethodPost()
         .Set("client_id", 1)
         .Set("shop_id", 1234)
-        .Set("access_token", token)
-        ;
+        .Set("access_token", "asdfghjkl")
+      ;
 
       //結果配列を取得する
-      var resp = api.GetResponse();
+      var json = api.GetJson();
     }
 
     [Fact]
