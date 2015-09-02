@@ -524,9 +524,10 @@ namespace UnitTest
       var select = new Sdx.Db.Query.Select();
 
       select.AddFrom(new Test.Orm.Table.Shop())
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        
         .ClearColumns()
-        .Table.AddColumns("id", "name").Select
+        .Table.AddColumns("id", "name")
+        .Context.AddOrder("id", Sdx.Db.Query.Order.ASC).Table.Select
         .SetLimit(2);
 
       select.Adapter = db.Adapter;

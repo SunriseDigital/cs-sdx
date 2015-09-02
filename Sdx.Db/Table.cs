@@ -100,6 +100,14 @@ namespace Sdx.Db
 
     internal string ContextName { get; set; }
 
+    public Query.Context Context
+    {
+      get
+      {
+        return this.Select.Context(this.ContextName);
+      }
+    }
+
     /// <summary>
     /// テーブル経由でカラムを変更したとき、カラムの並び順が呼び出し順になってるのが自然だと思ったので、Table内でSelectを保持するようになっています。
     /// </summary>
