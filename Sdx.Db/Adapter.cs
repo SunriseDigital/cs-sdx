@@ -124,7 +124,7 @@ namespace Sdx.Db
         throw new NotImplementedException("Missing Meta property in " + typeof(T));
       }
 
-      var meta = prop.GetValue(null, null) as MetaData;
+      var meta = prop.GetValue(null, null) as TableMeta;
       if (meta == null)
       {
         throw new NotImplementedException("Initialize TableMeta for " + typeof(T));

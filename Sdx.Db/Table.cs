@@ -43,7 +43,7 @@ namespace Sdx.Db
     public Adapter Adapter { get; set; }
     private Query.Select select;
 
-    public MetaData OwnMeta
+    public TableMeta OwnMeta
     {
       get
       {
@@ -53,7 +53,7 @@ namespace Sdx.Db
           throw new NotImplementedException("Missing Meta property in " + this.GetType());
         }
 
-        var meta = prop.GetValue(null, null) as MetaData;
+        var meta = prop.GetValue(null, null) as TableMeta;
         if (meta == null)
         {
           throw new NotImplementedException("Initialize TableMeta for " + this.GetType());
@@ -100,16 +100,24 @@ namespace Sdx.Db
 
     internal string ContextName { get; set; }
 
+    public Query.Context Context
+    {
+      get
+      {
+        return this.Select.Context(this.ContextName);
+      }
+    }
+
     /// <summary>
     /// テーブル経由でカラムを変更したとき、カラムの並び順が呼び出し順になってるのが自然だと思ったので、Table内でSelectを保持するようになっています。
     /// </summary>
-    internal Query.Select Select
+    public Query.Select Select
     {
       get
       {
         return this.select;
       }
-      set
+      internal set
       {
         this.select = value;
         this.OwnMeta.Columns.ForEach(column =>

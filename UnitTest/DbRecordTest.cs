@@ -508,5 +508,43 @@ namespace UnitTest
       Assert.IsType<InvalidOperationException>(ex);
       Assert.Equal("Use Sdx.Db.Table, if you want to get Record.", ex.Message);
     }
+
+    [Fact]
+    public void TestChangeColumn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunChangeColumn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunChangeColumn(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+
+      select.AddFrom(new Test.Orm.Table.Shop())
+        
+        .ClearColumns()
+        .Table.AddColumns("id", "name", "main_image_id")
+        .Context.AddOrder("id", Sdx.Db.Query.Order.ASC).Table.Select
+        .SetLimit(2);
+
+      select.Adapter = db.Adapter;
+
+      var shops = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+
+      Assert.Equal("天祥", shops[0].GetString("name"));
+      Assert.Equal("エスペリア", shops[1].GetString("name"));
+
+      //取得しなかったキーは取得を試みると例外になる。
+      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        shops[0].GetString("area_id");
+      }));
+
+      Assert.IsType<KeyNotFoundException>(ex);
+      Assert.Equal("Missing area_id@shop key.", ex.Message);
+      ;
+    }
   }
 }

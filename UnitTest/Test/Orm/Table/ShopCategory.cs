@@ -5,11 +5,11 @@ namespace Test.Orm.Table
 {
   class ShopCategory : Sdx.Db.Table
   {
-    public static Sdx.Db.MetaData Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static ShopCategory()
     {
-      Meta = new Sdx.Db.MetaData(
+      Meta = new Sdx.Db.TableMeta(
         "shop_category",
         new List<string>()
         {
