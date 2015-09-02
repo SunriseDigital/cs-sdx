@@ -56,6 +56,11 @@ namespace Sdx.Config
       return target;
     }
 
+    public override void ClearCache()
+    {
+      yamlData.Clear();
+    }
+
     public override string Value
     {
       get

@@ -15,6 +15,8 @@ namespace Sdx.Config
 
     public abstract List<Tree> List { get; }
 
+    public abstract void ClearCache();
+
     protected abstract Tree Get(string path, List<string> paths);
 
     private List<string> SplitPath(string path)
