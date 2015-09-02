@@ -16,9 +16,9 @@
 
  ![ER図](er.png "ER図")
 
-#### テーブルクラス
+#### Tableクラス
 
-基本的な設定です。テーブルクラス自体は各SELECTの中でJOINに利用され、JOIN時のデータを保有するため、複数生成されるクラスです。テーブルの定義自体はユニークなものなので`Sdx.Db.MetaData`クラスのインスタンスとしてstaticなプロパティに保持します。本来はテーブル同士の関係も定義しますが、話を単純にするため、最初の例では省略します。
+基本的な設定です。Tableクラス自体は各SELECTの中でJOINに利用され、JOIN時のデータを保有するため、複数生成されるクラスです。Tableの定義自体はユニークなものなので`Sdx.Db.TableMeta`クラスのインスタンスとしてstaticなプロパティに保持します。本来はテーブル同士の関係も定義しますが、話を単純にするため、最初の例では省略します。
 
 ```c#
 using System.Collections.Generic;
@@ -27,11 +27,11 @@ namespace Test.Orm.Table
 {
   class Shop : Sdx.Db.Table
   {
-    public static Sdx.Db.MetaData Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static Shop()
     {
-      Meta =  new Sdx.Db.MetaData(
+      Meta =  new Sdx.Db.TableMeta(
         "shop",
         new List<string>()
         {
@@ -57,14 +57,14 @@ namespace Test.Orm.Table
 }
 ```
 
-`MetaData`コンストラクタの引数は下記のようになっています。
+`TableMeta`コンストラクタの引数は下記のようになっています。
 
 1. テーブル名
 1. 主キー
 1. カラムのリスト
 1. 他テーブルとの関連（`Relation`）
-1. レコードクラスのタイプ
-1. テーブルクラスのタイプ
+1. Recordクラスのタイプ
+1. Tableクラスのタイプ
 
 #### レコードクラス
 
@@ -75,7 +75,7 @@ namespace Test.Orm
 {
   public class Shop : Sdx.Db.Record
   {
-    public static Sdx.Db.MetaData Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static Shop()
     {
@@ -96,11 +96,11 @@ namespace Test.Orm.Table
 {
   class Shop : Sdx.Db.Table
   {
-    public static Sdx.Db.MetaData Meta { get; private set; }
+    public static Sdx.Db.TableMeta Meta { get; private set; }
 
     static Shop()
     {
-      Meta =  new Sdx.Db.MetaData(
+      Meta =  new Sdx.Db.TableMeta(
         "shop",
         new List<string>()
         {
@@ -135,7 +135,7 @@ namespace Test.Orm.Table
 
 `Sdx.Db.Table.Relation`のインスタンスで関連を設定します。コンストラクタの引数は下記のようになっています。
 
-1. テーブルクラスのType
+1. TableクラスのType
 1. 自分自身の参照カラム。`shop.id`になります。
 1. 相手テーブルの参照ラカム。`menu.shop_id`です。
 
@@ -144,6 +144,6 @@ namespace Test.Orm.Table
 
 
 <br><br><br>
-### SELECTの組み立て
+### Tableを使ったSELECTの組み立て
 
 
