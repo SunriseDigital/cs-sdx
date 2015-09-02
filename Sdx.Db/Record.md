@@ -146,4 +146,68 @@ namespace Test.Orm.Table
 <br><br><br>
 ### Tableを使ったSELECTの組み立て
 
+#### 単純な問い合わせ
 
+```c#
+var select = new Sdx.Db.Query.Select();
+select.AddFrom(new Test.Orm.Table.Shop());
+
+var db = new Sdx.Db.SqlServerAdapter();
+db.ConnectionString = "DB CONNECTION STRING";
+var shops = db.FetchRecordSet<Test.Orm.Shop>(select);
+```
+
+`Select.AddFrom`にTableのインスタンスをセットすると、カラムはTableMetaに設定したカラムが自動で全て追加されます。
+
+`Adapter.FetchRecordSet<>(select)`/`Adapter.FetchRecord<>(select)`はジェネリックメソッドでタイプには取得したいRecordクラスの型を渡します。通常はFROM句にしていしたテーブルのRecordを渡します。
+
+
+カラムを変更したい場合はSetColumns`Table.SetColumn()`/`Table.ClearColumn()`/`Table.AddColumn()`などのTableの絡む操作系メソッドを使用してください。
+
+```c#
+select
+  .AddFrom(new Test.Orm.Table.Shop())
+  .SetColumns("id", "name");
+```
+
+#### 一対多をJOINする
+
+一対多の関係のテーブルをJOINすると、レコードが重複します。例えば、shopテーブルにmenuテーブルをJOINした場合、2つメニューを持ったお店は2行になって現れます。RecordSetはこれをうまくまとめてれます。
+
+```sql
+INSERT INTO shop (name, created_at, area_id) VALUES ('天府舫', '2015-01-03 12:30:00', (SELECT id FROM area WHERE name = '新宿'));
+
+INSERT INTO menu (name, shop_id) VALUES ('干し豆腐のサラダ', (SELECT id FROM shop WHERE name = '天府舫'));
+INSERT INTO menu (name, shop_id) VALUES ('麻婆豆腐', (SELECT id FROM shop WHERE name = '天府舫'));
+INSERT INTO menu (name, shop_id) VALUES ('牛肉の激辛水煮', (SELECT id FROM shop WHERE name = '天府舫'));
+```
+
+```c#
+var select = new Sdx.Db.Query.Select();
+
+select
+   .AddFrom(new Test.Orm.Table.Shop())
+   .AddOrder("id", Sdx.Db.Query.Order.ASC)
+   ;
+
+select.Context("shop")
+   .InnerJoin(new Test.Orm.Table.Menu())
+   .AddOrder("id", Sdx.Db.Query.Order.ASC)
+   ;
+
+select.Context("shop")
+    .Where.Add("name", "天府舫");
+
+var shops = db.FetchRecordSet<Test.Orm.Shop>(select);
+Assert.Equal(1, db.Profiler.Queries.Count);//データベースへの問い合わせは回数をチェック
+
+Assert.Equal(1, shops.Count);
+Assert.Equal("天府舫", shops[0].GetString("name"));
+
+var menuList = shops[0].GetRecordSet<Test.Orm.Menu>("menu");
+Assert.Equal(1, db.Profiler.Queries.Count);//新たに問い合わせはしていない
+Assert.Equal(3, menuList.Count);
+Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
+Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));
+Assert.Equal("牛肉の激辛水煮", menuList[2].GetString("name"));
+```
