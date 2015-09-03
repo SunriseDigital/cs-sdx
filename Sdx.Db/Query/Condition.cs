@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sdx.Db.Query
 {
-  public class Condition
+  public class Condition : ICloneable
   {
     private class Holder
     {
@@ -257,6 +257,11 @@ namespace Sdx.Db.Query
     {
       this.AddWithColumn(left, right, Logical.Or, comparison);
       return this;
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }

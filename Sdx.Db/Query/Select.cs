@@ -422,5 +422,16 @@ namespace Sdx.Db.Query
 
       return this;
     }
+
+    public Select(Select select)
+    {
+      select.contextList.ForEach(context =>
+      {
+        var clonedContext = (Context)context.Clone();
+        clonedContext.Select = this;
+
+        this.contextList.Add(clonedContext);
+      });
+    }
   }
 }

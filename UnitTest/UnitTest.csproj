@@ -68,6 +68,7 @@
     <Compile Include="ConfigTest.cs" />
     <Compile Include="DbQueryTest.cs" />
     <Compile Include="DbRecordTest.cs" />
+    <Compile Include="DbSelectCloneTest.cs" />
     <Compile Include="DbTableTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />

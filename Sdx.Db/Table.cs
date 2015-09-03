@@ -7,7 +7,7 @@ namespace Sdx.Db
   /// SelectにおいてTableを表現するオブジェクト。メタ情報としてカラムや他テーブルとの関連情報を保持し、SELECTにセットする。
   /// またテーブルに付与されたエイリアス名を保持し、Recordに必要なカラム名のエイリアス生成も行う。
   /// </summary>
-  public abstract class Table
+  public abstract class Table : ICloneable
   {
     public class Relation
     {
@@ -120,6 +120,11 @@ namespace Sdx.Db
       {
         return this.Context.Select;
       }
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }
