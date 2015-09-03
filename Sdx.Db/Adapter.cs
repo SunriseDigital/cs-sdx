@@ -133,7 +133,6 @@ namespace Sdx.Db
       var contextName = meta.Name;
 
       var command = select.Build();
-      Console.WriteLine(command.CommandText);
       var resultSet = new RecordSet<T>();
       using (var con = this.CreateConnection())
       {
