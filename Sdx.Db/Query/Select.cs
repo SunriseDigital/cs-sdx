@@ -423,15 +423,19 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Select(Select select)
+    public object Clone()
     {
-      select.contextList.ForEach(context =>
+      var cloned = (Select)this.MemberwiseClone();
+
+      cloned.contextList = new List<Query.Context>();
+      this.contextList.ForEach(context =>
       {
         var clonedContext = (Context)context.Clone();
-        clonedContext.Select = this;
-
-        this.contextList.Add(clonedContext);
+        clonedContext.Select = cloned;
+        cloned.contextList.Add(clonedContext);
       });
+
+      return cloned;
     }
   }
 }

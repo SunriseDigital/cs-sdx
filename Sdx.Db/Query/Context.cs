@@ -218,20 +218,20 @@ namespace Sdx.Db.Query
     {
       var cloned = (Context)this.MemberwiseClone();
 
-      if(this.Table != null)
+      if (this.Table != null)
       {
         cloned.Table = (Table)this.Table.Clone();
         cloned.Table.Context = cloned;
       }
 
-      if(this.ParentContext != null)
+      if (this.ParentContext != null)
       {
         cloned.ParentContext = (Context)this.ParentContext.Clone();
       }
 
       if (this.Target is Select)
       {
-        cloned.Target = new Select((Select) this.Target);
+        cloned.Target = ((Select)this.Target).Clone();
       }
 
       return cloned;

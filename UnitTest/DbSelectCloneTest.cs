@@ -55,7 +55,7 @@ namespace UnitTest
         "sub_cat"
       );
 
-      var cloned = new Sdx.Db.Query.Select(origin);
+      var cloned = (Sdx.Db.Query.Select)origin.Clone();
 
       foreach (var contextName in new String[]{ "shop", "menu", "sub_cat" })
       {
