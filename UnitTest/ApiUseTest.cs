@@ -31,8 +31,16 @@ namespace UnitTest
         .Set("access_token", "asdfghjkl")
       ;
 
-      //結果配列を取得する
-      var json = api.GetJson();
+      //リクエストを投げる
+      api.Run();
+
+      //通信の成否を取得
+      bool condition = api.IsSuccess();
+      if(condition)
+      {
+        //結果配列を取得する
+        var json = api.GetJson();
+      }
     }
 
     [Fact]
