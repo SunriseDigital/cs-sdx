@@ -427,6 +427,7 @@ namespace Sdx.Db.Query
     {
       var cloned = (Select)this.MemberwiseClone();
 
+      //context
       cloned.contextList = new List<Query.Context>();
       this.contextList.ForEach(context =>
       {
@@ -439,6 +440,12 @@ namespace Sdx.Db.Query
       cloned.columns = new List<Column>(this.columns);
       cloned.groups = new List<Column>(this.groups);
       cloned.orders = new List<Column>(this.orders);
+
+      //where
+      cloned.where = (Condition)this.where.Clone();
+
+      //having
+      cloned.having = (Condition)this.having.Clone();
 
       return cloned;
     }

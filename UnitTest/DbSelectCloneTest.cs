@@ -203,6 +203,47 @@ namespace UnitTest
     }
 
 
+    [Fact]
+    public void TestWhere()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunWhere(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunWhere(TestDb db)
+    {
+      var origin = this.CreateCommonSelect(db);
+      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+
+      cloned.Where.Add("id", "1");
+
+      Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
+    }
+
+    [Fact]
+    public void TestHaving()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunHaving(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunHaving(TestDb db)
+    {
+      var origin = this.CreateCommonSelect(db);
+      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+
+      cloned.Having.Add(Sdx.Db.Query.Expr.Wrap("shop.id"), "1");
+
+      Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
+    }
+
+
 
   }
 }

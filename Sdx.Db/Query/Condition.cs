@@ -261,7 +261,20 @@ namespace Sdx.Db.Query
 
     public object Clone()
     {
-      return this.MemberwiseClone();
+      var cloned = (Condition)this.MemberwiseClone();
+
+      cloned.wheres = new List<Holder>(this.wheres);
+
+      cloned.childConditions = new List<Condition>();
+      this.childConditions.ForEach(condition =>
+      {
+        cloned.childConditions.Add((Condition)condition.Clone());
+      });
+
+      //ContextはSelectやContextのプロパティ経由でアクセスされたときにセットされる
+      //一時的な変数なのでコピーの必要はないと思われます。
+
+      return cloned;
     }
   }
 }
