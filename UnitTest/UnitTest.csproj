@@ -70,7 +70,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
-    <Compile Include="UrlTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -89,10 +88,6 @@
       <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
       <Name>Sdx.Diagnostics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sdx.Url\Sdx.Url.csproj">
-      <Project>{8b6c5260-d947-4a11-815d-b8925d0e4d6d}</Project>
-      <Name>Sdx.Url</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
@@ -107,6 +102,9 @@
     <Content Include="setup.sqlserver.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

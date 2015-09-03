@@ -11,8 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Web", "Sdx.Web\Sdx.Web.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Diagnostics", "Sdx.Diagnostics\Sdx.Diagnostics.csproj", "{E015CB03-532E-4789-BAC5-E6542AED9F14}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sdx.Url", "Sdx.Url\Sdx.Url.csproj", "{8B6C5260-D947-4A11-815D-B8925D0E4D6D}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,12 +42,6 @@ Global
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.Release|Any CPU.Build.0 = Release|Any CPU
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.TravisCI|Any CPU.ActiveCfg = TravisCI|Any CPU
 		{E015CB03-532E-4789-BAC5-E6542AED9F14}.TravisCI|Any CPU.Build.0 = TravisCI|Any CPU
-		{8B6C5260-D947-4A11-815D-B8925D0E4D6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8B6C5260-D947-4A11-815D-B8925D0E4D6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8B6C5260-D947-4A11-815D-B8925D0E4D6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8B6C5260-D947-4A11-815D-B8925D0E4D6D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8B6C5260-D947-4A11-815D-B8925D0E4D6D}.TravisCI|Any CPU.ActiveCfg = Release|Any CPU
-		{8B6C5260-D947-4A11-815D-B8925D0E4D6D}.TravisCI|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
