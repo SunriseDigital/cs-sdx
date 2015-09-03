@@ -435,6 +435,11 @@ namespace Sdx.Db.Query
         cloned.contextList.Add(clonedContext);
       });
 
+      //コピーコンストラクタはシャローコピーです。
+      cloned.columns = new List<Column>(this.columns);
+      cloned.groups = new List<Column>(this.groups);
+      cloned.orders = new List<Column>(this.orders);
+
       return cloned;
     }
   }

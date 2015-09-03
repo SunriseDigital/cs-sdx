@@ -22,21 +22,12 @@ namespace UnitTest
       BaseDbTest.InitilizeClass(context);
     }
 
-    [Fact]
-    public void TestContext()
+    private Sdx.Db.Query.Select CreateCommonSelect(TestDb db)
     {
-      foreach (TestDb db in this.CreateTestDbList())
-      {
-        RunFromTable(db);
-        ExecSql(db);
-      }
-    }
+      var select = new Sdx.Db.Query.Select();
 
-    private void RunFromTable(TestDb db)
-    {
-      var origin = new Sdx.Db.Query.Select();
-
-      origin
+      //FROM + JOIN
+      select
         .AddFrom(new Test.Orm.Table.Shop())
         .InnerJoin(new Test.Orm.Table.Menu());
 
@@ -46,27 +37,76 @@ namespace UnitTest
         .AddColumn("id")
         .Where.Add("id", "2");
 
-      origin.Context("shop").InnerJoin(
+      select.Context("shop").InnerJoin(
         sub,
         db.Adapter.CreateCondition().Add(
           new Sdx.Db.Query.Column("area_id", "shop"),
-          new Sdx.Db.Query.Column("id", "sub_cat")
+          new Sdx.Db.Query.Column("id", "sub_area")
         ),
-        "sub_cat"
+        "sub_area"
       );
 
+      select.Context("shop").InnerJoin(
+        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
+        db.Adapter.CreateCondition().Add(
+          new Sdx.Db.Query.Column("area_id", "shop"),
+          new Sdx.Db.Query.Column("id", "sub_area_1")
+        ),
+        "sub_area_1"
+      );
+
+      select.Context("shop").InnerJoin(
+        "image",
+        db.Adapter.CreateCondition().Add(
+          new Sdx.Db.Query.Column("main_image_id", "shop"),
+          new Sdx.Db.Query.Column("id", "main_image")
+        ),
+        "main_image"
+      );
+
+      //Column
+      select.Context("sub_area").AddColumn("id");
+      select.Context("sub_area_1").AddColumn("id");
+      select.Context("main_image").AddColumn("id");
+
+      select.Adapter = db.Adapter;
+
+      return select;
+    }
+
+    [Fact]
+    public void TestContext()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunContext(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunContext(TestDb db)
+    {
+      var origin = this.CreateCommonSelect(db);
       var cloned = (Sdx.Db.Query.Select)origin.Clone();
 
-      foreach (var contextName in new String[]{ "shop", "menu", "sub_cat" })
+      foreach (var contextName in new String[] { "shop", "menu", "sub_area", "sub_area_1", "main_image" })
       {
         Assert.NotEqual(
           origin.Context(contextName),
           cloned.Context(contextName)
         );
 
-        if(origin.Context(contextName).Target is Sdx.Db.Query.Select)
+        if (origin.Context(contextName).Target is Sdx.Db.Query.Select)
         {
           Assert.NotEqual(
+            origin.Context(contextName).Target,
+            cloned.Context(contextName).Target
+          );
+        }
+        else
+        {
+          //Expr/Stringはimmutableなのでコピーしない
+          Assert.Equal(
             origin.Context(contextName).Target,
             cloned.Context(contextName).Target
           );
@@ -82,7 +122,7 @@ namespace UnitTest
           cloned.Context(contextName).Select
         );
 
-        if(origin.Context(contextName).Table != null)
+        if (origin.Context(contextName).Table != null)
         {
           Assert.NotEqual(
             origin.Context(contextName).Table,
@@ -101,5 +141,68 @@ namespace UnitTest
         }
       }
     }
+
+    [Fact]
+    public void TestColumn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunColumn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunColumn(TestDb db)
+    {
+      var origin = this.CreateCommonSelect(db);
+      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+
+      cloned.Context("main_image").ClearColumns();
+
+      Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
+    }
+
+    [Fact]
+    public void TestGroup()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGroup(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGroup(TestDb db)
+    {
+      var origin = this.CreateCommonSelect(db);
+      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+
+      cloned.Context("shop").AddGroup("id");
+
+      Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
+    }
+
+    [Fact]
+    public void TestOrder()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunOrder(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunOrder(TestDb db)
+    {
+      var origin = this.CreateCommonSelect(db);
+      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+
+      cloned.Context("shop").AddOrder("id", Sdx.Db.Query.Order.ASC);
+
+      Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
+    }
+
+
+
   }
 }

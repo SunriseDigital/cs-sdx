@@ -5,6 +5,7 @@ namespace Sdx.Db.Query
   public class Expr
   {
     private object unquotedValue;
+    //TODO これってobject?　StringでOKじゃないか？
     private Expr(object unquotedValue)
     {
       this.unquotedValue = unquotedValue;
