@@ -4,28 +4,21 @@ using System.Data.Common;
 
 namespace Sdx.Db.Query
 {
-  public class Context
+  public class Context : ICloneable
   {
-    private Select select;
-
-    private Sdx.Db.Table table;
-
     public Context(Select select)
     {
-      this.select = select;
+      this.Select = select;
     }
 
+    /// <summary>
+    /// string|Sdx.Db.Query.Expr|Sdx.Db.Query.Select
+    /// </summary>
     public object Target { get; internal set; }
 
     public string Alias { get; internal set; }
 
-    public Select Select
-    {
-      get
-      {
-        return this.select;
-      }
-    }
+    public Select Select { get; internal set; }
 
     public string Name
     {
@@ -42,7 +35,7 @@ namespace Sdx.Db.Query
 
     private Context AddJoin(object target, JoinType joinType, Condition condition, string alias = null)
     {
-      Context joinContext = new Context(this.select);
+      Context joinContext = new Context(this.Select);
 
       joinContext.ParentContext = this;
       joinContext.Target = target;
@@ -50,9 +43,9 @@ namespace Sdx.Db.Query
       joinContext.JoinCondition = condition;
       joinContext.JoinType = joinType;
 
-      this.select.RemoveContext(joinContext.Name);
+      this.Select.RemoveContext(joinContext.Name);
 
-      this.select.ContextList.Add(joinContext);
+      this.Select.ContextList.Add(joinContext);
       return joinContext;
     }
 
@@ -67,8 +60,8 @@ namespace Sdx.Db.Query
       }
 
       context.Table = target;
-      target.ContextName = context.Name;
-      target.Select = this.select;
+      target.Context = context;
+      target.AddAllColumnsFromMeta();
       return context;
     }
 
@@ -88,8 +81,8 @@ namespace Sdx.Db.Query
       }
 
       context.Table = target;
-      target.ContextName = context.Name;
-      target.Select = this.select;
+      target.Context = context;
+      target.AddAllColumnsFromMeta();
       return context;
     }
 
@@ -137,7 +130,7 @@ namespace Sdx.Db.Query
 
     public Context ClearColumns()
     {
-      this.select.ClearColumns(this.Name);
+      this.Select.ClearColumns(this.Name);
       return this;
     }
 
@@ -160,25 +153,25 @@ namespace Sdx.Db.Query
       var column = new Column(columnName);
       column.Alias = alias;
       column.ContextName = this.Name;
-      this.select.ColumnList.Add(column);
+      this.Select.ColumnList.Add(column);
       return this;
     }
 
     public string AppendName(string column)
     {
-      return this.select.Adapter.QuoteIdentifier(this.Name) + "." + this.select.Adapter.QuoteIdentifier(column);
+      return this.Select.Adapter.QuoteIdentifier(this.Name) + "." + this.Select.Adapter.QuoteIdentifier(column);
     }
 
     public Condition Where
     {
       get
       {
-        Condition where = this.select.Where;
+        Condition where = this.Select.Where;
         where.Context = this;
         return where;
         //ここは下記のようにするとContextの代入ができません。
-        //this.select.Condition.Context = this;
-        //return this.select.Condition;
+        //this.Select.Condition.Context = this;
+        //return this.Select.Condition;
         //Select.Writeが下記のような実装になっているからです。
         //public Condition Condition
         //{
@@ -195,7 +188,7 @@ namespace Sdx.Db.Query
     {
       get
       {
-        Condition having = this.select.Having;
+        Condition having = this.Select.Having;
         having.Context = this;
         return having;
       }
@@ -205,7 +198,7 @@ namespace Sdx.Db.Query
     {
       var column = new Column(columnName);
       column.ContextName = this.Name;
-      this.select.GroupList.Add(column);
+      this.Select.GroupList.Add(column);
       return this;
     }
 
@@ -214,22 +207,34 @@ namespace Sdx.Db.Query
       var column = new Column(columnName);
       column.ContextName = this.Name;
       column.Order = order;
-      this.select.OrderList.Add(column);
+      this.Select.OrderList.Add(column);
 
       return this;
     }
 
-    public Sdx.Db.Table Table 
+    public Table Table { get; internal set; }
+
+    public object Clone()
     {
-      get 
+      var cloned = (Context)this.MemberwiseClone();
+
+      if (this.Table != null)
       {
-        return this.table;
+        cloned.Table = (Table)this.Table.Clone();
+        cloned.Table.Context = cloned;
       }
 
-      internal set
+      if (this.ParentContext != null)
       {
-        this.table = value;
+        cloned.ParentContext = (Context)this.ParentContext.Clone();
       }
+
+      if (this.Target is Select)
+      {
+        cloned.Target = ((Select)this.Target).Clone();
+      }
+
+      return cloned;
     }
   }
 }

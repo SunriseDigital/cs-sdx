@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sdx.Db.Query
 {
-  public class Condition
+  public class Condition : ICloneable
   {
     private class Holder
     {
@@ -257,6 +257,24 @@ namespace Sdx.Db.Query
     {
       this.AddWithColumn(left, right, Logical.Or, comparison);
       return this;
+    }
+
+    public object Clone()
+    {
+      var cloned = (Condition)this.MemberwiseClone();
+
+      cloned.wheres = new List<Holder>(this.wheres);
+
+      cloned.childConditions = new List<Condition>();
+      this.childConditions.ForEach(condition =>
+      {
+        cloned.childConditions.Add((Condition)condition.Clone());
+      });
+
+      //ContextはSelectやContextのプロパティ経由でアクセスされたときにセットされる
+      //一時的な変数なのでコピーの必要はないと思われます。
+
+      return cloned;
     }
   }
 }
