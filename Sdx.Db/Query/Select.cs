@@ -60,8 +60,8 @@ namespace Sdx.Db.Query
     {
       var context = this.CreateContext(target.OwnMeta.Name, alias);
       context.Table = target;
-      target.ContextName = context.Name;
-      target.Select = this;
+      target.Context = context;
+      target.AddAllColumnsFromMeta();
       return context;
     }
 

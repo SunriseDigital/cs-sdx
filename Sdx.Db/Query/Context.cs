@@ -67,8 +67,8 @@ namespace Sdx.Db.Query
       }
 
       context.Table = target;
-      target.ContextName = context.Name;
-      target.Select = this.select;
+      target.Context = context;
+      target.AddAllColumnsFromMeta();
       return context;
     }
 
@@ -88,8 +88,8 @@ namespace Sdx.Db.Query
       }
 
       context.Table = target;
-      target.ContextName = context.Name;
-      target.Select = this.select;
+      target.Context = context;
+      target.AddAllColumnsFromMeta();
       return context;
     }
 
