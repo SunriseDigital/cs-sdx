@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sdx.Db.Query
 {
-  public class Select
+  public class Select : ICloneable
   {
     private List<Context> contextList = new List<Context>();
     private List<Column> columns = new List<Column>();

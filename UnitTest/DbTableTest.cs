@@ -47,7 +47,8 @@ namespace UnitTest
         {0}shop{1}.{0}name{1} AS {0}name@shop{1}, 
         {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, 
         {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
-        {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1} 
+        {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+        {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1} 
       FROM {0}shop{1}"), db.Command.CommandText);
 
       select = new Sdx.Db.Query.Select();
@@ -60,7 +61,8 @@ namespace UnitTest
         {0}foo{1}.{0}name{1} AS {0}name@foo{1}, 
         {0}foo{1}.{0}area_id{1} AS {0}area_id@foo{1}, 
         {0}foo{1}.{0}main_image_id{1} AS {0}main_image_id@foo{1}, 
-        {0}foo{1}.{0}sub_image_id{1} AS {0}sub_image_id@foo{1} 
+        {0}foo{1}.{0}sub_image_id{1} AS {0}sub_image_id@foo{1},
+        {0}foo{1}.{0}created_at{1} AS {0}created_at@foo{1} 
       FROM {0}shop{1} AS {0}foo{1}"), db.Command.CommandText);
     }
 
@@ -95,6 +97,7 @@ namespace UnitTest
           {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1},
           {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
           {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+          {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1},
           {0}area{1}.{0}id{1} AS {0}id@area{1},
           {0}area{1}.{0}name{1} AS {0}name@area{1},
           {0}area{1}.{0}code{1} AS {0}code@area{1},
@@ -117,6 +120,7 @@ namespace UnitTest
           {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1},
           {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
           {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+          {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1},
           {0}area{1}.{0}id{1} AS {0}id@area{1},
           {0}area{1}.{0}name{1} AS {0}name@area{1},
           {0}area{1}.{0}code{1} AS {0}code@area{1},
@@ -146,6 +150,7 @@ namespace UnitTest
           {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1},
           {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
           {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+          {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1},
           {0}area{1}.{0}id{1} AS {0}id@area{1},
           {0}area{1}.{0}name{1} AS {0}name@area{1},
           {0}area{1}.{0}code{1} AS {0}code@area{1},
@@ -227,6 +232,7 @@ namespace UnitTest
         {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1},
         {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+        {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1},
         {0}area{1}.{0}id{1} AS {0}id@area{1},
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
@@ -254,6 +260,7 @@ namespace UnitTest
         {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1},
         {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+        {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1},
         {0}area{1}.{0}id{1} AS {0}id@area{1},
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
@@ -285,6 +292,7 @@ namespace UnitTest
         {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1},
         {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+        {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1},
         {0}area{1}.{0}id{1} AS {0}id@area{1},
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
@@ -320,6 +328,7 @@ namespace UnitTest
         {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1},
         {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1},
         {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1},
+        {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1},
         {0}area{1}.{0}id{1} AS {0}id@area{1},
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
