@@ -13,7 +13,7 @@ using System;
 
 namespace UnitTest
 {
-  [TestClass]
+/*  [TestClass]
   public class ApiTest : BaseTest
   {
     [Fact]
@@ -48,5 +48,5 @@ namespace UnitTest
     {
       Console.WriteLine("TestMethod2");
     }
-  }
+  }*/
 }
