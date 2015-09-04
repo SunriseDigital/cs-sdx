@@ -6,7 +6,7 @@ using Sdx.Db.Query;
 
 namespace Sdx.Db
 {
-  public class RecordSet<T> where T : Record, new()
+  public class RecordSet<T> : IEnumerable<T> where T : Record, new()
   {
     private List<T> results = new List<T>();
     private Dictionary<string, T> resultDic = new Dictionary<string, T>();
@@ -137,6 +137,16 @@ namespace Sdx.Db
     public void ForEach(Action<T> action)
     {
       this.results.ForEach(action);
+    }
+
+    public IEnumerator<T> GetEnumerator()
+    {
+      return this.results.GetEnumerator();
+    }
+
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+      return this.results.GetEnumerator();
     }
   }
 }
