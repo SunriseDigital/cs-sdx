@@ -50,6 +50,36 @@ namespace Sdx.Db
       }
     }
 
+    public DateTime GetDateTime(string key)
+    {
+      return Convert.ToDateTime(this.GetValue(key));
+    }
+
+    public decimal GetDecimal(string key)
+    {
+      return Convert.ToDecimal(this.GetValue(key));
+    }
+
+    public double GetDouble(string key)
+    {
+      return Convert.ToDouble(this.GetValue(key));
+    }
+
+    public short GetInt16(string key)
+    {
+      return Convert.ToInt16(this.GetValue(key));
+    }
+
+    public int GetInt32(string key)
+    {
+      return Convert.ToInt32(this.GetValue(key));
+    }
+
+    public long GetInt64(string key)
+    {
+      return Convert.ToInt64(this.GetValue(key));
+    }
+
     public object GetValue(string key)
     {
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
@@ -62,7 +92,7 @@ namespace Sdx.Db
 
     public string GetString(string key)
     {
-      return this.GetValue(key).ToString();
+      return Convert.ToString(this.GetValue(key));
     }
 
     public T GetRecord<T>(string contextName) where T : Record, new()

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sdx.Db.Query
 {
-  public class Select
+  public class Select : ICloneable
   {
     private List<Context> contextList = new List<Context>();
     private List<Column> columns = new List<Column>();
@@ -60,8 +60,8 @@ namespace Sdx.Db.Query
     {
       var context = this.CreateContext(target.OwnMeta.Name, alias);
       context.Table = target;
-      target.ContextName = context.Name;
-      target.Select = this;
+      target.Context = context;
+      target.AddAllColumnsFromMeta();
       return context;
     }
 
@@ -421,6 +421,33 @@ namespace Sdx.Db.Query
       orders.Add(column);
 
       return this;
+    }
+
+    public object Clone()
+    {
+      var cloned = (Select)this.MemberwiseClone();
+
+      //context
+      cloned.contextList = new List<Query.Context>();
+      this.contextList.ForEach(context =>
+      {
+        var clonedContext = (Context)context.Clone();
+        clonedContext.Select = cloned;
+        cloned.contextList.Add(clonedContext);
+      });
+
+      //コピーコンストラクタはシャローコピーです。
+      cloned.columns = new List<Column>(this.columns);
+      cloned.groups = new List<Column>(this.groups);
+      cloned.orders = new List<Column>(this.orders);
+
+      //where
+      cloned.where = (Condition)this.where.Clone();
+
+      //having
+      cloned.having = (Condition)this.having.Clone();
+
+      return cloned;
     }
   }
 }

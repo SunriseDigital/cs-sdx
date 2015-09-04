@@ -38,11 +38,11 @@ namespace Sdx.Db.Query
       this.ContextName = contextName;
     }
 
-    public string Alias { get; set; }
+    public string Alias { get; internal set; }
 
-    public string ContextName { get; set; }
+    public string ContextName { get; internal set; }
 
-    public Order Order { get; set; }
+    public Order Order { get; internal set; }
 
     public object Target
     {

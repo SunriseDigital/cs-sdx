@@ -7,7 +7,7 @@ namespace Sdx.Db
   /// SelectにおいてTableを表現するオブジェクト。メタ情報としてカラムや他テーブルとの関連情報を保持し、SELECTにセットする。
   /// またテーブルに付与されたエイリアス名を保持し、Recordに必要なカラム名のエイリアス生成も行う。
   /// </summary>
-  public abstract class Table
+  public abstract class Table : ICloneable
   {
     public class Relation
     {
@@ -41,7 +41,6 @@ namespace Sdx.Db
     }
 
     public Adapter Adapter { get; set; }
-    private Query.Select select;
 
     public TableMeta OwnMeta
     {
@@ -65,19 +64,19 @@ namespace Sdx.Db
 
     public Table ClearColumns()
     {
-      this.select.ClearColumns(this.ContextName);
+      this.Select.ClearColumns(this.Context.Name);
       return this;
     }
 
     public Table AddColumn(object columnName, string alias = null)
     {
-      if (this.ContextName == null)
+      if (this.Context == null)
       {
         throw new InvalidOperationException("ContextName is null");
       }
 
-      alias = Record.BuildColumnAliasWithContextName(alias != null ? alias : columnName.ToString(), this.ContextName);
-      this.select.Context(this.ContextName).AddColumn(columnName, alias);
+      alias = Record.BuildColumnAliasWithContextName(alias != null ? alias : columnName.ToString(), this.Context.Name);
+      this.Select.Context(this.Context.Name).AddColumn(columnName, alias);
 
       return this;
     }
@@ -98,14 +97,18 @@ namespace Sdx.Db
       return this;
     }
 
-    internal string ContextName { get; set; }
-
     public Query.Context Context
     {
-      get
+      get; set;
+    }
+
+    internal void AddAllColumnsFromMeta()
+    {
+      this.OwnMeta.Columns.ForEach(column =>
       {
-        return this.Select.Context(this.ContextName);
-      }
+
+        this.AddColumn(column.Name);
+      });
     }
 
     /// <summary>
@@ -115,16 +118,13 @@ namespace Sdx.Db
     {
       get
       {
-        return this.select;
+        return this.Context.Select;
       }
-      internal set
-      {
-        this.select = value;
-        this.OwnMeta.Columns.ForEach(column =>
-        {
-          this.AddColumn(column.Name);
-        });
-      }
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }

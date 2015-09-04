@@ -546,5 +546,56 @@ namespace UnitTest
       Assert.Equal("Missing area_id@shop key.", ex.Message);
       ;
     }
+
+    [Fact]
+    public void TestGetter()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGetter(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGetter(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddOrder("id", Sdx.Db.Query.Order.ASC).Select
+        .SetLimit(1);
+        ;
+
+      var shop = db.Adapter.FetchRecord<Test.Orm.Shop>(select);
+
+      var datetime = shop.GetDateTime("created_at");
+      Assert.IsType<DateTime>(datetime);
+      Assert.Equal("2015/01/01 12:30:00", datetime.ToString("yyyy/MM/dd HH:mm:ss"));
+
+      var dec = shop.GetDecimal("id");
+      Assert.IsType<decimal>(dec);
+      Assert.Equal(1.0m, dec);
+
+      var dbl = shop.GetDouble("id");
+      Assert.IsType<double>(dbl);
+      Assert.Equal(1.0, dbl);
+
+      var shr = shop.GetInt16("id");
+      Assert.IsType<short>(shr);
+      Assert.Equal(1, shr);
+
+      var it = shop.GetInt32("id");
+      Assert.IsType<int>(it);
+      Assert.Equal(1, it);
+
+      var lng = shop.GetInt64("id");
+      Assert.IsType<long>(lng);
+      Assert.Equal(1, lng);
+
+      var str = shop.GetString("id");
+      Assert.IsType<string>(str);
+      Assert.Equal("1", str);
+    }
   }
 }
