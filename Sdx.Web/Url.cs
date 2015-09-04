@@ -5,7 +5,11 @@ using System.Text;
 
 namespace Sdx.Web
 {
-  class Url
+  public class Url
   {
+    public Url(String str)
+    {
+
+    }
   }
 }
