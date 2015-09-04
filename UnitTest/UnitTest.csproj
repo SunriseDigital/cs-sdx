@@ -70,6 +70,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="UrlTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -87,6 +88,10 @@
     <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
       <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
       <Name>Sdx.Diagnostics</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sdx.Web\Sdx.Web.csproj">
+      <Project>{a91e7e02-005e-4329-97ae-38dcfd6a2493}</Project>
+      <Name>Sdx.Web</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
