@@ -10,6 +10,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 #endif
 
 using System;
+using System.Collections.Generic;
 
 namespace UnitTest
 {
