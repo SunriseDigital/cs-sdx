@@ -26,5 +26,10 @@ namespace Sdx.Web
       }
       this._query_data = data;
     }
+
+    public string GetDomain()
+    {
+      return this._uri.Host;
+    }
   }
 }
