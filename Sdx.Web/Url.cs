@@ -17,7 +17,7 @@ namespace Sdx.Web
       this._uri = new Uri(url_str);
 
       //クエリを分解して連想配列にする
-      string[] param_list = this._uri.Query.Split('&');
+      string[] param_list = this._uri.Query.Trim('?').Split('&');
       Dictionary<string, string> data = new Dictionary<string, string>();
       foreach (var item in param_list)
       {
