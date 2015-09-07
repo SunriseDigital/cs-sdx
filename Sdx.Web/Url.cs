@@ -46,5 +46,10 @@ namespace Sdx.Web
     {
       return this._uri.Scheme;
     }
+
+    public void SetParam(string key, string value)
+    {
+      this._param_data.Add(key, value);
+    }
   }
 }
