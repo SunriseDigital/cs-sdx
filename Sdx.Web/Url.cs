@@ -51,5 +51,22 @@ namespace Sdx.Web
     {
       this._param_data.Add(key, value);
     }
+
+    public string BuildQueryString()
+    {
+      string query = "?";
+      foreach(KeyValuePair<string, string> pair in this._param_data)
+      {
+        query += pair.Key + "=" + pair.Value;
+      }
+      return query;
+    }
+
+    public string Build()
+    {
+      string path = string.Format("{0}://{1}", this.GetPath(), this.GetPath());
+      string query = this.BuildQueryString();
+      return path + query;
+    }
   }
 }
