@@ -28,7 +28,7 @@ namespace UnitTest
       Assert.Equal("example.com", url.GetDomain());
       //Assert.Equal(Sdx.Web.Url.Protocol.Http, url.GetProtocol());
       Assert.Equal("bar", url.GetParam("foo"));
-      //Assert.Equal("huga", url.GetParam("hoge"));
+      Assert.Equal("huga", url.GetParam("hoge"));
       //Assert.Equal("/path/to/api", url.GetPath());
 
       //新しくパラメータを追加した場合、正しくクエリが生成されているか
