@@ -57,9 +57,9 @@ namespace Sdx.Web
       string query = "?";
       foreach(KeyValuePair<string, string> pair in this._param_data)
       {
-        query += pair.Key + "=" + pair.Value;
+        query += string.Format("{0}={1}&", pair.Key, pair.Value);
       }
-      return query;
+      return query.Trim('&');//末尾の'&'は不要なのでカットして返す
     }
 
     public string Build()
