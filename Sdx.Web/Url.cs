@@ -64,7 +64,9 @@ namespace Sdx.Web
 
     public string Build()
     {
-      string path = string.Format("{0}://{1}", this.GetPath(), this.GetPath());
+      string path = string.Format(
+        "{0}://{1}{2}", this.GetProtocol(), this.GetDomain(), this.GetPath()
+      );
       string query = this.BuildQueryString();
       return path + query;
     }
