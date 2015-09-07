@@ -62,33 +62,33 @@ namespace Sdx.Web
       return query;
     }
 
-    public string Build()
+    private string _BuildPath()
     {
       string path = string.Format(
         "{0}://{1}{2}", this.GetProtocol(), this.GetDomain(), this.GetPath()
       );
+      return path;
+    }
 
+    public string Build()
+    {
+      string path = this._BuildPath();
       if(this._param_data.Count > 0)
       {
         string query = this._BuildQueryString(this._param_data);
         return path + "?" + query.Trim('&');
       }
-
       return path;
     }
 
     public string Build(Dictionary<string, string> param)
     {
-      string path = string.Format(
-        "{0}://{1}{2}", this.GetProtocol(), this.GetDomain(), this.GetPath()
-      );
-
+      string path = this._BuildPath();
       string query = "";
       if (this._param_data.Count > 0)
       {
         query = "?" + this._BuildQueryString(this._param_data);
       }
-
       string add_query = this._BuildQueryString(param);
       return path + query + add_query.Trim('&');
     }
