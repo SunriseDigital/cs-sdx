@@ -36,5 +36,10 @@ namespace Sdx.Web
     {
       return this._param_data[key_name];
     }
+
+    public string GetPath()
+    {
+      return this._uri.LocalPath;
+    }
   }
 }
