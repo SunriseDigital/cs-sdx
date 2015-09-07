@@ -41,5 +41,10 @@ namespace Sdx.Web
     {
       return this._uri.LocalPath;
     }
+
+    public string GetProtocol()
+    {
+      return this._uri.Scheme;
+    }
   }
 }
