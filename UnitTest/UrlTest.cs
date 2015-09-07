@@ -32,8 +32,8 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.GetPath());
 
       //新しくパラメータを追加した場合、正しくクエリが生成されているか
-      //url.SetParam("key", "value");
-      //Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+      url.SetParam("key", "value");
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
       //Setterではなくコンストラクタの引数にパラメータを渡した場合の挙動
       //オブジェクトが持つデータ自体は変わらないようにする
