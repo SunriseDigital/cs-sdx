@@ -8,7 +8,7 @@ namespace Sdx.Web
   public class Url
   {
     private Uri _uri;
-    private Dictionary<string, string> _query_data;
+    private Dictionary<string, string> _param_data;
 
     //コンストラクタ
     public Url(string url_str)
@@ -24,7 +24,7 @@ namespace Sdx.Web
         string[] item_part = item.Split('=');
         data.Add(item_part[0], item_part[1]);
       }
-      this._query_data = data;
+      this._param_data = data;
     }
 
     public string GetDomain()
