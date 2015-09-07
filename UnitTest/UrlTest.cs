@@ -37,10 +37,10 @@ namespace UnitTest
 
       //Setterではなくコンストラクタの引数にパラメータを渡した場合の挙動
       //オブジェクトが持つデータ自体は変わらないようにする
-      //var param = new Dictionary<string, string>();
-      //param["new"] = "newValue";
-      //Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&new=newValue", url.Build(param));
-      //Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+      var param = new Dictionary<string, string>();
+      param["new"] = "newValue";
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&new=newValue", url.Build(param));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
       //コンストラクタの引数に配列を渡した場合の挙動。指定したキーがクエリから除かれているようにする。
       //同じくオブジェクトが持つデータ自体が変わらないようにする

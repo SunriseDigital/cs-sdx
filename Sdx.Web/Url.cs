@@ -52,14 +52,14 @@ namespace Sdx.Web
       this._param_data.Add(key, value);
     }
 
-    private string _BuildQueryString()
+    private string _BuildQueryString(Dictionary<string,string> param)
     {
-      string query = "?";
-      foreach(KeyValuePair<string, string> pair in this._param_data)
+      string query = "";
+      foreach(KeyValuePair<string, string> pair in param)
       {
         query += string.Format("{0}={1}&", pair.Key, pair.Value);
       }
-      return query.Trim('&');//末尾の'&'は不要なのでカットして返す
+      return query;
     }
 
     public string Build()
@@ -67,8 +67,30 @@ namespace Sdx.Web
       string path = string.Format(
         "{0}://{1}{2}", this.GetProtocol(), this.GetDomain(), this.GetPath()
       );
-      string query = this._BuildQueryString();
-      return path + query;
+
+      if(this._param_data.Count > 0)
+      {
+        string query = this._BuildQueryString(this._param_data);
+        return path + "?" + query.Trim('&');
+      }
+
+      return path;
+    }
+
+    public string Build(Dictionary<string, string> param)
+    {
+      string path = string.Format(
+        "{0}://{1}{2}", this.GetProtocol(), this.GetDomain(), this.GetPath()
+      );
+
+      string query = "";
+      if (this._param_data.Count > 0)
+      {
+        query = "?" + this._BuildQueryString(this._param_data);
+      }
+
+      string add_query = this._BuildQueryString(param);
+      return path + query + add_query.Trim('&');
     }
   }
 }
