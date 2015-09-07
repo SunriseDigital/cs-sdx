@@ -31,5 +31,10 @@ namespace Sdx.Web
     {
       return this._uri.Host;
     }
+
+    public string GetParam(string key_name)
+    {
+      return this._param_data[key_name];
+    }
   }
 }

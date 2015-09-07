@@ -27,7 +27,7 @@ namespace UnitTest
       //コンストラクタの解析が意図通りに行われているか、各部品ごとに確認
       Assert.Equal("example.com", url.GetDomain());
       //Assert.Equal(Sdx.Web.Url.Protocol.Http, url.GetProtocol());
-      //Assert.Equal("bar", url.GetParam("foo"));
+      Assert.Equal("bar", url.GetParam("foo"));
       //Assert.Equal("huga", url.GetParam("hoge"));
       //Assert.Equal("/path/to/api", url.GetPath());
 
