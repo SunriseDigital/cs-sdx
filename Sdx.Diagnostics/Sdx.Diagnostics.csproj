@@ -7,8 +7,8 @@
     <ProjectGuid>{E015CB03-532E-4789-BAC5-E6542AED9F14}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sdx.DebugTool</RootNamespace>
-    <AssemblyName>Sdx.DebugTool</AssemblyName>
+    <RootNamespace>Sdx.Diagnostics</RootNamespace>
+    <AssemblyName>Sdx.Diagnostics</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

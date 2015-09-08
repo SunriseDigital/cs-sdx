@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 
 namespace Sdx.Db
@@ -287,6 +288,17 @@ namespace Sdx.Db
       {
         return (T)value;
       }
+    }
+
+    public override string ToString()
+    {
+      var prefix = "ConnectionString: ";
+      if(this.ConnectionString == null)
+      {
+        return prefix;
+      }
+
+      return prefix + Regex.Replace(this.ConnectionString, "(P|p)assword=[^;]+", "${1}assword=******");
     }
   }
 }
