@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data.Common;
+using System.Text.RegularExpressions;
 
 namespace Sdx.Db
 {
@@ -18,6 +19,14 @@ namespace Sdx.Db
         selectSql += " OFFSET " + offset;
       }
       return selectSql;
+    }
+
+    protected override string SecureConnectionString
+    {
+      get
+      {
+        return Regex.Replace(this.ConnectionString, "(P|p)wd=[^;]+", "${1}wd=" + PWD_FOR_SECURE_CONNECTION_STRING);
+      }
     }
   }
 }

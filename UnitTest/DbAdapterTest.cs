@@ -326,5 +326,14 @@ namespace UnitTest
       Assert.Equal("天府舫", objDic["name"]);
       Assert.IsType<DBNull>(objDic["main_image_id"]);
     }
+
+    [Fact]
+    public void TestSecureConnectionString()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        Assert.NotEqual(-1, db.Adapter.ToString().IndexOf(Sdx.Db.Adapter.PWD_FOR_SECURE_CONNECTION_STRING));
+      }
+    }
   }
 }

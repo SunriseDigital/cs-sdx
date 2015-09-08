@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data.Common;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 
 
 namespace Sdx.Db
@@ -10,8 +9,15 @@ namespace Sdx.Db
   {
     private DbProviderFactory factory;
     private DbCommandBuilder builder;
+    public const string PWD_FOR_SECURE_CONNECTION_STRING = "******";
 
     protected abstract DbProviderFactory GetFactory();
+
+    /// <summary>
+    /// ToStringで返される文字列。本来一般ユーザーが目にするものではないが不用意に表示される可能性もあるので、パスワード部分をわからないように置換するのが望ましい。
+    /// パスワードはPWD_FOR_SECURE_CONNECTION_STRINGで置換してください。
+    /// </summary>
+    protected abstract string SecureConnectionString { get; }
 
     public string ConnectionString { get; set; }
     public Query.Profiler Profiler { get; set; }
@@ -292,13 +298,13 @@ namespace Sdx.Db
 
     public override string ToString()
     {
-      var prefix = "ConnectionString: ";
+      var prefix = this.factory + ": ";
       if(this.ConnectionString == null)
       {
         return prefix;
       }
 
-      return prefix + Regex.Replace(this.ConnectionString, "(P|p)assword=[^;]+", "${1}assword=******");
+      return prefix + SecureConnectionString;
     }
   }
 }
