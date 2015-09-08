@@ -52,16 +52,41 @@ namespace Sdx.Web
       this.param_data[key] = value;
     }
 
-    private string BuildQueryString(Dictionary<string,string> param)
+    private string BuildQueryString(object param)
     {
-      List<string> param_list = new List<string>();
-      foreach (KeyValuePair<string, string> pair in param)
+      if(param is Dictionary<string, string>)
       {
-        var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
-        param_list.Add(tmp);
+        //キャストしないとコンパイルエラーになる。。。微妙なので違う方法を探す
+        var superparam = (Dictionary<string, string>)param;
+        List<string> param_list = new List<string>();
+        foreach (KeyValuePair<string, string> pair in superparam)
+        {
+          var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
+          param_list.Add(tmp);
+        }
+        var query = "?" + string.Join("&", param_list);
+        return query;
       }
-      var query = "?" + string.Join("&", param_list);
-      return query;
+
+      if(param is List<string>)
+      {
+        //クエリから取り除いて返す。LINQを使った処理がうまくいかないので
+        //とりあえず後回し
+        /*public string Build(List<string> param)
+        {
+          string path = this.BuildPath();
+          var param_list = new Dictionary<string, string>();
+          if (this.param_data.Count > 0)
+          {
+            var result = this.param_data.Where(item => item.Key != "sample");
+          }
+
+        }*/
+      }
+
+      //とりあえず適当な文字列を返しておく。テストでエラーになるのは認識済み。
+      var str = "hoge";
+      return str;
     }
 
     private string BuildPath()
@@ -106,5 +131,8 @@ namespace Sdx.Web
       string query = this.BuildQueryString(param_list);
       return path + query;
     }
+
+
+
   }
 }
