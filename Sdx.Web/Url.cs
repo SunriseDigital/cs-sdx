@@ -54,11 +54,13 @@ namespace Sdx.Web
 
     private string BuildQueryString(Dictionary<string,string> param)
     {
-      string query = "";
-      foreach(KeyValuePair<string, string> pair in param)
+      List<string> param_list = new List<string>();
+      foreach (KeyValuePair<string, string> pair in param)
       {
-        query += string.Format("{0}={1}&", pair.Key, pair.Value);
+        var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
+        param_list.Add(tmp);
       }
+      var query = "?" + string.Join("&", param_list);
       return query;
     }
 
@@ -76,7 +78,7 @@ namespace Sdx.Web
       if(this.param_data.Count > 0)
       {
         string query = this.BuildQueryString(this.param_data);
-        return path + "?" + query.Trim('&');
+        return path + query;
       }
       return path;
     }
@@ -84,13 +86,15 @@ namespace Sdx.Web
     public string Build(Dictionary<string, string> param)
     {
       string path = this.BuildPath();
-      string query = "";
       if (this.param_data.Count > 0)
       {
-        query = "?" + this.BuildQueryString(this.param_data);
+        foreach (KeyValuePair<string, string> item in this.param_data)
+        {
+          param[item.Key] = item.Value;
+        }
       }
-      string add_query = this.BuildQueryString(param);
-      return path + query + add_query.Trim('&');
+      string query = this.BuildQueryString(param);
+      return path + query;
     }
   }
 }
