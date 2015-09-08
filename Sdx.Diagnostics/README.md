@@ -1,4 +1,4 @@
-# Sdx.DebugTool
+# Sdx.Diagnostics
 
 ## 概要
 

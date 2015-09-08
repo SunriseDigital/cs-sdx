@@ -2,7 +2,7 @@
 
 ## 概要
 
-[Sdx.DebugTool.Debug.Log(someValue)](https://github.com/SunriseDigital/cs-sdx/blob/master/Sdx.DebugTool/Debug.md#void-logobject-value-string-title--)の値をページに付与するHttpModuleです。
+[Sdx.Diagnostics.Debug.Log(someValue)](https://github.com/SunriseDigital/cs-sdx/blob/master/Sdx.Diagnostics/Debug.md#void-logobject-value-string-title--)の値をページに付与するHttpModuleです。
 
 ## 有効にする
 
@@ -14,7 +14,7 @@ IIS6以前（クラシック）
 <configuration>
   <system.web>
     <httpModules>
-      <add name="DisplayHttpModule" type="Sdx.DebugTool.DisplayHttpModule"/>
+      <add name="DisplayHttpModule" type="Sdx.Diagnostics.DisplayHttpModule"/>
     </httpModules>
   </system.web>
 </configuration>
@@ -26,7 +26,7 @@ IIS7
 <configuration>
   <system.webServer>
     <modules>
-      <add name="DisplayHttpModule" type="Sdx.DebugTool.DisplayHttpModule"/>
+      <add name="DisplayHttpModule" type="Sdx.Diagnostics.DisplayHttpModule"/>
     </modules>
   </system.webServer>
 </configuration>

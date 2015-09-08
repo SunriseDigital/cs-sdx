@@ -2,7 +2,7 @@
 
 ## 概要
 
-変数のダンプ、ページヘのデバッグ用ログの出力を行います。`Log()`メソッドを使用するには`Sdx.DebugTool.DisplayHttpModule`をアプリケーションに追加する必要があります。詳しくは[こちら](DisplayHttpModule.md)をご覧ください。
+変数のダンプ、ページヘのデバッグ用ログの出力を行います。`Log()`メソッドを使用するには`Sdx.Diagnostics.DisplayHttpModule`をアプリケーションに追加する必要があります。詳しくは[こちら](DisplayHttpModule.md)をご覧ください。
 
 ## メソッド
 
@@ -11,7 +11,7 @@
 変数の中身を見やすい形で出力します。
 
 ```c#
-Sdx.DebugTool.Debug.Dump(someValue);
+Sdx.Diagnostics.Debug.Dump(someValue);
 ```
 
 ### void Log(Object value, String title = "")
@@ -19,5 +19,5 @@ Sdx.DebugTool.Debug.Dump(someValue);
 ページヘデバッグ用ログを出力します。タイトル部分に表示される`[0.303/4.978]`は`直前のLogからの経過秒/リクエスト開始からの経過秒`です。
 
 ```c#
-Sdx.DebugTool.Debug.Log(someValue, "someValue");
+Sdx.Diagnostics.Debug.Log(someValue, "someValue");
 ```

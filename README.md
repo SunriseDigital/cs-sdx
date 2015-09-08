@@ -7,5 +7,5 @@
 
 * [Sdx](Sdx)
 * [Sdx.Db](Sdx.Db)
-* [Sdx.DebugTool](Sdx.DebugTool)
+* [Sdx.Diagnostics](Sdx.Diagnostics)
 * [Sdx.Web](Sdx.Web)
