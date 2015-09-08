@@ -86,14 +86,24 @@ namespace Sdx.Web
     public string Build(Dictionary<string, string> param)
     {
       string path = this.BuildPath();
+      var param_list = new Dictionary<string, string>();
+
+      //コンストラクト時にセットされていたパラメータがあればリストに追加
       if (this.param_data.Count > 0)
       {
         foreach (KeyValuePair<string, string> item in this.param_data)
         {
-          param[item.Key] = item.Value;
+          param_list[item.Key] = item.Value;
         }
       }
-      string query = this.BuildQueryString(param);
+
+      //引数でセットされてきたパラメータをリストに追加
+      foreach(KeyValuePair<string, string> item in param)
+      {
+        param_list[item.Key] = item.Value;
+      }
+
+      string query = this.BuildQueryString(param_list);
       return path + query;
     }
   }
