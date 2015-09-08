@@ -22,7 +22,7 @@ namespace Sdx.Web
       foreach (var item in param_list)
       {
         string[] item_part = item.Split('=');
-        data.Add(item_part[0], item_part[1]);
+        data[item_part[0]] = item_part[1];
       }
       this._param_data = data;
     }
@@ -49,7 +49,7 @@ namespace Sdx.Web
 
     public void SetParam(string key, string value)
     {
-      this._param_data.Add(key, value);
+      this._param_data[key] = value;
     }
 
     private string _BuildQueryString(Dictionary<string,string> param)
