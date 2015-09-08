@@ -72,12 +72,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sdx.Util\Sdx.Util.csproj">
-      <Project>{814a034d-4cdd-4de6-9aa3-6ff1431ed11c}</Project>
-      <Name>Sdx.Util</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
