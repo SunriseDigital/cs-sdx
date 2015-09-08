@@ -7,52 +7,52 @@ namespace Sdx.Web
 {
   public class Url
   {
-    private Uri _uri;
-    private Dictionary<string, string> _param_data;
+    private Uri uri;
+    private Dictionary<string, string> param_data;
 
     //コンストラクタ
     public Url(string url_str)
     {
-      //@System.Uri
-      this._uri = new Uri(url_str);
+      //@var System.Uri
+      this.uri = new Uri(url_str);
 
       //クエリを分解して連想配列にする
-      string[] param_list = this._uri.Query.Trim('?').Split('&');
+      string[] param_list = this.uri.Query.Trim('?').Split('&');
       Dictionary<string, string> data = new Dictionary<string, string>();
       foreach (var item in param_list)
       {
         string[] item_part = item.Split('=');
         data[item_part[0]] = item_part[1];
       }
-      this._param_data = data;
+      this.param_data = data;
     }
 
     public string GetDomain()
     {
-      return this._uri.Host;
+      return this.uri.Host;
     }
 
     public string GetParam(string key_name)
     {
-      return this._param_data[key_name];
+      return this.param_data[key_name];
     }
 
     public string GetPath()
     {
-      return this._uri.LocalPath;
+      return this.uri.LocalPath;
     }
 
     public string GetProtocol()
     {
-      return this._uri.Scheme;
+      return this.uri.Scheme;
     }
 
     public void SetParam(string key, string value)
     {
-      this._param_data[key] = value;
+      this.param_data[key] = value;
     }
 
-    private string _BuildQueryString(Dictionary<string,string> param)
+    private string BuildQueryString(Dictionary<string,string> param)
     {
       string query = "";
       foreach(KeyValuePair<string, string> pair in param)
@@ -62,7 +62,7 @@ namespace Sdx.Web
       return query;
     }
 
-    private string _BuildPath()
+    private string BuildPath()
     {
       string path = string.Format(
         "{0}://{1}{2}", this.GetProtocol(), this.GetDomain(), this.GetPath()
@@ -72,10 +72,10 @@ namespace Sdx.Web
 
     public string Build()
     {
-      string path = this._BuildPath();
-      if(this._param_data.Count > 0)
+      string path = this.BuildPath();
+      if(this.param_data.Count > 0)
       {
-        string query = this._BuildQueryString(this._param_data);
+        string query = this.BuildQueryString(this.param_data);
         return path + "?" + query.Trim('&');
       }
       return path;
@@ -83,13 +83,13 @@ namespace Sdx.Web
 
     public string Build(Dictionary<string, string> param)
     {
-      string path = this._BuildPath();
+      string path = this.BuildPath();
       string query = "";
-      if (this._param_data.Count > 0)
+      if (this.param_data.Count > 0)
       {
-        query = "?" + this._BuildQueryString(this._param_data);
+        query = "?" + this.BuildQueryString(this.param_data);
       }
-      string add_query = this._BuildQueryString(param);
+      string add_query = this.BuildQueryString(param);
       return path + query + add_query.Trim('&');
     }
   }
