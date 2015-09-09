@@ -87,5 +87,14 @@ namespace UnitTest
         Debug.Dump(10)
       );
     }
+
+    [Fact]
+    public void TestLog()
+    {
+      //とりあえず、Httpcontextがない状態で例外にならないかテスト
+      //TODO同出力するか考える
+      var context = Sdx.Context.Current;
+      Sdx.Diagnostics.Debug.Log("aaaa");
+    }
   }
 }

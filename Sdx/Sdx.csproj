@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -47,13 +48,10 @@
   <ItemGroup>
     <Compile Include="Config\Tree.cs" />
     <Compile Include="Config\TreeYaml.cs" />
+    <Compile Include="Context.cs" />
+    <Compile Include="Diagnostics\Debug.cs" />
+    <Compile Include="Diagnostics\DisplayHttpModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
-      <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
-      <Name>Sdx.Diagnostics</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

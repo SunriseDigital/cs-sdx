@@ -17,7 +17,7 @@ namespace Sdx.Diagnostics
 
     private void Application_BeginRequest(object source, EventArgs a)
     {
-      Debug.initRequestTimer();
+      Sdx.Context.Current.Timer.Start();
     }
 
     private void Application_EndRequest(object source, EventArgs a)

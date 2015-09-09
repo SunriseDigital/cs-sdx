@@ -11,7 +11,6 @@ namespace Sdx.Diagnostics
   public class Debug
   {
     private static String logKey = "SDX.DEBUG_TOOL.DEBUG.LOGS_KEY";
-    private static String requestTimerKey = "SDX.DEBUG_TOOL.DEBUG.REQUEST_TIMER_KEY";
 
     public static String DumpIndent
     {
@@ -26,30 +25,23 @@ namespace Sdx.Diagnostics
       get
       {
         List<Dictionary<String, Object>> values;
-        if (!HttpContext.Current.Items.Contains(logKey))
+        if (!Sdx.Context.Current.HasVar(logKey))
         {
           values = new List<Dictionary<String, Object>>();
-          HttpContext.Current.Items.Add(logKey, values);
+          Sdx.Context.Current.SetVar(logKey, values);
         }
         else
         {
-          values = HttpContext.Current.Items[logKey] as List<Dictionary<String, Object>>;
+          values = Sdx.Context.Current.GetVar<List<Dictionary<String, Object>>>(logKey);
         }
         return values;
       }
     }
 
-    private static Stopwatch RequestTimer
-    {
-      get
-      {
-        return HttpContext.Current.Items[requestTimerKey] as Stopwatch; ;
-      }
-    }
 
     public static void Log(Object value, String title = "")
     {
-      Int64 ticks = Debug.RequestTimer.ElapsedTicks;
+      Int64 ticks = Context.Current.Timer.ElapsedTicks;
       Dictionary<String, Object> dic = new Dictionary<String, Object>();
       dic.Add("title", title);
       dic.Add("value", value);
@@ -101,13 +93,13 @@ namespace Sdx.Diagnostics
         IList list = value as IList;
         //タイトル部分
         result += "("+list.Count+")" + Environment.NewLine;
-        result = appendEnumerableDump(result, value as IEnumerable, indent);
+        result = AppendEnumerableDump(result, value as IEnumerable, indent);
       }
       else if (value is IEnumerable)
       {
         //タイトル部分
         result += Environment.NewLine;
-        result = appendEnumerableDump(result, value as IEnumerable, indent);
+        result = AppendEnumerableDump(result, value as IEnumerable, indent);
       }
       else
       {
@@ -118,7 +110,7 @@ namespace Sdx.Diagnostics
       return result;
     }
 
-    private static String appendEnumerableDump(String result, IEnumerable values, String indent)
+    private static String AppendEnumerableDump(String result, IEnumerable values, String indent)
     { 
       foreach (Object obj in values as IEnumerable)
       {
@@ -128,13 +120,6 @@ namespace Sdx.Diagnostics
       //改行を取り除く
       result = result.TrimEnd('\r', '\n');
       return result;
-    }
-
-    internal static void initRequestTimer()
-    {
-      Stopwatch sw = new Stopwatch();
-      sw.Start();
-      HttpContext.Current.Items.Add(requestTimerKey, sw);
     }
 
     public static string FormatStopwatchTicks(Int64 ticks, int precision = 8)

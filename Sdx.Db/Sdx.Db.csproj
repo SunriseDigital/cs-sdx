@@ -76,9 +76,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
-      <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
-      <Name>Sdx.Diagnostics</Name>
+    <ProjectReference Include="..\Sdx\Sdx.csproj">
+      <Project>{ed186d94-5ab8-4707-b0a8-60fbd4237d2d}</Project>
+      <Name>Sdx</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
