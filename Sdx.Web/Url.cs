@@ -56,15 +56,15 @@ namespace Sdx.Web
     {
       if(param is Dictionary<string, string>)
       {
-        //キャストしないとコンパイルエラーになる。。。微妙なので違う方法を探す
-        var superparam = (Dictionary<string, string>)param;
-        List<string> param_list = new List<string>();
-        foreach (KeyValuePair<string, string> pair in superparam)
+        //コンパイル時には型が確定していないためキャストしています
+        var dicParams = (Dictionary<string, string>)param;
+        List<string> listParams = new List<string>();
+        foreach (KeyValuePair<string, string> pair in dicParams)
         {
           var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
-          param_list.Add(tmp);
+          listParams.Add(tmp);
         }
-        var query = "?" + string.Join("&", param_list);
+        var query = "?" + string.Join("&", listParams);
         return query;
       }
 
