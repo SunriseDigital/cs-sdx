@@ -55,11 +55,11 @@ namespace Sdx.Web
     private string BuildQueryString(object param = null)
     {
       //ここに格納された値を最終的に "&" で連結してクエリ文字列にします
-      var listParams = new List<string>();
+      var baseParams = new List<string>();
       foreach (KeyValuePair<string, string> item in this.param_data)
       {
         var tmp = string.Format("{0}={1}", item.Key, item.Value);
-        listParams.Add(tmp);
+        baseParams.Add(tmp);
       }
 
       if(param is Dictionary<string, string>)
@@ -69,30 +69,19 @@ namespace Sdx.Web
         foreach (KeyValuePair<string, string> pair in dicParams)
         {
           var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
-          listParams.Add(tmp);
+          baseParams.Add(tmp);
         }
       }
 
       if(param is List<string>)
       {
-        //クエリから取り除いて返す。LINQを使った処理がうまくいかないので
-        //とりあえず後回し
-        /*public string Build(List<string> param)
-        {
-          string path = this.BuildPath();
-          var param_list = new Dictionary<string, string>();
-          if (this.param_data.Count > 0)
-          {
-            var result = this.param_data.Where(item => item.Key != "sample");
-          }
 
-        }*/
       }
 
       var query = "";
-      if(listParams.Count > 0)
+      if(baseParams.Count > 0)
       {
-        query = "?" + string.Join("&", listParams);
+        query = "?" + string.Join("&", baseParams);
       }
       return query;
     }
