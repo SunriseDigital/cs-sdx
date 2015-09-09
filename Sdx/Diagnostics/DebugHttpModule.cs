@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Sdx.Diagnostics
 {
-  public class DisplayHttpModule : IHttpModule
+  public class DebugHttpModule : IHttpModule
   {
     public void Init(HttpApplication application)
     {
