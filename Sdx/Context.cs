@@ -53,6 +53,7 @@ namespace Sdx
         return ((IEnumerable<KeyValuePair<string, object>>)items).GetEnumerator();
       }
     }
+
     private const string SDX_CONTEXT_KEY = "SDX.CONTEXT.INSTANCE_KEY";
 
     private static Context nonWebInstance;
@@ -62,6 +63,7 @@ namespace Sdx
     private Context()
     {
       this.Timer = new Stopwatch();
+      this.IsDebugMode = false;
     }
 
     public static Context Current
@@ -103,25 +105,6 @@ namespace Sdx
       }
     }
 
-    //public Context SetVar(string key, object value)
-    //{
-    //  this.items[key] = value;
-    //  return this;
-    //}
-
-    //public T GetVar<T>(string key)
-    //{
-    //  return (T)this.items[key];
-    //}
-
-    //public object GetVar(string key)
-    //{
-    //  return this.items[key];
-    //}
-
-    //public bool HasVar(string key)
-    //{
-    //  return this.items.ContainsKey(key);
-    //}
+    public bool IsDebugMode { get;  set; }
   }
 }

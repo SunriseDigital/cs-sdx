@@ -111,10 +111,6 @@
     <None Include="user.config.tpl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sdx.Db\Sdx.Db.csproj">
-      <Project>{ed1e6ba0-37f0-46cf-a86a-231a6cd2178c}</Project>
-      <Name>Sdx.Db</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Sdx\Sdx.csproj">
       <Project>{ed186d94-5ab8-4707-b0a8-60fbd4237d2d}</Project>
       <Name>Sdx</Name>

@@ -17,11 +17,20 @@ namespace Sdx.Diagnostics
 
     private void Application_BeginRequest(object source, EventArgs a)
     {
+      //start timer
       Sdx.Context.Current.Timer.Start();
+
+      //debug mode
+      if(HttpContext.Current.Request.Cookies["sdx_debug_mode"].Value == "1")
+      {
+        Sdx.Context.Current.IsDebugMode = true;
+      }
     }
 
     private void Application_EndRequest(object source, EventArgs a)
     {
+
+      //Debug.Log
       HttpApplication application = (HttpApplication)source;
       HttpContext context = application.Context;
 

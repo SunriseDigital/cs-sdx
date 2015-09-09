@@ -26,6 +26,10 @@ namespace Sdx.Db
     {
       this.factory = this.GetFactory();
       this.builder = this.factory.CreateCommandBuilder();
+      if(Sdx.Context.Current.IsDebugMode)
+      {
+        this.Profiler = new Query.Profiler();
+      }
     }
 
     public DbConnection CreateConnection()
@@ -72,6 +76,7 @@ namespace Sdx.Db
       if (query != null)
       {
         query.End();
+        query.Adapter = this;
       }
 
       return reader;

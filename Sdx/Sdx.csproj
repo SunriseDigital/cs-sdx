@@ -49,11 +49,28 @@
     <Compile Include="Config\Tree.cs" />
     <Compile Include="Config\TreeYaml.cs" />
     <Compile Include="Context.cs" />
+    <Compile Include="Db\Adapter.cs" />
+    <Compile Include="Db\MySqlAdapter.cs" />
+    <Compile Include="Db\Query\Column.cs" />
+    <Compile Include="Db\Query\Condition.cs" />
+    <Compile Include="Db\Query\Context.cs" />
+    <Compile Include="Db\Query\Counter.cs" />
+    <Compile Include="Db\Query\Enums.cs" />
+    <Compile Include="Db\Query\Expr.cs" />
+    <Compile Include="Db\Query\Log.cs" />
+    <Compile Include="Db\Query\Profiler.cs" />
+    <Compile Include="Db\Query\Select.cs" />
+    <Compile Include="Db\Record.cs" />
+    <Compile Include="Db\RecordSet.cs" />
+    <Compile Include="Db\SqlServerAdapter.cs" />
+    <Compile Include="Db\Table.cs" />
+    <Compile Include="Db\TableMeta.cs" />
     <Compile Include="Diagnostics\Debug.cs" />
     <Compile Include="Diagnostics\DebugHttpModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

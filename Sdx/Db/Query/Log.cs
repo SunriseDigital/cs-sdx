@@ -40,6 +40,8 @@ namespace Sdx.Db.Query
       }
     }
 
+    public Adapter Adapter { get; internal set; }
+
     internal void Begin()
     {
       this.stopwatch.Start();
