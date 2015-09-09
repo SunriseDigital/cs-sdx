@@ -75,7 +75,18 @@ namespace Sdx.Web
 
       if(param is List<string>)
       {
-
+        //コンパイル時には型が確定していないためキャストしています
+        var excludeList = (List<string>)param;
+        var excludedData = this.param_data
+          .Where(p => excludeList.Contains(p.Key) == false)
+          .ToList()//この時点で List<KeyValuePair<string,string>> 型のListになる
+        ;
+        var tmplist = new List<string>();
+        foreach (KeyValuePair<string, string> data in excludedData)
+        {
+          tmplist.Add(string.Format("{0}={1}", data.Key, data.Value));
+        }
+        baseParams = tmplist;
       }
 
       var query = "";
@@ -102,6 +113,13 @@ namespace Sdx.Web
     }
 
     public string Build(Dictionary<string, string> param)
+    {
+      string path = this.BuildPath();
+      string query = this.BuildQueryString(param);
+      return path + query;
+    }
+
+    public string Build(List<string> param)
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(param);
