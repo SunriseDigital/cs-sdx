@@ -52,20 +52,25 @@ namespace Sdx.Web
       this.param_data[key] = value;
     }
 
-    private string BuildQueryString(object param)
+    private string BuildQueryString(object param = null)
     {
+      //ここに格納された値を最終的に "&" で連結してクエリ文字列にします
+      var listParams = new List<string>();
+      foreach (KeyValuePair<string, string> item in this.param_data)
+      {
+        var tmp = string.Format("{0}={1}", item.Key, item.Value);
+        listParams.Add(tmp);
+      }
+
       if(param is Dictionary<string, string>)
       {
         //コンパイル時には型が確定していないためキャストしています
         var dicParams = (Dictionary<string, string>)param;
-        List<string> listParams = new List<string>();
         foreach (KeyValuePair<string, string> pair in dicParams)
         {
           var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
           listParams.Add(tmp);
         }
-        var query = "?" + string.Join("&", listParams);
-        return query;
       }
 
       if(param is List<string>)
@@ -84,9 +89,12 @@ namespace Sdx.Web
         }*/
       }
 
-      //とりあえず適当な文字列を返しておく。テストでエラーになるのは認識済み。
-      var str = "hoge";
-      return str;
+      var query = "";
+      if(listParams.Count > 0)
+      {
+        query = "?" + string.Join("&", listParams);
+      }
+      return query;
     }
 
     private string BuildPath()
@@ -100,39 +108,15 @@ namespace Sdx.Web
     public string Build()
     {
       string path = this.BuildPath();
-      if(this.param_data.Count > 0)
-      {
-        string query = this.BuildQueryString(this.param_data);
-        return path + query;
-      }
-      return path;
+      string query = this.BuildQueryString();
+      return path + query;
     }
 
     public string Build(Dictionary<string, string> param)
     {
       string path = this.BuildPath();
-      var param_list = new Dictionary<string, string>();
-
-      //コンストラクト時にセットされていたパラメータがあればリストに追加
-      if (this.param_data.Count > 0)
-      {
-        foreach (KeyValuePair<string, string> item in this.param_data)
-        {
-          param_list[item.Key] = item.Value;
-        }
-      }
-
-      //引数でセットされてきたパラメータをリストに追加
-      foreach(KeyValuePair<string, string> item in param)
-      {
-        param_list[item.Key] = item.Value;
-      }
-
-      string query = this.BuildQueryString(param_list);
+      string query = this.BuildQueryString(param);
       return path + query;
     }
-
-
-
   }
 }
