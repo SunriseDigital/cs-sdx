@@ -25,14 +25,14 @@ namespace Sdx.Diagnostics
       get
       {
         List<Dictionary<String, Object>> values;
-        if (!Sdx.Context.Current.HasVar(logKey))
+        if (!Sdx.Context.Current.Vars.ContainsKey(logKey))
         {
           values = new List<Dictionary<String, Object>>();
-          Sdx.Context.Current.SetVar(logKey, values);
+          Sdx.Context.Current.Vars[logKey] = values;
         }
         else
         {
-          values = Sdx.Context.Current.GetVar<List<Dictionary<String, Object>>>(logKey);
+          values = Sdx.Context.Current.Vars.As<List<Dictionary<String, Object>>>(logKey);
         }
         return values;
       }

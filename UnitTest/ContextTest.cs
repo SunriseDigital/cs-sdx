@@ -24,15 +24,26 @@ namespace UnitTest
       Sdx.Context context = Sdx.Context.Current;
       Assert.Equal(context, Sdx.Context.Current);
 
-      context.SetVar("foo", "bar");
-      Assert.Equal("bar", Sdx.Context.Current.GetVar("foo"));
+      context.Vars["foo"] = "bar";
+      Assert.Equal("bar", Sdx.Context.Current.Vars["foo"]);
 
       var shop = new Test.Orm.Shop();
-      context.SetVar("shop", shop);
-      Assert.Equal(shop, Sdx.Context.Current.GetVar<Test.Orm.Shop>("shop"));
+      context.Vars["shop"] = shop;
+      Assert.Equal(shop, Sdx.Context.Current.Vars.As<Test.Orm.Shop>("shop"));
 
-      Exception ex = Record.Exception(() => context.GetVar("hoge"));
+      //とりあえず回せるかどうかだけチェック
+      foreach (var item in context.Vars)
+      {
+        Console.WriteLine(item);
+      }
+
+      //存在しないキーにアクセスすると例外
+      Exception ex = Record.Exception(() => context.Vars["hoge"]);
       Assert.Equal(typeof(KeyNotFoundException), ex.GetType());
+
+      //Addは重複時例外
+      ex = Record.Exception(() => context.Vars.Add("foo", "000"));
+      Assert.Equal(typeof(ArgumentException), ex.GetType());
     }
 
     [Fact]

@@ -3,16 +3,61 @@ using System.Collections.Generic;
 using System.Linq;
 using System;
 using System.Diagnostics;
+using System.Collections;
 
 namespace Sdx
 {
   public class Context
   {
+    public class ContextVars : IEnumerable<KeyValuePair<string, object>>
+    {
+      private Dictionary<string, object> items = new Dictionary<string, object>();
+
+      public object this[string key]
+      {
+        set
+        {
+          this.items[key] = value;
+        }
+
+        get
+        {
+          return this.items[key];
+        }
+      }
+
+      public ContextVars Add(string key, object value)
+      {
+        this.items.Add(key, value);
+        return this;
+      }
+
+
+      public bool ContainsKey(string key)
+      {
+        return this.items.ContainsKey(key);
+      }
+
+      public T As<T>(string key)
+      {
+        return (T)this[key];
+      }
+
+      public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
+      {
+        return ((IEnumerable<KeyValuePair<string, object>>)items).GetEnumerator();
+      }
+
+      IEnumerator IEnumerable.GetEnumerator()
+      {
+        return ((IEnumerable<KeyValuePair<string, object>>)items).GetEnumerator();
+      }
+    }
     private const string SDX_CONTEXT_KEY = "SDX.CONTEXT.INSTANCE_KEY";
 
     private static Context nonWebInstance;
 
-    private Dictionary<string, object> items = new Dictionary<string, object>();
+    
 
     private Context()
     {
@@ -46,25 +91,37 @@ namespace Sdx
 
     public Stopwatch Timer { get; private set; }
 
-    public Context SetVar(string key, object value)
+    private ContextVars vars = new ContextVars();
+
+
+
+    public ContextVars Vars
     {
-      this.items[key] = value;
-      return this;
+      get
+      {
+        return this.vars;
+      }
     }
 
-    public T GetVar<T>(string key)
-    {
-      return (T)this.items[key];
-    }
+    //public Context SetVar(string key, object value)
+    //{
+    //  this.items[key] = value;
+    //  return this;
+    //}
 
-    public object GetVar(string key)
-    {
-      return this.items[key];
-    }
+    //public T GetVar<T>(string key)
+    //{
+    //  return (T)this.items[key];
+    //}
 
-    public bool HasVar(string key)
-    {
-      return this.items.ContainsKey(key);
-    }
+    //public object GetVar(string key)
+    //{
+    //  return this.items[key];
+    //}
+
+    //public bool HasVar(string key)
+    //{
+    //  return this.items.ContainsKey(key);
+    //}
   }
 }
