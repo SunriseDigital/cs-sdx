@@ -19,11 +19,10 @@ namespace Sdx.Web
 
       //各パラメータを連想配列でしまっておく
       string[] paramList = this.uri.Query.Trim('?').Split('&');
-      foreach (var item in paramList)
-      {
-        string[] tmp = item.Split('=');
+      paramList.ToList().ForEach(str => {
+        string[] tmp = str.Split('=');
         this.paramData[tmp[0]] = tmp[1];
-      }
+      });
     }
 
     public string GetDomain()
@@ -60,10 +59,9 @@ namespace Sdx.Web
 
       var sb = new StringBuilder();
       sb.Append("?");
-      foreach (KeyValuePair<string, string> pair in param)
-      {
-        sb.AppendFormat("{0}={1}&", pair.Key, pair.Value);
-      }
+      param.ToList().ForEach(
+        kv => sb.AppendFormat("{0}={1}&", kv.Key, kv.Value)
+      );
 
       return sb.ToString().TrimEnd('&');
     }
