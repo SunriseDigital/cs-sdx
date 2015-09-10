@@ -18,6 +18,11 @@ namespace Sdx.Db
         this.ReferenceKey = referenceKey;
       }
 
+      public Relation(Type tableType, string foreignKey) : this(tableType, foreignKey, foreignKey)
+      {
+
+      }
+
       public Type TableType { get; private set; }
       public string ForeignKey { get; private set; }
       public string ReferenceKey { get; private set; }
