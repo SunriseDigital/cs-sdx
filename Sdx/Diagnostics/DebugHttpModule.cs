@@ -121,7 +121,7 @@ namespace Sdx.Diagnostics
 
       debugString.Append(String.Format(
         LogBlockFormat,
-        Sdx.Context.Current.DbProfiler.Queries.Count + " queries " + Sdx.Diagnostics.Debug.FormatStopwatchTicks(totalElapsed) + "sec",
+        Sdx.Context.Current.DbProfiler.Queries.Count + " queries " + Sdx.Diagnostics.Debug.FormatStopwatchTicks(totalElapsed) + " sec",
         slowQueryString.ToString() + queryString.ToString()
       ));
     }

@@ -27,7 +27,7 @@ namespace Sdx.Db
     {
       this.factory = this.GetFactory();
       this.builder = this.factory.CreateCommandBuilder();
-      if(Sdx.Context.Current.DbProfiler != null)
+      if (Sdx.Context.Current.DbProfiler != null)
       {
         this.Profiler = Sdx.Context.Current.DbProfiler;
       }

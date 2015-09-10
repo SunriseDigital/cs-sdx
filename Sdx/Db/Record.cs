@@ -135,7 +135,7 @@ namespace Sdx.Db
         return (RecordSet<T>)this.recordCache[contextName];
       }
 
-      if (this.select.HasContext(contextName))
+      if (this.select.HasContext(contextName)) //already joined
       {
         if (selectHook != null)
         {
@@ -148,7 +148,7 @@ namespace Sdx.Db
         this.recordCache[contextName] = resultSet;
         return resultSet;
       }
-      else
+      else //no join
       {
         var table = this.select.Context(this.ContextName).Table;
         if (table.OwnMeta.Relations.ContainsKey(contextName))
@@ -156,6 +156,7 @@ namespace Sdx.Db
           var relations = table.OwnMeta.Relations[contextName];
 
           var sel = new Select();
+          sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
           sel.Adapter = this.select.Adapter;
           sel.AddFrom((Table)Activator.CreateInstance(relations.TableType))
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
