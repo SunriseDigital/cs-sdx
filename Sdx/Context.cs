@@ -103,20 +103,7 @@ namespace Sdx
       }
     }
 
-    private Sdx.Db.Query.Profiler dbProfiler;
-
-    public Sdx.Db.Query.Profiler DbProfiler
-    {
-      get
-      {
-        if(!this.IsDebugMode)
-        {
-          return null;
-        }
-
-        return dbProfiler;
-      }
-    }
+    public Sdx.Db.Query.Profiler DbProfiler { get; set; }
 
     private bool isDebugMode;
 
@@ -130,9 +117,9 @@ namespace Sdx
       set
       {
         this.isDebugMode = value;
-        if (value == true && this.dbProfiler == null)
+        if (value == true && this.DbProfiler == null)
         {
-          this.dbProfiler = new Sdx.Db.Query.Profiler();
+          this.DbProfiler = new Sdx.Db.Query.Profiler();
         }
       }
     }

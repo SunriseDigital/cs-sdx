@@ -28,7 +28,9 @@ namespace UnitTest
     {
       var db = this.CreateTestDbList()[0].Adapter;
 
-      db.Profiler = new Sdx.Db.Query.Profiler();
+
+      var profiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = profiler;
 
       var command = db.CreateCommand();
       command.CommandText = "SELECT * FROM shop WHERE id > @id";
@@ -45,11 +47,11 @@ namespace UnitTest
         var reader = db.ExecuteReader(command);
       }
 
-      Assert.Equal(1, db.Profiler.Queries.Count);
-      Assert.True(db.Profiler.Queries[0].ElapsedTime > 0);
-      Assert.True(db.Profiler.Queries[0].FormatedElapsedTime is String);
-      Assert.Equal("SELECT * FROM shop WHERE id > @id", db.Profiler.Queries[0].CommandText);
-      Assert.Equal("@id : 1", db.Profiler.Queries[0].FormatedParameters);
+      Assert.Equal(1, profiler.Queries.Count);
+      Assert.True(profiler.Queries[0].ElapsedTime > 0);
+      Assert.True(profiler.Queries[0].FormatedElapsedTime is String);
+      Assert.Equal("SELECT * FROM shop WHERE id > @id", profiler.Queries[0].CommandText);
+      Assert.Equal("@id : 1", profiler.Queries[0].FormatedParameters);
 
 
       command.CommandText = "SELECT * FROM shop WHERE id > @id AND name = @name";
@@ -65,11 +67,11 @@ namespace UnitTest
         var reader = db.ExecuteReader(command);
       }
 
-      Assert.Equal(2, db.Profiler.Queries.Count);
-      Assert.True(db.Profiler.Queries[1].ElapsedTime > 0);
-      Assert.True(db.Profiler.Queries[1].FormatedElapsedTime is String);
-      Assert.Equal("SELECT * FROM shop WHERE id > @id AND name = @name", db.Profiler.Queries[1].CommandText);
-      Assert.Equal("  @id : 1"+System.Environment.NewLine+"@name : foobar", db.Profiler.Queries[1].FormatedParameters);
+      Assert.Equal(2, profiler.Queries.Count);
+      Assert.True(profiler.Queries[1].ElapsedTime > 0);
+      Assert.True(profiler.Queries[1].FormatedElapsedTime is String);
+      Assert.Equal("SELECT * FROM shop WHERE id > @id AND name = @name", profiler.Queries[1].CommandText);
+      Assert.Equal("  @id : 1" + System.Environment.NewLine + "@name : foobar", profiler.Queries[1].FormatedParameters);
     }
 
     [Fact]

@@ -1529,6 +1529,8 @@ namespace UnitTest
 
     private void RunSelectComment(TestDb db)
     {
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+
       //
       var select = new Sdx.Db.Query.Select();
       select
@@ -1536,8 +1538,7 @@ namespace UnitTest
         .AddFrom(new Test.Orm.Table.Shop())
         .AddColumn("id");
 
-      var profiler = new Sdx.Db.Query.Profiler();
-      db.Adapter.Profiler = profiler;
+      var profiler = Sdx.Context.Current.DbProfiler;
 
       var rset = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
 

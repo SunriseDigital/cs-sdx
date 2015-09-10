@@ -21,16 +21,11 @@ namespace Sdx.Db
     protected abstract string SecureConnectionString { get; }
 
     public string ConnectionString { get; set; }
-    public Query.Profiler Profiler { get; set; }
 
     public Adapter()
     {
       this.factory = this.GetFactory();
       this.builder = this.factory.CreateCommandBuilder();
-      if (Sdx.Context.Current.DbProfiler != null)
-      {
-        this.Profiler = Sdx.Context.Current.DbProfiler;
-      }
     }
 
     public DbConnection CreateConnection()
@@ -80,9 +75,9 @@ namespace Sdx.Db
         }
       }
 
-      if (this.Profiler != null)
+      if (Sdx.Context.Current.DbProfiler != null)
       {
-        query = this.Profiler.Begin(command);
+        query = Sdx.Context.Current.DbProfiler.Begin(command);
       }
 
       DbDataReader reader = null;
