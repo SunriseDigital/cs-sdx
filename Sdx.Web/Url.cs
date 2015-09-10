@@ -15,6 +15,7 @@ namespace Sdx.Web
     {
       //@var System.Uri
       this.uri = new Uri(urlStr);
+      this.paramData = new Dictionary<string, string>();
 
       //各パラメータを連想配列でしまっておく
       string[] paramList = this.uri.Query.Trim('?').Split('&');
