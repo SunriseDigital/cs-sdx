@@ -84,22 +84,14 @@ namespace Sdx.Web
       return path + query;
     }
 
-    public string Build(Dictionary<string, string> param)
+    public string Build(Dictionary<string, string> addDic)
     {
       string path = this.BuildPath();
-      var list = new Dictionary<string, string>();
-
-      foreach (KeyValuePair<string, string> item in this.paramData)
-      {
-        list[item.Key] = item.Value;
-      }
-
-      foreach (KeyValuePair<string, string> item in param)
-      {
-        list[item.Key] = item.Value;
-      }
-
-      string query = this.BuildQueryString(list);
+      var addedDic = this.paramData
+        .Concat(addDic)
+        .ToDictionary(p => p.Key, p => p.Value)
+      ;
+      string query = this.BuildQueryString(addedDic);
       return path + query;
     }
 
