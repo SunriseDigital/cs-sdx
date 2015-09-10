@@ -54,19 +54,19 @@ namespace Sdx.Web
 
     private string BuildQueryString(Dictionary<string,string> param)
     {
-      //ここに格納された値を最終的に "&" で連結してクエリ文字列にします
-      var baseParams = new List<string>();
+      if (param.Count == 0)
+      {
+        return "";
+      }
+
+      var sb = new StringBuilder();
+      sb.Append("?");
       foreach (KeyValuePair<string, string> pair in param)
       {
-        var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
-        baseParams.Add(tmp);
+        sb.AppendFormat("{0}={1}&", pair.Key, pair.Value);
       }
-      var query = "";
-      if(baseParams.Count > 0)
-      {
-        query = "?" + string.Join("&", baseParams);
-      }
-      return query;
+
+      return sb.ToString().TrimEnd('&');
     }
 
     private string BuildPath()
