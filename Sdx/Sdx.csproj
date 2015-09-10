@@ -50,6 +50,7 @@
     <Compile Include="Config\TreeYaml.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Db\Adapter.cs" />
+    <Compile Include="Db\DbException.cs" />
     <Compile Include="Db\MySqlAdapter.cs" />
     <Compile Include="Db\Query\Column.cs" />
     <Compile Include="Db\Query\Condition.cs" />

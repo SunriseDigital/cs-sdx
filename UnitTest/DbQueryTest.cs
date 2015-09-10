@@ -1516,5 +1516,81 @@ namespace UnitTest
       Assert.Equal(1, db.Command.Parameters.Count);
       Assert.Equal("3", db.Command.Parameters["@0"].Value);
     }
+
+    [Fact]
+    public void TestSelectComment()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectComment(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectComment(TestDb db)
+    {
+      //
+      var select = new Sdx.Db.Query.Select();
+      select
+        .SetComment("No where comment")
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddColumn("id");
+
+      var profiler = new Sdx.Db.Query.Profiler();
+      db.Adapter.Profiler = profiler;
+
+      var rset = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+
+      Assert.Equal(1, profiler.Queries.Count);
+      Assert.Equal("No where comment", profiler.Queries[0].Comment);
+
+      //
+      select
+        .SetComment("Where and order limit")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(10)
+        .Context("shop").Where.Add("area_id", 1);
+
+      rset = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+      Assert.Equal(2, profiler.Queries.Count);
+      Assert.Equal("Where and order limit", profiler.Queries[1].Comment);
+
+      //
+      select = new Sdx.Db.Query.Select();
+      select.Adapter = db.Adapter;
+
+      select
+        .SetComment("No where form string")
+        .AddFrom("shop")
+        .AddColumn("id");
+
+      var command = select.Build();
+      using (command.Connection = db.Adapter.CreateConnection())
+      {
+        command.Connection.Open();
+        var reader = db.Adapter.ExecuteReader(command);
+        Assert.Equal(3, profiler.Queries.Count);
+        Assert.Equal("No where form string", profiler.Queries[2].Comment);
+      }
+
+
+      //
+      select
+        .SetComment("Where and order limit from string")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(10)
+        .Context("shop").Where.Add("area_id", 1);
+
+      command = select.Build();
+      using (command.Connection = db.Adapter.CreateConnection())
+      {
+        command.Connection.Open();
+        var reader = db.Adapter.ExecuteReader(command);
+        Assert.Equal(4, profiler.Queries.Count);
+        Assert.Equal("Where and order limit from string", profiler.Queries[3].Comment);
+      }
+
+
+    }
   }
 }

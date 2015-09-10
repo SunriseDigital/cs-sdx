@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Data.Common;
 using System.Collections.Generic;
+using System.Linq;
 
 
 namespace Sdx.Db
@@ -26,9 +27,9 @@ namespace Sdx.Db
     {
       this.factory = this.GetFactory();
       this.builder = this.factory.CreateCommandBuilder();
-      if(Sdx.Context.Current.IsDebugMode)
+      if(Sdx.Context.Current.DbProfiler != null)
       {
-        this.Profiler = new Query.Profiler();
+        this.Profiler = Sdx.Context.Current.DbProfiler;
       }
     }
 
@@ -66,17 +67,39 @@ namespace Sdx.Db
     public DbDataReader ExecuteReader(DbCommand command)
     {
       Query.Log query = null;
+      string comment = null;
+      if(command.Parameters.Count > 0)
+      {
+        //最後がコメントかチェックする
+        var lastIndex = command.Parameters.Count - 1;
+        var param = command.Parameters[lastIndex];
+        if (param.ParameterName == Query.Select.CommentParameterKey)
+        {
+          command.Parameters.RemoveAt(lastIndex);
+          comment = param.Value.ToString();
+        }
+      }
+
       if (this.Profiler != null)
       {
         query = this.Profiler.Begin(command);
       }
 
-      var reader = command.ExecuteReader();
+      DbDataReader reader = null;
+      try
+      {
+        reader = command.ExecuteReader();
+      }
+      catch(Exception e)
+      {
+        throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText);
+      }
 
       if (query != null)
       {
         query.End();
         query.Adapter = this;
+        query.Comment = comment;
       }
 
       return reader;
@@ -303,7 +326,7 @@ namespace Sdx.Db
 
     public override string ToString()
     {
-      var prefix = this.factory + ": ";
+      var prefix = this.GetType().Name + ": ";
       if(this.ConnectionString == null)
       {
         return prefix;

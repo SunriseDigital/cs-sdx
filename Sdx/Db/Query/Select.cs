@@ -11,6 +11,15 @@ namespace Sdx.Db.Query
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
+
+    public string Comment { get; set; }
+
+    public Select SetComment(string comment)
+    {
+      this.Comment = comment;
+      return this;
+    }
+
     private Condition where;
     private Condition having;
 
@@ -239,6 +248,8 @@ namespace Sdx.Db.Query
       return joinString;
     }
 
+    public const string CommentParameterKey = "##Sdx.Db.Query.Select.Comment##";
+
     public DbCommand Build()
     {
       if (this.Adapter == null)
@@ -247,8 +258,14 @@ namespace Sdx.Db.Query
       }
 
       DbCommand command = this.Adapter.CreateCommand();
+
       var condCount = new Counter();
       command.CommandText = this.BuildSelectString(command.Parameters, condCount);
+
+      if (this.Comment != null)
+      {
+        command.Parameters.Add(this.Adapter.CreateParameter(CommentParameterKey, this.Comment));
+      }
 
       return command;
     }

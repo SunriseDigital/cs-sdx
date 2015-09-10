@@ -101,5 +101,7 @@ namespace Sdx.Db.Query
         return result;
       }
     }
+
+    public string Comment { get; internal set; }
   }
 }

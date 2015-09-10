@@ -9,7 +9,7 @@ namespace Sdx
 {
   public class Context
   {
-    public class ContextVars : IEnumerable<KeyValuePair<string, object>>
+    public class ContextVarCollection : IEnumerable<KeyValuePair<string, object>>
     {
       private Dictionary<string, object> items = new Dictionary<string, object>();
 
@@ -26,7 +26,7 @@ namespace Sdx
         }
       }
 
-      public ContextVars Add(string key, object value)
+      public ContextVarCollection Add(string key, object value)
       {
         this.items.Add(key, value);
         return this;
@@ -58,12 +58,10 @@ namespace Sdx
 
     private static Context nonWebInstance;
 
-    
-
     private Context()
     {
       this.Timer = new Stopwatch();
-      this.IsDebugMode = false;
+      this.isDebugMode = false;
     }
 
     public static Context Current
@@ -93,11 +91,11 @@ namespace Sdx
 
     public Stopwatch Timer { get; private set; }
 
-    private ContextVars vars = new ContextVars();
+    private ContextVarCollection vars = new ContextVarCollection();
 
 
 
-    public ContextVars Vars
+    public ContextVarCollection Vars
     {
       get
       {
@@ -105,6 +103,38 @@ namespace Sdx
       }
     }
 
-    public bool IsDebugMode { get;  set; }
+    private Sdx.Db.Query.Profiler dbProfiler;
+
+    public Sdx.Db.Query.Profiler DbProfiler
+    {
+      get
+      {
+        if(!this.IsDebugMode)
+        {
+          return null;
+        }
+
+        return dbProfiler;
+      }
+    }
+
+    private bool isDebugMode;
+
+    public bool IsDebugMode
+    {
+      get
+      {
+        return this.isDebugMode;
+      }
+
+      set
+      {
+        this.isDebugMode = value;
+        if (value == true && this.dbProfiler == null)
+        {
+          this.dbProfiler = new Sdx.Db.Query.Profiler();
+        }
+      }
+    }
   }
 }
