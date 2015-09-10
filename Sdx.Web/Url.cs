@@ -8,23 +8,23 @@ namespace Sdx.Web
   public class Url
   {
     private Uri uri;
-    private Dictionary<string, string> param_data;
+    private Dictionary<string, string> paramData;
 
     //コンストラクタ
-    public Url(string url_str)
+    public Url(string urlStr)
     {
       //@var System.Uri
-      this.uri = new Uri(url_str);
+      this.uri = new Uri(urlStr);
 
       //クエリを分解して連想配列にする
-      string[] param_list = this.uri.Query.Trim('?').Split('&');
+      string[] paramList = this.uri.Query.Trim('?').Split('&');
       Dictionary<string, string> data = new Dictionary<string, string>();
-      foreach (var item in param_list)
+      foreach (var item in paramList)
       {
-        string[] item_part = item.Split('=');
-        data[item_part[0]] = item_part[1];
+        string[] tmp = item.Split('=');
+        data[tmp[0]] = tmp[1];
       }
-      this.param_data = data;
+      this.paramData = data;
     }
 
     public string GetDomain()
@@ -32,9 +32,9 @@ namespace Sdx.Web
       return this.uri.Host;
     }
 
-    public string GetParam(string key_name)
+    public string GetParam(string key)
     {
-      return this.param_data[key_name];
+      return this.paramData[key];
     }
 
     public string GetPath()
@@ -49,14 +49,14 @@ namespace Sdx.Web
 
     public void SetParam(string key, string value)
     {
-      this.param_data[key] = value;
+      this.paramData[key] = value;
     }
 
     private string BuildQueryString(object param = null)
     {
       //ここに格納された値を最終的に "&" で連結してクエリ文字列にします
       var baseParams = new List<string>();
-      foreach (KeyValuePair<string, string> item in this.param_data)
+      foreach (KeyValuePair<string, string> item in this.paramData)
       {
         var tmp = string.Format("{0}={1}", item.Key, item.Value);
         baseParams.Add(tmp);
@@ -77,7 +77,7 @@ namespace Sdx.Web
       {
         //コンパイル時には型が確定していないためキャストしています
         var excludeList = (List<string>)param;
-        var excludedData = this.param_data
+        var excludedData = this.paramData
           .Where(p => excludeList.Contains(p.Key) == false)
           .ToList()//この時点で List<KeyValuePair<string,string>> 型のListになる
         ;
