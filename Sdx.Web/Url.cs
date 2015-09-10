@@ -16,15 +16,13 @@ namespace Sdx.Web
       //@var System.Uri
       this.uri = new Uri(urlStr);
 
-      //クエリを分解して連想配列にする
+      //各パラメータを連想配列でしまっておく
       string[] paramList = this.uri.Query.Trim('?').Split('&');
-      Dictionary<string, string> data = new Dictionary<string, string>();
       foreach (var item in paramList)
       {
         string[] tmp = item.Split('=');
-        data[tmp[0]] = tmp[1];
+        this.paramData[tmp[0]] = tmp[1];
       }
-      this.paramData = data;
     }
 
     public string GetDomain()
