@@ -2,6 +2,7 @@
 using Sdx.Data;
 using System.Text;
 using System.IO;
+using System;
 
 namespace Sdx
 {
@@ -50,11 +51,11 @@ namespace Sdx
       Tree tree = new T();
 
       var path = BaseDir + Path.DirectorySeparatorChar + fileName;
-      if (encoding != null)
+      if (extension != null)
       {
         path += "." + extension;
       }
-
+      
       if(memoryCache.ContainsKey(path))
       {
         return memoryCache[path];
