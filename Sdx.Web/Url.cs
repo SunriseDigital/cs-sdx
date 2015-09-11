@@ -130,5 +130,19 @@ namespace Sdx.Web
         return this.uri.LocalPath;
       }
     }
+
+    public Dictionary<string, string> Param
+    {
+      get
+      {
+        return this.paramData;
+      }
+
+      set
+      {
+        this.paramData = value;
+      }
+    }
+
   }
 }
