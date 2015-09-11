@@ -8,17 +8,63 @@ namespace Sdx.Data
 {
   public abstract class Tree
   {
-    ///////////////////////////////////////////////////////////////
+    private List<Tree> listCache;
+    private Dictionary<string, Tree> treeCache = new Dictionary<string, Tree>();
 
-    public abstract string Value { get; }
-
-    public abstract List<Tree> List { get; }
-
-    protected abstract Tree Get(string path, List<string> paths);
-
-    public abstract void Load(StreamReader input);
+    public abstract void Load(TextReader input);
 
     internal abstract string DefaultFileExtension { get; }
+
+    /// <summary>
+    /// 値を返します。末端のノードでない場合は例外を投げてください。
+    /// </summary>
+    public abstract string ToValue();
+
+    /// <summary>
+    /// Treeのリストを生成して返す。自分自身がListのノードでない場合は例外を投げてください。
+    /// </summary>
+    /// <returns></returns>
+    protected abstract List<Tree> ToList();
+
+    /// <summary>
+    /// 自分自身からpaths分階層をだとったノードを含む新しいTreeを生成して返してください。
+    /// </summary>
+    /// <param name="paths"></param>
+    /// <returns></returns>
+    protected abstract Tree BuildTree(List<string> paths);
+
+    public string Value
+    {
+      get
+      {
+        return this.ToValue();
+      }
+    }
+
+    public List<Tree> List
+    {
+      get
+      {
+        if (this.listCache == null)
+        {
+          this.listCache = this.ToList();
+        }
+
+        
+        return this.listCache;
+      }
+    }
+
+    public Tree Get(string path)
+    {
+      if(!this.treeCache.ContainsKey(path))
+      {
+        var paths = this.SplitPath(path);
+        this.treeCache[path] = this.BuildTree(paths);
+      }
+      return this.treeCache[path];
+    }
+
 
     private List<string> SplitPath(string path)
     {
@@ -56,12 +102,6 @@ namespace Sdx.Data
       }
 
       return paths;
-    }
-
-    public Tree Get(string path)
-    {
-      var paths = this.SplitPath(path);
-      return Get(path, paths);
     }
 
     public IEnumerator<Tree> GetEnumerator()

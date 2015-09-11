@@ -10,8 +10,7 @@ namespace Sdx.Data
 {
   public class TreeYaml : Tree
   {
-    private List<Tree> listCache;
-    private Dictionary<string, Tree> treeCache = new Dictionary<string, Tree>();
+    private const string FileExtension = "yml";
 
     private YamlNode BaseNode { get; set; }
 
@@ -27,57 +26,44 @@ namespace Sdx.Data
       return target;
     }
 
-    public override string Value
+    public override string ToValue()
     {
-      get
+      if (this.BaseNode == null)
       {
-        if (this.BaseNode == null)
-        {
-          throw new InvalidCastException("This is root node.");
-        }
-
-        if (!(this.BaseNode is YamlScalarNode))
-        {
-          throw new InvalidCastException("Target is not string.");
-
-        }
-
-        return ((YamlScalarNode)this.BaseNode).Value;
+        throw new InvalidCastException("This is root node.");
       }
+
+      if (!(this.BaseNode is YamlScalarNode))
+      {
+        throw new InvalidCastException("Target is not string.");
+
+      }
+
+      return ((YamlScalarNode)this.BaseNode).Value;
     }
 
-    public override List<Tree> List
+    protected override List<Tree> ToList()
     {
-      get
+      if (this.BaseNode == null)
       {
-        if(this.listCache != null)
-        {
-          return this.listCache;
-        }
-
-        if (this.BaseNode == null)
-        {
-          throw new InvalidCastException("This is root node.");
-        }
-
-        if (!(this.BaseNode is YamlSequenceNode))
-        {
-          throw new InvalidCastException("Target is not List");
-        }
-
-        this.listCache = new List<Tree>();
-        foreach (var node in ((YamlSequenceNode)this.BaseNode))
-        {
-          var row = new TreeYaml();
-          row.BaseNode = node;
-          this.listCache.Add(row);
-        }
-
-        return this.listCache;
+        throw new InvalidOperationException("Load before this.");
       }
-    }
 
-    private const string FileExtension = "yml";
+      if (!(this.BaseNode is YamlSequenceNode))
+      {
+        throw new InvalidCastException("Target is not List.");
+      }
+
+      var list = new List<Tree>();
+      foreach (var node in ((YamlSequenceNode)this.BaseNode))
+      {
+        var row = new TreeYaml();
+        row.BaseNode = node;
+        list.Add(row);
+      }
+
+      return list;
+    }
 
     internal override string DefaultFileExtension
     {
@@ -87,19 +73,14 @@ namespace Sdx.Data
       }
     }
 
-    protected override Tree Get(string path, List<string> paths)
+    protected override Tree BuildTree(List<string> paths)
     {
-      if(!this.treeCache.ContainsKey(path))
-      {
-        var tree = new TreeYaml();
-        tree.BaseNode = this.FindTargetNode(paths);
-        this.treeCache[path] = tree;
-      }
-      
-      return this.treeCache[path];
+      var tree = new TreeYaml();
+      tree.BaseNode = this.FindTargetNode(paths);
+      return tree;
     }
 
-    public override void Load(StreamReader input)
+    public override void Load(TextReader input)
     {
       var yaml = new YamlStream();
       yaml.Load(input);
