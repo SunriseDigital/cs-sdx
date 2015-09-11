@@ -114,5 +114,13 @@ namespace Sdx.Web
       );
       return path + query;
     }
+
+    public IEnumerable<char> Domain { get; set; }
+
+    public string Param { get; set; }
+
+    public IEnumerable<char> Path { get; set; }
+
+    public IEnumerable<T> Protocol { get; set; }
   }
 }
