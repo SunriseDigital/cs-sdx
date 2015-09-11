@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
-using System.Text;
-using System.Reflection;
 using System.Collections;
 using System.Diagnostics;
 
@@ -49,35 +46,29 @@ namespace Sdx.Diagnostics
       Logs.Add(dic);
     }
 
-    public static String Dump(Object value)
+    private static string GetDumpTitle(object value, string indent, string appendText = "")
     {
-      return Dump(value, "");
+      Type type = value.GetType();
+      return indent + type.Namespace + "." + type.Name + appendText + Environment.NewLine;
     }
 
-    private static String Dump(Object value, String indent)
+    public static string Dump(object value, string indent = "")
     {
-      //文字列だったら即返す
-      if (value is String)
-      {
-        String strVal = value as String;
-        return indent + "String(" + strVal.Length + ") " + strVal;
-      }
-
       if (value == null)
       {
-        return indent + "NULL";
+        return GetDumpTitle(value, indent) + "NULL";
       }
-
-      //それ以外のクラスはTypeNameを付与
-      Type type = value.GetType();
-      String result = indent + type.Namespace + "." + type.Name;
-
-      if (value is IDictionary)
+      else if (value is string)
+      {
+        string strVal = value as string;
+        //stringは型名を付与して改行するのは冗長なのでString(文字数)を付与
+        return indent + "String(" + strVal.Length + ") " + strVal;
+      }
+      else if (value is IDictionary)
       {
         var dic = value as IDictionary;
 
-        //タイトル部分
-        result += "("+dic.Count+")" + Environment.NewLine;
+        var result =  GetDumpTitle(value, indent, "(" + dic.Count + ")");
 
         foreach (var key in dic.Keys)
         {
@@ -86,28 +77,23 @@ namespace Sdx.Diagnostics
         }
 
         //改行を取り除く
-        result = result.TrimEnd('\r', '\n');
+        return result.TrimEnd('\r', '\n');
       }
       else if (value is IList)
       {
         IList list = value as IList;
-        //タイトル部分
-        result += "("+list.Count+")" + Environment.NewLine;
-        result = AppendEnumerableDump(result, value as IEnumerable, indent);
+        var result = GetDumpTitle(value, indent, "(" + list.Count + ")");
+        return AppendEnumerableDump(result, value as IEnumerable, indent);
       }
       else if (value is IEnumerable)
       {
-        //タイトル部分
-        result += Environment.NewLine;
-        result = AppendEnumerableDump(result, value as IEnumerable, indent);
+        var result = GetDumpTitle(value, indent);
+        return AppendEnumerableDump(result, value as IEnumerable, indent);
       }
       else
       {
-        //タイトル部分
-        result += " " + value.ToString();
+        return GetDumpTitle(value, indent, " " + value.ToString()).TrimEnd('\r', '\n'); ;
       }
-
-      return result;
     }
 
     private static String AppendEnumerableDump(String result, IEnumerable values, String indent)
@@ -134,6 +120,5 @@ namespace Sdx.Diagnostics
         return result.ToString("N" + precision.ToString());
       }
     }
-
   }
 }

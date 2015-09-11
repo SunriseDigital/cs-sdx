@@ -96,5 +96,29 @@ namespace UnitTest
       var context = Sdx.Context.Current;
       Sdx.Diagnostics.Debug.Log("aaaa");
     }
+
+    [Fact]
+    public void DumpNestedDictionary()
+    {
+      var dic = new Dictionary<string, object>();
+      dic.Add("string", "foobar");
+      dic.Add("array", new string[] { "arr1", "arr2" });
+      dic.Add("dic", new Dictionary<string, string>() {
+        { "key1", "value1"},
+        { "key2", "value2"},
+      });
+      Assert.Equal(
+        @"
+System.Collections.Generic.Dictionary`2(3)
+  string : String(6) foobar
+  array : System.String[](2)
+   String(4) arr1
+   String(4) arr2
+  dic : System.Collections.Generic.Dictionary`2(2)
+   key1 : String(6) value1
+   key2 : String(6) value2".Trim(),
+        Debug.Dump(dic)
+      );
+    }
   }
 }
