@@ -115,12 +115,20 @@ namespace Sdx.Web
       return path + query;
     }
 
-    public IEnumerable<char> Domain { get; set; }
+    public string Domain
+    {
+      get
+      {
+        return this.uri.Host;
+      }
+    }
 
-    public string Param { get; set; }
-
-    public IEnumerable<char> Path { get; set; }
-
-    public IEnumerable<T> Protocol { get; set; }
+    public string Path
+    {
+      get
+      {
+        return this.uri.LocalPath;
+      }
+    }
   }
 }

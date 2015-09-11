@@ -25,11 +25,11 @@ namespace UnitTest
       var url = new Sdx.Web.Url("http://example.com/path/to/api?foo=bar&hoge=huga");
 
       //コンストラクタの解析が意図通りに行われているか、各部品ごとに確認
-      //Assert.Equal("example.com", url.Domain);
+      Assert.Equal("example.com", url.Domain);
       //Assert.Equal(Sdx.Web.Url.Protocol.Http, url.Protocol);
       //Assert.Equal("bar", url.Param["foo"]);
       //Assert.Equal("huga", url.Param["hoge"]);
-      //Assert.Equal("/path/to/api", url.Path);
+      Assert.Equal("/path/to/api", url.Path);
 
       //新しくパラメータを追加した場合、正しくクエリが生成されているか
       //url.Param("key", "value");
