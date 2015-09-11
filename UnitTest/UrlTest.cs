@@ -42,6 +42,11 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&new=newValue", url.Build(param));
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
+      //同じキー名のパラメータを引数に渡した場合の挙動。上書きされることを期待
+      var dic = new Dictionary<string, string>() { { "key", "newValue" } };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=newValue", url.Build(dic));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+
       //コンストラクタの引数に配列を渡した場合の挙動。指定したキーがクエリから除かれているようにする。
       //同じくオブジェクトが持つデータ自体が変わらないようにする
       var array = new String[] { "key" };
