@@ -102,5 +102,16 @@ namespace Sdx.Web
       string query = this.BuildQueryString(excludedDic);
       return path + query;
     }
+
+    public string Build(string[] excludeArray)
+    {
+      string path = this.BuildPath();
+      var excludedDic = this.paramData
+        .Where(p => excludeArray.Contains(p.Key) == false)
+        .ToDictionary(p => p.Key, p => p.Value)
+      ;
+      string query = this.BuildQueryString(excludedDic);
+      return path + query;
+    }
   }
 }

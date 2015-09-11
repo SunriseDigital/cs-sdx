@@ -44,9 +44,14 @@ namespace UnitTest
 
       //コンストラクタの引数に配列を渡した場合の挙動。指定したキーがクエリから除かれているようにする。
       //同じくオブジェクトが持つデータ自体が変わらないようにする
-      //var array = new String[] { "key" };
-      //Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(array));
-      //Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+      var array = new String[] { "key" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(array));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+
+      //引数をListにした際の挙動。基本は array のときと同じ挙動を期待
+      var list = new List<string>() { "key" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(list));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
     }
 
     [Fact]
