@@ -10,8 +10,6 @@ namespace Sdx.Data
 {
   public class TreeYaml : Tree
   {
-    private const string FileExtension = "yml";
-
     private YamlNode BaseNode { get; set; }
 
     private YamlNode FindTargetNode(List<string> paths)
@@ -63,14 +61,6 @@ namespace Sdx.Data
       }
 
       return list;
-    }
-
-    internal override string DefaultFileExtension
-    {
-      get
-      {
-        return FileExtension;
-      }
     }
 
     protected override Tree BuildTree(List<string> paths)

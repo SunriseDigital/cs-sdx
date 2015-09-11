@@ -19,22 +19,22 @@ namespace Sdx
 
     public Tree Get(string fileName)
     {
-      return this.CreateTree(fileName, Encoding.GetEncoding("utf-8"), null);
+      return this.CreateTree(fileName, null, Encoding.GetEncoding("utf-8"));
     }
 
     public Tree Get(string fileName, string extension)
     {
-      return this.CreateTree(fileName, Encoding.GetEncoding("utf-8"), extension);
+      return this.CreateTree(fileName, extension, Encoding.GetEncoding("utf-8"));
     }
 
     public Tree Get(string fileName, Encoding encoding)
     {
-      return this.CreateTree(fileName, encoding, null);
+      return this.CreateTree(fileName, null, encoding);
     }
 
     public Tree Get(string fileName, string extension, Encoding encoding)
     {
-      return this.CreateTree(fileName, encoding, extension);
+      return this.CreateTree(fileName, extension, encoding);
     }
 
     public void ClearCache()
@@ -42,18 +42,18 @@ namespace Sdx
       memoryCache.Clear();
     }
 
-    private Tree CreateTree(string fileName, Encoding encoding, string extension = null)
+    private Tree CreateTree(string fileName, string extension, Encoding encoding)
     {
       //置換しないとBaseを`/path/to/foo`まで含めたGet("bar")と、`/path/to`の時のGet("foo/bar")が
       //同じファイルを指しているのに別のキャッシュになる
       fileName = fileName.Replace('/', Path.DirectorySeparatorChar);
       Tree tree = new T();
-      if (extension == null)
-      {
-        extension = tree.DefaultFileExtension;
-      }
 
-      var path = BaseDir + Path.DirectorySeparatorChar + fileName + "." + extension;
+      var path = BaseDir + Path.DirectorySeparatorChar + fileName;
+      if (encoding != null)
+      {
+        path += "." + extension;
+      }
 
       if(memoryCache.ContainsKey(path))
       {

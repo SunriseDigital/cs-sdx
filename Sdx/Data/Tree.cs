@@ -13,8 +13,6 @@ namespace Sdx.Data
 
     public abstract void Load(TextReader input);
 
-    internal abstract string DefaultFileExtension { get; }
-
     /// <summary>
     /// 値を返します。末端のノードでない場合は例外を投げてください。
     /// </summary>

@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using UnitTest.DummyClasses;
 
+
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
@@ -13,6 +14,7 @@ using System;
 
 using System.IO;
 using System.Collections.Generic;
+using System.Text;
 
 namespace UnitTest
 {
@@ -25,8 +27,12 @@ namespace UnitTest
       var loader = new Sdx.Config<Sdx.Data.TreeYaml>();
       loader.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
 
-      Sdx.Data.Tree config = loader.Get("test");
+      this.AssertTree(loader.Get("test", "yml"));
+      this.AssertTree(loader.Get("test.yml"));
+    }
 
+    private void AssertTree(Sdx.Data.Tree config)
+    {
       Assert.Equal("Oz-Ware Purchase Invoice", config.Get("receipt").Value);
 
       var strDic = config.Get("customer");
@@ -70,14 +76,14 @@ namespace UnitTest
       var config = new Sdx.Config<Sdx.Data.TreeYaml>();
       config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
 
-      var testReceipt = config.Get("test").Get("receipt");
-      Assert.Equal(testReceipt, config.Get("test").Get("receipt"));
+      var testReceipt = config.Get("test.yml").Get("receipt");
+      Assert.Equal(testReceipt, config.Get("test.yml").Get("receipt"));
 
-      var nestedDic = config.Get("test").Get("nested-dic");
-      Assert.Equal(nestedDic, config.Get("test").Get("nested-dic"));
+      var nestedDic = config.Get("test.yml").Get("nested-dic");
+      Assert.Equal(nestedDic, config.Get("test.yml").Get("nested-dic"));
 
       //経由先が別なのでキャッシュされたものとは違ってしまう。
-      Assert.NotEqual(nestedDic.Get("inner-dic.key1"), config.Get("test").Get("nested-dic.inner-dic.key1"));
+      Assert.NotEqual(nestedDic.Get("inner-dic.key1"), config.Get("test.yml").Get("nested-dic.inner-dic.key1"));
 
       var clonedList = new List<Sdx.Data.Tree>();
       foreach (var tree in nestedDic.Get("inner-str-list"))
@@ -99,7 +105,7 @@ namespace UnitTest
       var config = new Sdx.Config<Sdx.Data.TreeYaml>();
       config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
 
-      Assert.Equal("hoge", config.Get("dir/foo").Get("bar").Value);
+      Assert.Equal("hoge", config.Get("dir/foo.yml").Get("bar").Value);
     }
 
     [Fact]
@@ -109,7 +115,7 @@ namespace UnitTest
       var config = new Test.Config.Dir<Sdx.Data.TreeYaml>();
       Assert.True(config.BaseDir.EndsWith("config" + Path.DirectorySeparatorChar + "dir"));
 
-      var fooConfig = config.Get("foo");
+      var fooConfig = config.Get("foo.yml");
       Assert.Equal("hoge", fooConfig.Get("bar").Value);
       Assert.Equal("foo", fooConfig.Get("dic.key1").Value);
       Assert.Equal("bar", fooConfig.Get("dic.key2").Value);
@@ -118,10 +124,25 @@ namespace UnitTest
       var config2 = new Test.Config.Dir2<Sdx.Data.TreeYaml>();
       Assert.True(config2.BaseDir.EndsWith("config" + Path.DirectorySeparatorChar + "dir2"));
 
-      var fooConfig2 = config2.Get("foo");
+      var fooConfig2 = config2.Get("foo.yml");
       Assert.Equal("hoge2", fooConfig2.Get("bar").Value);
       Assert.Equal("foo2", fooConfig2.Get("dic.key1").Value);
       Assert.Equal("bar2", fooConfig2.Get("dic.key2").Value);
+    }
+
+    [Fact]
+    public void TestEncoding()
+    {
+      var config = new Sdx.Config<Sdx.Data.TreeYaml>();
+      config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
+
+      var sjis = config.Get("sjis.yml");
+      //UT8で読んだら文字化けしてるのでちゃんと見えないはず
+      Assert.NotEqual("日本語", sjis.Get("value").Value);
+
+      config.ClearCache();
+      sjis = config.Get("sjis.yml", Encoding.GetEncoding("SJIS"));
+      Assert.Equal("日本語", sjis.Get("value").Value);
     }
   }
 }
