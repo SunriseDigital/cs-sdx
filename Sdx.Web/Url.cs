@@ -10,6 +10,12 @@ namespace Sdx.Web
     private Uri uri;
     private Dictionary<string, string> paramData;
 
+    public enum Protocol
+    {
+      Http,
+      Https
+    }
+
     //コンストラクタ
     public Url(string urlStr)
     {
