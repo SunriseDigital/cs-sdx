@@ -81,37 +81,37 @@ namespace Sdx.Web
       return path + query;
     }
 
-    public string Build(Dictionary<string, string> addDic)
+    public string Build(Dictionary<string, string> add)
     {
       string path = this.BuildPath();
-      var addedDic = this.paramData
-        .Where(p => addDic.ContainsKey(p.Key) == false)
-        .Concat(addDic)
-        .ToDictionary(p => p.Key, p => p.Value)
-      ;
-      string query = this.BuildQueryString(addedDic);
+      string query = this.BuildQueryString(
+        this.paramData
+          .Where(p => add.ContainsKey(p.Key) == false)
+          .Concat(add)
+          .ToDictionary(p => p.Key, p => p.Value)
+      );
       return path + query;
     }
 
-    public string Build(List<string> excludeList)
+    public string Build(List<string> exclude)
     {
       string path = this.BuildPath();
-      var excludedDic = this.paramData
-        .Where(p => excludeList.Contains(p.Key) == false)
-        .ToDictionary(p => p.Key, p => p.Value)
-      ;
-      string query = this.BuildQueryString(excludedDic);
+      string query = this.BuildQueryString(
+        this.paramData
+          .Where(p => exclude.Contains(p.Key) == false)
+          .ToDictionary(p => p.Key, p => p.Value)
+      );
       return path + query;
     }
 
-    public string Build(string[] excludeArray)
+    public string Build(string[] exclude)
     {
       string path = this.BuildPath();
-      var excludedDic = this.paramData
-        .Where(p => excludeArray.Contains(p.Key) == false)
-        .ToDictionary(p => p.Key, p => p.Value)
-      ;
-      string query = this.BuildQueryString(excludedDic);
+      string query = this.BuildQueryString(
+        this.paramData
+          .Where(p => exclude.Contains(p.Key) == false)
+          .ToDictionary(p => p.Key, p => p.Value)
+      );
       return path + query;
     }
   }
