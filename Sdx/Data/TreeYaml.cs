@@ -6,16 +6,10 @@ using System.IO;
 
 using YamlDotNet.RepresentationModel;
 
-namespace Sdx.Config
+namespace Sdx.Data
 {
   public class TreeYaml : Tree
   {
-    private static Dictionary<string, YamlNode> yamlData;
-    static TreeYaml()
-    {
-      yamlData = new Dictionary<string, YamlNode>();
-    }
-
     private List<Tree> listCache;
     private Dictionary<string, Tree> treeCache = new Dictionary<string, Tree>();
 
@@ -23,30 +17,7 @@ namespace Sdx.Config
 
     private YamlNode FindTargetNode(List<string> paths)
     {
-      YamlNode target;
-
-      if (this.BaseNode == null)
-      {
-        //ファイル名を含むルートの場合
-        var fileKey = paths[0];
-        var path = this.BaseDir
-          + Path.DirectorySeparatorChar
-          + fileKey.Replace('/', Path.DirectorySeparatorChar)
-          + ".yml";
-
-        //一度読み込んだYamlはメモリにキャッシュ
-        if (!yamlData.ContainsKey(path))
-        {
-          yamlData[path] = this.LoadYaml(path);
-        }
-
-        target = yamlData[path];
-        paths.RemoveAt(0);
-      }
-      else
-      {
-        target = this.BaseNode;
-      }
+      YamlNode target = this.BaseNode;
 
       foreach (var key in paths)
       {
@@ -54,11 +25,6 @@ namespace Sdx.Config
       }
 
       return target;
-    }
-
-    public override void ClearCache()
-    {
-      yamlData.Clear();
     }
 
     public override string Value
@@ -111,6 +77,16 @@ namespace Sdx.Config
       }
     }
 
+    private const string FileExtension = "yml";
+
+    internal override string DefaultFileExtension
+    {
+      get
+      {
+        return FileExtension;
+      }
+    }
+
     protected override Tree Get(string path, List<string> paths)
     {
       if(!this.treeCache.ContainsKey(path))
@@ -123,17 +99,13 @@ namespace Sdx.Config
       return this.treeCache[path];
     }
 
-    private YamlNode LoadYaml(string path)
+    public override void Load(StreamReader input)
     {
-      YamlStream yaml;
-      using (var fs = new FileStream(path, FileMode.Open))
-      {
-        var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
-        yaml = new YamlStream();
-        yaml.Load(input);
-      }
+      var yaml = new YamlStream();
+      yaml.Load(input);
 
-      return yaml.Documents[0].RootNode;
+
+      this.BaseNode = yaml.Documents[0].RootNode; ;
     }
   }
 }

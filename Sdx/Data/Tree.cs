@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 
-namespace Sdx.Config
+namespace Sdx.Data
 {
   public abstract class Tree
   {
     ///////////////////////////////////////////////////////////////
-    public string BaseDir { get; set; }
 
     public abstract string Value { get; }
 
     public abstract List<Tree> List { get; }
 
-    public abstract void ClearCache();
-
     protected abstract Tree Get(string path, List<string> paths);
+
+    public abstract void Load(StreamReader input);
+
+    internal abstract string DefaultFileExtension { get; }
 
     private List<string> SplitPath(string path)
     {

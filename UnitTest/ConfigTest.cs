@@ -22,28 +22,31 @@ namespace UnitTest
     [Fact]
     public void TestYaml()
     {
-      Sdx.Config.Tree config = new Sdx.Config.TreeYaml();
-      config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
+      var loader = new Sdx.Config<Sdx.Data.TreeYaml>();
+      loader.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
 
-      Assert.Equal("Oz-Ware Purchase Invoice", config.Get("test.receipt").Value);
+      Sdx.Data.Tree config = loader.Get("test");
 
-      var strDic = config.Get("test.customer");
+      Assert.Equal("Oz-Ware Purchase Invoice", config.Get("receipt").Value);
+
+      var strDic = config.Get("customer");
       Assert.Equal("Dorothy", strDic.Get("given").Value);
 
-      var strList = config.Get("test.list");
+      var strList = config.Get("list");
       Assert.Equal(3, strList.Count);
       Assert.Equal("foo", strList[0].Value);
       Assert.Equal("bar", strList[1].Value);
       Assert.Equal("foobar", strList[2].Value);
       foreach (var item in strList)
       {
+
         //foreachできるかどうかのテストなので、何もAssertしない。
       }
 
-      Assert.Equal("マルチバイト\"文字中\"のクオート", config.Get("test.multi-string").Value);
-      Assert.Equal("マルチバイト文字の複数行\nマルチバイト文字の二行目\n", config.Get("test.bill-to.street").Value);
+      Assert.Equal("マルチバイト\"文字中\"のクオート", config.Get("multi-string").Value);
+      Assert.Equal("マルチバイト文字の複数行\nマルチバイト文字の二行目\n", config.Get("bill-to.street").Value);
 
-      var nestedDic = config.Get("test.nested-dic");
+      var nestedDic = config.Get("nested-dic");
       Assert.Equal("普通の文字列", nestedDic.Get("plane-string").Value);
       Assert.Equal("value1", nestedDic.Get("inner-dic.key1").Value);
       Assert.Equal("value2", nestedDic.Get("inner-dic.key2").Value);
@@ -64,19 +67,19 @@ namespace UnitTest
     [Fact]
     public void TestAssertMemoryCache()
     {
-      Sdx.Config.Tree config = new Sdx.Config.TreeYaml();
+      var config = new Sdx.Config<Sdx.Data.TreeYaml>();
       config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
 
-      var testReceipt = config.Get("test.receipt");
-      Assert.Equal(testReceipt, config.Get("test.receipt"));
+      var testReceipt = config.Get("test").Get("receipt");
+      Assert.Equal(testReceipt, config.Get("test").Get("receipt"));
 
-      var nestedDic = config.Get("test.nested-dic");
-      Assert.Equal(nestedDic, config.Get("test.nested-dic"));
+      var nestedDic = config.Get("test").Get("nested-dic");
+      Assert.Equal(nestedDic, config.Get("test").Get("nested-dic"));
 
       //経由先が別なのでキャッシュされたものとは違ってしまう。
-      Assert.NotEqual(nestedDic.Get("inner-dic.key1"), config.Get("test.nested-dic.inner-dic.key1"));
+      Assert.NotEqual(nestedDic.Get("inner-dic.key1"), config.Get("test").Get("nested-dic.inner-dic.key1"));
 
-      var clonedList = new List<Sdx.Config.Tree>();
+      var clonedList = new List<Sdx.Data.Tree>();
       foreach (var tree in nestedDic.Get("inner-str-list"))
       {
         clonedList.Add(tree);
@@ -93,18 +96,18 @@ namespace UnitTest
     [Fact]
     public void TestDirectory()
     {
-      Sdx.Config.Tree config = new Sdx.Config.TreeYaml();
+      var config = new Sdx.Config<Sdx.Data.TreeYaml>();
       config.BaseDir = Path.GetFullPath(".") + Path.DirectorySeparatorChar + "config";
 
-      Assert.Equal("hoge", config.Get("dir/foo.bar").Value);
+      Assert.Equal("hoge", config.Get("dir/foo").Get("bar").Value);
     }
 
     [Fact]
     public void TestSubclass()
     {
       //test of `dir`
-      var config = new Test.Config.Dir();
-      Assert.True(config.BaseDir.EndsWith("config"+Path.DirectorySeparatorChar+"dir"));
+      var config = new Test.Config.Dir<Sdx.Data.TreeYaml>();
+      Assert.True(config.BaseDir.EndsWith("config" + Path.DirectorySeparatorChar + "dir"));
 
       var fooConfig = config.Get("foo");
       Assert.Equal("hoge", fooConfig.Get("bar").Value);
@@ -112,7 +115,7 @@ namespace UnitTest
       Assert.Equal("bar", fooConfig.Get("dic.key2").Value);
 
       //test of `dir2`
-      var config2 = new Test.Config.Dir2();
+      var config2 = new Test.Config.Dir2<Sdx.Data.TreeYaml>();
       Assert.True(config2.BaseDir.EndsWith("config" + Path.DirectorySeparatorChar + "dir2"));
 
       var fooConfig2 = config2.Get("foo");

@@ -2,7 +2,7 @@
 
 namespace Test.Config
 {
-  class Dir : Sdx.Config.TreeYaml
+  class Dir<T> : Sdx.Config<T> where T : Sdx.Data.Tree, new()
   {
     public Dir()
     {

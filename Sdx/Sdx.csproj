@@ -46,8 +46,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Config\Tree.cs" />
-    <Compile Include="Config\TreeYaml.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Data\Tree.cs" />
+    <Compile Include="Data\TreeYaml.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Db\Adapter.cs" />
     <Compile Include="Db\DbException.cs" />
