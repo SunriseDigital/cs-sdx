@@ -85,6 +85,7 @@ namespace Sdx.Web
     {
       string path = this.BuildPath();
       var addedDic = this.paramData
+        .Where(p => addDic.ContainsKey(p.Key) == false)
         .Concat(addDic)
         .ToDictionary(p => p.Key, p => p.Value)
       ;
