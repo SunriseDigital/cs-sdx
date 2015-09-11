@@ -31,11 +31,6 @@ namespace Sdx.Web
       });
     }
 
-    public string GetProtocol()
-    {
-      return this.uri.Scheme;
-    }
-
     private string BuildQueryString(Dictionary<string,string> param)
     {
       if (param.Count == 0)
@@ -55,7 +50,7 @@ namespace Sdx.Web
     private string BuildPath()
     {
       string path = string.Format(
-        "{0}://{1}{2}", this.GetProtocol(), this.Domain, this.Path
+        "{0}://{1}{2}", this.Scheme, this.Domain, this.Path
       );
       return path;
     }
@@ -127,6 +122,14 @@ namespace Sdx.Web
       set
       {
         this.paramData = value;
+      }
+    }
+
+    public string Scheme
+    {
+      get
+      {
+        return this.uri.Scheme;
       }
     }
 
