@@ -43,6 +43,25 @@ namespace Sdx
         return (T)this[key];
       }
 
+      /// <summary>
+      /// 既にそのキーが存在していればそのインスタンスを返し、なければ`creator()`を呼んで、キーにセットします。
+      /// IF文と余計な代入を省略できる省略できるショートカットです。
+      /// </summary>
+      /// <typeparam name="T"></typeparam>
+      /// <param name="key"></param>
+      /// <param name="factory">T型のインスタンスを返す引数なしの関数</param>
+      /// <returns></returns>
+      public T As<T>(string key, Func<T> factory)
+      {
+        if (!this.ContainsKey(key))
+        {
+          //同じキーだと例外。インデクサーとAddほどハッキリしないので安全のため例外にしてあります。
+          this.Add(key, factory());
+        }
+
+        return As<T>(key);
+      }
+
       public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
       {
         return ((IEnumerable<KeyValuePair<string, object>>)items).GetEnumerator();
@@ -121,6 +140,18 @@ namespace Sdx
         {
           this.DbProfiler = new Sdx.Db.Query.Profiler();
         }
+      }
+    }
+
+    private const string DebugContextKey = "Sdx.Context.DebugContextKey";
+
+    public Diagnostics.Debug Debug
+    {
+      get
+      {
+        return Sdx.Context.Current.Vars.As<Diagnostics.Debug>(DebugContextKey, () => {
+          return new Diagnostics.Debug();
+        });
       }
     }
   }

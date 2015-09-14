@@ -68,6 +68,7 @@
     <Compile Include="Db\Table.cs" />
     <Compile Include="Db\TableMeta.cs" />
     <Compile Include="Diagnostics\Debug.cs" />
+    <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
     <Compile Include="Diagnostics\DebugHttpModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

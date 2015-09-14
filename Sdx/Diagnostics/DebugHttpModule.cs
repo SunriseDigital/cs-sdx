@@ -3,6 +3,7 @@ using System.Web;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Text;
+using System.IO;
 
 namespace Sdx.Diagnostics
 {
@@ -38,10 +39,14 @@ namespace Sdx.Diagnostics
 
     public void Dispose() { }
 
+    private const string HtmlWriteContextKey = "Sdx.Diagnostics.DebugHttpModule.HtmlWriterContextKey";
+
     private void Application_BeginRequest(object source, EventArgs a)
     {
       //start timer
       Sdx.Context.Current.Timer.Start();
+
+      Sdx.Context.Current.Debug.Out = new Diagnostics.DebugHtmlWriter();
 
       //debug mode
       var cookie = HttpContext.Current.Request.Cookies["sdx_debug_mode"];
@@ -140,46 +145,22 @@ namespace Sdx.Diagnostics
 
     private void AppendDebugLogs(StringBuilder debugString)
     {
-      if (Debug.Logs.Count == 0)
+      if(!(Sdx.Context.Current.Debug.Out is DebugHtmlWriter))
       {
         return;
       }
 
-      
-      Int64 prevElapsed = -1;
-      foreach (Dictionary<String, Object> dic in Debug.Logs)
+      var writer = (DebugHtmlWriter)Sdx.Context.Current.Debug.Out;
+      if(writer.Builder.Length == 0)
       {
-        var totalElapsed = (Int64)dic["elapsedTicks"];
-        Int64 currentElapsed = 0;
-        if (prevElapsed != -1)
-        {
-          currentElapsed = totalElapsed - prevElapsed;
-        }
-
-        debugString.Append(WrapTag(
-          Debug.Dump(dic["value"]),
-          dic["title"] as String,
-          totalElapsed,
-          currentElapsed
-        ));
-
-        prevElapsed = totalElapsed;
+        return;
       }
-    }
 
-    private String WrapTag(String value, String title, Int64 totalElapsed, Int64 currentElapsed)
-    {
-      return
-        String.Format(
-          LogBlockFormat,
-          "[" + formatTicks(currentElapsed) + "/" + formatTicks(totalElapsed) + "]" + title,
-          "<pre style=\"margin: 0;\">" + value + "</pre>"
-        );
-    }
-
-    private String formatTicks(long ticks)
-    {
-      return Debug.FormatStopwatchTicks(ticks);
+      debugString.Append(String.Format(
+        LogBlockFormat,
+        "Debug.Log",
+        "<pre style=\"margin: 0;\">" + writer.Builder.ToString() + "</pre>"
+      ));
     }
   }
 }

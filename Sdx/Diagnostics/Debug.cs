@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
+using System.IO;
 
 namespace Sdx.Diagnostics
 {
   public class Debug
   {
-    private static String logKey = "SDX.DEBUG_TOOL.DEBUG.LOGS_KEY";
+    private long prevTimerElapsedTicks = 0;
 
     public static String DumpIndent
     {
@@ -17,33 +18,26 @@ namespace Sdx.Diagnostics
       }
     }
 
-    internal static List<Dictionary<String, Object>> Logs
+    public TextWriter Out { get; set; }
+
+    public void Log(Object value, String title = "")
     {
-      get
+      var currentTicks = Context.Current.Timer.ElapsedTicks;
+      var delta = 0L;
+      if(prevTimerElapsedTicks > 0)
       {
-        List<Dictionary<String, Object>> values;
-        if (!Sdx.Context.Current.Vars.ContainsKey(logKey))
-        {
-          values = new List<Dictionary<String, Object>>();
-          Sdx.Context.Current.Vars[logKey] = values;
-        }
-        else
-        {
-          values = Sdx.Context.Current.Vars.As<List<Dictionary<String, Object>>>(logKey);
-        }
-        return values;
+        delta = currentTicks - prevTimerElapsedTicks;
       }
-    }
-
-
-    public static void Log(Object value, String title = "")
-    {
-      Int64 ticks = Context.Current.Timer.ElapsedTicks;
-      Dictionary<String, Object> dic = new Dictionary<String, Object>();
-      dic.Add("title", title);
-      dic.Add("value", value);
-      dic.Add("elapsedTicks", ticks);
-      Logs.Add(dic);
+      Out.WriteLine(String.Format(
+        "[{0}/{1} sec] {2}",
+        FormatStopwatchTicks(delta),
+        FormatStopwatchTicks(currentTicks),
+        title
+      ));
+      prevTimerElapsedTicks = currentTicks;
+      Out.WriteLine(Dump(value));
+      Out.WriteLine();
+      Out.WriteLine();
     }
 
     private static string GetDumpTitle(object value, string indent, string appendText = "")
@@ -111,14 +105,7 @@ namespace Sdx.Diagnostics
     public static string FormatStopwatchTicks(Int64 ticks, int precision = 8)
     {
       double result = (double)ticks / Stopwatch.Frequency;
-      if (result == 0.0)
-      {
-        return "0";
-      }
-      else
-      {
-        return result.ToString("N" + precision.ToString());
-      }
+      return result.ToString("N" + precision.ToString());
     }
   }
 }

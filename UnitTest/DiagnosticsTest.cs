@@ -91,10 +91,22 @@ namespace UnitTest
     [Fact]
     public void TestLog()
     {
-      //とりあえず、Httpcontextがない状態で例外にならないかテスト
-      //TODO同出力するか考える
-      var context = Sdx.Context.Current;
-      Sdx.Diagnostics.Debug.Log("aaaa");
+      Sdx.Context.Current.Timer.Start();
+
+      Sdx.Context.Current.Debug.Out = Console.Out;
+      Sdx.Context.Current.Debug.Log("aaaa");
+
+      Sdx.Context.Current.Debug.Out = new Sdx.Diagnostics.DebugHtmlWriter();
+      Sdx.Context.Current.Debug.Log("aaaa");
+
+      //秒数が出るのでAssertできません。とりあえず。例外が出ないかと文字数をテストしてるだけです。
+      var result = Sdx.Context.Current.Debug.Out.ToString();
+      Assert.Equal(50, result.Length);
+
+      
+      Console.WriteLine(result);
+
+
     }
 
     [Fact]
