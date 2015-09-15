@@ -655,5 +655,74 @@ namespace UnitTest
         Assert.Equal("Freeve", list[1].Value);
       }
     }
+
+    [Fact]
+    public void TestFetchRecordWithConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchRecordWithConnection(db);
+      }
+    }
+
+    private void RunFetchRecordWithConnection(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", 1);
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Test.Orm.Shop shop;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          shop = db.Adapter.FetchRecord<Test.Orm.Shop>(sel, con);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        shop = db.Adapter.FetchRecord<Test.Orm.Shop>(sel, con);
+        Assert.Equal(1, shop.GetInt32("id"));
+        Assert.Equal("天祥", shop.GetString("name"));
+      }
+    }
+
+    [Fact]
+    public void TestFetchRecordListWithConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchRecordListWithConnection(db);
+      }
+    }
+
+    private void RunFetchRecordListWithConnection(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", new string[] { "2", "3" }).Context
+        .AddOrder("id", Sdx.Db.Query.Order.DESC)
+        ;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Sdx.Db.RecordSet<Test.Orm.Shop> set;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          set = db.Adapter.FetchRecordSet<Test.Orm.Shop>(sel, con);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        set = db.Adapter.FetchRecordSet<Test.Orm.Shop>(sel, con);
+        Assert.Equal(2, set.Count);
+        Assert.Equal(3, set[0].GetInt32("id"));
+        Assert.Equal("天府舫", set[0].GetString("name"));
+        Assert.Equal(2, set[1].GetInt32("id"));
+        Assert.Equal("エスペリア", set[1].GetString("name"));
+      }
+    }
   }
 }

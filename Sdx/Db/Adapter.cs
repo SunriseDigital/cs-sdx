@@ -123,9 +123,9 @@ namespace Sdx.Db
 
     internal abstract string AppendLimitQuery(string selectSql, int limit, int offset);
 
-    public T FetchRecord<T>(Query.Select select) where T : Record, new()
+    public T FetchRecord<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
     {
-      var resultSet = this.FetchRecordSet<T>(select);
+      var resultSet = this.FetchRecordSet<T>(select, connection);
 
       if (resultSet.Count == 0)
       {
@@ -144,7 +144,7 @@ namespace Sdx.Db
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(Query.Select select) where T : Record, new()
+    public RecordSet<T> FetchRecordSet<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
     {
       select.Adapter = this;
 
@@ -163,13 +163,27 @@ namespace Sdx.Db
       var contextName = meta.Name;
 
       var command = select.Build();
+      command.Connection = connection;
+
       var resultSet = new RecordSet<T>();
-      using (var con = this.CreateConnection())
-      {
-        con.Open();
-        command.Connection = con;
+
+      Action action = () => {
         var reader = this.ExecuteReader(command);
         resultSet.Build(reader, select, contextName);
+      };
+
+      if (command.Connection == null)
+      {
+        using (var con = this.CreateConnection())
+        {
+          con.Open();
+          command.Connection = con;
+          action();
+        }
+      }
+      else
+      {
+        action();
       }
 
       return resultSet;
