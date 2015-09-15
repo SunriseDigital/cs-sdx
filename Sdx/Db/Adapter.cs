@@ -245,26 +245,26 @@ namespace Sdx.Db
     public List<T> FetchList<T>(DbCommand command)
     {
       var list = new List<T>();
+      Action action = () => {
+        var reader = this.ExecuteReader(command);
+        while (reader.Read())
+        {
+          list.Add(this.castDbValue<T>(reader.GetValue(0)));
+        }
+      };
+
       if(command.Connection == null)
       {
         using (var con = this.CreateConnection())
         {
           con.Open();
           command.Connection = con;
-          var reader = this.ExecuteReader(command);
-          while (reader.Read())
-          {
-            list.Add(this.castDbValue<T>(reader.GetValue(0)));
-          }
+          action();
         }
       }
       else
       {
-        var reader = this.ExecuteReader(command);
-        while (reader.Read())
-        {
-          list.Add(this.castDbValue<T>(reader.GetValue(0)));
-        }
+        action();
       }
 
       return list;
@@ -280,44 +280,42 @@ namespace Sdx.Db
 
     public T FetchOne<T>(DbCommand command)
     {
+      Func<T> func = () => {
+        var reader = this.ExecuteReader(command);
+        while (reader.Read())
+        {
+          return this.castDbValue<T>(reader.GetValue(0));
+        }
+        return default(T);
+      };
+
       if(command.Connection == null)
       {
         using (var con = this.CreateConnection())
         {
           con.Open();
           command.Connection = con;
-          var reader = this.ExecuteReader(command);
-          while (reader.Read())
-          {
-            return this.castDbValue<T>(reader.GetValue(0));
-          }
+          return func();
         }
       }
       else
       {
-        var reader = this.ExecuteReader(command);
-        while (reader.Read())
-        {
-          return this.castDbValue<T>(reader.GetValue(0));
-        }
+        return func();
       }
-
-      return default(T);
     }
 
-    public Dictionary<string, T> FetchDictionary<T>(Query.Select select)
+    public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbConnection connection = null)
     {
       select.Adapter = this;
-      return this.FetchDictionary<T>(select.Build());
+      var command = select.Build();
+      command.Connection = connection;
+      return this.FetchDictionary<T>(command);
     }
 
     public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
     {
       var dic = new Dictionary<string, T>();
-      using (var con = this.CreateConnection())
-      {
-        con.Open();
-        command.Connection = con;
+      Action action = () => {
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
@@ -328,6 +326,20 @@ namespace Sdx.Db
 
           break;
         }
+      };
+
+      if (command.Connection == null)
+      {
+        using (var con = this.CreateConnection())
+        {
+          con.Open();
+          command.Connection = con;
+          action();
+        }
+      }
+      else
+      {
+        action();
       }
 
       return dic;

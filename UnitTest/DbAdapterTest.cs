@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using UnitTest.DummyClasses;
 using System.Collections.Generic;
+using System.Data.Common;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -453,6 +454,72 @@ namespace UnitTest
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]);
         Assert.Equal("Freeve", list[1]);
+      }
+    }
+
+    [Fact]
+    public void TestFetchDictionaryWithConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchDictionaryWithConnection(db);
+      }
+    }
+
+    private void RunFetchDictionaryWithConnection(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom("shop").Select
+        .AddColumns("id", "name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Dictionary<string, string> strDic = null;
+        var command = sel.Build();
+        command.Connection = con;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          strDic = db.Adapter.FetchDictionary<string>(command);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        strDic = db.Adapter.FetchDictionary<string>(sel.Build());
+        Assert.IsType<Dictionary<string, string>>(strDic);
+        Assert.Equal("1", strDic["id"]);
+        Assert.Equal("天祥", strDic["name"]);
+        Assert.Equal("", strDic["main_image_id"]);
+      }
+
+
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("id", "name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Dictionary<string, object> objDic;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          objDic = db.Adapter.FetchDictionary<object>(sel, con);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        objDic = db.Adapter.FetchDictionary<object>(sel, con);
+        Assert.IsType<Dictionary<string, object>>(objDic);
+        Assert.Equal(3, objDic["id"]);
+        Assert.Equal("天府舫", objDic["name"]);
+        Assert.IsType<DBNull>(objDic["main_image_id"]);
       }
     }
   }
