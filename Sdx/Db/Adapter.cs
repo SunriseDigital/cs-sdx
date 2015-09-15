@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Collections.Generic;
 using System.Linq;
-
+using Sdx.Db.Query;
 
 namespace Sdx.Db
 {
@@ -257,18 +257,31 @@ namespace Sdx.Db
       return list;
     }
 
-    public T FetchOne<T>(Query.Select select)
+    public T FetchOne<T>(Query.Select select, DbConnection connection = null)
     {
       select.Adapter = this;
-      return this.FetchOne<T>(select.Build());
+      var command = select.Build();
+      command.Connection = connection;
+      return this.FetchOne<T>(command);
     }
 
     public T FetchOne<T>(DbCommand command)
     {
-      using (var con = this.CreateConnection())
+      if(command.Connection == null)
       {
-        con.Open();
-        command.Connection = con;
+        using (var con = this.CreateConnection())
+        {
+          con.Open();
+          command.Connection = con;
+          var reader = this.ExecuteReader(command);
+          while (reader.Read())
+          {
+            return this.castDbValue<T>(reader.GetValue(0));
+          }
+        }
+      }
+      else
+      {
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {

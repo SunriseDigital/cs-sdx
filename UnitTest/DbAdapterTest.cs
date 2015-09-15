@@ -337,5 +337,40 @@ namespace UnitTest
         Assert.NotEqual(-1, db.Adapter.ToString().IndexOf(Sdx.Db.Adapter.PWD_FOR_SECURE_CONNECTION_STRING));
       }
     }
+
+    [Fact]
+    public void TestFetchOneWithConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchOneWithConnection(db);
+      }
+    }
+
+    private void RunFetchOneWithConnection(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .Table.SetColumns("id");
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        con.Open();
+        var id = db.Adapter.FetchOne<string>(select, con);
+        Assert.Equal("1", id);
+      }
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        con.Open();
+        select.Adapter = db.Adapter;
+        var command = select.Build();
+        command.Connection = con;
+        var id = db.Adapter.FetchOne<string>(command);
+        Assert.Equal("1", id);
+      }
+    }
   }
 }
