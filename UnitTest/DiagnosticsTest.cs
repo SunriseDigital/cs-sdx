@@ -99,14 +99,10 @@ namespace UnitTest
       Sdx.Context.Current.Debug.Out = new Sdx.Diagnostics.DebugHtmlWriter();
       Sdx.Context.Current.Debug.Log("aaaa");
 
-      //秒数が出るのでAssertできません。とりあえず。例外が出ないかと文字数をテストしてるだけです。
+      //秒数が出るのでAssertできません。とりあえず。例外が出ないかと空っぽじゃないかをテストしてるだけです。
       var result = Sdx.Context.Current.Debug.Out.ToString();
-      Assert.Equal(50, result.Length);
-
-      
-      Console.WriteLine(result);
-
-
+      Console.WriteLine(result.Length);
+      Assert.True(result.Length > 0);
     }
 
     [Fact]
