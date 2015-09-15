@@ -50,7 +50,7 @@ namespace Sdx.Diagnostics
     {
       if (value == null)
       {
-        return GetDumpTitle(value, indent) + "NULL";
+        return indent + "NULL";
       }
       else if (value is string)
       {

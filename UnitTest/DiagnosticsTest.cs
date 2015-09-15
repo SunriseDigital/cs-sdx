@@ -128,5 +128,15 @@ System.Collections.Generic.Dictionary`2(3)
         Debug.Dump(dic)
       );
     }
+
+    [Fact]
+    public void DumpNull()
+    {
+      string str = null;
+      Assert.Equal(
+        "NULL",
+        Debug.Dump(str)
+      );
+    }
   }
 }
