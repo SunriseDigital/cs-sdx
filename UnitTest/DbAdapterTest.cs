@@ -357,19 +357,102 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
+        string id = null;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          id = db.Adapter.FetchOne<string>(select, con);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
         con.Open();
-        var id = db.Adapter.FetchOne<string>(select, con);
+        id = db.Adapter.FetchOne<string>(select, con);
         Assert.Equal("1", id);
+        Assert.Equal(System.Data.ConnectionState.Open, con.State);
       }
 
       using (var con = db.Adapter.CreateConnection())
       {
-        con.Open();
         select.Adapter = db.Adapter;
         var command = select.Build();
         command.Connection = con;
-        var id = db.Adapter.FetchOne<string>(command);
+
+        string id = null;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          id = db.Adapter.FetchOne<string>(command);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        id = db.Adapter.FetchOne<string>(command);
         Assert.Equal("1", id);
+      }
+    }
+
+    [Fact]
+    public void TestFetchListWithConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchListWithConnection(db);
+      }
+    }
+
+    private void RunFetchListWithConnection(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom("shop").Select
+        .AddColumns("name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      List<string> list = null;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        var command = sel.Build();
+        command.Connection = con;
+
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          list = db.Adapter.FetchList<string>(command);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        list = db.Adapter.FetchList<string>(command);
+        Assert.IsType<List<string>>(list);
+        Assert.Equal(2, list.Count);
+        Assert.Equal("天祥", list[0]);
+        Assert.Equal("エスペリア", list[1]);
+      }
+
+
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("name", "main_image_id")//最初１つ以外は無視
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          list = db.Adapter.FetchList<string>(sel, con);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        list = db.Adapter.FetchList<string>(sel, con);
+        Assert.IsType<List<string>>(list);
+        Assert.Equal(2, list.Count);
+        Assert.Equal("天府舫", list[0]);
+        Assert.Equal("Freeve", list[1]);
       }
     }
   }

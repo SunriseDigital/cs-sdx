@@ -234,19 +234,32 @@ namespace Sdx.Db
       return list;
     }
 
-    public List<T> FetchList<T>(Query.Select select)
+    public List<T> FetchList<T>(Query.Select select, DbConnection connection = null)
     {
       select.Adapter = this;
-      return this.FetchList<T>(select.Build());
+      var command = select.Build();
+      command.Connection = connection;
+      return this.FetchList<T>(command);
     }
 
     public List<T> FetchList<T>(DbCommand command)
     {
       var list = new List<T>();
-      using (var con = this.CreateConnection())
+      if(command.Connection == null)
       {
-        con.Open();
-        command.Connection = con;
+        using (var con = this.CreateConnection())
+        {
+          con.Open();
+          command.Connection = con;
+          var reader = this.ExecuteReader(command);
+          while (reader.Read())
+          {
+            list.Add(this.castDbValue<T>(reader.GetValue(0)));
+          }
+        }
+      }
+      else
+      {
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
