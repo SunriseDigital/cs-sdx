@@ -587,5 +587,73 @@ namespace UnitTest
         Assert.Equal("Freeve", list[1]["name"]);
       }
     }
+
+    [Fact]
+    public void TestFetchKeyValuePairListWithConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchKeyValuePairListWithConnection(db);
+      }
+    }
+
+    private void RunFetchKeyValuePairListWithConnection(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom("shop").Select
+        .AddColumns("id", "name")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      List<KeyValuePair<int, string>> list = null;
+      using (var con = db.Adapter.CreateConnection())
+      {
+        var command = sel.Build();
+        command.Connection = con;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          list = db.Adapter.FetchKeyValuePairList<int, string>(command);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        list = db.Adapter.FetchKeyValuePairList<int, string>(command);
+        Assert.IsType<List<KeyValuePair<int, string>>>(list);
+        Assert.Equal(2, list.Count);
+        Assert.Equal(1, list[0].Key);
+        Assert.Equal("天祥", list[0].Value);
+        Assert.Equal(2, list[1].Key);
+        Assert.Equal("エスペリア", list[1].Value);
+      }
+
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("id", "name", "main_image_id")//最初の二つ以外は無視
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          list = db.Adapter.FetchKeyValuePairList<int, string>(sel, con);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        list = db.Adapter.FetchKeyValuePairList<int, string>(sel, con);
+        Assert.IsType<List<KeyValuePair<int, string>>>(list);
+        Assert.Equal(2, list.Count);
+        Assert.Equal(3, list[0].Key);
+        Assert.Equal("天府舫", list[0].Value);
+        Assert.Equal(4, list[1].Key);
+        Assert.Equal("Freeve", list[1].Value);
+      }
+    }
   }
 }

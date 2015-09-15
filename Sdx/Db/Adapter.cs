@@ -218,20 +218,19 @@ namespace Sdx.Db
       return list;
     }
 
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select)
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbConnection connection = null)
     {
       select.Adapter = this;
-      return this.FetchKeyValuePairList<TKey, TValue>(select.Build());
+      var command = select.Build();
+      command.Connection = connection;
+      return this.FetchKeyValuePairList<TKey, TValue>(command);
     }
 
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command)
     {
       var list = new List<KeyValuePair<TKey, TValue>>();
 
-      using (var con = this.CreateConnection())
-      {
-        con.Open();
-        command.Connection = con;
+      Action action = () => {
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
@@ -242,6 +241,20 @@ namespace Sdx.Db
 
           list.Add(row);
         }
+      };
+
+      if (command.Connection == null)
+      {
+        using (var con = this.CreateConnection())
+        {
+          con.Open();
+          command.Connection = con;
+          action();
+        }
+      }
+      else
+      {
+        action();
       }
 
       return list;
