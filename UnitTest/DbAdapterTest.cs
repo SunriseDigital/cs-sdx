@@ -522,5 +522,70 @@ namespace UnitTest
         Assert.IsType<DBNull>(objDic["main_image_id"]);
       }
     }
+
+    [Fact]
+    public void TestFetchDictionaryListWithConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchDictionaryListWithConnection(db);
+      }
+    }
+
+    private void RunFetchDictionaryListWithConnection(TestDb db)
+    {
+      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      sel
+        .AddFrom("shop").Select
+        .AddColumns("id", "name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+      List<Dictionary<string, string>> list = null;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        var command = sel.Build();
+        command.Connection = con;
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          list = db.Adapter.FetchDictionaryList<string>(command);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        command.Connection.Open();
+        list = db.Adapter.FetchDictionaryList<string>(command);
+        Assert.IsType<List<Dictionary<string, string>>>(list);
+        Assert.Equal(2, list.Count);
+        Assert.Equal("天祥", list[0]["name"]);
+        Assert.Equal("", list[0]["main_image_id"]);
+        Assert.Equal("エスペリア", list[1]["name"]);
+      }
+      
+      sel = new Sdx.Db.Query.Select();
+      sel
+        .AddFrom("shop")
+        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .AddColumns("id", "name", "main_image_id")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(2)
+        ;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          list = db.Adapter.FetchDictionaryList<string>(sel, con);
+        }));
+        //connectionを開いてないので例外になるはず
+        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+
+        con.Open();
+        list = db.Adapter.FetchDictionaryList<string>(sel, con);
+        Assert.IsType<List<Dictionary<string, string>>>(list);
+        Assert.Equal(2, list.Count);
+        Assert.Equal("天府舫", list[0]["name"]);
+        Assert.Equal("Freeve", list[1]["name"]);
+      }
+    }
   }
 }

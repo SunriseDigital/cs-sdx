@@ -175,20 +175,19 @@ namespace Sdx.Db
       return resultSet;
     }
 
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select)
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbConnection connection = null)
     {
       select.Adapter = this;
-      return this.FetchDictionaryList<T>(select.Build());
+      var command = select.Build();
+      command.Connection = connection;
+      return this.FetchDictionaryList<T>(command);
     }
 
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
     {
       var list = new List<Dictionary<string, T>>();
 
-      using (var con = this.CreateConnection())
-      {
-        con.Open();
-        command.Connection = con;
+      Action action = () => {
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
@@ -200,6 +199,20 @@ namespace Sdx.Db
 
           list.Add(row);
         }
+      };
+
+      if (command.Connection == null)
+      {
+        using (var con = this.CreateConnection())
+        {
+          con.Open();
+          command.Connection = con;
+          action();
+        }
+      }
+      else
+      {
+        action();
       }
 
       return list;
