@@ -7,12 +7,20 @@ namespace Sdx.Db.Query
 {
   public class Condition : ICloneable
   {
+    private enum Type
+    {
+      Comparison,
+      NullCompare,
+      Between,
+      Free,
+    }
     private class Holder
     {
-      public Comparison Comparison { get; set; }
+      public Comparison? Comparison { get; set; }
       public Logical Logical { get; set; }
       public Column Column { get; set; }
       public object Value { get; set; }
+      public Type Type { get; set; }
     }
 
     private List<Holder> wheres = new List<Holder>();
@@ -30,61 +38,61 @@ namespace Sdx.Db.Query
 
     public Condition AddOr(Condition condition)
     {
-      this.AddWithCondition(condition, Logical.Or);
+      this.AddWithCondition(condition, Logical.Or, Type.Free);
       return this;
     }
 
     public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.Or, comparison);
+      this.AddWithColumn(column, value, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
     public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.Or, comparison);
+      this.AddWithColumn(column, value, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
     public Condition Add(Condition condition)
     {
-      this.AddWithCondition(condition, Logical.And);
+      this.AddWithCondition(condition, Logical.And, Type.Free);
       return this;
     }
 
     public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.And, comparison);
+      this.AddWithColumn(column, value, Logical.And, comparison, Type.Comparison);
       return this;
     }
 
     public Condition Add(Expr column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.And, comparison);
+      this.AddWithColumn(column, value, Logical.And, comparison, Type.Comparison);
       return this;
     }
 
     public Condition AddIsNull(string column)
     {
-      this.AddWithColumn(column, null, Logical.And, Comparison.IsNull);
+      this.AddWithColumn(column, null, Logical.And, Comparison.Equal, Type.NullCompare);
       return this;
     }
 
     public Condition AddIsNotNullOr(string column)
     {
-      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNotNull);
-      return this;
-    }
-
-    public Condition AddIsNotNull(string column)
-    {
-      this.AddWithColumn(column, null, Logical.And, Comparison.IsNotNull);
+      this.AddWithColumn(column, null, Logical.Or, Comparison.NotEqual, Type.NullCompare);
       return this;
     }
 
     public Condition AddIsNullOr(string column)
     {
-      this.AddWithColumn(column, null, Logical.Or, Comparison.IsNull);
+      this.AddWithColumn(column, null, Logical.Or, Comparison.Equal, Type.NullCompare);
+      return this;
+    }
+
+    public Condition AddIsNotNull(string column)
+    {
+      this.AddWithColumn(column, null, Logical.And, Comparison.NotEqual, Type.NullCompare);
       return this;
     }
 
@@ -102,7 +110,7 @@ namespace Sdx.Db.Query
       });
     }
 
-    private void AddWithCondition(Condition condition, Logical logical)
+    private void AddWithCondition(Condition condition, Logical logical, Type type)
     {
       condition.EnableBracket = true;
       this.childConditions.Add(condition);
@@ -114,11 +122,12 @@ namespace Sdx.Db.Query
       this.Add(new Holder
       {
         Value = condition,
-        Logical = logical
+        Logical = logical,
+        Type = type
       });
     }
 
-    private void AddWithColumn(Object columnName, Object value, Logical logical, Comparison comparison)
+    private void AddWithColumn(Object columnName, Object value, Logical logical, Comparison? comparison, Type type)
     {
       Column column;
       if (!(columnName is Column))
@@ -141,6 +150,7 @@ namespace Sdx.Db.Query
         Logical = logical,
         Comparison = comparison,
         Value = value,
+        Type = type,
       });
     }
 
@@ -173,7 +183,7 @@ namespace Sdx.Db.Query
         }
         else
         {
-          whereString += this.BuildValueConditionString(select, parameters, holder, condCount);
+          whereString += this.BuildConditionString(select, parameters, holder, condCount);
         }
       });
 
@@ -185,9 +195,10 @@ namespace Sdx.Db.Query
       return whereString;
     }
 
-    private string BuildValueConditionString(Select select, DbParameterCollection parameters, Holder cond, Counter condCount)
+    private string BuildPlaceholderAndParameters(Select select, DbParameterCollection parameters, Holder cond, Counter condCount)
     {
       string rightHand;
+
       if (cond.Value is Column)
       {
         rightHand = ((Column)cond.Value).Build(select.Adapter);
@@ -200,15 +211,11 @@ namespace Sdx.Db.Query
       else if (cond.Value is Select)
       {
         Select sub = (Select)cond.Value;
-        if(sub.Adapter == null)
+        if (sub.Adapter == null)
         {
           sub.Adapter = select.Adapter;
         }
         rightHand = "(" + sub.BuildSelectString(parameters, condCount) + ")";
-      }
-      else if (cond.Comparison == Comparison.IsNull || cond.Comparison == Comparison.IsNotNull)
-      {
-        rightHand = "";
       }
       //IEnumerable<>かどうかチェック。
       else if (!(cond.Value is string) && cond.Value.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
@@ -237,25 +244,81 @@ namespace Sdx.Db.Query
         condCount.Incr();
       }
 
-      var leftHand = cond.Column.Build(select.Adapter);
+      return rightHand;
+    }
 
-      return String.Format(
-        "{0}{1}{2}",
-        leftHand,
-        cond.Comparison.SqlString(),
-        rightHand
+    private string BuildConditionString(Select select, DbParameterCollection parameters, Holder cond, Counter condCount)
+    {
+      if (cond.Type == Type.Comparison)
+      {
+        var value = this.BuildPlaceholderAndParameters(select, parameters, cond, condCount);
+        return String.Format(
+          "{0}{1}{2}",
+          cond.Column.Build(select.Adapter),
+          cond.Comparison.SqlString(),
+          value
         );
+      }
+      else if(cond.Type == Type.NullCompare)
+      {
+        if (cond.Comparison == Comparison.Equal)
+        {
+          return cond.Column.Build(select.Adapter) + " IS NULL";
+        }
+        else if(cond.Comparison == Comparison.NotEqual)
+        {
+          return cond.Column.Build(select.Adapter) + " IS NOT NULL";
+        }
+
+        throw new InvalidOperationException("Illeagal Comparison is specified.");
+      }
+      else if(cond.Type == Type.Between)
+      {
+        var minMax = (string[])cond.Value;
+
+        cond.Value = minMax[0];
+        var min = this.BuildPlaceholderAndParameters(select, parameters, cond, condCount);
+
+        cond.Value = minMax[1];
+        var max = this.BuildPlaceholderAndParameters(select, parameters, cond, condCount);
+
+        //元に戻さないと2回で上のキャストがこけてしまう。
+        cond.Value = minMax;
+
+        string condFormat;
+        if(cond.Comparison == Comparison.Equal)
+        {
+          condFormat = "{0} BETWEEN {1} AND {2}";
+        }
+        else if (cond.Comparison == Comparison.NotEqual)
+        {
+          condFormat = "{0} NOT BETWEEN {1} AND {2}";
+        }
+        else
+        {
+          throw new InvalidOperationException("Illegal Comparison is specified");
+        }
+
+        return String.Format(
+          condFormat,
+          cond.Column.Build(select.Adapter),
+          min,
+          max
+        );
+      }
+
+      throw new InvalidOperationException("Illeagal Type is specified.");
     }
 
     public Condition Add(Column left, object right, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(left, right, Logical.And, comparison);
+      this.AddWithColumn(left, right, Logical.And, comparison, Type.Comparison);
       return this;
     }
 
     public Condition AddOr(Column left, object right, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(left, right, Logical.Or, comparison);
+      this.AddWithColumn(left, right, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
@@ -275,6 +338,54 @@ namespace Sdx.Db.Query
       //一時的な変数なのでコピーの必要はないと思われます。
 
       return cloned;
+    }
+
+    public Condition AddBetween(string column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] {min, max}, Logical.And, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddBetween(Expr column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddBetweenOr(string column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddBetweenOr(Expr column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetween(string column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetween(Expr column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetweenOr(string column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetweenOr(Expr column, string min, string max)
+    {
+      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
+      return this;
     }
   }
 }

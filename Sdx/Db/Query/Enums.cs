@@ -40,8 +40,6 @@ namespace Sdx.Db.Query
     NotLike,
     In,
     NotIn,
-    IsNull,
-    IsNotNull
   }
 
   internal static class Enumns
@@ -52,8 +50,13 @@ namespace Sdx.Db.Query
       return strings[(int)logical];
     }
 
-    internal static string SqlString(this Comparison comp)
+    internal static string SqlString(this Comparison? comp)
     {
+      if(comp == null)
+      {
+        return "";
+      }
+
       string[] strings = {
           " = ",
           " <> ",
@@ -66,8 +69,6 @@ namespace Sdx.Db.Query
           " NOT LIKE ",
           " IN ",
           " NOT IN ",
-          " IS NULL",
-          " IS NOT NULL"
         };
       return strings[(int)comp];
     }

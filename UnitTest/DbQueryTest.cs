@@ -1590,8 +1590,110 @@ namespace UnitTest
         Assert.Equal(4, profiler.Queries.Count);
         Assert.Equal("Where and order limit from string", profiler.Queries[3].Comment);
       }
+    }
 
+    [Fact]
+    public void TestSelectBetween()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectBetween(db);
+        ExecSql(db);
+      }
+    }
 
+    private void RunSelectBetween(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom("shop")
+        .AddColumn("id")
+        .Where.AddBetween(
+          "created_at",
+          "2015-12-10 00:00:00",
+          "2015-12-10 23:59:59"
+        );
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE {0}shop{1}.{0}created_at{1} BETWEEN @0 AND @1"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-10 00:00:00", db.Command.Parameters["@0"].Value);
+      Assert.Equal("2015-12-10 23:59:59", db.Command.Parameters["@1"].Value);
+
+      select.Context("shop")
+        .Where.AddBetweenOr(
+          "created_at",
+          "2015-12-20 00:00:00",
+          "2015-12-20 23:59:59"
+        );
+
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} 
+          WHERE {0}shop{1}.{0}created_at{1} BETWEEN @0 AND @1
+          OR {0}shop{1}.{0}created_at{1} BETWEEN @2 AND @3"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-20 00:00:00", db.Command.Parameters["@2"].Value);
+      Assert.Equal("2015-12-20 23:59:59", db.Command.Parameters["@3"].Value);
+    }
+
+    [Fact]
+    public void TestSelectNotBetween()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectNotBetween(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectNotBetween(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom("shop")
+        .AddColumn("id")
+        .Where.AddNotBetween(
+          "created_at",
+          "2015-12-10 00:00:00",
+          "2015-12-10 23:59:59"
+        );
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE {0}shop{1}.{0}created_at{1} NOT BETWEEN @0 AND @1"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-10 00:00:00", db.Command.Parameters["@0"].Value);
+      Assert.Equal("2015-12-10 23:59:59", db.Command.Parameters["@1"].Value);
+
+      select.Context("shop")
+        .Where.AddNotBetween(
+          "created_at",
+          "2015-12-20 00:00:00",
+          "2015-12-20 23:59:59"
+        );
+
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} 
+          WHERE {0}shop{1}.{0}created_at{1} NOT BETWEEN @0 AND @1
+          AND {0}shop{1}.{0}created_at{1} NOT BETWEEN @2 AND @3"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-20 00:00:00", db.Command.Parameters["@2"].Value);
+      Assert.Equal("2015-12-20 23:59:59", db.Command.Parameters["@3"].Value);
     }
   }
 }
