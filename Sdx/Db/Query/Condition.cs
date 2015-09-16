@@ -17,7 +17,7 @@ namespace Sdx.Db.Query
     private class Holder
     {
       public Comparison? Comparison { get; set; }
-      public Logical Logical { get; set; }
+      public Logical? Logical { get; set; }
       public Column Column { get; set; }
       public object Value { get; set; }
       public Type Type { get; set; }
@@ -127,7 +127,7 @@ namespace Sdx.Db.Query
       });
     }
 
-    private void AddWithColumn(Object columnName, Object value, Logical logical, Comparison? comparison, Type type)
+    private void AddWithColumn(Object columnName, Object value, Logical? logical, Comparison? comparison, Type type)
     {
       Column column;
       if (!(columnName is Column))
@@ -306,6 +306,10 @@ namespace Sdx.Db.Query
           max
         );
       }
+      else if(cond.Type == Type.Free)
+      {
+        return cond.Column.Name;
+      }
 
       throw new InvalidOperationException("Illeagal Type is specified.");
     }
@@ -385,6 +389,18 @@ namespace Sdx.Db.Query
     public Condition AddNotBetweenOr(Expr column, string min, string max)
     {
       this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
+      return this;
+    }
+
+    /// <summary>
+    /// 引数一個のAddは自由文をWhere句に足します。クオートやサニタイズは一切されないので注意してください。
+    /// また、AND・ORは付与されません。
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    public Condition Add(string expression)
+    {
+      this.AddWithColumn(expression, null, null, null, Type.Free);
       return this;
     }
   }

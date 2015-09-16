@@ -44,8 +44,13 @@ namespace Sdx.Db.Query
 
   internal static class Enumns
   {
-    internal static string SqlString(this Logical logical)
+    internal static string SqlString(this Logical? logical)
     {
+      if(logical == null)
+      {
+        return "";
+      }
+
       string[] strings = { " AND ", " OR " };
       return strings[(int)logical];
     }

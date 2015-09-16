@@ -1695,5 +1695,39 @@ namespace UnitTest
       Assert.Equal("2015-12-20 00:00:00", db.Command.Parameters["@2"].Value);
       Assert.Equal("2015-12-20 23:59:59", db.Command.Parameters["@3"].Value);
     }
+
+    [Fact]
+    public void TestSelectFree()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectFree(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectFree(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select.Adapter = db.Adapter;
+      select
+        .AddFrom("shop")
+        .AddColumn("id");
+
+      select.Where.Add("id = 1");
+
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE id = 1"),
+        db.Command.CommandText
+      );
+
+      select.Where.Add(" /* foo bar */");
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE id = 1 /* foo bar */"),
+        db.Command.CommandText
+      );
+    }
   }
 }
