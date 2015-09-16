@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Globalization;
 
 namespace Sdx.Web
 {
@@ -10,7 +11,7 @@ namespace Sdx.Web
     private Uri uri;
     private Dictionary<string, string> paramData;
 
-    public enum Protocol
+    public enum Scheme
     {
       Http,
       Https
@@ -50,7 +51,7 @@ namespace Sdx.Web
     private string BuildPath()
     {
       string path = string.Format(
-        "{0}://{1}{2}", this.Scheme, this.Domain, this.Path
+        "{0}://{1}{2}", this.SchemeName, this.Domain, this.Path
       );
       return path;
     }
@@ -125,11 +126,21 @@ namespace Sdx.Web
       }
     }
 
-    public string Scheme
+    public string SchemeName
     {
       get
       {
         return this.uri.Scheme;
+      }
+    }
+
+    public Scheme SchemeType
+    {
+      get
+      {
+        TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
+        string kind = ti.ToTitleCase(this.uri.Scheme);
+        return (Scheme)Enum.Parse(typeof(Scheme), kind);
       }
     }
 
