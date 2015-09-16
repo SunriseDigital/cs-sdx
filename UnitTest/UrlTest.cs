@@ -26,8 +26,7 @@ namespace UnitTest
 
       //コンストラクタの解析が意図通りに行われているか、各部品ごとに確認
       Assert.Equal("example.com", url.Domain);
-      Assert.Equal(Sdx.Web.Url.Scheme.Http, url.SchemeType);//スキームが Sdx.Web.Url.Scheme 型の値かの確認
-      Assert.Equal("http", url.SchemeName);
+      Assert.Equal("http", url.Scheme);
       Assert.Equal("bar", url.Param["foo"]);
       Assert.Equal("huga", url.Param["hoge"]);
       Assert.Equal("/path/to/api", url.Path);
