@@ -29,7 +29,7 @@ namespace UnitTest
       Assert.Equal("http", url.Scheme);
       Assert.Equal("bar", url.Param["foo"]);
       Assert.Equal("huga", url.Param["hoge"]);
-      Assert.Equal("/path/to/api", url.Path);
+      Assert.Equal("/path/to/api", url.LocalPath);
 
       //新しくパラメータを追加した場合、正しくクエリが生成されているか
       url.Param["key"] = "value";

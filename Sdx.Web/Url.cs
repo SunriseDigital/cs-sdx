@@ -8,18 +8,25 @@ namespace Sdx.Web
 {
   public class Url
   {
-    private Uri uri;
     private Dictionary<string, string> paramData;
+    private String scheme;
+    private String localPath;
+    private String domain;
 
     //コンストラクタ
     public Url(string urlStr)
     {
       //@var System.Uri
-      this.uri = new Uri(urlStr);
+      var uri = new Uri(urlStr);
       this.paramData = new Dictionary<string, string>();
 
+      //パス用の情報を保存
+      this.Scheme = uri.Scheme;
+      this.Domain = uri.Host;
+      this.LocalPath = uri.LocalPath;
+
       //各パラメータを連想配列でしまっておく
-      string[] paramList = this.uri.Query.Trim('?').Split('&');
+      string[] paramList = uri.Query.Trim('?').Split('&');
       paramList.ToList().ForEach(str => {
         string[] tmp = str.Split('=');
         this.paramData[tmp[0]] = tmp[1];
@@ -45,7 +52,7 @@ namespace Sdx.Web
     private string BuildPath()
     {
       string path = string.Format(
-        "{0}://{1}{2}", this.Scheme, this.Domain, this.Path
+        "{0}://{1}{2}", this.Scheme, this.Domain, this.LocalPath
       );
       return path;
     }
@@ -95,15 +102,25 @@ namespace Sdx.Web
     {
       get
       {
-        return this.uri.Host;
+        return this.domain;
+      }
+
+      set
+      {
+        this.domain = value;
       }
     }
 
-    public string Path
+    public string LocalPath
     {
       get
       {
-        return this.uri.LocalPath;
+        return this.localPath;
+      }
+
+      set
+      {
+        this.localPath = value;
       }
     }
 
@@ -124,7 +141,12 @@ namespace Sdx.Web
     {
       get
       {
-        return this.uri.Scheme;
+        return this.scheme;
+      }
+
+      set
+      {
+        this.scheme = value;
       }
     }
   }
