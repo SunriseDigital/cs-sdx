@@ -24,12 +24,27 @@ namespace Sdx.Web
       this.Domain = uri.Host;
       this.LocalPath = uri.LocalPath;
 
-      //各パラメータを連想配列でしまっておく
-      string[] paramList = uri.Query.Trim('?').Split('&');
-      paramList.ToList().ForEach(str => {
-        string[] tmp = str.Split('=');
-        this.paramData[tmp[0]] = tmp[1];
-      });
+      //クエリ文字列があればパラメータ毎に連想配列でしまっておく
+      if (uri.Query.Contains('?'))
+      {
+        string query = uri.Query.Trim('?');
+
+        //パラメータの項目数が複数か単独か
+        if(query.Contains('&'))
+        {
+          string[] paramArray = query.Split('&');
+          paramArray.ToList().ForEach(str =>
+          {
+            string[] tmp = str.Split('=');
+            this.paramData[tmp[0]] = tmp[1];
+          });
+        }
+        else
+        {
+          string[] tmp = query.Split('=');
+          this.paramData[tmp[0]] = tmp[1];
+        }
+      }
     }
 
     private string BuildQueryString(Dictionary<string,string> param)

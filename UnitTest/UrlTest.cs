@@ -64,12 +64,12 @@ namespace UnitTest
     {
       Console.WriteLine("TestNonParams");
       //クエリなしURLを渡す
-      //var url = new Sdx.Web.Url("http://example.com/path/to/api");
+      var url = new Sdx.Web.Url("http://example.com/path/to/api");
 
       //各部品の取得
-      //Assert.Equal("example.com", url.Domain);
-      //Assert.Equal("http", url.Scheme);
-      //Assert.Equal("/path/to/api", url.LocalPath);
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("/path/to/api", url.LocalPath);
     }
 
     [Fact]
@@ -77,12 +77,12 @@ namespace UnitTest
     {
       Console.WriteLine("TestSingleParam");
       //パラメータが1つだけ(クエリに'＆'が無い)
-      //var url = new Sdx.Web.Url("http://example.com/path/to/api?foo=bar");
+      var url = new Sdx.Web.Url("http://example.com/path/to/api?foo=bar");
 
       //各部品の取得
-      //Assert.Equal("example.com", url.Domain);
-      //Assert.Equal("http", url.Scheme);
-      //Assert.Equal("/path/to/api", url.LocalPath);
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("/path/to/api", url.LocalPath);
     }
   }
 }
