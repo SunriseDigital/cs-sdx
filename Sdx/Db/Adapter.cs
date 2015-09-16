@@ -65,7 +65,7 @@ namespace Sdx.Db
       string comment = null;
       if(command.Parameters.Count > 0)
       {
-        //最後がコメントかチェックする
+        //Select.SetCommentのため、最後がコメントかチェックする
         var lastIndex = command.Parameters.Count - 1;
         var param = command.Parameters[lastIndex];
         if (param.ParameterName == Query.Select.CommentParameterKey)
@@ -160,33 +160,16 @@ namespace Sdx.Db
         throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
       }
 
-      var contextName = meta.Name;
-
       var command = select.Build();
       command.Connection = connection;
 
-      var resultSet = new RecordSet<T>();
-
-      Action action = () => {
+      return this.Fetch<RecordSet<T>>(command, () =>
+      {
+        var resultSet = new RecordSet<T>();
         var reader = this.ExecuteReader(command);
-        resultSet.Build(reader, select, contextName);
-      };
-
-      if (command.Connection == null)
-      {
-        using (var con = this.CreateConnection())
-        {
-          con.Open();
-          command.Connection = con;
-          action();
-        }
-      }
-      else
-      {
-        action();
-      }
-
-      return resultSet;
+        resultSet.Build(reader, select, meta.Name);
+        return resultSet;
+      });
     }
 
     public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbConnection connection = null)
@@ -197,11 +180,32 @@ namespace Sdx.Db
       return this.FetchDictionaryList<T>(command);
     }
 
+    private T Fetch<T>(DbCommand command, Func<T> func)
+    {
+      T result = default(T);
+      if (command.Connection == null)
+      {
+        using (var con = this.CreateConnection())
+        {
+          con.Open();
+          command.Connection = con;
+          result = func();
+        }
+      }
+      else
+      {
+        result = func();
+      }
+
+      return result;
+    }
+
+
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
     {
-      var list = new List<Dictionary<string, T>>();
+      return this.Fetch<List<Dictionary<string, T>>>(command, () => {
+        var list = new List<Dictionary<string, T>>();
 
-      Action action = () => {
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
@@ -213,23 +217,9 @@ namespace Sdx.Db
 
           list.Add(row);
         }
-      };
 
-      if (command.Connection == null)
-      {
-        using (var con = this.CreateConnection())
-        {
-          con.Open();
-          command.Connection = con;
-          action();
-        }
-      }
-      else
-      {
-        action();
-      }
-
-      return list;
+        return list;
+      });
     }
 
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbConnection connection = null)
@@ -242,9 +232,8 @@ namespace Sdx.Db
 
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command)
     {
-      var list = new List<KeyValuePair<TKey, TValue>>();
-
-      Action action = () => {
+      return this.Fetch<List<KeyValuePair<TKey, TValue>>>(command, () => {
+        var list = new List<KeyValuePair<TKey, TValue>>();
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
@@ -255,23 +244,8 @@ namespace Sdx.Db
 
           list.Add(row);
         }
-      };
-
-      if (command.Connection == null)
-      {
-        using (var con = this.CreateConnection())
-        {
-          con.Open();
-          command.Connection = con;
-          action();
-        }
-      }
-      else
-      {
-        action();
-      }
-
-      return list;
+        return list;
+      });
     }
 
     public List<T> FetchList<T>(Query.Select select, DbConnection connection = null)
@@ -284,30 +258,15 @@ namespace Sdx.Db
 
     public List<T> FetchList<T>(DbCommand command)
     {
-      var list = new List<T>();
-      Action action = () => {
+      return this.Fetch<List<T>>(command, () => {
+        var list = new List<T>();
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
           list.Add(this.castDbValue<T>(reader.GetValue(0)));
         }
-      };
-
-      if(command.Connection == null)
-      {
-        using (var con = this.CreateConnection())
-        {
-          con.Open();
-          command.Connection = con;
-          action();
-        }
-      }
-      else
-      {
-        action();
-      }
-
-      return list;
+        return list;
+      });
     }
 
     public T FetchOne<T>(Query.Select select, DbConnection connection = null)
@@ -320,28 +279,14 @@ namespace Sdx.Db
 
     public T FetchOne<T>(DbCommand command)
     {
-      Func<T> func = () => {
+      return this.Fetch<T>(command, () => {
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
           return this.castDbValue<T>(reader.GetValue(0));
         }
         return default(T);
-      };
-
-      if(command.Connection == null)
-      {
-        using (var con = this.CreateConnection())
-        {
-          con.Open();
-          command.Connection = con;
-          return func();
-        }
-      }
-      else
-      {
-        return func();
-      }
+      });
     }
 
     public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbConnection connection = null)
@@ -354,8 +299,8 @@ namespace Sdx.Db
 
     public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
     {
-      var dic = new Dictionary<string, T>();
-      Action action = () => {
+      return this.Fetch<Dictionary<string, T>>(command, () => {
+        var dic = new Dictionary<string, T>();
         var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
@@ -366,23 +311,8 @@ namespace Sdx.Db
 
           break;
         }
-      };
-
-      if (command.Connection == null)
-      {
-        using (var con = this.CreateConnection())
-        {
-          con.Open();
-          command.Connection = con;
-          action();
-        }
-      }
-      else
-      {
-        action();
-      }
-
-      return dic;
+        return dic;
+      });
     }
 
     private T castDbValue<T>(object value)
