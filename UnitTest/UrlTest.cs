@@ -62,9 +62,22 @@ namespace UnitTest
     [Fact]
     public void TestNonParams()
     {
-      Console.WriteLine("TestMethod2");
+      Console.WriteLine("TestNonParams");
       //クエリなしURLを渡す
       //var url = new Sdx.Web.Url("http://example.com/path/to/api");
+
+      //各部品の取得
+      //Assert.Equal("example.com", url.Domain);
+      //Assert.Equal("http", url.Scheme);
+      //Assert.Equal("/path/to/api", url.LocalPath);
+    }
+
+    [Fact]
+    public void TestSingleParam()
+    {
+      Console.WriteLine("TestSingleParam");
+      //パラメータが1つだけ(クエリに'＆'が無い)
+      //var url = new Sdx.Web.Url("http://example.com/path/to/api?foo=bar");
 
       //各部品の取得
       //Assert.Equal("example.com", url.Domain);
