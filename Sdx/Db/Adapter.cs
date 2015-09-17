@@ -123,63 +123,6 @@ namespace Sdx.Db
 
     internal abstract string AppendLimitQuery(string selectSql, int limit, int offset);
 
-    public T FetchRecord<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
-    {
-      var resultSet = this.FetchRecordSet<T>(select, connection);
-
-      if (resultSet.Count == 0)
-      {
-        return null;
-      }
-
-      return resultSet[0];
-    }
-
-    /// <summary>
-    /// SQLを実行しRecordSetを生成して返します。
-    /// </summary>
-    /// <typeparam name="T">Recordのクラスを指定</typeparam>
-    /// <param name="contextName">
-    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
-    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
-    /// </param>
-    /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
-    {
-      select.Adapter = this;
-
-      var prop = typeof(T).GetProperty("Meta");
-      if (prop == null)
-      {
-        throw new NotImplementedException("Missing Meta property in " + typeof(T));
-      }
-
-      var meta = prop.GetValue(null, null) as TableMeta;
-      if (meta == null)
-      {
-        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
-      }
-
-      var command = select.Build();
-      command.Connection = connection;
-
-      return this.Fetch<RecordSet<T>>(command, () =>
-      {
-        var resultSet = new RecordSet<T>();
-        var reader = this.ExecuteReader(command);
-        resultSet.Build(reader, select, meta.Name);
-        return resultSet;
-      });
-    }
-
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbConnection connection = null)
-    {
-      select.Adapter = this;
-      var command = select.Build();
-      command.Connection = connection;
-      return this.FetchDictionaryList<T>(command);
-    }
-
     private T Fetch<T>(DbCommand command, Func<T> func)
     {
       T result = default(T);
@@ -200,6 +143,106 @@ namespace Sdx.Db
       return result;
     }
 
+    public T FetchRecord<T>(Query.Select select, DbTransaction transaction) where T : Record, new()
+    {
+      return this.FetchRecord<T>(select, transaction.Connection, transaction);
+    }
+
+    public T FetchRecord<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
+    {
+      return this.FetchRecord<T>(select, connection, null);
+    }
+
+    private T FetchRecord<T>(Query.Select select, DbConnection connection, DbTransaction transaction) where T : Record, new()
+    {
+      var resultSet = this.FetchRecordSet<T>(select, connection, transaction);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
+    public RecordSet<T> FetchRecordSet<T>(Query.Select select, DbTransaction transaction) where T : Record, new()
+    {
+      return this.FetchRecordSet<T>(select, transaction.Connection, transaction);
+    }
+
+    /// <summary>
+    /// SQLを実行しRecordSetを生成して返します。
+    /// </summary>
+    /// <typeparam name="T">Recordのクラスを指定</typeparam>
+    /// <param name="contextName">
+    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
+    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
+    /// </param>
+    /// <returns></returns>
+    public RecordSet<T> FetchRecordSet<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
+    {
+      return this.FetchRecordSet<T>(select, connection, null);
+    }
+
+    private RecordSet<T> FetchRecordSet<T>(Query.Select select, DbConnection connection, DbTransaction transaction) where T : Record, new()
+    {
+      select.Adapter = this;
+
+      var prop = typeof(T).GetProperty("Meta");
+      if (prop == null)
+      {
+        throw new NotImplementedException("Missing Meta property in " + typeof(T));
+      }
+
+      var meta = prop.GetValue(null, null) as TableMeta;
+      if (meta == null)
+      {
+        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
+      }
+
+      RecordSet<T> recordSet = null;
+      using (var command = select.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        recordSet = this.Fetch<RecordSet<T>>(command, () =>
+        {
+          var resultSet = new RecordSet<T>();
+          using (var reader = this.ExecuteReader(command))
+          {
+            resultSet.Build(reader, select, meta.Name);
+          }
+
+          return resultSet;
+        });
+      }
+
+      return recordSet;
+    }
+
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbTransaction transaction)
+    {
+      return this.FetchDictionaryList<T>(select, transaction.Connection, transaction);
+    }
+
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbConnection connection = null)
+    {
+      return this.FetchDictionaryList<T>(select, connection, null);
+    }
+
+    private List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbConnection connection, DbTransaction transaction)
+    {
+      select.Adapter = this;
+      List<Dictionary<string, T>> result = null;
+      using (var command = select.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.FetchDictionaryList<T>(command);
+      }
+
+      return result;
+    }
 
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
     {
@@ -222,12 +265,28 @@ namespace Sdx.Db
       });
     }
 
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbTransaction transaction)
+    {
+      return this.FetchKeyValuePairList<TKey, TValue>(select, transaction.Connection, transaction);
+    }
+
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbConnection connection = null)
     {
+      return this.FetchKeyValuePairList<TKey, TValue>(select, connection, null);
+    }
+
+    private List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbConnection connection, DbTransaction transaction)
+    {
       select.Adapter = this;
-      var command = select.Build();
-      command.Connection = connection;
-      return this.FetchKeyValuePairList<TKey, TValue>(command);
+      List<KeyValuePair<TKey, TValue>> result = null;
+      using (var command = select.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.FetchKeyValuePairList<TKey, TValue>(command);
+      }
+
+      return result;
     }
 
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command)
@@ -248,12 +307,28 @@ namespace Sdx.Db
       });
     }
 
+    public List<T> FetchList<T>(Query.Select select, DbTransaction transaction)
+    {
+      return this.FetchList<T>(select, transaction.Connection, transaction);
+    }
+
     public List<T> FetchList<T>(Query.Select select, DbConnection connection = null)
     {
+      return this.FetchList<T>(select, connection, null);
+    }
+
+    private List<T> FetchList<T>(Query.Select select, DbConnection connection, DbTransaction transaction)
+    {
       select.Adapter = this;
-      var command = select.Build();
-      command.Connection = connection;
-      return this.FetchList<T>(command);
+      List<T> result = null;
+      using (var command = select.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.FetchList<T>(command);
+      }
+
+      return result;
     }
 
     public List<T> FetchList<T>(DbCommand command)
@@ -269,12 +344,28 @@ namespace Sdx.Db
       });
     }
 
+    public T FetchOne<T>(Query.Select select, DbTransaction transaction)
+    {
+      return this.FetchOne<T>(select, transaction.Connection, transaction);
+    }
+
     public T FetchOne<T>(Query.Select select, DbConnection connection = null)
     {
+      return this.FetchOne<T>(select, connection, null);
+    }
+
+    private T FetchOne<T>(Query.Select select, DbConnection connection, DbTransaction transaction)
+    {
       select.Adapter = this;
-      var command = select.Build();
-      command.Connection = connection;
-      return this.FetchOne<T>(command);
+      T result = default(T);
+      using (var command = select.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.FetchOne<T>(command);
+      }
+
+      return result;
     }
 
     public T FetchOne<T>(DbCommand command)
@@ -289,12 +380,28 @@ namespace Sdx.Db
       });
     }
 
+    public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbTransaction transaction)
+    {
+      return this.FetchDictionary<T>(select, transaction.Connection, transaction);
+    }
+
     public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbConnection connection = null)
     {
+      return this.FetchDictionary<T>(select, connection, null);
+    }
+
+    public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbConnection connection, DbTransaction transaction)
+    {
       select.Adapter = this;
-      var command = select.Build();
-      command.Connection = connection;
-      return this.FetchDictionary<T>(command);
+      Dictionary<string, T> result;
+      using (var command = select.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.FetchDictionary<T>(command);
+      }
+
+      return result;
     }
 
     public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
