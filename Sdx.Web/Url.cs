@@ -7,17 +7,12 @@ namespace Sdx.Web
 {
   public class Url
   {
-    private Dictionary<string, string> paramData;
-    private String scheme;
-    private String localPath;
-    private String domain;
-
     //コンストラクタ
     public Url(string urlStr)
     {
       //@var System.Uri
       var uri = new Uri(urlStr);
-      this.paramData = new Dictionary<string, string>();
+      this.Param = new Dictionary<string, string>();
 
       //パス用の情報を保存
       this.Scheme = uri.Scheme;
@@ -36,13 +31,13 @@ namespace Sdx.Web
           paramArray.ToList().ForEach(str =>
           {
             string[] tmp = str.Split('=');
-            this.paramData[tmp[0]] = tmp[1];
+            this.Param[tmp[0]] = tmp[1];
           });
         }
         else
         {
           string[] tmp = query.Split('=');
-          this.paramData[tmp[0]] = tmp[1];
+          this.Param[tmp[0]] = tmp[1];
         }
       }
     }
@@ -74,7 +69,7 @@ namespace Sdx.Web
     public string Build()
     {
       string path = this.BuildPath();
-      string query = this.BuildQueryString(this.paramData);
+      string query = this.BuildQueryString(this.Param);
       return path + query;
     }
 
@@ -82,7 +77,7 @@ namespace Sdx.Web
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
-        this.paramData
+        this.Param
           .Where(p => add.ContainsKey(p.Key) == false)
           .Concat(add)
           .ToDictionary(p => p.Key, p => p.Value)
@@ -94,7 +89,7 @@ namespace Sdx.Web
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
-        this.paramData
+        this.Param
           .Where(p => exclude.Contains(p.Key) == false)
           .ToDictionary(p => p.Key, p => p.Value)
       );
@@ -105,7 +100,7 @@ namespace Sdx.Web
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
-        this.paramData
+        this.Param
           .Where(p => exclude.Contains(p.Key) == false)
           .ToDictionary(p => p.Key, p => p.Value)
       );
@@ -114,54 +109,22 @@ namespace Sdx.Web
 
     public string Domain
     {
-      get
-      {
-        return this.domain;
-      }
-
-      set
-      {
-        this.domain = value;
-      }
+      get; set;
     }
 
     public string LocalPath
     {
-      get
-      {
-        return this.localPath;
-      }
-
-      set
-      {
-        this.localPath = value;
-      }
+      get; set;
     }
 
     public Dictionary<string, string> Param
     {
-      get
-      {
-        return this.paramData;
-      }
-
-      set
-      {
-        this.paramData = value;
-      }
+      get; set;
     }
 
     public string Scheme
     {
-      get
-      {
-        return this.scheme;
-      }
-
-      set
-      {
-        this.scheme = value;
-      }
+      get; set;
     }
   }
 }
