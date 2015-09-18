@@ -7,100 +7,66 @@ namespace Sdx.Web
 {
   public class Url
   {
-    private Uri uri;
     private Dictionary<string, string> paramData;
+    private String scheme;
+    private String localPath;
+    private String domain;
 
     //コンストラクタ
     public Url(string urlStr)
     {
       //@var System.Uri
-      this.uri = new Uri(urlStr);
+      var uri = new Uri(urlStr);
+      this.paramData = new Dictionary<string, string>();
 
-      //クエリを分解して連想配列にする
-      string[] paramList = this.uri.Query.Trim('?').Split('&');
-      Dictionary<string, string> data = new Dictionary<string, string>();
-      foreach (var item in paramList)
+      //パス用の情報を保存
+      this.Scheme = uri.Scheme;
+      this.Domain = uri.Host;
+      this.LocalPath = uri.LocalPath;
+
+      //クエリ文字列があればパラメータ毎に連想配列でしまっておく
+      if (uri.Query.Contains('?'))
       {
-        string[] tmp = item.Split('=');
-        data[tmp[0]] = tmp[1];
-      }
-      this.paramData = data;
-    }
+        string query = uri.Query.Trim('?');
 
-    public string GetDomain()
-    {
-      return this.uri.Host;
-    }
-
-    public string GetParam(string key)
-    {
-      return this.paramData[key];
-    }
-
-    public string GetPath()
-    {
-      return this.uri.LocalPath;
-    }
-
-    public string GetProtocol()
-    {
-      return this.uri.Scheme;
-    }
-
-    public void SetParam(string key, string value)
-    {
-      this.paramData[key] = value;
-    }
-
-    private string BuildQueryString(object param = null)
-    {
-      //ここに格納された値を最終的に "&" で連結してクエリ文字列にします
-      var baseParams = new List<string>();
-      foreach (KeyValuePair<string, string> item in this.paramData)
-      {
-        var tmp = string.Format("{0}={1}", item.Key, item.Value);
-        baseParams.Add(tmp);
-      }
-
-      if(param is Dictionary<string, string>)
-      {
-        //コンパイル時には型が確定していないためキャストしています
-        var dicParams = (Dictionary<string, string>)param;
-        foreach (KeyValuePair<string, string> pair in dicParams)
+        //パラメータの項目数が複数か単独か
+        if(query.Contains('&'))
         {
-          var tmp = string.Format("{0}={1}", pair.Key, pair.Value);
-          baseParams.Add(tmp);
+          string[] paramArray = query.Split('&');
+          paramArray.ToList().ForEach(str =>
+          {
+            string[] tmp = str.Split('=');
+            this.paramData[tmp[0]] = tmp[1];
+          });
+        }
+        else
+        {
+          string[] tmp = query.Split('=');
+          this.paramData[tmp[0]] = tmp[1];
         }
       }
+    }
 
-      if(param is List<string>)
+    private string BuildQueryString(Dictionary<string,string> param)
+    {
+      if (param.Count == 0)
       {
-        //コンパイル時には型が確定していないためキャストしています
-        var excludeList = (List<string>)param;
-        var excludedData = this.paramData
-          .Where(p => excludeList.Contains(p.Key) == false)
-          .ToList()//この時点で List<KeyValuePair<string,string>> 型のListになる
-        ;
-        var tmplist = new List<string>();
-        foreach (KeyValuePair<string, string> data in excludedData)
-        {
-          tmplist.Add(string.Format("{0}={1}", data.Key, data.Value));
-        }
-        baseParams = tmplist;
+        return "";
       }
 
-      var query = "";
-      if(baseParams.Count > 0)
-      {
-        query = "?" + string.Join("&", baseParams);
-      }
-      return query;
+      var sb = new StringBuilder();
+      sb.Append("?");
+      param.ToList().ForEach(
+        kv => sb.AppendFormat("{0}={1}&", kv.Key, kv.Value)
+      );
+
+      return sb.ToString().TrimEnd('&');
     }
 
     private string BuildPath()
     {
       string path = string.Format(
-        "{0}://{1}{2}", this.GetProtocol(), this.GetDomain(), this.GetPath()
+        "{0}://{1}{2}", this.Scheme, this.Domain, this.LocalPath
       );
       return path;
     }
@@ -108,22 +74,94 @@ namespace Sdx.Web
     public string Build()
     {
       string path = this.BuildPath();
-      string query = this.BuildQueryString();
+      string query = this.BuildQueryString(this.paramData);
       return path + query;
     }
 
-    public string Build(Dictionary<string, string> param)
+    public string Build(Dictionary<string, string> add)
     {
       string path = this.BuildPath();
-      string query = this.BuildQueryString(param);
+      string query = this.BuildQueryString(
+        this.paramData
+          .Where(p => add.ContainsKey(p.Key) == false)
+          .Concat(add)
+          .ToDictionary(p => p.Key, p => p.Value)
+      );
       return path + query;
     }
 
-    public string Build(List<string> param)
+    public string Build(List<string> exclude)
     {
       string path = this.BuildPath();
-      string query = this.BuildQueryString(param);
+      string query = this.BuildQueryString(
+        this.paramData
+          .Where(p => exclude.Contains(p.Key) == false)
+          .ToDictionary(p => p.Key, p => p.Value)
+      );
       return path + query;
+    }
+
+    public string Build(string[] exclude)
+    {
+      string path = this.BuildPath();
+      string query = this.BuildQueryString(
+        this.paramData
+          .Where(p => exclude.Contains(p.Key) == false)
+          .ToDictionary(p => p.Key, p => p.Value)
+      );
+      return path + query;
+    }
+
+    public string Domain
+    {
+      get
+      {
+        return this.domain;
+      }
+
+      set
+      {
+        this.domain = value;
+      }
+    }
+
+    public string LocalPath
+    {
+      get
+      {
+        return this.localPath;
+      }
+
+      set
+      {
+        this.localPath = value;
+      }
+    }
+
+    public Dictionary<string, string> Param
+    {
+      get
+      {
+        return this.paramData;
+      }
+
+      set
+      {
+        this.paramData = value;
+      }
+    }
+
+    public string Scheme
+    {
+      get
+      {
+        return this.scheme;
+      }
+
+      set
+      {
+        this.scheme = value;
+      }
     }
   }
 }

@@ -25,14 +25,14 @@ namespace UnitTest
       var url = new Sdx.Web.Url("http://example.com/path/to/api?foo=bar&hoge=huga");
 
       //コンストラクタの解析が意図通りに行われているか、各部品ごとに確認
-      Assert.Equal("example.com", url.GetDomain());
-      //Assert.Equal(Sdx.Web.Url.Protocol.Http, url.GetProtocol());
-      Assert.Equal("bar", url.GetParam("foo"));
-      Assert.Equal("huga", url.GetParam("hoge"));
-      Assert.Equal("/path/to/api", url.GetPath());
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("bar", url.Param["foo"]);
+      Assert.Equal("huga", url.Param["hoge"]);
+      Assert.Equal("/path/to/api", url.LocalPath);
 
       //新しくパラメータを追加した場合、正しくクエリが生成されているか
-      url.SetParam("key", "value");
+      url.Param["key"] = "value";
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
       //Setterではなくコンストラクタの引数にパラメータを渡した場合の挙動
@@ -42,17 +42,47 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&new=newValue", url.Build(param));
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
+      //同じキー名のパラメータを引数に渡した場合の挙動。上書きされることを期待
+      var dic = new Dictionary<string, string>() { { "key", "newValue" } };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=newValue", url.Build(dic));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+
       //コンストラクタの引数に配列を渡した場合の挙動。指定したキーがクエリから除かれているようにする。
       //同じくオブジェクトが持つデータ自体が変わらないようにする
-      //var array = new String[] { "key" };
-      //Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(array));
-      //Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+      var array = new String[] { "key" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(array));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+
+      //引数をListにした際の挙動。基本は array のときと同じ挙動を期待
+      var list = new List<string>() { "key" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(list));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
     }
 
     [Fact]
-    public void TestMethod2()
+    public void TestNonParams()
     {
-      Console.WriteLine("TestMethod2");
+      Console.WriteLine("TestNonParams");
+      //クエリなしURLを渡す
+      var url = new Sdx.Web.Url("http://example.com/path/to/api");
+
+      //各部品の取得
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("/path/to/api", url.LocalPath);
+    }
+
+    [Fact]
+    public void TestSingleParam()
+    {
+      Console.WriteLine("TestSingleParam");
+      //パラメータが1つだけ(クエリに'＆'が無い)
+      var url = new Sdx.Web.Url("http://example.com/path/to/api?foo=bar");
+
+      //各部品の取得
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("/path/to/api", url.LocalPath);
     }
   }
 }
