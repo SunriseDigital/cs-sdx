@@ -25,7 +25,7 @@ namespace Sdx.Db
       select.AfterFromFunc = (sel) => {
         if (sel.ForUpdate)
         {
-          return " WITH (updlock)";
+          return " WITH (UPDLOCK,ROWLOCK)";
         }
 
         return "";

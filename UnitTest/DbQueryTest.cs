@@ -1760,7 +1760,7 @@ namespace UnitTest
         {
           Assert.Equal(db.Sql(@"
 SELECT [shop].[id] AS [id@shop] FROM [shop] 
-  WITH (updlock) 
+  WITH (UPDLOCK,ROWLOCK) 
   WHERE [shop].[id] = @0"), command.CommandText);
         }
         else if(db.Adapter is Sdx.Db.MySqlAdapter)
