@@ -18,7 +18,7 @@ namespace UnitTest
   public class UrlTest : BaseTest
   {
     [Fact]
-    public void TestMethod1()
+    public void TestMultipleParams()
     {
       Console.WriteLine("TestMethod1");
       //コンストラクタで、URLの分解・解析は済ませておく
