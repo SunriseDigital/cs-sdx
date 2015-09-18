@@ -23,183 +23,12 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 namespace UnitTest
 {
   [TestClass]
-  public class DbQueryTest : BaseTest
+  public class DbQueryTest : BaseDbTest
   {
-    /// <summary>
-    /// 複数のDBのテストをまとめて行うためのDbFactoryのラッパークラス
-    /// CreateTestDbList()メソッドで生成しています。
-    /// </summary>
-    class TestDb
-    {
-      private DbCommand command;
-      private List<DbCommand> commands = new List<DbCommand>();
-      public Sdx.Db.Adapter Adapter { get; set; }
-      public String LeftQuoteChar { get; set; }
-      public String RightQupteChar { get; set; }
-      public DbCommand Command
-      {
-        get { return this.command; }
-        set { this.command = value; this.commands.Add(command); }
-      }
-      public List<DbCommand> Commands { get { return this.commands; } }
-      public String Sql(String sql)
-      {
-        return String.Format(sql, this.LeftQuoteChar, this.RightQupteChar);
-      }
-    }
-
     [ClassInitialize]
-    public static void InitilizeClass(TestContext context)
+    public new static void InitilizeClass(TestContext context)
     {
-      ResetMySqlDatabase();
-      ResetSqlServerDatabase();
-    }
-
-    public override void FixtureSetUp()
-    {
-      DbQueryTest.InitilizeClass(null);
-    }
-
-    private static String MySqlConnectionString
-    {
-      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963;"; }
-    }
-
-    private static String SqlServerConnectionString
-    {
-      get { return "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;"; }
-    }
-
-    private static void ResetMySqlDatabase()
-    {
-      Sdx.Db.Adapter factory = new Sdx.Db.MySqlAdapter();
-
-      var masterCon = factory.CreateConnection();
-      masterCon.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=";
-      using (masterCon)
-      {
-        masterCon.Open();
-
-        //drop and create db
-        try
-        {
-          var dropSql = masterCon.CreateCommand();
-          dropSql.CommandText = @"
-DROP DATABASE IF EXISTS `sdxtest` ;
-CREATE DATABASE `sdxtest` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
-GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
-";
-          dropSql.ExecuteNonQuery();
-        }
-        catch (DbException e)
-        {
-          Console.WriteLine(e.Message);
-          //do nothing
-        }
-      }
-
-      factory.ConnectionString = DbQueryTest.MySqlConnectionString;
-      var con = factory.CreateConnection();
-      using (con)
-      {
-        con.Open();
-        DbQueryTest.ExecuteSqlFile(con, "setup.mysql.sql");
-        DbQueryTest.ExecuteSqlFile(con, "insert.sql");
-      }
-
-      Console.WriteLine("ResetMySqlDatabase");
-    }
-
-    [Conditional("ON_VISUAL_STUDIO")]
-    private static void ResetSqlServerDatabase()
-    {
-      //SdxTestデータベースをDROPします
-      Sdx.Db.Adapter factory = new Sdx.Db.SqlServerAdapter();
-      var masterCon = factory.CreateConnection();
-      String pwd = ConfigurationManager.AppSettings["SqlServerSaPwd"];
-      masterCon.ConnectionString = "Server=.\\SQLEXPRESS;Database=master;User Id=sa;Password=" + pwd;
-      using (masterCon)
-      {
-        masterCon.Open();
-
-        //drop db
-        try
-        {
-          var dropSql = masterCon.CreateCommand();
-          dropSql.CommandText = @"
-ALTER DATABASE sdxtest SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
-DROP DATABASE [sdxtest]
-";
-          dropSql.ExecuteNonQuery();
-        }
-        catch (DbException e)
-        {
-          //do nothing
-        }
-
-        //drop user
-        try
-        {
-          var dropUserSql = masterCon.CreateCommand();
-          dropUserSql.CommandText = "DROP LOGIN sdxuser";
-          dropUserSql.ExecuteNonQuery();
-        }
-        catch (DbException e)
-        {
-          //do nothing
-        }
-
-        //create db
-        var createSql = masterCon.CreateCommand();
-        createSql.CommandText = "CREATE DATABASE sdxtest";
-        createSql.ExecuteNonQuery();
-
-        //create user
-        var createUserSql = masterCon.CreateCommand();
-        createUserSql.CommandText = @"
-CREATE LOGIN sdxuser WITH PASSWORD = 'sdx5963';
-ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
-";
-        createUserSql.ExecuteNonQuery();
-      }
-
-      factory.ConnectionString = DbQueryTest.SqlServerConnectionString;
-      var con = factory.CreateConnection();
-      using (con)
-      {
-        con.Open();
-        DbQueryTest.ExecuteSqlFile(con, "setup.sqlserver.sql");
-        DbQueryTest.ExecuteSqlFile(con, "insert.sql");
-      }
-
-      Console.WriteLine("ResetSqlServerDatabase");
-    }
-
-    private static void ExecuteSqlFile(DbConnection con, string dataFilePath)
-    {
-      //setup.sqlを流し込みます。
-      using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
-      {
-        String setupSql = stream.ReadToEnd();
-        DbTransaction sqlTran = con.BeginTransaction();
-        DbCommand command = con.CreateCommand();
-        command.Transaction = sqlTran;
-
-        try
-        {
-          // Execute two separate commands.
-          command.CommandText = setupSql;
-          command.ExecuteNonQuery();
-
-          // Commit the transaction.
-          sqlTran.Commit();
-        }
-        catch (Exception ex)
-        {
-          sqlTran.Rollback();
-          throw ex;
-        }
-      }
+      BaseDbTest.InitilizeClass(context);
     }
 
     [Fact]
@@ -220,8 +49,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
 
         DbCommand command = con.CreateCommand();
-        command.CommandText = "SELECT shop.name as name_shop, category.name as name_category FROM shop"
-          + " INNER JOIN category ON category.id = shop.category_id"
+        command.CommandText = "SELECT shop.name as name_shop, area.name as name_area FROM shop"
+          + " INNER JOIN area ON area.id = shop.area_id"
           + " WHERE shop.id = @shop@id"
           ;
 
@@ -235,47 +64,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
         Assert.Equal(1, dataset.Tables[0].Rows.Count);
         Assert.Equal("天祥", dataset.Tables[0].Rows[0]["name_shop"]);
-        Assert.Equal("中華", dataset.Tables[0].Rows[0]["name_category"]);
+        Assert.Equal("新中野", dataset.Tables[0].Rows[0]["name_area"]);
       }
-    }
-
-    [Fact]
-    public void TestUtilCommandToSql()
-    {
-      SqlCommand cmd;
-
-      cmd = new SqlCommand("SELECT * FROM user WHERE city = @City");
-      cmd.Parameters.AddWithValue("@City", "東京");
-      Assert.Equal("SELECT * FROM user WHERE city = '東京'", Sdx.Db.Util.CommandToSql(cmd));
-
-      cmd = new SqlCommand("SELECT * FROM user WHERE city = @City AND city_code = @CityCode");
-      cmd.Parameters.AddWithValue("@City", "東京");
-      cmd.Parameters.AddWithValue("@CityCode", "tokyo");
-      Assert.Equal("SELECT * FROM user WHERE city = '東京' AND city_code = 'tokyo'", Sdx.Db.Util.CommandToSql(cmd));
-    }
-
-    private List<TestDb> CreateTestDbList()
-    {
-      var list = new List<TestDb>();
-      TestDb testDb;
-
-#if ON_VISUAL_STUDIO
-      testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.SqlServerAdapter();
-      testDb.Adapter.ConnectionString = DbQueryTest.SqlServerConnectionString;
-      testDb.LeftQuoteChar = "[";
-      testDb.RightQupteChar = "]";
-      list.Add(testDb);
-#endif
-
-      testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.MySqlAdapter();
-      testDb.Adapter.ConnectionString = DbQueryTest.MySqlConnectionString;
-      testDb.LeftQuoteChar = "`";
-      testDb.RightQupteChar = "`";
-      list.Add(testDb);
-
-      return list;
     }
 
     [Fact]
@@ -290,25 +80,28 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimple(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
 
-      //Column
-      select.From("shop").Columns("*");
+      //AddColumn
+      select.AddFrom("shop").AddColumns("*");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop", "s").Columns("*");
+      select.RemoveContext("shop").AddFrom("shop", "s").AddColumns("*");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}s{1}.* FROM {0}shop{1} AS {0}s{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("s").From("shop");
-      select.Table("shop").Columns("id");
+      select.RemoveContext("s").AddFrom("shop");
+      select.Context("shop").AddColumns("id");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
@@ -316,50 +109,57 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //SetColumns
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns("id");
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns("id");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns("id", "name");
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns("id", "name");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns(new String[] { "id", "name" });
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      //Columns
-      select.RemoveTable("shop").From("shop").Columns("id");
+      //AddColumns
+      select.RemoveContext("shop").AddFrom("shop").AddColumns("id");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns("name");
+      select.Context("shop").AddColumns("name");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").Columns("id", "name");
+      select.RemoveContext("shop").AddFrom("shop").AddColumns("id", "name");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.RemoveTable("shop").From("shop").Columns(new String[] { "id", "name" });
+      select.RemoveContext("shop").AddFrom("shop").AddColumns(new String[] { "id", "name" });
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -367,29 +167,33 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //ClearColumns
-      select.RemoveTable("shop").From("shop").ClearColumns().Columns(new String[] { "id", "name" });
-      select.Table("shop").ClearColumns().Columns("*");
+      select.RemoveContext("shop").AddFrom("shop").ClearColumns().AddColumns(new String[] { "id", "name" });
+      select.Context("shop").ClearColumns().AddColumns("*");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").ClearColumns().Columns("id");
+      select.Context("shop").ClearColumns().AddColumns("id");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").ClearColumns().Columns("id");
+      select.Context("shop").ClearColumns().AddColumns("id");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}"),
         db.Command.CommandText
       );
 
-      select.Table("shop").Columns("name");
+      select.Context("shop").AddColumns("name");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1}, {0}shop{1}.{0}name{1} FROM {0}shop{1}"),
@@ -409,34 +213,57 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSimpleInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
 
-      select.From("shop").Columns("*");
+      select.AddFrom("shop").AddColumns("*");
 
-      select.Table("shop").InnerJoin(
-        "category",
-        "{0}.category_id = {1}.id"
-      ).Columns("*");
+      select.Context("shop").InnerJoin(
+        "area",
+        db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          )
+      ).AddColumns("*");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id"),
+        db.Sql("SELECT {0}shop{1}.*, {0}area{1}.* FROM {0}shop{1} INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"),
         db.Command.CommandText
       );
 
       //上書きなので順番が入れ替わるはず
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id = {1}.id");
+      select.Context("shop").InnerJoin(
+        "image",
+        db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("main_image_id", "shop"),
+            new Sdx.Db.Query.Column("id", "image")
+          )
+        );
 
       //同じテーブルをJOINしてもAliasを与えなければ上書きになる
-      select.Table("shop").InnerJoin(
-        "category",
-        "{0}.category_id = {1}.id AND {1}.id = 1"
-      ).Columns("*");
+      select.Context("shop").InnerJoin(
+        "area",
+        db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          ).Add(
+            new Sdx.Db.Query.Column("id", "area"),
+            1
+          )
+      ).AddColumns("*");
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.*, {0}category{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} ON {0}shop{1}.main_image_id = {0}image{1}.id INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id AND {0}category{1}.id = 1"),
+        db.Sql("SELECT {0}shop{1}.*, {0}area{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image{1}.{0}id{1} INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} AND {0}area{1}.{0}id{1} = @0"),
         db.Command.CommandText
       );
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters["@0"].Value);
     }
 
     [Fact]
@@ -451,18 +278,28 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectMultipleInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .InnerJoin("category", "{0}.category_id = {1}.id")
-        .InnerJoin("category_type", "{0}.category_type_id = {1}.id");
+        .AddFrom("shop")
+        .InnerJoin("area", db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          )
+        ).InnerJoin("large_area", db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("large_area_id", "area"),
+            new Sdx.Db.Query.Column("id", "large_area")
+          )
+        );
 
-      select.Table("shop").Columns("*");
+      select.Context("shop").AddColumns("*");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
 
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id"),
+        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}"),
         db.Command.CommandText
       );
     }
@@ -482,16 +319,27 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNoColumnInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .InnerJoin("category", "{0}.category_id = {1}.id")
-        .InnerJoin("category_type", "{0}.category_type_id = {1}.id");
+        .AddFrom("shop")
+        .InnerJoin("area", db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          )
+        )
+        .InnerJoin("large_area", db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("large_area_id", "area"),
+            new Sdx.Db.Query.Column("id", "large_area")
+          )
+        );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
 
       Assert.Equal(
-        db.Sql("SELECT  FROM {0}shop{1} INNER JOIN {0}category{1} ON {0}shop{1}.category_id = {0}category{1}.id INNER JOIN {0}category_type{1} ON {0}category{1}.category_type_id = {0}category_type{1}.id"),
+        db.Sql("SELECT FROM {0}shop{1} INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}"),
         db.Command.CommandText
       );
     }
@@ -508,21 +356,35 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSameTableInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Columns("*");
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*");
 
-      select.Table("shop")
-        .InnerJoin("image", "{0}.main_image_id = {1}.id", "main_image")
-        .Columns("*");
+      select.Context("shop")
+        .InnerJoin("image", db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("main_image_id", "shop"),
+            new Sdx.Db.Query.Column("id", "main_image")
+          ), "main_image")
+        .AddColumns("*");
 
-      select.Table("shop")
-        .InnerJoin("image", "{0}.sub_image_id = {1}.id", "sub_image")
-        .Columns("*");
+      select.Context("shop")
+        .InnerJoin("image", db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("sub_image_id", "shop"),
+            new Sdx.Db.Query.Column("id", "sub_image")
+          ), "sub_image")
+        .AddColumns("*");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
 
       Assert.Equal(
-        db.Sql("SELECT {0}shop{1}.*, {0}main_image{1}.*, {0}sub_image{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.main_image_id = {0}main_image{1}.id INNER JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.sub_image_id = {0}sub_image{1}.id"),
+        db.Sql(
+          @"SELECT {0}shop{1}.*, {0}main_image{1}.*, {0}sub_image{1}.* 
+            FROM {0}shop{1} 
+            INNER JOIN {0}image{1} AS {0}main_image{1} ON {0}shop{1}.{0}main_image_id{1} = {0}main_image{1}.{0}id{1} 
+            INNER JOIN {0}image{1} AS {0}sub_image{1} ON {0}shop{1}.{0}sub_image_id{1} = {0}sub_image{1}.{0}id{1}"
+        ),
         db.Command.CommandText
       );
     }
@@ -539,40 +401,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectColumnAlias(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Column("id", "shop_id");
+      var select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumn("id", "shop_id");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.{0}id{1} AS {0}shop_id{1} FROM {0}shop{1}"),
-       db.Command.CommandText
-      );
-
-      select.Table("shop")
-        .ClearColumns()
-        .Columns(new Dictionary<string, object>()
-         { 
-           {"shop_id", "id"},
-           {"shop_name", "name"},
-         });
-
-      db.Command = select.Build();
-      Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.{0}id{1} AS {0}shop_id{1}, {0}shop{1}.{0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
-       db.Command.CommandText
-      );
-
-      select.Table("shop")
-        .ClearColumns()
-        .Columns(new Dictionary<string, object>()
-         { 
-           {"shop_id", "id"},
-           {"shop_name", Sdx.Db.Query.Expr.Wrap("name")},
-         });
-
-      db.Command = select.Build();
-      Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.{0}id{1} AS {0}shop_id{1}, {0}shop{1}.name AS {0}shop_name{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
     }
@@ -589,14 +424,18 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectLeftJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop")
-        .Column("*")
-        .LeftJoin("image", "{0}.main_image_id={1}.id");
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop")
+        .AddColumn("*")
+        .LeftJoin("image", db.Adapter.CreateCondition().Add(
+            new Sdx.Db.Query.Column("main_image_id", "shop"),
+            new Sdx.Db.Query.Column("id", "image")
+        ));
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN {0}image{1} ON {0}shop{1}.main_image_id={0}image{1}.id"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN {0}image{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image{1}.{0}id{1}"),
        db.Command.CommandText
       );
     }
@@ -613,38 +452,63 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectJoinOrder(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
+      var cshop = new Sdx.Db.Query.Column("main_image_id", "shop");
+      var cols = new Dictionary<int, Sdx.Db.Query.Column>();
+      for (int i = 1; i <= 7; i++)
+      {
+        cols[i] = new Sdx.Db.Query.Column("id", "image" + i.ToString());
+      }
 
+      select.AddFrom("shop").AddColumn("*");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[1]), "image1");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[2]), "image2");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[3]), "image3");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[4]), "image4");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[5]), "image5");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[6]), "image6");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[7]), "image7");
+
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
-      Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN {0}image{1} AS {0}image3{1} ON {0}shop{1}.main_image_id={0}image3{1}.id INNER JOIN {0}image{1} AS {0}image5{1} ON {0}shop{1}.main_image_id={0}image5{1}.id INNER JOIN {0}image{1} AS {0}image7{1} ON {0}shop{1}.main_image_id={0}image7{1}.id LEFT JOIN {0}image{1} AS {0}image1{1} ON {0}shop{1}.main_image_id={0}image1{1}.id LEFT JOIN {0}image{1} AS {0}image2{1} ON {0}shop{1}.main_image_id={0}image2{1}.id LEFT JOIN {0}image{1} AS {0}image4{1} ON {0}shop{1}.main_image_id={0}image4{1}.id LEFT JOIN {0}image{1} AS {0}image6{1} ON {0}shop{1}.main_image_id={0}image6{1}.id"),
-       db.Command.CommandText
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.* 
+          FROM {0}shop{1} 
+          INNER JOIN {0}image{1} AS {0}image3{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image3{1}.{0}id{1} 
+          INNER JOIN {0}image{1} AS {0}image5{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image5{1}.{0}id{1} 
+          INNER JOIN {0}image{1} AS {0}image7{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image7{1}.{0}id{1} 
+          LEFT JOIN {0}image{1} AS {0}image1{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image1{1}.{0}id{1} 
+          LEFT JOIN {0}image{1} AS {0}image2{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image2{1}.{0}id{1} 
+          LEFT JOIN {0}image{1} AS {0}image4{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image4{1}.{0}id{1} 
+          LEFT JOIN {0}image{1} AS {0}image6{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image6{1}.{0}id{1}"
+        ),
+        db.Command.CommandText
       );
 
-      select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image1");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image2");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image3");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image4");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image5");
-      select.Table("shop").LeftJoin("image", "{0}.main_image_id={1}.id", "image6");
-      select.Table("shop").InnerJoin("image", "{0}.main_image_id={1}.id", "image7");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumn("*");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[1]), "image1");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[2]), "image2");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[3]), "image3");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[4]), "image4");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[5]), "image5");
+      select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[6]), "image6");
+      select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[7]), "image7");
 
       select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN {0}image{1} AS {0}image1{1} ON {0}shop{1}.main_image_id={0}image1{1}.id LEFT JOIN {0}image{1} AS {0}image2{1} ON {0}shop{1}.main_image_id={0}image2{1}.id INNER JOIN {0}image{1} AS {0}image3{1} ON {0}shop{1}.main_image_id={0}image3{1}.id LEFT JOIN {0}image{1} AS {0}image4{1} ON {0}shop{1}.main_image_id={0}image4{1}.id INNER JOIN {0}image{1} AS {0}image5{1} ON {0}shop{1}.main_image_id={0}image5{1}.id LEFT JOIN {0}image{1} AS {0}image6{1} ON {0}shop{1}.main_image_id={0}image6{1}.id INNER JOIN {0}image{1} AS {0}image7{1} ON {0}shop{1}.main_image_id={0}image7{1}.id"),
-       db.Command.CommandText
+        db.Sql(@"SELECT {0}shop{1}.* 
+          FROM {0}shop{1} 
+          LEFT JOIN {0}image{1} AS {0}image1{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image1{1}.{0}id{1} 
+          LEFT JOIN {0}image{1} AS {0}image2{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image2{1}.{0}id{1} 
+          INNER JOIN {0}image{1} AS {0}image3{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image3{1}.{0}id{1} 
+          LEFT JOIN {0}image{1} AS {0}image4{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image4{1}.{0}id{1} 
+          INNER JOIN {0}image{1} AS {0}image5{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image5{1}.{0}id{1} 
+          LEFT JOIN {0}image{1} AS {0}image6{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image6{1}.{0}id{1} 
+          INNER JOIN {0}image{1} AS {0}image7{1} ON {0}shop{1}.{0}main_image_id{1} = {0}image7{1}.{0}id{1}"),
+        db.Command.CommandText
       );
     }
 
@@ -660,12 +524,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectNonTableColumns(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
 
       //単純なAddColumns
-      select.From("shop");
-      select.Columns("id", "name");
+      select.AddFrom("shop");
+      select.AddColumns("id", "name");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}id{1}, {0}name{1} FROM {0}shop{1}"),
@@ -673,44 +538,34 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       //テーブル名だけすり替える
-      select.RemoveTable("shop").From("category");
+      select.RemoveContext("shop").AddFrom("area");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}id{1}, {0}name{1} FROM {0}category{1}"),
+       db.Sql("SELECT {0}id{1}, {0}name{1} FROM {0}area{1}"),
        db.Command.CommandText
       );
 
       //SetColumns
-      select.RemoveTable("category").From("shop");
-      select.ClearColumns().Columns("name", "category_id");
+      select.RemoveContext("area").AddFrom("shop");
+      select.ClearColumns().AddColumns("name", "area_id");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}name{1}, {0}category_id{1} FROM {0}shop{1}"),
+       db.Sql("SELECT {0}name{1}, {0}area_id{1} FROM {0}shop{1}"),
        db.Command.CommandText
       );
 
-      //Column Dictinary
-      select.ClearColumns().RemoveTable("shop").From("shop");
-      select.Columns(new Dictionary<string, object>() { 
-        {"shop_id", "id"},
-        {"shop_name", "name"}
-      });
-
-      db.Command = select.Build();
-      Assert.Equal(
-       db.Sql("SELECT {0}id{1} AS {0}shop_id{1}, {0}name{1} AS {0}shop_name{1} FROM {0}shop{1}"),
-       db.Command.CommandText
-      );
-
-      //Column MAX
-      select.ClearColumns().RemoveTable("shop").From("shop");
-      select.Column(
-        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Table("shop").AppendAlias("id") + ")"),
+      //AddColumn MAX
+      select.ClearColumns().RemoveContext("shop").AddFrom("shop");
+      select.AddColumn(
+        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Context("shop").AppendName("id") + ")"),
         "max_id"
       );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT MAX({0}shop{1}.{0}id{1}) AS {0}max_id{1} FROM {0}shop{1}"),
@@ -730,39 +585,26 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectMultipleFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
-      select.From("category");
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumn("*");
+      select.AddFrom("area");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, {0}category{1}"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, {0}area{1}"),
        db.Command.CommandText
       );
     }
 
     [Fact]
-    public void trySqlAction()
+    public void TrySqlAction()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        var con = db.Adapter.CreateConnection();
         var command = db.Adapter.CreateCommand();
-        command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}category_id{1} IN (SELECT id FROM category WHERE id = 1)");
-        using (con)
-        {
-          con.Open();
-          command.Connection = con;
-          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
-          DataSet dataset = new DataSet();
-          adapter.SelectCommand = command;
-          adapter.Fill(dataset);
-
-          foreach (DataRow row in dataset.Tables[0].Rows)
-          {
-            Console.WriteLine(Sdx.Diagnostics.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
-          }
-        }
+        command.CommandText = db.Sql("SELECT * FROM shop WHERE {0}area_id{1} IN (SELECT id FROM area WHERE id = 1)");
+        this.ExecCommand(command, db.Adapter);
       }
     }
 
@@ -781,11 +623,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Sdx.Db.Query.Select select;
 
       //selectに対する呼び出し
-      select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumn("*");
 
       select.Where.Add("id", "1");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}id{1} = @0"),
@@ -797,11 +640,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
 
       //tableに対する呼び出し
-      select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumn("*");
 
-      select.Table("shop").Where.Add("id", "1");
+      select.Context("shop").Where.Add("id", "1");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @0"),
@@ -812,15 +656,16 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("1", db.Command.Parameters[0].Value);
 
       //WhereのAdd
-      select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumn("*");
 
       select.Where.Add(
-        select.CreateWhere()
+        db.Adapter.CreateCondition()
           .Add("id", "1")
           .AddOr("id", "2")
       );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @0 OR {0}id{1} = @1)"),
@@ -832,20 +677,21 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("2", db.Command.Parameters[1].Value);
 
       //Where2つをORでつなぐ
-      select = db.Adapter.CreateSelect();
-      select.From("shop").Column("*");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumn("*");
 
       select.Where
         .Add(
-          select.CreateWhere()
+          db.Adapter.CreateCondition()
             .Add("id", "3")
             .Add("id", "4")
         ).AddOr(
-          select.CreateWhere()
+          db.Adapter.CreateCondition()
             .Add("id", "1")
             .AddOr("id", "2")
         );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE ({0}id{1} = @0 AND {0}id{1} = @1) OR ({0}id{1} = @2 OR {0}id{1} = @3)"),
@@ -871,19 +717,23 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectRawSubqueryJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .InnerJoin(
-          Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
-          "{0}.category_id = {1}.id",
+          Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
+          db.Adapter.CreateCondition().Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "sub_cat")
+          ),
           "sub_cat"
         );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM area WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.{0}area_id{1} = {0}sub_cat{1}.{0}id{1}"),
        db.Command.CommandText
       );
 
@@ -902,23 +752,29 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select sub = new Sdx.Db.Query.Select();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("area")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").InnerJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+      select.Context("shop").InnerJoin(
+        sub,
+        db.Adapter.CreateCondition().Add(
+          new Sdx.Db.Query.Column("area_id", "shop"),
+          new Sdx.Db.Query.Column("id", "sub_cat")
+        ), "sub_cat");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.{0}area_id{1} = {0}sub_cat{1}.{0}id{1} WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -939,23 +795,27 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryLeftJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select sub = new Sdx.Db.Query.Select();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("area")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").LeftJoin(sub, "{0}.category_id = {1}.id", "sub_cat");
+      select.Context("shop").LeftJoin(sub, db.Adapter.CreateCondition().Add(
+        new Sdx.Db.Query.Column("area_id", "shop"),
+        new Sdx.Db.Query.Column("id", "sub_cat")
+      ), "sub_cat");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.category_id = {0}sub_cat{1}.id WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} LEFT JOIN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.{0}area_id{1} = {0}sub_cat{1}.{0}id{1} WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -976,23 +836,24 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryWhere(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select sub = new Sdx.Db.Query.Select();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("area")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Table("shop").Where.Add("category_id", sub, Sdx.Db.Query.Comparison.In);
+      select.Context("shop").Where.Add("area_id", sub, Sdx.Db.Query.Comparison.In);
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @0 AND {0}shop{1}.{0}category_id{1} IN (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @1)"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} = @0 AND {0}shop{1}.{0}area_id{1} IN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @1)"),
        db.Command.CommandText
       );
 
@@ -1013,20 +874,21 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectRawSubqueryFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
-      select.From(
-        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM category WHERE id = 1)"),
+      select.AddFrom(
+        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
         "sub_cat"
       );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM category WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @0"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT id FROM area WHERE id = 1) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @0"),
        db.Command.CommandText
       );
 
@@ -1046,23 +908,24 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectSubqueryFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select sub = new Sdx.Db.Query.Select();
       sub
-        .From("category")
-        .Column("id")
+        .AddFrom("area")
+        .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.From(sub, "sub_cat");
+      select.AddFrom(sub, "sub_cat");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}category{1}.{0}id{1} FROM {0}category{1} WHERE {0}category{1}.{0}id{1} = @0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1}, (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} WHERE {0}shop{1}.{0}id{1} = @1"),
        db.Command.CommandText
       );
 
@@ -1083,14 +946,15 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectWhereIn(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
+        .AddFrom("shop")
+        .AddColumn("*")
         .Where
           .Add("id", new string[] { "1", "2" })
           .AddOr("id", new string[] { "3", "4" });
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} IN (@0, @1) OR {0}shop{1}.{0}id{1} IN (@2, @3)"),
@@ -1117,12 +981,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     private void RunSelectGroupHaving(TestDb db)
     {
       //TableにGroup
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("id")
-        .Group("id");
+        .AddFrom("shop")
+        .AddColumn("id")
+        .AddGroup("id");
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} GROUP BY {0}shop{1}.{0}id{1}"),
@@ -1130,14 +995,15 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       );
 
       select.Having.Add(
-        Sdx.Db.Query.Expr.Wrap("SUM({shop}.id)"),
+        Sdx.Db.Query.Expr.Wrap("SUM(shop.id)"),
         10,
         Sdx.Db.Query.Comparison.GreaterEqual
       );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} GROUP BY {0}shop{1}.{0}id{1} HAVING SUM({0}shop{1}.id) >= @0"),
+       db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} GROUP BY {0}shop{1}.{0}id{1} HAVING SUM(shop.id) >= @0"),
        db.Command.CommandText
       );
 
@@ -1145,12 +1011,12 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("10", db.Command.Parameters[0].Value);
 
       //selectに直接
-      select = db.Adapter.CreateSelect();
-      select.From("shop");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop");
 
       select
-        .Column("id")
-        .Group("id");
+        .AddColumn("id")
+        .AddGroup("id");
 
       select.Having.Add(
         Sdx.Db.Query.Expr.Wrap("SUM(id)"),
@@ -1158,6 +1024,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         Sdx.Db.Query.Comparison.GreaterEqual
       );
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}id{1} FROM {0}shop{1} GROUP BY {0}id{1} HAVING SUM(id) >= @0"),
@@ -1180,20 +1047,22 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectOrderLimitOffset(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*");
+        .AddFrom("shop")
+        .AddColumn("*");
 
-      select.Order("id", Sdx.Db.Query.Order.DESC);
+      select.AddOrder("id", Sdx.Db.Query.Order.DESC);
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC"),
        db.Command.CommandText
       );
 
-      select.Limit = 100;
+      select.SetLimit(100);
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
 
       this.AssertCommandText(
@@ -1208,8 +1077,8 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db
       );
 
-      select.Limit = 100;
-      select.Offset = 10;
+      select.SetLimit(100, 10);
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
 
       this.AssertCommandText(
@@ -1223,7 +1092,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100 OFFSET 10"),
         db
       );
-      
+
     }
 
     private void AssertCommandText(Type type, string expected, TestDb db)
@@ -1249,12 +1118,13 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectOrderTable(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("*")
-        .Order("id", Sdx.Db.Query.Order.DESC);
+        .AddFrom("shop")
+        .AddColumn("*")
+        .AddOrder("id", Sdx.Db.Query.Order.DESC);
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}shop{1}.{0}id{1} DESC"),
@@ -1276,13 +1146,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private void RunSelectHavingTable(TestDb db)
     {
-      var select = db.Adapter.CreateSelect();
+      var select = new Sdx.Db.Query.Select();
       select
-        .From("shop")
-        .Column("id")
-        .Group("id")
+        .AddFrom("shop")
+        .AddColumn("id")
+        .AddGroup("id")
         .Having.Add("id", "2", Sdx.Db.Query.Comparison.GreaterEqual);
 
+      select.Adapter = db.Adapter;
       db.Command = select.Build();
       Assert.Equal(
        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} GROUP BY {0}shop{1}.{0}id{1} HAVING {0}shop{1}.{0}id{1} >= @0"),
@@ -1293,32 +1164,626 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Assert.Equal("2", db.Command.Parameters["@0"].Value);
     }
 
-    /// <summary>
-    /// DbCommandを一度実行してみるメソッド。特にAssertはしていません。Syntax errorのチェック用です。
-    /// </summary>
-    /// <param name="select"></param>
-    /// <param name="commands"></param>
-    private void ExecSql(TestDb db)
+    [Fact]
+    public void TestJoinCondition()
     {
-      db.Commands.ForEach(command =>
+      foreach (TestDb db in this.CreateTestDbList())
       {
-        DbConnection con = db.Adapter.CreateConnection();
-        using (con)
-        {
-          con.Open();
-          command.Connection = con;
-          DbDataAdapter adapter = db.Adapter.CreateDataAdapter();
-          DataSet dataset = new DataSet();
-          adapter.SelectCommand = command;
-          adapter.Fill(dataset);
+        RunJoinCondition(db);
+        ExecSql(db);
+      }
+    }
 
-          Console.WriteLine("execDbCommand");
-          foreach (DataRow row in dataset.Tables[0].Rows)
-          {
-            Console.WriteLine(Sdx.Diagnostics.Debug.Dump(Sdx.Db.Util.ToDictionary(row)));
-          }
+    private void RunJoinCondition(TestDb db)
+    {
+      Sdx.Db.Query.Select select = new Sdx.Db.Query.Select();
+
+      //InnerJoin
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*");
+      select.Context("shop").InnerJoin(
+        "area",
+        db.Adapter.CreateCondition().Add(
+          new Sdx.Db.Query.Column("area_id", "shop"),
+          new Sdx.Db.Query.Column("id", "area")
+        )
+      ).AddColumns("*");
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
+        FROM {0}shop{1} 
+        INNER JOIN {0}area{1} 
+          ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"), db.Command.CommandText);
+
+      Assert.Equal(0, db.Command.Parameters.Count);
+
+      //InnerJoin Additional String condition
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*");
+      select.Context("shop").InnerJoin(
+        "area",
+        db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          ).Add(
+            new Sdx.Db.Query.Column("id", "area"),
+            "1"
+          )
+      ).AddColumns("*");
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
+        FROM {0}shop{1} 
+        INNER JOIN {0}area{1} 
+          ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} 
+          AND {0}area{1}.{0}id{1} = @0"), db.Command.CommandText);
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters[0].Value);
+
+      ////InnerJoin Additional Expr condition
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*");
+      select.Context("shop").InnerJoin(
+        "area",
+        db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          ).Add(
+            new Sdx.Db.Query.Column("id", "area"),
+            Sdx.Db.Query.Expr.Wrap(99)
+          )
+      ).AddColumns("*");
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
+        FROM {0}shop{1} 
+        INNER JOIN {0}area{1} 
+          ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} 
+          AND {0}area{1}.{0}id{1} = 99"), db.Command.CommandText);
+
+      Assert.Equal(0, db.Command.Parameters.Count);
+
+      //InnerJoin Additional Subquery
+      var sub = new Sdx.Db.Query.Select();
+      sub.AddFrom("area").AddColumn("id");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*");
+      select.Context("shop").InnerJoin(
+        "area",
+        db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          ).Add(
+            new Sdx.Db.Query.Column("id", "area"),
+            sub,
+            Sdx.Db.Query.Comparison.In
+          )
+      ).AddColumns("*");
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.*
+        FROM {0}shop{1} 
+        INNER JOIN {0}area{1}
+          ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} 
+            AND {0}area{1}.{0}id{1} IN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1})"), db.Command.CommandText);
+
+      ////InnerJoin Additional Subquery and parameter
+      sub = new Sdx.Db.Query.Select();
+      sub.AddFrom("area").AddColumn("id").Where.Add("code", "foo");
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*").Where.Add("name", "bar");
+      select.Context("shop").InnerJoin(
+        "area",
+        db.Adapter.CreateCondition()
+          .Add(
+            new Sdx.Db.Query.Column("area_id", "shop"),
+            new Sdx.Db.Query.Column("id", "area")
+          ).Add(
+            new Sdx.Db.Query.Column("id", "area"),
+            sub,
+            Sdx.Db.Query.Comparison.In
+          )
+      ).AddColumns("*").Where.Add("id", "99");
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.*
+        FROM {0}shop{1}
+        INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+          AND {0}area{1}.{0}id{1} IN 
+            (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}code{1} = @0)
+        WHERE {0}shop{1}.{0}name{1} = @1 
+        AND {0}area{1}.{0}id{1} = @2"), db.Command.CommandText);
+
+      Assert.Equal(3, db.Command.Parameters.Count);
+      Assert.Equal("foo", db.Command.Parameters[0].Value);
+      Assert.Equal("bar", db.Command.Parameters[1].Value);
+      Assert.Equal("99", db.Command.Parameters[2].Value);
+
+      ////InnerJoin Addtional include `OR` right
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*");
+      select.Context("shop")
+        .InnerJoin(
+          "area",
+          db.Adapter.CreateCondition()
+            .Add(
+              new Sdx.Db.Query.Column("area_id", "shop"),
+              new Sdx.Db.Query.Column("id", "area")
+            ).Add(
+              db.Adapter.CreateCondition()
+                .Add(new Sdx.Db.Query.Column("id", "area"), "1")
+                .AddOr(new Sdx.Db.Query.Column("id", "area"), "2")
+            )
+        )
+        .AddColumns("*");
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
+        FROM {0}shop{1}
+        INNER JOIN {0}area{1}
+          ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+            AND ({0}area{1}.{0}id{1} = @0 OR {0}area{1}.{0}id{1} = @1)"), db.Command.CommandText);
+
+      //InnerJoin Addtional include `OR` left
+      select = new Sdx.Db.Query.Select();
+      select.AddFrom("shop").AddColumns("*");
+      select.Context("shop")
+        .InnerJoin(
+          "area",
+          db.Adapter.CreateCondition()
+            .Add(
+              new Sdx.Db.Query.Column("area_id", "shop"),
+              new Sdx.Db.Query.Column("id", "area")
+            ).Add(
+              db.Adapter.CreateCondition()
+                .Add(new Sdx.Db.Query.Column("id", "shop"), "1")
+                .AddOr(new Sdx.Db.Query.Column("id", "shop"), "2")
+            )
+        )
+        .AddColumns("*");
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(db.Sql(@"SELECT {0}shop{1}.*, {0}area{1}.* 
+        FROM {0}shop{1}
+        INNER JOIN {0}area{1}
+          ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+            AND ({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)"), db.Command.CommandText);
+    }
+
+    [Fact]
+    public void TestSelectNestingWhere()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectNestingWhere(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectNestingWhere(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom("shop")
+        .AddColumn("*")
+        .InnerJoin("area", db.Adapter.CreateCondition().Add(
+          new Sdx.Db.Query.Column("area_id", "shop"),
+          new Sdx.Db.Query.Column("id", "area")
+         ))
+        .InnerJoin("large_area", db.Adapter.CreateCondition().Add(
+          new Sdx.Db.Query.Column("large_area_id", "area"),
+          new Sdx.Db.Query.Column("id", "large_area")
+        ));
+
+      select.Context("shop").Where.Add(
+        db.Adapter.CreateCondition().Add(
+          db.Adapter.CreateCondition()
+            .Add("id", "1")
+            .AddOr("id", "2")
+        ).Add(
+          db.Adapter.CreateCondition()
+            .Add("id", "3")
+            .AddOr("id", "4")
+        )
+      );
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+                {0}shop{1}.*
+              FROM {0}shop{1}
+              INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+              INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}
+              WHERE (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1) AND ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))"),
+       db.Command.CommandText
+      );
+
+      Assert.Equal(4, db.Command.Parameters.Count);
+      Assert.Equal("1", db.Command.Parameters["@0"].Value);
+      Assert.Equal("2", db.Command.Parameters["@1"].Value);
+      Assert.Equal("3", db.Command.Parameters["@2"].Value);
+      Assert.Equal("4", db.Command.Parameters["@3"].Value);
+
+      select.Context("area").Where.Add(
+        db.Adapter.CreateCondition().Add(
+          db.Adapter.CreateCondition()
+            .Add("id", "5")
+            .AddOr("id", "6")
+        ).Add(
+          db.Adapter.CreateCondition()
+            .Add("id", "7")
+            .AddOr("id", "8")
+        )
+      );
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+                  {0}shop{1}.*
+                FROM {0}shop{1}
+                INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+                INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}
+                WHERE
+                  (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)
+                  AND
+                  ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))
+                AND
+                  (({0}area{1}.{0}id{1} = @4 OR {0}area{1}.{0}id{1} = @5)
+                  AND
+                  ({0}area{1}.{0}id{1} = @6 OR {0}area{1}.{0}id{1} = @7))"),
+       db.Command.CommandText
+      );
+      Assert.Equal(8, db.Command.Parameters.Count);
+      Assert.Equal("5", db.Command.Parameters["@4"].Value);
+      Assert.Equal("6", db.Command.Parameters["@5"].Value);
+      Assert.Equal("7", db.Command.Parameters["@6"].Value);
+      Assert.Equal("8", db.Command.Parameters["@7"].Value);
+
+      select.Context("large_area").Where.Add(
+        db.Adapter.CreateCondition()
+          .Add("id", "9")
+          .AddOr("id", "10")
+      );
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+                  {0}shop{1}.*
+                FROM {0}shop{1}
+                INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
+                INNER JOIN {0}large_area{1} ON {0}area{1}.{0}large_area_id{1} = {0}large_area{1}.{0}id{1}
+                WHERE
+                  (({0}shop{1}.{0}id{1} = @0 OR {0}shop{1}.{0}id{1} = @1)
+                  AND
+                  ({0}shop{1}.{0}id{1} = @2 OR {0}shop{1}.{0}id{1} = @3))
+                AND
+                  (({0}area{1}.{0}id{1} = @4 OR {0}area{1}.{0}id{1} = @5)
+                  AND
+                  ({0}area{1}.{0}id{1} = @6 OR {0}area{1}.{0}id{1} = @7))
+                AND ({0}large_area{1}.{0}id{1} = @8 OR {0}large_area{1}.{0}id{1} = @9)"),
+       db.Command.CommandText
+      );
+      Assert.Equal(10, db.Command.Parameters.Count);
+      Assert.Equal("9", db.Command.Parameters["@8"].Value);
+      Assert.Equal("10", db.Command.Parameters["@9"].Value);
+    }
+
+    [Fact]
+    public void TestSelectHavingSubquery()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectHavingSubquery(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectHavingSubquery(TestDb db)
+    {
+      var sub = new Sdx.Db.Query.Select();
+      sub
+        .AddFrom("shop_category")
+        .AddColumn("shop_Id")
+        .Where.Add("category_id", 3);
+
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom("shop")
+        .AddColumn("id")
+        .AddGroup("id")
+        .Having.Add("id", sub, Sdx.Db.Query.Comparison.In);
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+      Assert.Equal(
+       db.Sql(@"SELECT
+         {0}shop{1}.{0}id{1}
+        FROM {0}shop{1} 
+        GROUP BY {0}shop{1}.{0}id{1} 
+        HAVING {0}shop{1}.{0}id{1} IN (SELECT {0}shop_category{1}.{0}shop_Id{1} FROM {0}shop_category{1} WHERE {0}shop_category{1}.{0}category_id{1} = @0)"),
+       db.Command.CommandText
+      );
+
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal("3", db.Command.Parameters["@0"].Value);
+    }
+
+    [Fact]
+    public void TestSelectComment()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectComment(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectComment(TestDb db)
+    {
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+
+      //
+      var select = new Sdx.Db.Query.Select();
+      select
+        .SetComment("No where comment")
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddColumn("id");
+
+      var profiler = Sdx.Context.Current.DbProfiler;
+
+      var rset = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+
+      Assert.Equal(1, profiler.Queries.Count);
+      Assert.Equal("No where comment", profiler.Queries[0].Comment);
+
+      //
+      select
+        .SetComment("Where and order limit")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(10)
+        .Context("shop").Where.Add("area_id", 1);
+
+      rset = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+      Assert.Equal(2, profiler.Queries.Count);
+      Assert.Equal("Where and order limit", profiler.Queries[1].Comment);
+
+      //
+      select = new Sdx.Db.Query.Select();
+      select.Adapter = db.Adapter;
+
+      select
+        .SetComment("No where form string")
+        .AddFrom("shop")
+        .AddColumn("id");
+
+      var command = select.Build();
+      using (command.Connection = db.Adapter.CreateConnection())
+      {
+        command.Connection.Open();
+        var reader = db.Adapter.ExecuteReader(command);
+        Assert.Equal(3, profiler.Queries.Count);
+        Assert.Equal("No where form string", profiler.Queries[2].Comment);
+      }
+
+
+      //
+      select
+        .SetComment("Where and order limit from string")
+        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .SetLimit(10)
+        .Context("shop").Where.Add("area_id", 1);
+
+      command = select.Build();
+      using (command.Connection = db.Adapter.CreateConnection())
+      {
+        command.Connection.Open();
+        var reader = db.Adapter.ExecuteReader(command);
+        Assert.Equal(4, profiler.Queries.Count);
+        Assert.Equal("Where and order limit from string", profiler.Queries[3].Comment);
+      }
+    }
+
+    [Fact]
+    public void TestSelectBetween()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectBetween(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectBetween(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom("shop")
+        .AddColumn("id")
+        .Where.AddBetween(
+          "created_at",
+          "2015-12-10 00:00:00",
+          "2015-12-10 23:59:59"
+        );
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE {0}shop{1}.{0}created_at{1} BETWEEN @0 AND @1"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-10 00:00:00", db.Command.Parameters["@0"].Value);
+      Assert.Equal("2015-12-10 23:59:59", db.Command.Parameters["@1"].Value);
+
+      select.Context("shop")
+        .Where.AddBetweenOr(
+          "created_at",
+          "2015-12-20 00:00:00",
+          "2015-12-20 23:59:59"
+        );
+
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} 
+          WHERE {0}shop{1}.{0}created_at{1} BETWEEN @0 AND @1
+          OR {0}shop{1}.{0}created_at{1} BETWEEN @2 AND @3"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-20 00:00:00", db.Command.Parameters["@2"].Value);
+      Assert.Equal("2015-12-20 23:59:59", db.Command.Parameters["@3"].Value);
+    }
+
+    [Fact]
+    public void TestSelectNotBetween()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectNotBetween(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectNotBetween(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select
+        .AddFrom("shop")
+        .AddColumn("id")
+        .Where.AddNotBetween(
+          "created_at",
+          "2015-12-10 00:00:00",
+          "2015-12-10 23:59:59"
+        );
+
+      select.Adapter = db.Adapter;
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE {0}shop{1}.{0}created_at{1} NOT BETWEEN @0 AND @1"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-10 00:00:00", db.Command.Parameters["@0"].Value);
+      Assert.Equal("2015-12-10 23:59:59", db.Command.Parameters["@1"].Value);
+
+      select.Context("shop")
+        .Where.AddNotBetween(
+          "created_at",
+          "2015-12-20 00:00:00",
+          "2015-12-20 23:59:59"
+        );
+
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql(@"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} 
+          WHERE {0}shop{1}.{0}created_at{1} NOT BETWEEN @0 AND @1
+          AND {0}shop{1}.{0}created_at{1} NOT BETWEEN @2 AND @3"),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("2015-12-20 00:00:00", db.Command.Parameters["@2"].Value);
+      Assert.Equal("2015-12-20 23:59:59", db.Command.Parameters["@3"].Value);
+    }
+
+    [Fact]
+    public void TestSelectFree()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectFree(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectFree(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select.Adapter = db.Adapter;
+      select
+        .AddFrom("shop")
+        .AddColumn("id");
+
+      select.Where.Add("id = 1");
+
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE id = 1"),
+        db.Command.CommandText
+      );
+
+      select.Where.Add(" /* foo bar */");
+      db.Command = select.Build();
+      Assert.Equal(
+        db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE id = 1 /* foo bar */"),
+        db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestSelectForUpdate()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectForUpdate(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectForUpdate(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select.ForUpdate = true;
+
+      select.Adapter = db.Adapter;
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddColumn("id")
+        .Where.Add("id", 1)
+        ;
+
+      select.Context("shop").Table.SetColumns("id");
+
+      using (var command = select.Build())
+      {
+        if(db.Adapter is Sdx.Db.SqlServerAdapter)
+        {
+          Assert.Equal(db.Sql(@"
+SELECT [shop].[id] AS [id@shop] FROM [shop] 
+  WITH (UPDLOCK,ROWLOCK) 
+  WHERE [shop].[id] = @0"), command.CommandText);
         }
-      });
+        else if(db.Adapter is Sdx.Db.MySqlAdapter)
+        {
+          Assert.Equal(db.Sql(@"
+SELECT `shop`.`id` AS `id@shop` FROM `shop` 
+  WHERE `shop`.`id` = @0 
+  FOR UPDATE"), command.CommandText);
+        }
+        
+      }
+
+      //実行で例外が出ないかチェック。
+      using (var con = db.Adapter.CreateConnection())
+      {
+        con.Open();
+
+        using (var transaction = con.BeginTransaction())
+        {
+          var shop = db.Adapter.FetchRecord<Test.Orm.Shop>(select, transaction);
+          transaction.Commit();
+        }
+      }
     }
   }
 }

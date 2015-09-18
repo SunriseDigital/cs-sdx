@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{A91E7E02-005E-4329-97AE-38DCFD6A2493}</ProjectGuid>
+    <ProjectGuid>{ED186D94-5AB8-4707-B0A8-60FBD4237D2D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Sdx.Web</RootNamespace>
-    <AssemblyName>Sdx.Web</AssemblyName>
+    <RootNamespace>Sdx</RootNamespace>
+    <AssemblyName>Sdx</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -40,13 +40,41 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="YamlDotNet, Version=3.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\YamlDotNet.3.7.0\lib\net35\YamlDotNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api.cs" />
-    <Compile Include="Holder.cs" />
+    <Compile Include="Config.cs" />
+    <Compile Include="Data\Tree.cs" />
+    <Compile Include="Data\TreeYaml.cs" />
+    <Compile Include="Context.cs" />
+    <Compile Include="Db\Adapter.cs" />
+    <Compile Include="Db\DbException.cs" />
+    <Compile Include="Db\MySqlAdapter.cs" />
+    <Compile Include="Db\Query\Column.cs" />
+    <Compile Include="Db\Query\Condition.cs" />
+    <Compile Include="Db\Query\Context.cs" />
+    <Compile Include="Db\Query\Counter.cs" />
+    <Compile Include="Db\Query\Enums.cs" />
+    <Compile Include="Db\Query\Expr.cs" />
+    <Compile Include="Db\Query\Log.cs" />
+    <Compile Include="Db\Query\Profiler.cs" />
+    <Compile Include="Db\Query\Select.cs" />
+    <Compile Include="Db\Record.cs" />
+    <Compile Include="Db\RecordSet.cs" />
+    <Compile Include="Db\SqlServerAdapter.cs" />
+    <Compile Include="Db\Table.cs" />
+    <Compile Include="Db\TableMeta.cs" />
+    <Compile Include="Diagnostics\Debug.cs" />
+    <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
+    <Compile Include="Diagnostics\DebugHttpModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Url.cs" />
-    <Compile Include="View.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

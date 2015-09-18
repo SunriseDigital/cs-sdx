@@ -64,16 +64,51 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiUseTest.cs" />
+    <Compile Include="BaseDbTest.cs" />
+    <Compile Include="ContextTest.cs" />
+    <Compile Include="DbAdapterTest.cs" />
+    <Compile Include="ConfigTest.cs" />
     <Compile Include="DbQueryTest.cs" />
+    <Compile Include="DbRecordTest.cs" />
+    <Compile Include="DbSelectCloneTest.cs" />
+    <Compile Include="DbTableTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="UrlTest.cs" />
+    <Compile Include="Test\Orm\LargeArea.cs" />
+    <Compile Include="Test\Orm\Category.cs" />
+    <Compile Include="Test\Orm\Image.cs" />
+    <Compile Include="Test\Orm\ShopCategory.cs" />
+    <Compile Include="Test\Orm\Menu.cs" />
+    <Compile Include="Test\Orm\Table\ShopCategory.cs" />
+    <Compile Include="Test\Orm\Table\LargeArea.cs" />
+    <Compile Include="Test\Orm\Table\Area.cs" />
+    <Compile Include="Test\Orm\Table\Category.cs" />
+    <Compile Include="Test\Orm\Table\Image.cs" />
+    <Compile Include="Test\Orm\Table\Menu.cs" />
+    <Compile Include="Test\Orm\Table\Shop.cs" />
+    <Compile Include="Test\Orm\Area.cs" />
+    <Compile Include="Test\Orm\Shop.cs" />
+    <Compile Include="Test\Config\Dir.cs" />
+    <Compile Include="Test\Config\Dir2.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="config\dir2\foo.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\dir\foo.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\sjis.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="config\test.yml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="user.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -81,13 +116,9 @@
     <None Include="user.config.tpl" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Sdx.Db\Sdx.Db.csproj">
-      <Project>{ed1e6ba0-37f0-46cf-a86a-231a6cd2178c}</Project>
-      <Name>Sdx.Db</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Sdx.Diagnostics\Sdx.Diagnostics.csproj">
-      <Project>{e015cb03-532e-4789-bac5-e6542aed9f14}</Project>
-      <Name>Sdx.Diagnostics</Name>
+    <ProjectReference Include="..\Sdx\Sdx.csproj">
+      <Project>{ed186d94-5ab8-4707-b0a8-60fbd4237d2d}</Project>
+      <Name>Sdx</Name>
     </ProjectReference>
     <ProjectReference Include="..\Sdx.Web\Sdx.Web.csproj">
       <Project>{a91e7e02-005e-4329-97ae-38dcfd6a2493}</Project>

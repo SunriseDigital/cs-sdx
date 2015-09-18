@@ -87,5 +87,56 @@ namespace UnitTest
         Debug.Dump(10)
       );
     }
+
+    [Fact]
+    public void TestLog()
+    {
+      Sdx.Context.Current.Timer.Start();
+
+      Sdx.Context.Current.Debug.Out = Console.Out;
+      Sdx.Context.Current.Debug.Log("aaaa");
+
+      Sdx.Context.Current.Debug.Out = new Sdx.Diagnostics.DebugHtmlWriter();
+      Sdx.Context.Current.Debug.Log("aaaa");
+
+      //秒数が出るのでAssertできません。とりあえず。例外が出ないかと空っぽじゃないかをテストしてるだけです。
+      var result = Sdx.Context.Current.Debug.Out.ToString();
+      Console.WriteLine(result.Length);
+      Assert.True(result.Length > 0);
+    }
+
+    [Fact]
+    public void DumpNestedDictionary()
+    {
+      var dic = new Dictionary<string, object>();
+      dic.Add("string", "foobar");
+      dic.Add("array", new string[] { "arr1", "arr2" });
+      dic.Add("dic", new Dictionary<string, string>() {
+        { "key1", "value1"},
+        { "key2", "value2"},
+      });
+      Assert.Equal(
+        @"
+System.Collections.Generic.Dictionary`2(3)
+  string : String(6) foobar
+  array : System.String[](2)
+   String(4) arr1
+   String(4) arr2
+  dic : System.Collections.Generic.Dictionary`2(2)
+   key1 : String(6) value1
+   key2 : String(6) value2".Trim(),
+        Debug.Dump(dic)
+      );
+    }
+
+    [Fact]
+    public void DumpNull()
+    {
+      string str = null;
+      Assert.Equal(
+        "NULL",
+        Debug.Dump(str)
+      );
+    }
   }
 }
