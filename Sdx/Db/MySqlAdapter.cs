@@ -11,14 +11,28 @@ namespace Sdx.Db
       return DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
     }
 
-    internal override string AppendLimitQuery(string selectSql, int limit, int offset)
+    internal override void InitSelectEvent(Query.Select select)
     {
-      selectSql += " LIMIT " + limit;
-      if (offset > 0)
-      {
-        selectSql += " OFFSET " + offset;
-      }
-      return selectSql;
+      //AfterOrderFunc(Limit/Offset+ForUpdate)
+      select.AfterOrderFunc = (sel) => {
+        var result = "";
+
+        if (sel.Limit >= 0)
+        {
+          result += " LIMIT " + sel.Limit;
+          if (sel.Offset > 0)
+          {
+            result += " OFFSET " + sel.Offset;
+          }
+        }
+
+        if (sel.ForUpdate)
+        {
+          result += " FOR UPDATE";
+        }
+
+        return result;
+      };
     }
 
     protected override string SecureConnectionString

@@ -7,21 +7,24 @@ namespace Sdx.Db.Query
 {
   public class Select : ICloneable
   {
+    public const string CommentParameterKey = "##Sdx.Db.Query.Select.Comment##";
+
     private List<Context> contextList = new List<Context>();
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
+    private Condition where;
+    private Condition having;
 
     public string Comment { get; set; }
+    internal Func<Select, string> AfterFromFunc { get; set; }
+    internal Func<Select, string> AfterOrderFunc { get; set; }
 
     public Select SetComment(string comment)
     {
       this.Comment = comment;
       return this;
     }
-
-    private Condition where;
-    private Condition having;
 
     public Select()
     {
@@ -38,7 +41,21 @@ namespace Sdx.Db.Query
       this.Adapter = adapter;
     }
 
-    public Adapter Adapter { get; set; }
+    private Adapter adapter;
+
+    public Adapter Adapter
+    {
+      get
+      {
+        return this.adapter;
+      }
+
+      set
+      {
+        this.adapter = value;
+        this.adapter.InitSelectEvent(this);
+      }
+    }
 
     internal List<Context> ContextList
     {
@@ -130,6 +147,11 @@ namespace Sdx.Db.Query
 
       selectString += fromString;
 
+      if (AfterFromFunc != null)
+      {
+        selectString += this.AfterFromFunc(this);
+      }
+
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
@@ -196,10 +218,10 @@ namespace Sdx.Db.Query
         selectString += " ORDER BY " + orderString;
       }
 
-      //LIMIT/OFFSET
-      if(this.Limit > -1)
+
+      if (AfterOrderFunc != null)
       {
-        selectString = this.Adapter.AppendLimitQuery(selectString, this.Limit, this.Offset);
+        selectString += this.AfterOrderFunc(this);
       }
 
       return selectString;
@@ -247,8 +269,6 @@ namespace Sdx.Db.Query
 
       return joinString;
     }
-
-    public const string CommentParameterKey = "##Sdx.Db.Query.Select.Comment##";
 
     public DbCommand Build()
     {
@@ -413,9 +433,9 @@ namespace Sdx.Db.Query
       }
     }
 
-    private int Limit { get; set; }
+    public int Limit { get; private set; }
 
-    private int Offset { get; set; }
+    public int Offset { get; private set; }
 
     public Select SetLimit(int limit, int offset = 0)
     {
@@ -466,5 +486,7 @@ namespace Sdx.Db.Query
 
       return cloned;
     }
+
+    public bool ForUpdate { get; set; }
   }
 }

@@ -44,6 +44,8 @@ namespace Sdx.Db
       return param;
     }
 
+    internal abstract void InitSelectEvent(Select select);
+
     public DbCommand CreateCommand()
     {
       return this.factory.CreateCommand();
@@ -120,8 +122,6 @@ namespace Sdx.Db
         throw new NotSupportedException("QuoteIdentifier support only Query.Expr or string, "+obj.GetType()+" given.");
       }
     }
-
-    internal abstract string AppendLimitQuery(string selectSql, int limit, int offset);
 
     private T Fetch<T>(DbCommand command, Func<T> func)
     {

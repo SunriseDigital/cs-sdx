@@ -1729,5 +1729,61 @@ namespace UnitTest
         db.Command.CommandText
       );
     }
+
+    [Fact]
+    public void TestSelectForUpdate()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectForUpdate(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectForUpdate(TestDb db)
+    {
+      var select = new Sdx.Db.Query.Select();
+      select.ForUpdate = true;
+
+      select.Adapter = db.Adapter;
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddColumn("id")
+        .Where.Add("id", 1)
+        ;
+
+      select.Context("shop").Table.SetColumns("id");
+
+      using (var command = select.Build())
+      {
+        if(db.Adapter is Sdx.Db.SqlServerAdapter)
+        {
+          Assert.Equal(db.Sql(@"
+SELECT [shop].[id] AS [id@shop] FROM [shop] 
+  WITH (updlock) 
+  WHERE [shop].[id] = @0"), command.CommandText);
+        }
+        else if(db.Adapter is Sdx.Db.MySqlAdapter)
+        {
+          Assert.Equal(db.Sql(@"
+SELECT `shop`.`id` AS `id@shop` FROM `shop` 
+  WHERE `shop`.`id` = @0 
+  FOR UPDATE"), command.CommandText);
+        }
+        
+      }
+
+      //実行で例外が出ないかチェック。
+      using (var con = db.Adapter.CreateConnection())
+      {
+        con.Open();
+
+        using (var transaction = con.BeginTransaction())
+        {
+          var shop = db.Adapter.FetchRecord<Test.Orm.Shop>(select, transaction);
+          transaction.Commit();
+        }
+      }
+    }
   }
 }

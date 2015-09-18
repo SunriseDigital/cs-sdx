@@ -11,18 +11,35 @@ namespace Sdx.Db
       return DbProviderFactories.GetFactory("System.Data.SqlClient");
     }
 
-    internal override string AppendLimitQuery(string selectSql, int limit, int offset)
-    {
-      selectSql += " OFFSET " + offset + " ROWS FETCH NEXT " + limit + " ROWS ONLY";
-      return selectSql;
-    }
-
     protected override string SecureConnectionString
     {
       get
       {
         return Regex.Replace(this.ConnectionString, "(P|p)assword=[^;]+", "${1}assword=" + PWD_FOR_SECURE_CONNECTION_STRING);
       }
+    }
+
+    internal override void InitSelectEvent(Query.Select select)
+    {
+      //AfterFromFunc(ForUpdate)
+      select.AfterFromFunc = (sel) => {
+        if (sel.ForUpdate)
+        {
+          return " WITH (updlock)";
+        }
+
+        return "";
+      };
+
+      //AfterOrderFunc(Limit/Offset)
+      select.AfterOrderFunc = (sel) => {
+        if (sel.Limit >= 0)
+        {
+          return " OFFSET " + sel.Offset + " ROWS FETCH NEXT " + sel.Limit + " ROWS ONLY";
+        }
+
+        return "";
+      };
     }
   }
 }
