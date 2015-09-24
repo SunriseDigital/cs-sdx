@@ -300,7 +300,7 @@ namespace UnitTest
 
     private void RunFetchDictionary(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
@@ -314,7 +314,7 @@ namespace UnitTest
       Assert.Equal("天祥", strDic["name"]);
       Assert.Equal("", strDic["main_image_id"]);
 
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -323,7 +323,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      var objDic = db.Adapter.FetchDictionary<object>(sel);
+      var objDic = sel.FetchDictionary<object>();
       Assert.IsType<Dictionary<string, object>>(objDic);
       Assert.Equal(3, objDic["id"]);
       Assert.Equal("天府舫", objDic["name"]);
@@ -496,7 +496,7 @@ namespace UnitTest
       }
 
 
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -509,13 +509,13 @@ namespace UnitTest
       {
         Dictionary<string, object> objDic;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          objDic = db.Adapter.FetchDictionary<object>(sel, con);
+          objDic = sel.FetchDictionary<object>(con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        objDic = db.Adapter.FetchDictionary<object>(sel, con);
+        objDic = sel.FetchDictionary<object>(con);
         Assert.IsType<Dictionary<string, object>>(objDic);
         Assert.Equal(3, objDic["id"]);
         Assert.Equal("天府舫", objDic["name"]);

@@ -380,30 +380,6 @@ namespace Sdx.Db
       });
     }
 
-    public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbTransaction transaction)
-    {
-      return this.FetchDictionary<T>(select, transaction.Connection, transaction);
-    }
-
-    public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbConnection connection = null)
-    {
-      return this.FetchDictionary<T>(select, connection, null);
-    }
-
-    public Dictionary<string, T> FetchDictionary<T>(Query.Select select, DbConnection connection, DbTransaction transaction)
-    {
-      select.Adapter = this;
-      Dictionary<string, T> result;
-      using (var command = select.Build())
-      {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.FetchDictionary<T>(command);
-      }
-
-      return result;
-    }
-
     public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
     {
       return this.Fetch<Dictionary<string, T>>(command, () => {
@@ -443,6 +419,11 @@ namespace Sdx.Db
       }
 
       return prefix + SecureConnectionString;
+    }
+
+    public Query.Select CreateSelect()
+    {
+      return new Query.Select(this);
     }
   }
 }

@@ -185,7 +185,7 @@ namespace Sdx.Db.Query
         var groupString = "";
         this.GroupList.ForEach(column =>
         {
-          if(groupString != "")
+          if (groupString != "")
           {
             groupString += ", ";
           }
@@ -197,18 +197,18 @@ namespace Sdx.Db.Query
       }
 
       //Having
-      if(this.having.Count > 0)
+      if (this.having.Count > 0)
       {
         selectString += " HAVING ";
         selectString += this.having.Build(this, parameters, condCount);
       }
 
       //ORDER
-      if(this.orders.Count > 0)
+      if (this.orders.Count > 0)
       {
         var orderString = "";
-        this.orders.ForEach(column => { 
-          if(orderString.Length > 0)
+        this.orders.ForEach(column => {
+          if (orderString.Length > 0)
           {
             orderString += ", ";
           }
@@ -243,7 +243,7 @@ namespace Sdx.Db.Query
         {
           select.Adapter = this.Adapter;
         }
-        
+
         string subquery = select.BuildSelectString(parameters, condCount);
         joinString += "(" + subquery + ")";
       }
@@ -334,7 +334,7 @@ namespace Sdx.Db.Query
       {
         this.columns.RemoveAll(column => column.ContextName != null && column.ContextName == contextName);
       }
-      
+
       return this;
     }
 
@@ -424,7 +424,7 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Condition Having 
+    public Condition Having
     {
       get
       {
@@ -488,5 +488,29 @@ namespace Sdx.Db.Query
     }
 
     public bool ForUpdate { get; set; }
+
+
+    public Dictionary<string, T> FetchDictionary<T>(DbTransaction transaction)
+    {
+      return this.FetchDictionary<T>(transaction.Connection, transaction);
+    }
+
+    public Dictionary<string, T> FetchDictionary<T>(DbConnection connection = null)
+    {
+      return this.FetchDictionary<T>(connection, null);
+    }
+
+    public Dictionary<string, T> FetchDictionary<T>(DbConnection connection, DbTransaction transaction)
+    {
+      Dictionary<string, T> result;
+      using (var command = this.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.Adapter.FetchDictionary<T>(command);
+      }
+
+      return result;
+    }
   }
 }
