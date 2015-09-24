@@ -70,6 +70,25 @@ namespace UnitTest
       Assert.Equal("example.com", url.Domain);
       Assert.Equal("http", url.Scheme);
       Assert.Equal("/path/to/api", url.LocalPath);
+
+      //パラメータの追加(プロパティ経由)
+      url.Param["key"] = "value";
+      Assert.Equal("value", url.Param["key"]);
+      Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
+
+      //パラメータの追加(引数で)
+      var param = new Dictionary<string, string>() { {"foo", "bar"} };
+      Assert.Equal("http://example.com/path/to/api?key=value&foo=bar", url.Build(param));
+      Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
+
+      //パラメータ削除
+      var array = new string[] { "key" };
+      Assert.Equal("http://example.com/path/to/api", url.Build(array));
+      Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
+
+      var list = new List<string>() { "key" };
+      Assert.Equal("http://example.com/path/to/api", url.Build(list));
+      Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
     }
 
     [Fact]
@@ -83,6 +102,25 @@ namespace UnitTest
       Assert.Equal("example.com", url.Domain);
       Assert.Equal("http", url.Scheme);
       Assert.Equal("/path/to/api", url.LocalPath);
+
+      //パラメータの追加(プロパティ経由)
+      url.Param["key"] = "value";
+      Assert.Equal("value", url.Param["key"]);
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
+
+      //パラメータの追加(引数で)
+      var param = new Dictionary<string, string>() { { "hoge", "fuga" } };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value&hoge=fuga", url.Build(param));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
+
+      //パラメータ削除
+      var array = new string[] { "key" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar", url.Build(array));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
+
+      var list = new List<string>() { "key" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar", url.Build(list));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
     }
   }
 }
