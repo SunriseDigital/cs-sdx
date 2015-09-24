@@ -35,18 +35,24 @@ namespace UnitTest
 
     private void RunUpdate(TestDb testDb)
     {
-      var db = new Sdx.Db.SqlServerAdapter();
-      db.ConnectionString = "SomeConnectionString...";
+      //var db = new Sdx.Db.SqlServerAdapter();
+      //db.ConnectionString = "SomeConnectionString...";
 
-      db.Insert("shop", new Dictionary<string, string> {
-        { "name", "FooBar" },
-        { "area_id", "1"}
-      });
+      //using (var conn = db.CreateConnection())
+      //{
+      //  conn.Open();
+      //  using (var transaction = conn.BeginTransaction())
+      //  {
+      //    db.Insert("shop", new Dictionary<string, string> {
+      //      { "name", "FooBar" },
+      //      { "area_id", "1"}
+      //    });
+      //  }
+      //}
 
       //var db = testDb.Adapter;
 
       //var shop = new Test.Orm.Shop();
-
       //shop
       //  .Set("name", "FooBar")
       //  .Set("area_id", "1");
