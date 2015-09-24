@@ -512,5 +512,28 @@ namespace Sdx.Db.Query
 
       return result;
     }
+
+    public T FetchOne<T>(DbTransaction transaction)
+    {
+      return this.FetchOne<T>(transaction.Connection, transaction);
+    }
+
+    public T FetchOne<T>(DbConnection connection = null)
+    {
+      return this.FetchOne<T>(connection, null);
+    }
+
+    private T FetchOne<T>(DbConnection connection, DbTransaction transaction)
+    {
+      T result = default(T);
+      using (var command = this.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.Adapter.FetchOne<T>(command);
+      }
+
+      return result;
+    }
   }
 }

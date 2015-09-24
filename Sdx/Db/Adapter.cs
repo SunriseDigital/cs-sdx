@@ -344,30 +344,6 @@ namespace Sdx.Db
       });
     }
 
-    public T FetchOne<T>(Query.Select select, DbTransaction transaction)
-    {
-      return this.FetchOne<T>(select, transaction.Connection, transaction);
-    }
-
-    public T FetchOne<T>(Query.Select select, DbConnection connection = null)
-    {
-      return this.FetchOne<T>(select, connection, null);
-    }
-
-    private T FetchOne<T>(Query.Select select, DbConnection connection, DbTransaction transaction)
-    {
-      select.Adapter = this;
-      T result = default(T);
-      using (var command = select.Build())
-      {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.FetchOne<T>(command);
-      }
-
-      return result;
-    }
-
     public T FetchOne<T>(DbCommand command)
     {
       return this.Fetch<T>(command, () => {

@@ -101,7 +101,7 @@ namespace UnitTest
       Assert.Equal("", list[0]["main_image_id"]);
       Assert.Equal("エスペリア", list[1]["name"]);
 
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -145,7 +145,7 @@ namespace UnitTest
       Assert.Equal("エスペリア", list[1].Value);
 
 
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -188,7 +188,7 @@ namespace UnitTest
       Assert.Equal("天祥", list[0]);
       Assert.Equal("エスペリア", list[1]);
 
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -204,7 +204,7 @@ namespace UnitTest
       Assert.Equal("Freeve", list[1]);
 
       //int
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 4, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -220,7 +220,7 @@ namespace UnitTest
       Assert.Equal(6, intList[1]);
 
       //datetime
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .AddColumns("created_at")
@@ -260,7 +260,7 @@ namespace UnitTest
       Assert.Equal(1, intValue);
 
       //string
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -269,13 +269,13 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      var strValue = db.Adapter.FetchOne<string>(sel);
+      var strValue = sel.FetchOne<string>();
       Assert.IsType<string>(strValue);
       Assert.Equal("天府舫", strValue);
 
 
       //string
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 3, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -284,7 +284,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      var dtValue = db.Adapter.FetchOne<DateTime>(sel);
+      var dtValue = sel.FetchOne<DateTime>();
       Assert.IsType<DateTime>(dtValue);
       Assert.Equal("2015-01-04 12:30:00", dtValue.ToString("yyyy-MM-dd HH:mm:ss"));
     }
@@ -350,7 +350,7 @@ namespace UnitTest
 
     private void RunFetchOneWithConnection(TestDb db)
     {
-      var select = new Sdx.Db.Query.Select();
+      var select = db.Adapter.CreateSelect();
       select
         .AddFrom(new Test.Orm.Table.Shop())
         .AddOrder("id", Sdx.Db.Query.Order.ASC)
@@ -360,13 +360,13 @@ namespace UnitTest
       {
         string id = null;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          id = db.Adapter.FetchOne<string>(select, con);
+          id = select.FetchOne<string>(con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        id = db.Adapter.FetchOne<string>(select, con);
+        id = select.FetchOne<string>(con);
         Assert.Equal("1", id);
         Assert.Equal(System.Data.ConnectionState.Open, con.State);
       }
@@ -431,7 +431,7 @@ namespace UnitTest
       }
 
 
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -561,8 +561,8 @@ namespace UnitTest
         Assert.Equal("", list[0]["main_image_id"]);
         Assert.Equal("エスペリア", list[1]["name"]);
       }
-      
-      sel = new Sdx.Db.Query.Select();
+
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
@@ -628,7 +628,7 @@ namespace UnitTest
         Assert.Equal("エスペリア", list[1].Value);
       }
 
-      sel = new Sdx.Db.Query.Select();
+      sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
         .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
