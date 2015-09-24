@@ -25,6 +25,82 @@ namespace UnitTest
     }
 
     [Fact]
+    public void TestConnection()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunConnection(db);
+      }
+    }
+
+    private void RunConnection(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select
+        .SetLimit(1)
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddOrder("id", Sdx.Db.Query.Order.ASC);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        var command = select.Build();
+        var shop = db.FetchDictionary<object>(command, conn);
+        Assert.Equal(command.Connection, conn.DbConnection);
+        Assert.Equal(command.Transaction, conn.DbTransaction);
+        conn.Commit();
+      }
+
+      //commandにちゃんとConnectionとTransactionが代入されてるかのテストだったが、readerを閉じ忘れてるバグを発見したので全Fetch系をテストします。
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        var command = select.Build();
+        var id = db.FetchOne<string>(command, conn);
+        Assert.Equal(command.Connection, conn.DbConnection);
+        Assert.Equal(command.Transaction, conn.DbTransaction);
+        conn.Commit();
+      }
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        var command = select.Build();
+        var result = db.FetchList<string>(command, conn);
+        Assert.Equal(command.Connection, conn.DbConnection);
+        Assert.Equal(command.Transaction, conn.DbTransaction);
+        conn.Commit();
+      }
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        var command = select.Build();
+        var result = db.FetchKeyValuePairList<string, string>(command, conn);
+        Assert.Equal(command.Connection, conn.DbConnection);
+        Assert.Equal(command.Transaction, conn.DbTransaction);
+        conn.Commit();
+      }
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        var command = select.Build();
+        var result = db.FetchDictionaryList<string>(command, conn);
+        Assert.Equal(command.Connection, conn.DbConnection);
+        Assert.Equal(command.Transaction, conn.DbTransaction);
+        conn.Commit();
+      }
+    }
+
+    [Fact]
     public void TestUpdate()
     {
       foreach (TestDb db in this.CreateTestDbList())

@@ -8,7 +8,7 @@ namespace Sdx.Db
 {
   public abstract class Adapter
   {
-    private DbProviderFactory factory;
+    internal DbProviderFactory Factory { get; private set; }
     private DbCommandBuilder builder;
     public const string PWD_FOR_SECURE_CONNECTION_STRING = "******";
 
@@ -24,20 +24,20 @@ namespace Sdx.Db
 
     public Adapter()
     {
-      this.factory = this.GetFactory();
-      this.builder = this.factory.CreateCommandBuilder();
+      this.Factory = this.GetFactory();
+      this.builder = this.Factory.CreateCommandBuilder();
     }
 
-    public DbConnection CreateConnection()
+    public Connection CreateConnection()
     {
-      DbConnection con = this.factory.CreateConnection();
+      var con = new Connection(this);
       con.ConnectionString = this.ConnectionString;
       return con;
     }
 
     public DbParameter CreateParameter(string key, string value)
     {
-      DbParameter param = this.factory.CreateParameter();
+      DbParameter param = this.Factory.CreateParameter();
       param.ParameterName = key;
       param.Value = value;
 
@@ -48,17 +48,17 @@ namespace Sdx.Db
 
     public DbCommand CreateCommand()
     {
-      return this.factory.CreateCommand();
+      return this.Factory.CreateCommand();
     }
 
     public DbCommandBuilder CreateCommandBuilder()
     {
-      return this.factory.CreateCommandBuilder();
+      return this.Factory.CreateCommandBuilder();
     }
 
     public DbDataAdapter CreateDataAdapter()
     {
-      return this.factory.CreateDataAdapter();
+      return this.Factory.CreateDataAdapter();
     }
 
     public DbDataReader ExecuteReader(DbCommand command)
@@ -123,32 +123,36 @@ namespace Sdx.Db
       }
     }
 
-    internal T Fetch<T>(DbCommand command, Func<T> func)
+    internal T Fetch<T>(DbCommand command, Connection connection, Func<DbDataReader, T> func)
     {
-      T result = default(T);
-      if (command.Connection == null)
+      if (connection == null)
       {
         using (var con = this.CreateConnection())
         {
           con.Open();
-          command.Connection = con;
-          result = func();
+          command.Connection = con.DbConnection;
+          using (var reader = this.ExecuteReader(command))
+          {
+            return func(reader);
+          }
         }
       }
       else
       {
-        result = func();
+        command.Connection = connection.DbConnection;
+        command.Transaction = connection.DbTransaction;
+        using (var reader = this.ExecuteReader(command))
+        {
+          return func(reader);
+        }
       }
-
-      return result;
     }
 
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command, Connection connection = null)
     {
-      return this.Fetch<List<Dictionary<string, T>>>(command, () => {
+      return this.Fetch<List<Dictionary<string, T>>>(command, connection, (reader) => {
         var list = new List<Dictionary<string, T>>();
 
-        var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
           var row = new Dictionary<string, T>();
@@ -164,11 +168,10 @@ namespace Sdx.Db
       });
     }
 
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command)
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command, Connection connection = null)
     {
-      return this.Fetch<List<KeyValuePair<TKey, TValue>>>(command, () => {
+      return this.Fetch<List<KeyValuePair<TKey, TValue>>>(command, connection, (reader) => {
         var list = new List<KeyValuePair<TKey, TValue>>();
-        var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
           var row = new KeyValuePair<TKey, TValue>(
@@ -182,11 +185,10 @@ namespace Sdx.Db
       });
     }
 
-    public List<T> FetchList<T>(DbCommand command)
+    public List<T> FetchList<T>(DbCommand command, Connection connection = null)
     {
-      return this.Fetch<List<T>>(command, () => {
+      return this.Fetch<List<T>>(command, connection, (reader) => {
         var list = new List<T>();
-        var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
           list.Add(this.castDbValue<T>(reader.GetValue(0)));
@@ -195,23 +197,22 @@ namespace Sdx.Db
       });
     }
 
-    public T FetchOne<T>(DbCommand command)
+    public T FetchOne<T>(DbCommand command, Connection connection = null)
     {
-      return this.Fetch<T>(command, () => {
-        var reader = this.ExecuteReader(command);
+      return this.Fetch<T>(command, connection, (reader) => {
         while (reader.Read())
         {
           return this.castDbValue<T>(reader.GetValue(0));
         }
+
         return default(T);
       });
     }
 
-    public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
+    public Dictionary<string, T> FetchDictionary<T>(DbCommand command, Connection connection = null)
     {
-      return this.Fetch<Dictionary<string, T>>(command, () => {
+      return this.Fetch<Dictionary<string, T>>(command, connection, (reader) => {
         var dic = new Dictionary<string, T>();
-        var reader = this.ExecuteReader(command);
         while (reader.Read())
         {
           for (var i = 0; i < reader.FieldCount; i++)
@@ -221,6 +222,7 @@ namespace Sdx.Db
 
           break;
         }
+
         return dic;
       });
     }

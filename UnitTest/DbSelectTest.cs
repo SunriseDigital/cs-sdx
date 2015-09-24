@@ -48,7 +48,7 @@ namespace UnitTest
         con.Open();
 
 
-        DbCommand command = con.CreateCommand();
+        DbCommand command = con.DbConnection.CreateCommand();
         command.CommandText = "SELECT shop.name as name_shop, area.name as name_area FROM shop"
           + " INNER JOIN area ON area.id = shop.area_id"
           + " WHERE shop.id = @shop@id"
@@ -1566,8 +1566,9 @@ namespace UnitTest
         .AddColumn("id");
 
       var command = select.Build();
-      using (command.Connection = db.Adapter.CreateConnection())
+      using (var con = db.Adapter.CreateConnection())
       {
+        command.Connection = con.DbConnection;
         command.Connection.Open();
         var reader = db.Adapter.ExecuteReader(command);
         Assert.Equal(3, profiler.Queries.Count);
@@ -1583,8 +1584,9 @@ namespace UnitTest
         .Context("shop").Where.Add("area_id", 1);
 
       command = select.Build();
-      using (command.Connection = db.Adapter.CreateConnection())
+      using (var con = db.Adapter.CreateConnection())
       {
+        command.Connection = con.DbConnection;
         command.Connection.Open();
         var reader = db.Adapter.ExecuteReader(command);
         Assert.Equal(4, profiler.Queries.Count);
@@ -1777,12 +1779,9 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       using (var con = db.Adapter.CreateConnection())
       {
         con.Open();
-
-        using (var transaction = con.BeginTransaction())
-        {
-          var shop = select.FetchRecord<Test.Orm.Shop>(transaction);
-          transaction.Commit();
-        }
+        con.BeginTransaction();
+        var shop = select.FetchRecord<Test.Orm.Shop>(con);
+        con.Commit();
       }
     }
   }

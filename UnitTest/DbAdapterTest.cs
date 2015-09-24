@@ -44,7 +44,7 @@ namespace UnitTest
       using (var con = db.CreateConnection())
       {
         con.Open();
-        command.Connection = con;
+        command.Connection = con.DbConnection;
         var reader = db.ExecuteReader(command);
       }
 
@@ -64,7 +64,7 @@ namespace UnitTest
       using (var con = db.CreateConnection())
       {
         con.Open();
-        command.Connection = con;
+        command.Connection = con.DbConnection;
         var reader = db.ExecuteReader(command);
       }
 
@@ -375,17 +375,16 @@ namespace UnitTest
       {
         select.Adapter = db.Adapter;
         var command = select.Build();
-        command.Connection = con;
 
         string id = null;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          id = db.Adapter.FetchOne<string>(command);
+          id = db.Adapter.FetchOne<string>(command, con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        id = db.Adapter.FetchOne<string>(command);
+        id = db.Adapter.FetchOne<string>(command, con);
         Assert.Equal("1", id);
       }
     }
@@ -414,16 +413,15 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
-        command.Connection = con;
 
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          list = db.Adapter.FetchList<string>(command);
+          list = db.Adapter.FetchList<string>(command, con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = db.Adapter.FetchList<string>(command);
+        list = db.Adapter.FetchList<string>(command, con);
         Assert.IsType<List<string>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天祥", list[0]);
@@ -480,9 +478,8 @@ namespace UnitTest
       {
         Dictionary<string, string> strDic = null;
         var command = sel.Build();
-        command.Connection = con;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          strDic = db.Adapter.FetchDictionary<string>(command);
+          strDic = db.Adapter.FetchDictionary<string>(command, con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
@@ -546,15 +543,14 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
-        command.Connection = con;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          list = db.Adapter.FetchDictionaryList<string>(command);
+          list = db.Adapter.FetchDictionaryList<string>(command, con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         command.Connection.Open();
-        list = db.Adapter.FetchDictionaryList<string>(command);
+        list = db.Adapter.FetchDictionaryList<string>(command, con);
         Assert.IsType<List<Dictionary<string, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天祥", list[0]["name"]);
@@ -611,15 +607,14 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
-        command.Connection = con;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          list = db.Adapter.FetchKeyValuePairList<int, string>(command);
+          list = db.Adapter.FetchKeyValuePairList<int, string>(command, con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = db.Adapter.FetchKeyValuePairList<int, string>(command);
+        list = db.Adapter.FetchKeyValuePairList<int, string>(command, con);
         Assert.IsType<List<KeyValuePair<int, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal(1, list[0].Key);

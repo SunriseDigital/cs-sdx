@@ -489,135 +489,64 @@ namespace Sdx.Db.Query
 
     public bool ForUpdate { get; set; }
 
-
-    public Dictionary<string, T> FetchDictionary<T>(DbTransaction transaction)
-    {
-      return this.FetchDictionary<T>(transaction.Connection, transaction);
-    }
-
-    public Dictionary<string, T> FetchDictionary<T>(DbConnection connection = null)
-    {
-      return this.FetchDictionary<T>(connection, null);
-    }
-
-    public Dictionary<string, T> FetchDictionary<T>(DbConnection connection, DbTransaction transaction)
+    public Dictionary<string, T> FetchDictionary<T>(Connection connection = null)
     {
       Dictionary<string, T> result;
       using (var command = this.Build())
       {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.Adapter.FetchDictionary<T>(command);
+        result = this.Adapter.FetchDictionary<T>(command, connection);
       }
 
       return result;
     }
 
-    public T FetchOne<T>(DbTransaction transaction)
-    {
-      return this.FetchOne<T>(transaction.Connection, transaction);
-    }
-
-    public T FetchOne<T>(DbConnection connection = null)
-    {
-      return this.FetchOne<T>(connection, null);
-    }
-
-    private T FetchOne<T>(DbConnection connection, DbTransaction transaction)
+    public T FetchOne<T>(Connection connection = null)
     {
       T result = default(T);
       using (var command = this.Build())
       {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.Adapter.FetchOne<T>(command);
+        result = this.Adapter.FetchOne<T>(command, connection);
       }
 
       return result;
     }
 
-    public List<T> FetchList<T>(DbTransaction transaction)
-    {
-      return this.FetchList<T>(transaction.Connection, transaction);
-    }
-
-    public List<T> FetchList<T>(DbConnection connection = null)
-    {
-      return this.FetchList<T>(connection, null);
-    }
-
-    private List<T> FetchList<T>(DbConnection connection, DbTransaction transaction)
+    public List<T> FetchList<T>(Connection connection = null)
     {
       List<T> result = null;
       using (var command = this.Build())
       {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.Adapter.FetchList<T>(command);
+        result = this.Adapter.FetchList<T>(command, connection);
       }
 
       return result;
     }
 
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbTransaction transaction)
-    {
-      return this.FetchKeyValuePairList<TKey, TValue>(transaction.Connection, transaction);
-    }
-
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbConnection connection = null)
-    {
-      return this.FetchKeyValuePairList<TKey, TValue>(connection, null);
-    }
-
-    private List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbConnection connection, DbTransaction transaction)
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Connection connection = null)
     {
       List<KeyValuePair<TKey, TValue>> result = null;
       using (var command = this.Build())
       {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.Adapter.FetchKeyValuePairList<TKey, TValue>(command);
+        result = this.Adapter.FetchKeyValuePairList<TKey, TValue>(command, connection);
       }
 
       return result;
     }
 
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(DbTransaction transaction)
-    {
-      return this.FetchDictionaryList<T>(transaction.Connection, transaction);
-    }
-
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(DbConnection connection = null)
-    {
-      return this.FetchDictionaryList<T>(connection, null);
-    }
-
-    private List<Dictionary<string, T>> FetchDictionaryList<T>(DbConnection connection, DbTransaction transaction)
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(Connection connection = null)
     {
       List<Dictionary<string, T>> result = null;
       using (var command = this.Build())
       {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.Adapter.FetchDictionaryList<T>(command);
+        result = this.Adapter.FetchDictionaryList<T>(command, connection);
       }
 
       return result;
     }
 
-    public T FetchRecord<T>(DbTransaction transaction) where T : Record, new()
+    public T FetchRecord<T>(Connection connection = null) where T : Record, new()
     {
-      return this.FetchRecord<T>(transaction.Connection, transaction);
-    }
-
-    public T FetchRecord<T>(DbConnection connection = null) where T : Record, new()
-    {
-      return this.FetchRecord<T>(connection, null);
-    }
-
-    private T FetchRecord<T>(DbConnection connection, DbTransaction transaction) where T : Record, new()
-    {
-      var resultSet = this.FetchRecordSet<T>(connection, transaction);
+      var resultSet = this.FetchRecordSet<T>(connection);
 
       if (resultSet.Count == 0)
       {
@@ -625,11 +554,6 @@ namespace Sdx.Db.Query
       }
 
       return resultSet[0];
-    }
-
-    public RecordSet<T> FetchRecordSet<T>(DbTransaction transaction) where T : Record, new()
-    {
-      return this.FetchRecordSet<T>(transaction.Connection, transaction);
     }
 
     /// <summary>
@@ -641,12 +565,7 @@ namespace Sdx.Db.Query
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(DbConnection connection = null) where T : Record, new()
-    {
-      return this.FetchRecordSet<T>(connection, null);
-    }
-
-    private RecordSet<T> FetchRecordSet<T>(DbConnection connection, DbTransaction transaction) where T : Record, new()
+    public RecordSet<T> FetchRecordSet<T>(Connection connection = null) where T : Record, new()
     {
       var prop = typeof(T).GetProperty("Meta");
       if (prop == null)
@@ -663,16 +582,10 @@ namespace Sdx.Db.Query
       RecordSet<T> recordSet = null;
       using (var command = this.Build())
       {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        recordSet = this.Adapter.Fetch<RecordSet<T>>(command, () =>
+        recordSet = this.Adapter.Fetch<RecordSet<T>>(command, connection, (reader) =>
         {
           var resultSet = new RecordSet<T>();
-          using (var reader = this.Adapter.ExecuteReader(command))
-          {
-            resultSet.Build(reader, this, meta.Name);
-          }
-
+          resultSet.Build(reader, this, meta.Name);
           return resultSet;
         });
       }

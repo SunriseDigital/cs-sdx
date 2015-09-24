@@ -51,6 +51,7 @@
     <Compile Include="Data\TreeYaml.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Db\Adapter.cs" />
+    <Compile Include="Db\Connection.cs" />
     <Compile Include="Db\DbException.cs" />
     <Compile Include="Db\MySqlAdapter.cs" />
     <Compile Include="Db\Query\Column.cs" />
