@@ -70,6 +70,14 @@ namespace UnitTest
       // * 値が null の場合
       var nulValDic = new Dictionary<string, string>() { { "newkey", null } };
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&newkey=", url.Build(nulValDic));
+
+      //存在しないキーをList, Array で渡す
+      //(パラメータがまだ何も無い状態で、特定のキーを削除しようとした場合の挙動チェックも兼ねて)
+      var unknownList = new List<string>() { "unknown" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(unknownList));
+
+      var unknownArray = new string[] { "unknown" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(unknownArray));
     }
 
     [Fact]
@@ -115,6 +123,14 @@ namespace UnitTest
       // * 値が null の場合
       var nulValDic = new Dictionary<string, string>() { { "newkey", null } };
       Assert.Equal("http://example.com/path/to/api?key=value&newkey=", url.Build(nulValDic));
+
+      //存在しないキーをList, Array で渡す
+      //(パラメータがまだ何も無い状態で、特定のキーを削除しようとした場合の挙動チェックも兼ねて)
+      var unknownList = new List<string>() { "unknown" };
+      Assert.Equal("http://example.com/path/to/api?key=value", url.Build(unknownList));
+
+      var unknownArray = new string[] { "unknown" };
+      Assert.Equal("http://example.com/path/to/api?key=value", url.Build(unknownArray));
     }
 
     [Fact]
@@ -160,6 +176,14 @@ namespace UnitTest
       // * 値が null の場合
       var nulValDic = new Dictionary<string, string>() { { "newkey", null } };
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value&newkey=", url.Build(nulValDic));
+
+      //存在しないキーをList, Array で渡す
+      //(パラメータがまだ何も無い状態で、特定のキーを削除しようとした場合の挙動チェックも兼ねて)
+      var unknownList = new List<string>() { "unknown" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build(unknownList));
+
+      var unknownArray = new string[] { "unknown" };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build(unknownArray));
     }
   }
 }
