@@ -197,7 +197,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      list = db.Adapter.FetchList<string>(sel);
+      list = sel.FetchList<string>();
       Assert.IsType<List<string>>(list);
       Assert.Equal(2, list.Count);
       Assert.Equal("天府舫", list[0]);
@@ -213,7 +213,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      var intList = db.Adapter.FetchList<int>(sel);
+      var intList = sel.FetchList<int>();
       Assert.IsType<List<int>>(intList);
       Assert.Equal(2, intList.Count);
       Assert.Equal(5, intList[0]);
@@ -228,7 +228,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      var datetimes = db.Adapter.FetchList<DateTime>(sel);
+      var datetimes = sel.FetchList<DateTime>();
       Assert.IsType<List<DateTime>>(datetimes);
       Assert.Equal(2, datetimes.Count);
       Assert.Equal("2015-01-01 12:30:00", datetimes[0].ToString("yyyy-MM-dd HH:mm:ss"));
@@ -443,13 +443,13 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          list = db.Adapter.FetchList<string>(sel, con);
+          list = sel.FetchList<string>(con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = db.Adapter.FetchList<string>(sel, con);
+        list = sel.FetchList<string>(con);
         Assert.IsType<List<string>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]);
