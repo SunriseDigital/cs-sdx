@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
-using System.Linq;
-using System.Text;
 
 namespace Sdx.Db
 {
   public class Connection : IDisposable
   {
+    private bool disposed = false;
+
     public Adapter Adapter { get; private set; }
 
     public DbConnection DbConnection { get; private set; }
@@ -27,7 +27,7 @@ namespace Sdx.Db
       }
     }
 
-    public System.Data.ConnectionState State
+    public ConnectionState State
     {
       get
       {
@@ -41,32 +41,57 @@ namespace Sdx.Db
       this.DbConnection = this.Adapter.Factory.CreateConnection();
     }
 
+    private void ThrowExceptionIfDisposed()
+    {
+      if (this.disposed)
+      {
+        throw new ObjectDisposedException("This object is already disposed.");
+      }
+    }
+
     public void Dispose()
     {
-      if (this.DbTransaction != null)
+      lock(this)
       {
-        this.DbTransaction.Dispose();
+        if(this.disposed)
+        {
+          return;
+        }
+
+        this.disposed = true;
+
+        if (this.DbTransaction != null)
+        {
+          this.DbTransaction.Dispose();
+          this.DbTransaction = null;
+        }
+
+        this.DbConnection.Dispose();
+        this.DbConnection = null;
+
+        this.Adapter = null;
+
+        GC.SuppressFinalize(this);
       }
-
-      this.DbConnection.Dispose();
-
-      Console.WriteLine("Connection.Dispose");
     }
 
     public void Open()
     {
+      this.ThrowExceptionIfDisposed();
       this.DbConnection.Open();
     }
 
     public DbTransaction BeginTransaction()
     {
+      this.ThrowExceptionIfDisposed();
       this.DbTransaction = this.DbConnection.BeginTransaction();
       return this.DbTransaction;
     }
 
     public void Commit()
     {
-      if(this.DbTransaction == null)
+      this.ThrowExceptionIfDisposed();
+      if (this.DbTransaction == null)
       {
         throw new InvalidOperationException("Missing DbTransaction");
       }
@@ -75,6 +100,7 @@ namespace Sdx.Db
 
     public void Rollback()
     {
+      this.ThrowExceptionIfDisposed();
       if (this.DbTransaction == null)
       {
         throw new InvalidOperationException("Missing DbTransaction");
