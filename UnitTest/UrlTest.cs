@@ -57,6 +57,19 @@ namespace UnitTest
       var list = new List<string>() { "key" };
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(list));
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
+
+      //空の Dictionary を追加
+      var empDic = new Dictionary<string, string>();
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(empDic));
+
+      //値が空になっている Dictionary を追加
+      // * 値が空文字の場合
+      var empValDic = new Dictionary<string, string>() { { "newkey", "" } };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&newkey=", url.Build(empValDic));
+
+      // * 値が null の場合
+      var nulValDic = new Dictionary<string, string>() { { "newkey", null } };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&newkey=", url.Build(nulValDic));
     }
 
     [Fact]
@@ -89,6 +102,19 @@ namespace UnitTest
       var list = new List<string>() { "key" };
       Assert.Equal("http://example.com/path/to/api", url.Build(list));
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
+
+      //空の Dictionary を追加
+      var empDic = new Dictionary<string, string>();
+      Assert.Equal("http://example.com/path/to/api?key=value", url.Build(empDic));
+
+      //値が空になっている Dictionary を追加
+      // * 値が空文字の場合
+      var empValDic = new Dictionary<string, string>() { { "newkey", "" } };
+      Assert.Equal("http://example.com/path/to/api?key=value&newkey=", url.Build(empValDic));
+
+      // * 値が null の場合
+      var nulValDic = new Dictionary<string, string>() { { "newkey", null } };
+      Assert.Equal("http://example.com/path/to/api?key=value&newkey=", url.Build(nulValDic));
     }
 
     [Fact]
@@ -121,6 +147,19 @@ namespace UnitTest
       var list = new List<string>() { "key" };
       Assert.Equal("http://example.com/path/to/api?foo=bar", url.Build(list));
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
+
+      //空の Dictionary を追加
+      var empDic = new Dictionary<string, string>();
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build(empDic));
+
+      //値が空になっている Dictionary を追加
+      // * 値が空文字の場合
+      var empValDic = new Dictionary<string, string>() { { "newkey", "" } };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value&newkey=", url.Build(empValDic));
+
+      // * 値が null の場合
+      var nulValDic = new Dictionary<string, string>() { { "newkey", null } };
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=value&newkey=", url.Build(nulValDic));
     }
   }
 }
