@@ -220,30 +220,6 @@ namespace Sdx.Db
       return recordSet;
     }
 
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbTransaction transaction)
-    {
-      return this.FetchDictionaryList<T>(select, transaction.Connection, transaction);
-    }
-
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbConnection connection = null)
-    {
-      return this.FetchDictionaryList<T>(select, connection, null);
-    }
-
-    private List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select, DbConnection connection, DbTransaction transaction)
-    {
-      select.Adapter = this;
-      List<Dictionary<string, T>> result = null;
-      using (var command = select.Build())
-      {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.FetchDictionaryList<T>(command);
-      }
-
-      return result;
-    }
-
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
     {
       return this.Fetch<List<Dictionary<string, T>>>(command, () => {

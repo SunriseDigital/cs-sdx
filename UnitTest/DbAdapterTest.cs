@@ -110,7 +110,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      list = db.Adapter.FetchDictionaryList<string>(sel);
+      list = sel.FetchDictionaryList<string>();
       Assert.IsType<List<Dictionary<string, string>>>(list);
       Assert.Equal(2, list.Count);
       Assert.Equal("天府舫", list[0]["name"]);
@@ -574,13 +574,13 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          list = db.Adapter.FetchDictionaryList<string>(sel, con);
+          list = sel.FetchDictionaryList<string>(con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = db.Adapter.FetchDictionaryList<string>(sel, con);
+        list = sel.FetchDictionaryList<string>(con);
         Assert.IsType<List<Dictionary<string, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]["name"]);

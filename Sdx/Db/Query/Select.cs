@@ -581,5 +581,28 @@ namespace Sdx.Db.Query
 
       return result;
     }
+
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(DbTransaction transaction)
+    {
+      return this.FetchDictionaryList<T>(transaction.Connection, transaction);
+    }
+
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(DbConnection connection = null)
+    {
+      return this.FetchDictionaryList<T>(connection, null);
+    }
+
+    private List<Dictionary<string, T>> FetchDictionaryList<T>(DbConnection connection, DbTransaction transaction)
+    {
+      List<Dictionary<string, T>> result = null;
+      using (var command = this.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.Adapter.FetchDictionaryList<T>(command);
+      }
+
+      return result;
+    }
   }
 }
