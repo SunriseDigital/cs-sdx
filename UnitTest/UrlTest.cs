@@ -78,6 +78,9 @@ namespace UnitTest
 
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(unknownArray));
+
+      //存在しない値を取得する
+      Assert.Equal(null, url.Param["unknown"]);
     }
 
     [Fact]
@@ -131,6 +134,9 @@ namespace UnitTest
 
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build(unknownArray));
+
+      //存在しない値を取得する
+      Assert.Equal(null, url.Param["unknown"]);
     }
 
     [Fact]
@@ -184,6 +190,9 @@ namespace UnitTest
 
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build(unknownArray));
+
+      //存在しない値を取得する
+      Assert.Equal(null, url.Param["unknown"]);
     }
   }
 }
