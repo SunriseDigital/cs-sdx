@@ -604,5 +604,80 @@ namespace Sdx.Db.Query
 
       return result;
     }
+
+    public T FetchRecord<T>(DbTransaction transaction) where T : Record, new()
+    {
+      return this.FetchRecord<T>(transaction.Connection, transaction);
+    }
+
+    public T FetchRecord<T>(DbConnection connection = null) where T : Record, new()
+    {
+      return this.FetchRecord<T>(connection, null);
+    }
+
+    private T FetchRecord<T>(DbConnection connection, DbTransaction transaction) where T : Record, new()
+    {
+      var resultSet = this.FetchRecordSet<T>(connection, transaction);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
+    public RecordSet<T> FetchRecordSet<T>(DbTransaction transaction) where T : Record, new()
+    {
+      return this.FetchRecordSet<T>(transaction.Connection, transaction);
+    }
+
+    /// <summary>
+    /// SQLを実行しRecordSetを生成して返します。
+    /// </summary>
+    /// <typeparam name="T">Recordのクラスを指定</typeparam>
+    /// <param name="contextName">
+    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
+    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
+    /// </param>
+    /// <returns></returns>
+    public RecordSet<T> FetchRecordSet<T>(DbConnection connection = null) where T : Record, new()
+    {
+      return this.FetchRecordSet<T>(connection, null);
+    }
+
+    private RecordSet<T> FetchRecordSet<T>(DbConnection connection, DbTransaction transaction) where T : Record, new()
+    {
+      var prop = typeof(T).GetProperty("Meta");
+      if (prop == null)
+      {
+        throw new NotImplementedException("Missing Meta property in " + typeof(T));
+      }
+
+      var meta = prop.GetValue(null, null) as TableMeta;
+      if (meta == null)
+      {
+        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
+      }
+
+      RecordSet<T> recordSet = null;
+      using (var command = this.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        recordSet = this.Adapter.Fetch<RecordSet<T>>(command, () =>
+        {
+          var resultSet = new RecordSet<T>();
+          using (var reader = this.Adapter.ExecuteReader(command))
+          {
+            resultSet.Build(reader, this, meta.Name);
+          }
+
+          return resultSet;
+        });
+      }
+
+      return recordSet;
+    }
   }
 }

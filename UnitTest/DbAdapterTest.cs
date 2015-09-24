@@ -676,13 +676,13 @@ namespace UnitTest
       {
         Test.Orm.Shop shop;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          shop = db.Adapter.FetchRecord<Test.Orm.Shop>(sel, con);
+          shop = sel.FetchRecord<Test.Orm.Shop>(con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        shop = db.Adapter.FetchRecord<Test.Orm.Shop>(sel, con);
+        shop = sel.FetchRecord<Test.Orm.Shop>(con);
         Assert.Equal(1, shop.GetInt32("id"));
         Assert.Equal("天祥", shop.GetString("name"));
       }
@@ -710,13 +710,13 @@ namespace UnitTest
       {
         Sdx.Db.RecordSet<Test.Orm.Shop> set;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          set = db.Adapter.FetchRecordSet<Test.Orm.Shop>(sel, con);
+          set = sel.FetchRecordSet<Test.Orm.Shop>(con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        set = db.Adapter.FetchRecordSet<Test.Orm.Shop>(sel, con);
+        set = sel.FetchRecordSet<Test.Orm.Shop>(con);
         Assert.Equal(2, set.Count);
         Assert.Equal(3, set[0].GetInt32("id"));
         Assert.Equal("天府舫", set[0].GetString("name"));

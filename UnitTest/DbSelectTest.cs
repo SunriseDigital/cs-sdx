@@ -1532,7 +1532,7 @@ namespace UnitTest
       Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
 
       //
-      var select = new Sdx.Db.Query.Select();
+      var select = db.Adapter.CreateSelect();
       select
         .SetComment("No where comment")
         .AddFrom(new Test.Orm.Table.Shop())
@@ -1540,7 +1540,7 @@ namespace UnitTest
 
       var profiler = Sdx.Context.Current.DbProfiler;
 
-      var rset = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+      var rset = select.FetchRecordSet<Test.Orm.Shop>();
 
       Assert.Equal(1, profiler.Queries.Count);
       Assert.Equal("No where comment", profiler.Queries[0].Comment);
@@ -1552,7 +1552,7 @@ namespace UnitTest
         .SetLimit(10)
         .Context("shop").Where.Add("area_id", 1);
 
-      rset = db.Adapter.FetchRecordSet<Test.Orm.Shop>(select);
+      rset = select.FetchRecordSet<Test.Orm.Shop>();
       Assert.Equal(2, profiler.Queries.Count);
       Assert.Equal("Where and order limit", profiler.Queries[1].Comment);
 
@@ -1780,7 +1780,7 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
 
         using (var transaction = con.BeginTransaction())
         {
-          var shop = db.Adapter.FetchRecord<Test.Orm.Shop>(select, transaction);
+          var shop = select.FetchRecord<Test.Orm.Shop>(transaction);
           transaction.Commit();
         }
       }

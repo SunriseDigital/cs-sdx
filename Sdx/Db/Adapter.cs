@@ -123,7 +123,7 @@ namespace Sdx.Db
       }
     }
 
-    private T Fetch<T>(DbCommand command, Func<T> func)
+    internal T Fetch<T>(DbCommand command, Func<T> func)
     {
       T result = default(T);
       if (command.Connection == null)
@@ -141,83 +141,6 @@ namespace Sdx.Db
       }
 
       return result;
-    }
-
-    public T FetchRecord<T>(Query.Select select, DbTransaction transaction) where T : Record, new()
-    {
-      return this.FetchRecord<T>(select, transaction.Connection, transaction);
-    }
-
-    public T FetchRecord<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
-    {
-      return this.FetchRecord<T>(select, connection, null);
-    }
-
-    private T FetchRecord<T>(Query.Select select, DbConnection connection, DbTransaction transaction) where T : Record, new()
-    {
-      var resultSet = this.FetchRecordSet<T>(select, connection, transaction);
-
-      if (resultSet.Count == 0)
-      {
-        return null;
-      }
-
-      return resultSet[0];
-    }
-
-    public RecordSet<T> FetchRecordSet<T>(Query.Select select, DbTransaction transaction) where T : Record, new()
-    {
-      return this.FetchRecordSet<T>(select, transaction.Connection, transaction);
-    }
-
-    /// <summary>
-    /// SQLを実行しRecordSetを生成して返します。
-    /// </summary>
-    /// <typeparam name="T">Recordのクラスを指定</typeparam>
-    /// <param name="contextName">
-    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
-    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
-    /// </param>
-    /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(Query.Select select, DbConnection connection = null) where T : Record, new()
-    {
-      return this.FetchRecordSet<T>(select, connection, null);
-    }
-
-    private RecordSet<T> FetchRecordSet<T>(Query.Select select, DbConnection connection, DbTransaction transaction) where T : Record, new()
-    {
-      select.Adapter = this;
-
-      var prop = typeof(T).GetProperty("Meta");
-      if (prop == null)
-      {
-        throw new NotImplementedException("Missing Meta property in " + typeof(T));
-      }
-
-      var meta = prop.GetValue(null, null) as TableMeta;
-      if (meta == null)
-      {
-        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
-      }
-
-      RecordSet<T> recordSet = null;
-      using (var command = select.Build())
-      {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        recordSet = this.Fetch<RecordSet<T>>(command, () =>
-        {
-          var resultSet = new RecordSet<T>();
-          using (var reader = this.ExecuteReader(command))
-          {
-            resultSet.Build(reader, select, meta.Name);
-          }
-
-          return resultSet;
-        });
-      }
-
-      return recordSet;
     }
 
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
