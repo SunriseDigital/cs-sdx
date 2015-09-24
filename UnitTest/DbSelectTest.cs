@@ -23,7 +23,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 namespace UnitTest
 {
   [TestClass]
-  public class DbQueryTest : BaseDbTest
+  public class DbSelectTest : BaseDbTest
   {
     [ClassInitialize]
     public new static void InitilizeClass(TestContext context)

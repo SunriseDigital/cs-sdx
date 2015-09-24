@@ -67,10 +67,11 @@
     <Compile Include="ContextTest.cs" />
     <Compile Include="DbAdapterTest.cs" />
     <Compile Include="ConfigTest.cs" />
-    <Compile Include="DbQueryTest.cs" />
+    <Compile Include="DbSelectTest.cs" />
     <Compile Include="DbRecordTest.cs" />
     <Compile Include="DbSelectCloneTest.cs" />
     <Compile Include="DbTableTest.cs" />
+    <Compile Include="DbUpdateTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
