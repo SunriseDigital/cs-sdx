@@ -558,5 +558,28 @@ namespace Sdx.Db.Query
 
       return result;
     }
+
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbTransaction transaction)
+    {
+      return this.FetchKeyValuePairList<TKey, TValue>(transaction.Connection, transaction);
+    }
+
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbConnection connection = null)
+    {
+      return this.FetchKeyValuePairList<TKey, TValue>(connection, null);
+    }
+
+    private List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbConnection connection, DbTransaction transaction)
+    {
+      List<KeyValuePair<TKey, TValue>> result = null;
+      using (var command = this.Build())
+      {
+        command.Connection = connection;
+        command.Transaction = transaction;
+        result = this.Adapter.FetchKeyValuePairList<TKey, TValue>(command);
+      }
+
+      return result;
+    }
   }
 }

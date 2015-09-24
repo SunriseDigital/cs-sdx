@@ -265,30 +265,6 @@ namespace Sdx.Db
       });
     }
 
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbTransaction transaction)
-    {
-      return this.FetchKeyValuePairList<TKey, TValue>(select, transaction.Connection, transaction);
-    }
-
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbConnection connection = null)
-    {
-      return this.FetchKeyValuePairList<TKey, TValue>(select, connection, null);
-    }
-
-    private List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select, DbConnection connection, DbTransaction transaction)
-    {
-      select.Adapter = this;
-      List<KeyValuePair<TKey, TValue>> result = null;
-      using (var command = select.Build())
-      {
-        command.Connection = connection;
-        command.Transaction = transaction;
-        result = this.FetchKeyValuePairList<TKey, TValue>(command);
-      }
-
-      return result;
-    }
-
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command)
     {
       return this.Fetch<List<KeyValuePair<TKey, TValue>>>(command, () => {

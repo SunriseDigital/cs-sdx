@@ -154,7 +154,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      list = db.Adapter.FetchKeyValuePairList<int, string>(sel);
+      list = sel.FetchKeyValuePairList<int, string>();
       Assert.IsType<List<KeyValuePair<int, string>>>(list);
       Assert.Equal(2, list.Count);
       Assert.Equal(3, list[0].Key);
@@ -640,13 +640,13 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          list = db.Adapter.FetchKeyValuePairList<int, string>(sel, con);
+          list = sel.FetchKeyValuePairList<int, string>(con);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = db.Adapter.FetchKeyValuePairList<int, string>(sel, con);
+        list = sel.FetchKeyValuePairList<int, string>(con);
         Assert.IsType<List<KeyValuePair<int, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal(3, list[0].Key);
