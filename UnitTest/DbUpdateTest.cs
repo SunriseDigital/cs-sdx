@@ -40,7 +40,7 @@ namespace UnitTest
 
       var insert = db.CreateInsert();
 
-      var now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+      var now = DateTime.Now;
       insert
          .SetInto("shop")
          .AddPair("name", "FooBar")
@@ -86,7 +86,8 @@ namespace UnitTest
         var shop = conn.FetchDictionary<string>(command);
         Assert.Equal(id.ToString(), shop["id"]);
         Assert.Equal("1", shop["area_id"]);
-        Assert.Equal(now, shop["created_at"]);
+
+        Assert.Equal(now.ToString(), shop["created_at"]);
       }
 
       //ExecuteInsert
@@ -111,6 +112,21 @@ namespace UnitTest
         var shops = conn.FetchDictionaryList<string>(command);
         Assert.Equal(2, shops.Count);
       }
+    }
+
+    [Fact]
+    public void TestInsertWithSubquery()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunInsertWithSubquery(db);
+      }
+    }
+
+    private void RunInsertWithSubquery(TestDb testDb)
+    {
+
+
     }
 
     [Fact]
