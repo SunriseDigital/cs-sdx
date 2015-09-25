@@ -194,5 +194,17 @@ namespace UnitTest
       //存在しないキーを指定して、想定した例外になっているかを確認する
       Assert.Throws<KeyNotFoundException>(() => url.Param["unknown"]);
     }
+
+    [Fact]
+    public void TestArrayParams()
+    {
+      var url = new Sdx.Web.Url("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2");
+    }
+
+    [Fact]
+    public void TestHashParams()
+    {
+      var url = new Sdx.Web.Url("http://example.com/path/to/api?list[key0]=value0&list[key1]=value1&list[key2]=value2");
+    }
   }
 }
