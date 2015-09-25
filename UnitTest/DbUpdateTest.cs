@@ -38,22 +38,40 @@ namespace UnitTest
       Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
       var db = testDb.Adapter;
 
-      ulong id = 0;
+      var insert = db.CreateInsert();
+
       var now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
-      using (var conn = db.CreateConnection())
+      insert
+         .SetInto("shop")
+         .AddPair("name", "FooBar")
+         .AddPair("area_id", 1)
+         .AddPair("created_at", now);
+
+      ulong id = 0;
+      using (var command = insert.Build())
       {
-        conn.Open();
-        conn.BeginTransaction();
-        conn.Insert("shop", new Dictionary<string, object> {
-          { "name", "FooBar" },
-          { "area_id", "1"},
-          { "created_at", now}
-        });
+        Assert.Equal(
+          testDb.Sql("INSERT INTO {0}shop{1} ({0}name{1}, {0}area_id{1}, {0}created_at{1}) VALUES (@0, @1, @2)"),
+          command.CommandText
+        );
 
-        id = conn.FetchLastInsertId();
+        Assert.Equal("FooBar", command.Parameters["@0"].Value);
+        Assert.Equal(1, command.Parameters["@1"].Value);
+        Assert.Equal(now, command.Parameters["@2"].Value);
 
-        conn.Commit();
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+
+          conn.ExecuteNonQuery(command);
+
+          id = conn.FetchLastInsertId();
+
+          conn.Commit();
+        }
       }
+
 
       using (var conn = db.CreateConnection())
       {
@@ -71,11 +89,28 @@ namespace UnitTest
         Assert.Equal(now, shop["created_at"]);
       }
 
-      Sdx.Context.Current.DbProfiler.Queries.ForEach(query => {
-        Console.WriteLine(query.ToString());
-      });
-      
+      //ExecuteInsert
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        conn.Execute(insert);
+        conn.Commit();
+      }
 
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var command = conn.CreateCommand();
+        command.CommandText = "SELECT * FROM shop WHERE name = @name";
+        var param = command.CreateParameter();
+        param.ParameterName = "@name";
+        param.Value = "FooBar";
+        command.Parameters.Add(param);
+
+        var shops = conn.FetchDictionaryList<string>(command);
+        Assert.Equal(2, shops.Count);
+      }
     }
 
     [Fact]

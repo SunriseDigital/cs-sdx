@@ -1577,8 +1577,7 @@ namespace UnitTest
       var command = select.Build();
       using (var con = db.Adapter.CreateConnection())
       {
-        con.AttachTo(command);
-        command.Connection.Open();
+        con.Open();
         var reader = con.ExecuteReader(command);
         Assert.Equal(3, profiler.Queries.Count);
         Assert.Equal("No where form string", profiler.Queries[2].Comment);
@@ -1595,8 +1594,7 @@ namespace UnitTest
       command = select.Build();
       using (var con = db.Adapter.CreateConnection())
       {
-        con.AttachTo(command);
-        command.Connection.Open();
+        con.Open();
         var reader = con.ExecuteReader(command);
         Assert.Equal(4, profiler.Queries.Count);
         Assert.Equal("Where and order limit from string", profiler.Queries[3].Comment);

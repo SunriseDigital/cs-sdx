@@ -60,6 +60,7 @@
     <Compile Include="Db\Query\Counter.cs" />
     <Compile Include="Db\Query\Enums.cs" />
     <Compile Include="Db\Query\Expr.cs" />
+    <Compile Include="Db\Query\Insert.cs" />
     <Compile Include="Db\Query\Log.cs" />
     <Compile Include="Db\Query\Profiler.cs" />
     <Compile Include="Db\Query\Select.cs" />

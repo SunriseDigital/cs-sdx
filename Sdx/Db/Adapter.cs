@@ -99,5 +99,11 @@ namespace Sdx.Db
     {
       return new Query.Select(this);
     }
+
+    public Query.Insert CreateInsert()
+    {
+      return new Query.Insert(this);
+    }
+
   }
 }

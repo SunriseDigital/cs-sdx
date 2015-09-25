@@ -115,7 +115,6 @@ namespace UnitTest
       using (var con = db.CreateConnection())
       {
         con.Open();
-        con.AttachTo(command);
         var reader = con.ExecuteReader(command);
       }
 
@@ -135,7 +134,6 @@ namespace UnitTest
       using (var con = db.CreateConnection())
       {
         con.Open();
-        con.AttachTo(command);
         var reader = con.ExecuteReader(command);
       }
 
