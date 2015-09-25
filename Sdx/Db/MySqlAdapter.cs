@@ -47,7 +47,7 @@ namespace Sdx.Db
     {
       var command = connection.CreateCommand();
       command.CommandText = "SELECT LAST_INSERT_ID()";
-      return (ulong)this.ExecuteScalar(command);
+      return (ulong)connection.ExecuteScalar(command);
     }
   }
 }

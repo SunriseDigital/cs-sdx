@@ -46,7 +46,7 @@ namespace Sdx.Db
     {
       var command = connection.CreateCommand();
       command.CommandText = "SELECT @@IDENTITY";
-      return Convert.ToUInt64(this.ExecuteScalar(command));
+      return Convert.ToUInt64(connection.ExecuteScalar(command));
     }
   }
 }

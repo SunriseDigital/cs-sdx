@@ -1540,10 +1540,15 @@ namespace UnitTest
 
       var profiler = Sdx.Context.Current.DbProfiler;
 
-      var rset = select.FetchRecordSet<Test.Orm.Shop>();
+      using (var conn = db.Adapter.CreateConnection())
+      {
+        conn.Open();
+        var rset = conn.FetchRecordSet<Test.Orm.Shop>(select);
 
-      Assert.Equal(1, profiler.Queries.Count);
-      Assert.Equal("No where comment", profiler.Queries[0].Comment);
+        Assert.Equal(1, profiler.Queries.Count);
+        Assert.Equal("No where comment", profiler.Queries[0].Comment);
+      }
+
 
       //
       select
@@ -1552,9 +1557,13 @@ namespace UnitTest
         .SetLimit(10)
         .Context("shop").Where.Add("area_id", 1);
 
-      rset = select.FetchRecordSet<Test.Orm.Shop>();
-      Assert.Equal(2, profiler.Queries.Count);
-      Assert.Equal("Where and order limit", profiler.Queries[1].Comment);
+      using (var conn = db.Adapter.CreateConnection())
+      {
+        conn.Open();
+        var rset = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        Assert.Equal(2, profiler.Queries.Count);
+        Assert.Equal("Where and order limit", profiler.Queries[1].Comment);
+      }
 
       //
       select = new Sdx.Db.Query.Select();
@@ -1570,7 +1579,7 @@ namespace UnitTest
       {
         command.Connection = con.DbConnection;
         command.Connection.Open();
-        var reader = db.Adapter.ExecuteReader(command);
+        var reader = con.ExecuteReader(command);
         Assert.Equal(3, profiler.Queries.Count);
         Assert.Equal("No where form string", profiler.Queries[2].Comment);
       }
@@ -1588,7 +1597,7 @@ namespace UnitTest
       {
         command.Connection = con.DbConnection;
         command.Connection.Open();
-        var reader = db.Adapter.ExecuteReader(command);
+        var reader = con.ExecuteReader(command);
         Assert.Equal(4, profiler.Queries.Count);
         Assert.Equal("Where and order limit from string", profiler.Queries[3].Comment);
       }
@@ -1780,7 +1789,7 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       {
         con.Open();
         con.BeginTransaction();
-        var shop = select.FetchRecord<Test.Orm.Shop>(con);
+        var shop = con.FetchRecord<Test.Orm.Shop>(select);
         con.Commit();
       }
     }

@@ -258,7 +258,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         con.Open();
         
         Console.WriteLine("execDbCommand");
-        var reader = adapter.ExecuteReader(command);
+        var reader = con.ExecuteReader(command);
         while (reader.Read())
         {
           var row = new Dictionary<string, object>();
