@@ -12,9 +12,9 @@ namespace Sdx.Db
 
     public Adapter Adapter { get; private set; }
 
-    public DbConnection DbConnection { get; private set; }
+    private DbConnection DbConnection { get; set; }
 
-    public DbTransaction DbTransaction { get; internal set; }
+    private DbTransaction DbTransaction { get; set; }
 
     public string ConnectionString
     {
@@ -231,7 +231,7 @@ namespace Sdx.Db
       });
     }
 
-    internal T Fetch<T>(DbCommand command, Func<DbDataReader, T> func)
+    private T Fetch<T>(DbCommand command, Func<DbDataReader, T> func)
     {
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
@@ -318,6 +318,17 @@ namespace Sdx.Db
 
         return dic;
       });
+    }
+
+    public void AttachTo(DbCommand command)
+    {
+      command.Connection = this.DbConnection;
+      command.Transaction = this.DbTransaction;
+    }
+
+    public bool IsAttachedTo(DbCommand command)
+    {
+      return command.Connection == this.DbConnection && command.Transaction == this.DbTransaction;
     }
 
     public Dictionary<string, T> FetchDictionary<T>(Query.Select select)

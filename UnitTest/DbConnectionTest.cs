@@ -49,8 +49,7 @@ namespace UnitTest
         conn.BeginTransaction();
         var command = select.Build();
         var shop = conn.FetchDictionary<object>(command);
-        Assert.Equal(command.Connection, conn.DbConnection);
-        Assert.Equal(command.Transaction, conn.DbTransaction);
+        Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
 
@@ -61,8 +60,7 @@ namespace UnitTest
         conn.BeginTransaction();
         var command = select.Build();
         var id = conn.FetchOne<string>(command);
-        Assert.Equal(command.Connection, conn.DbConnection);
-        Assert.Equal(command.Transaction, conn.DbTransaction);
+        Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
 
@@ -72,8 +70,7 @@ namespace UnitTest
         conn.BeginTransaction();
         var command = select.Build();
         var result = conn.FetchList<string>(command);
-        Assert.Equal(command.Connection, conn.DbConnection);
-        Assert.Equal(command.Transaction, conn.DbTransaction);
+        Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
 
@@ -83,8 +80,7 @@ namespace UnitTest
         conn.BeginTransaction();
         var command = select.Build();
         var result = conn.FetchKeyValuePairList<string, string>(command);
-        Assert.Equal(command.Connection, conn.DbConnection);
-        Assert.Equal(command.Transaction, conn.DbTransaction);
+        Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
 
@@ -94,8 +90,7 @@ namespace UnitTest
         conn.BeginTransaction();
         var command = select.Build();
         var result = conn.FetchDictionaryList<string>(command);
-        Assert.Equal(command.Connection, conn.DbConnection);
-        Assert.Equal(command.Transaction, conn.DbTransaction);
+        Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
     }
@@ -120,7 +115,7 @@ namespace UnitTest
       using (var con = db.CreateConnection())
       {
         con.Open();
-        command.Connection = con.DbConnection;
+        con.AttachTo(command);
         var reader = con.ExecuteReader(command);
       }
 
@@ -140,7 +135,7 @@ namespace UnitTest
       using (var con = db.CreateConnection())
       {
         con.Open();
-        command.Connection = con.DbConnection;
+        con.AttachTo(command);
         var reader = con.ExecuteReader(command);
       }
 

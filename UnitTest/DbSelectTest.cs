@@ -48,7 +48,7 @@ namespace UnitTest
         con.Open();
 
 
-        DbCommand command = con.DbConnection.CreateCommand();
+        DbCommand command = con.CreateCommand();
         command.CommandText = "SELECT shop.name as name_shop, area.name as name_area FROM shop"
           + " INNER JOIN area ON area.id = shop.area_id"
           + " WHERE shop.id = @shop@id"
@@ -1577,7 +1577,7 @@ namespace UnitTest
       var command = select.Build();
       using (var con = db.Adapter.CreateConnection())
       {
-        command.Connection = con.DbConnection;
+        con.AttachTo(command);
         command.Connection.Open();
         var reader = con.ExecuteReader(command);
         Assert.Equal(3, profiler.Queries.Count);
@@ -1595,7 +1595,7 @@ namespace UnitTest
       command = select.Build();
       using (var con = db.Adapter.CreateConnection())
       {
-        command.Connection = con.DbConnection;
+        con.AttachTo(command);
         command.Connection.Open();
         var reader = con.ExecuteReader(command);
         Assert.Equal(4, profiler.Queries.Count);

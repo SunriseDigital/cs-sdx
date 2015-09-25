@@ -116,7 +116,7 @@ namespace UnitTest
         //drop and create db
         try
         {
-          var dropSql = masterCon.DbConnection.CreateCommand();
+          var dropSql = masterCon.CreateCommand();
           dropSql.CommandText = @"
 DROP DATABASE IF EXISTS `sdxtest` ;
 CREATE DATABASE `sdxtest` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci;
@@ -136,8 +136,8 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
       using (con)
       {
         con.Open();
-        BaseDbTest.ExecuteSqlFile(con.DbConnection, "setup.mysql.sql");
-        BaseDbTest.ExecuteSqlFile(con.DbConnection, "insert.sql");
+        BaseDbTest.ExecuteSqlFile(con, "setup.mysql.sql");
+        BaseDbTest.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetMySqlDatabase");
@@ -158,7 +158,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         //drop db
         try
         {
-          var dropSql = masterCon.DbConnection.CreateCommand();
+          var dropSql = masterCon.CreateCommand();
           dropSql.CommandText = @"
 ALTER DATABASE sdxtest SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
 DROP DATABASE [sdxtest]
@@ -174,7 +174,7 @@ DROP DATABASE [sdxtest]
         //drop user
         try
         {
-          var dropUserSql = masterCon.DbConnection.CreateCommand();
+          var dropUserSql = masterCon.CreateCommand();
           dropUserSql.CommandText = "DROP LOGIN sdxuser";
           dropUserSql.ExecuteNonQuery();
         }
@@ -185,12 +185,12 @@ DROP DATABASE [sdxtest]
         }
 
         //create db
-        var createSql = masterCon.DbConnection.CreateCommand();
+        var createSql = masterCon.CreateCommand();
         createSql.CommandText = "CREATE DATABASE sdxtest";
         createSql.ExecuteNonQuery();
 
         //create user
-        var createUserSql = masterCon.DbConnection.CreateCommand();
+        var createUserSql = masterCon.CreateCommand();
         createUserSql.CommandText = @"
 CREATE LOGIN sdxuser WITH PASSWORD = 'sdx5963';
 ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
@@ -203,14 +203,14 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       using (con)
       {
         con.Open();
-        BaseDbTest.ExecuteSqlFile(con.DbConnection, "setup.sqlserver.sql");
-        BaseDbTest.ExecuteSqlFile(con.DbConnection, "insert.sql");
+        BaseDbTest.ExecuteSqlFile(con, "setup.sqlserver.sql");
+        BaseDbTest.ExecuteSqlFile(con, "insert.sql");
       }
 
       Console.WriteLine("ResetSqlServerDatabase");
     }
 
-    private static void ExecuteSqlFile(DbConnection con, string dataFilePath)
+    private static void ExecuteSqlFile(Sdx.Db.Connection con, string dataFilePath)
     {
       //setup.sqlを流し込みます。
       using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
@@ -254,9 +254,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       using (var con = adapter.CreateConnection())
       {
-        command.Connection = con.DbConnection;
         con.Open();
-        
+
+        con.AttachTo(command);
+
         Console.WriteLine("execDbCommand");
         var reader = con.ExecuteReader(command);
         while (reader.Read())
