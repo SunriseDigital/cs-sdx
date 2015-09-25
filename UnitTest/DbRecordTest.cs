@@ -236,13 +236,13 @@ namespace UnitTest
         var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Queries.Count);
 
-        var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area");
+        var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area", conn);
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
 
         Assert.Equal(1, areaSet.Count);
         Assert.Equal("新中野", areaSet[0].GetString("name"));
 
-        var largeAreaSet = areaSet[0].GetRecordSet<Test.Orm.LargeArea>("large_area");
+        var largeAreaSet = areaSet[0].GetRecordSet<Test.Orm.LargeArea>("large_area", conn);
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Queries.Count);
 
         Assert.Equal(1, largeAreaSet.Count);
@@ -278,6 +278,7 @@ namespace UnitTest
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Queries.Count);
         var menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
           "menu",
+          conn,
           sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Query.Order.ASC); }
         );
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
@@ -290,6 +291,7 @@ namespace UnitTest
         //ORDERをひっくり返す
         menuSet = shops[0].ClearRecordCache("menu").GetRecordSet<Test.Orm.Menu>(
           "menu",
+          conn,
           sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Query.Order.DESC); }
         );
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Queries.Count);
@@ -330,27 +332,29 @@ namespace UnitTest
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Queries.Count);
         var shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
           "shop_category",
+          conn,
           sel => { sel.AddOrder("category_id", Sdx.Db.Query.Order.ASC); }
         );
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
 
         Assert.Equal(3, shopCategorySet.Count);
-        Assert.Equal("美容室", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
-        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
-        Assert.Equal("まつげエクステ", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+        Assert.Equal("美容室", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
+        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
+        Assert.Equal("まつげエクステ", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
         Assert.Equal(5, Sdx.Context.Current.DbProfiler.Queries.Count);
 
         shopCategorySet = shops[0].ClearRecordCache("shop_category").GetRecordSet<Test.Orm.ShopCategory>(
           "shop_category",
+          conn,
           sel => { sel.AddOrder("category_id", Sdx.Db.Query.Order.DESC); }
         );
         Assert.Equal(6, Sdx.Context.Current.DbProfiler.Queries.Count);
 
 
         Assert.Equal(3, shopCategorySet.Count);
-        Assert.Equal("まつげエクステ", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
-        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
-        Assert.Equal("美容室", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+        Assert.Equal("まつげエクステ", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
+        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
+        Assert.Equal("美容室", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
         Assert.Equal(9, Sdx.Context.Current.DbProfiler.Queries.Count);
       }
     }
@@ -454,10 +458,10 @@ namespace UnitTest
 
         Assert.Equal(1, shops.Count);
 
-        Assert.Equal("/freeve/main.jpq", shops[0].GetRecord<Test.Orm.Image>("main_image").GetString("path"));
+        Assert.Equal("/freeve/main.jpq", shops[0].GetRecord<Test.Orm.Image>("main_image", conn).GetString("path"));
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
 
-        Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord<Test.Orm.Image>("sub_image").GetString("path"));
+        Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord<Test.Orm.Image>("sub_image", conn).GetString("path"));
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Queries.Count);
       }
     }
@@ -487,10 +491,10 @@ namespace UnitTest
         var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
         Assert.Equal(1, shops.Count);
 
-        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image"));
+        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image", conn));
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
 
-        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("sub_image"));
+        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("sub_image", conn));
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Queries.Count);
       }
     }
@@ -521,17 +525,25 @@ namespace UnitTest
         Assert.True(shop is Test.Orm.Shop);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Queries.Count);
 
-        var area = shop.GetRecord<Test.Orm.Area>("area");
+        var area = shop.GetRecord<Test.Orm.Area>("area", conn);
         Assert.True(area is Test.Orm.Area);
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
 
-        //キャッシュされている
+        //キャッシュされている（Connection必要なし）
         var area2 = shop.GetRecord<Test.Orm.Area>("area");
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
         Assert.Equal(area, area2);
 
         shop.ClearRecordCache();
-        var area3 = shop.GetRecord<Test.Orm.Area>("area");
+
+        //キャッシュがクリアされたのでConnectionなしだと例外に
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+          var areaEx = shop.GetRecord<Test.Orm.Area>("area");
+        }));
+
+        Assert.IsType<ArgumentNullException>(ex);
+
+        var area3 = shop.GetRecord<Test.Orm.Area>("area", conn);
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Queries.Count);
         Assert.NotEqual(area2, area3);
       }

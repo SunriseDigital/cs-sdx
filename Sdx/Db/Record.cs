@@ -95,17 +95,6 @@ namespace Sdx.Db
       return Convert.ToString(this.GetValue(key));
     }
 
-    public T GetRecord<T>(string contextName) where T : Record, new()
-    {
-      var records = this.GetRecordSet<T>(contextName);
-      if (records.Count == 0)
-      {
-        return null;
-      }
-
-      return records[0];
-    }
-
     public Record ClearRecordCache(string contextName = null)
     {
       if (contextName != null)
@@ -123,7 +112,28 @@ namespace Sdx.Db
       return this;
     }
 
+    public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    {
+      return this.GetRecord<T>(contextName, null, selectHook);
+    }
+
+    public T GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    {
+      var records = this.GetRecordSet<T>(contextName, connection, selectHook);
+      if (records.Count == 0)
+      {
+        return null;
+      }
+
+      return records[0];
+    }
+
     public RecordSet<T> GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    {
+      return this.GetRecordSet<T>(contextName, null, selectHook);
+    }
+
+    public RecordSet<T> GetRecordSet<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
     {
       if (this.recordCache.ContainsKey(contextName))
       {
@@ -150,6 +160,11 @@ namespace Sdx.Db
       }
       else //no join
       {
+        if (connection == null)
+        {
+          throw new ArgumentNullException("connection");
+        }
+
         var table = this.select.Context(this.ContextName).Table;
         if (table.OwnMeta.Relations.ContainsKey(contextName))
         {
@@ -166,12 +181,7 @@ namespace Sdx.Db
             selectHook.Invoke(sel);
           }
 
-          RecordSet<T> resultSet = null;
-          using (var conn = this.select.Adapter.CreateConnection())
-          {
-            conn.Open();
-            resultSet = conn.FetchRecordSet<T>(sel);
-          }
+          RecordSet<T> resultSet = connection.FetchRecordSet<T>(sel);
 
           //キャッシュする
           this.recordCache[contextName] = resultSet;
