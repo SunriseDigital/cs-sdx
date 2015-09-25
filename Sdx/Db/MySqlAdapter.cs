@@ -42,5 +42,12 @@ namespace Sdx.Db
         return Regex.Replace(this.ConnectionString, "(P|p)wd=[^;]+", "${1}wd=" + PWD_FOR_SECURE_CONNECTION_STRING);
       }
     }
+
+    internal override ulong FetchLastInsertId(Connection connection)
+    {
+      var command = connection.CreateCommand();
+      command.CommandText = "SELECT LAST_INSERT_ID()";
+      return (ulong)this.ExecuteScalar(command);
+    }
   }
 }

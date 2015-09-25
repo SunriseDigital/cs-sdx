@@ -61,9 +61,50 @@ namespace Sdx.Db
       return this.Factory.CreateDataAdapter();
     }
 
-    public DbDataReader ExecuteReader(DbCommand command)
+    private T ExecuteCommand<T>(DbCommand command, string comment, Func<T> func)
     {
       Query.Log query = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        query = Sdx.Context.Current.DbProfiler.Begin(command);
+      }
+
+      T result = default(T);
+      try
+      {
+        result = func();
+      }
+      catch (Exception e)
+      {
+        throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText);
+      }
+
+      if (query != null)
+      {
+        query.End();
+        query.Adapter = this;
+        query.Comment = comment;
+      }
+
+      return result;
+    }
+
+    public object ExecuteScalar(DbCommand command)
+    {
+      return this.ExecuteCommand<object>(command, null, () => {
+        return command.ExecuteScalar();
+      });
+    }
+
+    public int ExecuteNonQuery(DbCommand command)
+    {
+      return this.ExecuteCommand<int>(command, null, () => {
+        return command.ExecuteNonQuery();
+      });
+    }
+
+    public DbDataReader ExecuteReader(DbCommand command)
+    {
       string comment = null;
       if(command.Parameters.Count > 0)
       {
@@ -77,29 +118,9 @@ namespace Sdx.Db
         }
       }
 
-      if (Sdx.Context.Current.DbProfiler != null)
-      {
-        query = Sdx.Context.Current.DbProfiler.Begin(command);
-      }
-
-      DbDataReader reader = null;
-      try
-      {
-        reader = command.ExecuteReader();
-      }
-      catch(Exception e)
-      {
-        throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText);
-      }
-
-      if (query != null)
-      {
-        query.End();
-        query.Adapter = this;
-        query.Comment = comment;
-      }
-
-      return reader;
+      return this.ExecuteCommand<DbDataReader>(command, comment, () => {
+        return command.ExecuteReader();
+      });
     }
 
     public Query.Condition CreateCondition()
@@ -147,6 +168,8 @@ namespace Sdx.Db
         }
       }
     }
+
+    internal abstract ulong FetchLastInsertId(Connection connection);
 
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command, Connection connection = null)
     {

@@ -101,6 +101,60 @@ namespace UnitTest
     }
 
     [Fact]
+    public void TestInsert()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunInsert(db);
+      }
+    }
+
+    private void RunInsert(TestDb testDb)
+    {
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      var db = testDb.Adapter;
+
+      ulong id = 0;
+      var now = DateTime.Now.ToString("yyyy/MM/dd HH:mm:ss");
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        conn.Insert("shop", new Dictionary<string, object> {
+          { "name", "FooBar" },
+          { "area_id", "1"},
+          { "created_at", now}
+        });
+
+        id = conn.FetchLastInsertId();
+
+        conn.Commit();
+      }
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var command = conn.CreateCommand();
+        command.CommandText = "SELECT * FROM shop WHERE name = @name";
+        var param = command.CreateParameter();
+        param.ParameterName = "@name";
+        param.Value = "FooBar";
+        command.Parameters.Add(param);
+
+        var shop = db.FetchDictionary<string>(command);
+        Assert.Equal(id.ToString(), shop["id"]);
+        Assert.Equal("1", shop["area_id"]);
+        Assert.Equal(now, shop["created_at"]);
+      }
+
+      Sdx.Context.Current.DbProfiler.Queries.ForEach(query => {
+        Console.WriteLine(query.ToString());
+      });
+      
+
+    }
+
+    [Fact]
     public void TestUpdate()
     {
       foreach (TestDb db in this.CreateTestDbList())
