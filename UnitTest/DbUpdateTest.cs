@@ -41,6 +41,8 @@ namespace UnitTest
       var insert = db.CreateInsert();
 
       var now = DateTime.Now;
+      //mysqlで保存時にミリ秒は丸められてテストがこけるのでtruncateします。
+      now = now.AddTicks(-(now.Ticks % TimeSpan.TicksPerSecond));
       insert
          .SetInto("shop")
          .AddPair("name", "FooBar")
