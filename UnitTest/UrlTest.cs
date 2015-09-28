@@ -27,18 +27,17 @@ namespace UnitTest
       //コンストラクタの解析が意図通りに行われているか、各部品ごとに確認
       Assert.Equal("example.com", url.Domain);
       Assert.Equal("http", url.Scheme);
-      Assert.Equal("bar", url.Param["foo"]);
-      Assert.Equal("huga", url.Param["hoge"]);
+      Assert.Equal("bar", url.GetParam("foo"));
+      Assert.Equal("huga", url.GetParam("hoge"));
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //新しくパラメータを追加した場合、正しくクエリが生成されているか
-      url.Param["key"] = "value";
+      url.SetParam("key", "value");
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
       //Setterではなくコンストラクタの引数にパラメータを渡した場合の挙動
       //オブジェクトが持つデータ自体は変わらないようにする
-      var param = new Dictionary<string, string>();
-      param["new"] = "newValue";
+      var param = new Dictionary<string, string>() { {"new", "newValue"} };
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&new=newValue", url.Build(param));
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
@@ -80,7 +79,7 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(unknownArray));
 
       //存在しないキーを指定して、想定した例外になっているかを確認する
-      Assert.Throws<KeyNotFoundException>(() => url.Param["unknown"]);
+      Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
     }
 
     [Fact]
@@ -96,8 +95,8 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //パラメータの追加(プロパティ経由)
-      url.Param["key"] = "value";
-      Assert.Equal("value", url.Param["key"]);
+      url.SetParam("key", "value");
+      Assert.Equal("value", url.GetParam("key"));
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
 
       //パラメータの追加(引数で)
@@ -136,7 +135,7 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build(unknownArray));
 
       //存在しないキーを指定して、想定した例外になっているかを確認する
-      Assert.Throws<KeyNotFoundException>(() => url.Param["unknown"]);
+      Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
     }
 
     [Fact]
@@ -152,8 +151,8 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //パラメータの追加(プロパティ経由)
-      url.Param["key"] = "value";
-      Assert.Equal("value", url.Param["key"]);
+      url.SetParam("key", "value");
+      Assert.Equal("value", url.GetParam("key"));
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
 
       //パラメータの追加(引数で)
@@ -192,7 +191,7 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build(unknownArray));
 
       //存在しないキーを指定して、想定した例外になっているかを確認する
-      Assert.Throws<KeyNotFoundException>(() => url.Param["unknown"]);
+      Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
     }
 
     [Fact]

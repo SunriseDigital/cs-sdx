@@ -117,7 +117,7 @@ namespace Sdx.Web
       get; set;
     }
 
-    public Dictionary<string, string> Param
+    private Dictionary<string, string> Param
     {
       get; set;
     }
@@ -125,6 +125,22 @@ namespace Sdx.Web
     public string Scheme
     {
       get; set;
+    }
+
+    public void SetParam(string key, string value)
+    {
+      this.Param[key] = value;
+    }
+
+    public string GetParam(string key)
+    {
+      return this.Param[key];
+    }
+
+    //まだ使用しないのでとりあえず定義だけ
+    public List<string> GetParamList(string key)
+    {
+      return new List<string>() { "" };
     }
   }
 }
