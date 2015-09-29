@@ -76,7 +76,7 @@ namespace UnitTest
 
     private void RunJoinTable(TestDb db)
     {
-      Sdx.Db.Query.Select select;
+      Sdx.Db.Sql.Select select;
 
       //Inner
       select = db.Adapter.CreateSelect();
@@ -131,9 +131,9 @@ namespace UnitTest
           new Test.Orm.Table.Area(),
           db.Adapter.CreateCondition()
             .Add(
-              new Sdx.Db.Query.Column("area_id", "shop"),
-              new Sdx.Db.Query.Column("id", "area")
-            ).Add(new Sdx.Db.Query.Column("id", "area"), "3")
+              new Sdx.Db.Sql.Column("area_id", "shop"),
+              new Sdx.Db.Sql.Column("id", "area")
+            ).Add(new Sdx.Db.Sql.Column("id", "area"), "3")
         );
 
       //conditionの上書き
@@ -171,7 +171,7 @@ namespace UnitTest
 
     private void RunTableChangeColumn(TestDb db)
     {
-      Sdx.Db.Query.Select select;
+      Sdx.Db.Sql.Select select;
 
       //simple set
       select = db.Adapter.CreateSelect();
@@ -204,7 +204,7 @@ namespace UnitTest
 
     private void RunTableComplexJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select;
+      Sdx.Db.Sql.Select select;
 
       select = db.Adapter.CreateSelect();
 

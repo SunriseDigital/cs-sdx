@@ -42,9 +42,9 @@ namespace Sdx.Db
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }
 
-    public Query.Condition CreateJoinCondition(string contextName)
+    public Sql.Condition CreateJoinCondition(string contextName)
     {
-      var cond = new Query.Condition();
+      var cond = new Sql.Condition();
 
       if(!this.Relations.ContainsKey(contextName))
       {
@@ -53,8 +53,8 @@ namespace Sdx.Db
 
       var relation = this.Relations[contextName];
       cond.Add(
-        new Query.Column(relation.ForeignKey, this.Name),
-        new Query.Column(relation.ReferenceKey, contextName)
+        new Sql.Column(relation.ForeignKey, this.Name),
+        new Sql.Column(relation.ReferenceKey, contextName)
       );
 
       return cond;

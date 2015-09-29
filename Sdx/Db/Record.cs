@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-using Sdx.Db.Query;
+using Sdx.Db.Sql;
 
 namespace Sdx.Db
 {

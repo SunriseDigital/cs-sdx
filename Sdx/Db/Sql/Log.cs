@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Log
   {

@@ -35,7 +35,7 @@ namespace UnitTest
 
     private void RunInsert(TestDb testDb)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var db = testDb.Adapter;
 
       var insert = db.CreateInsert();
@@ -134,7 +134,7 @@ namespace UnitTest
 
     private void RunInsertWithSubquery(TestDb testDb)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var db = testDb.Adapter;
 
       var insert = db.CreateInsert();
@@ -147,7 +147,7 @@ namespace UnitTest
 
       var select = db.CreateSelect();
       select
-        .AddColumn(Sdx.Db.Query.Expr.Wrap("'FooBarSubquery'"))
+        .AddColumn(Sdx.Db.Sql.Expr.Wrap("'FooBarSubquery'"))
         .AddFrom("shop")
         .AddColumns("area_id", "created_at")
         .Where.Add("id", 1)

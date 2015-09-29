@@ -19,7 +19,7 @@ namespace Sdx.Db
       }
     }
 
-    internal override void InitSelectEvent(Query.Select select)
+    internal override void InitSelectEvent(Sql.Select select)
     {
       //AfterFromFunc(ForUpdate)
       select.AfterFromFunc = (sel) => {

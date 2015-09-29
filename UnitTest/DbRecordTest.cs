@@ -40,7 +40,7 @@ namespace UnitTest
 
       select
          .AddFrom(tShop)
-         .AddOrder("id", Sdx.Db.Query.Order.ASC);
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
       select.SetLimit(1);
 
       using (var conn = db.Adapter.CreateConnection())
@@ -71,13 +71,13 @@ namespace UnitTest
 
     private void RunJoinManyOne(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
 
       var select = db.Adapter.CreateSelect();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
-         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
          .InnerJoin(new Test.Orm.Table.Area())
          ;
       select.SetLimit(2);
@@ -126,17 +126,17 @@ namespace UnitTest
 
     private void RunJoinOneMany(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
-         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
          ;
 
       select.Context("shop")
          .InnerJoin(new Test.Orm.Table.Menu())
-         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
          ;
 
       select.Context("shop")
@@ -172,18 +172,18 @@ namespace UnitTest
 
     private void RunJoinManyMany(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
 
       var select = db.Adapter.CreateSelect();
 
       select.AddFrom(new Test.Orm.Table.Shop())
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .Where.Add("name", new List<string>() { "ビーナスラッシュ", "Freeve" }).Context
         .InnerJoin(new Test.Orm.Table.ShopCategory())
          ;
 
       select.Context("shop_category").InnerJoin(new Test.Orm.Table.Category())
-        .AddOrder("id", Sdx.Db.Query.Order.ASC);
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC);
 
       using (var conn = db.Adapter.CreateConnection())
       {
@@ -220,12 +220,12 @@ namespace UnitTest
 
     private void RunNoJoinManyOne(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
-         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
          ;
 
       select.SetLimit(1);
@@ -262,12 +262,12 @@ namespace UnitTest
 
     private void RunNoJoinOneMany(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
-         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
          .Where.Add("name", "天府舫")
          ;
 
@@ -279,7 +279,7 @@ namespace UnitTest
         var menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
           "menu",
           conn,
-          sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Query.Order.ASC); }
+          sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Sql.Order.ASC); }
         );
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
 
@@ -292,7 +292,7 @@ namespace UnitTest
         menuSet = shops[0].ClearRecordCache("menu").GetRecordSet<Test.Orm.Menu>(
           "menu",
           conn,
-          sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Query.Order.DESC); }
+          sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Sql.Order.DESC); }
         );
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Queries.Count);
 
@@ -316,12 +316,12 @@ namespace UnitTest
 
     private void RunNoJoinManyMany(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
          .AddFrom(new Test.Orm.Table.Shop())
-         .AddOrder("id", Sdx.Db.Query.Order.ASC)
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
          .Where.Add("name", "Freeve")
          ;
 
@@ -333,7 +333,7 @@ namespace UnitTest
         var shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
           "shop_category",
           conn,
-          sel => { sel.AddOrder("category_id", Sdx.Db.Query.Order.ASC); }
+          sel => { sel.AddOrder("category_id", Sdx.Db.Sql.Order.ASC); }
         );
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Queries.Count);
 
@@ -346,7 +346,7 @@ namespace UnitTest
         shopCategorySet = shops[0].ClearRecordCache("shop_category").GetRecordSet<Test.Orm.ShopCategory>(
           "shop_category",
           conn,
-          sel => { sel.AddOrder("category_id", Sdx.Db.Query.Order.DESC); }
+          sel => { sel.AddOrder("category_id", Sdx.Db.Sql.Order.DESC); }
         );
         Assert.Equal(6, Sdx.Context.Current.DbProfiler.Queries.Count);
 
@@ -371,7 +371,7 @@ namespace UnitTest
 
     private void RunSameTableLeftJoinNotNull(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
@@ -408,7 +408,7 @@ namespace UnitTest
 
     private void RunSameTableLeftJoinNull(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
@@ -443,7 +443,7 @@ namespace UnitTest
 
     private void RunSameTableNoJoinNotNull(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
@@ -478,7 +478,7 @@ namespace UnitTest
 
     private void RunSameTableNoJoinNull(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
@@ -511,7 +511,7 @@ namespace UnitTest
 
     private void RunRecordCache(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
       select
@@ -604,7 +604,7 @@ namespace UnitTest
 
         .ClearColumns()
         .Table.AddColumns("id", "name", "main_image_id")
-        .Context.AddOrder("id", Sdx.Db.Query.Order.ASC).Table.Select
+        .Context.AddOrder("id", Sdx.Db.Sql.Order.ASC).Table.Select
         .SetLimit(2);
 
       using (var conn = db.Adapter.CreateConnection())
@@ -642,7 +642,7 @@ namespace UnitTest
 
       select
         .AddFrom(new Test.Orm.Table.Shop())
-        .AddOrder("id", Sdx.Db.Query.Order.ASC).Select
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC).Select
         .SetLimit(1);
       ;
 

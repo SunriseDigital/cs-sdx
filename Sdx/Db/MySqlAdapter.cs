@@ -11,7 +11,7 @@ namespace Sdx.Db
       return DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
     }
 
-    internal override void InitSelectEvent(Query.Select select)
+    internal override void InitSelectEvent(Sql.Select select)
     {
       //AfterOrderFunc(Limit/Offset+ForUpdate)
       select.AfterOrderFunc = (sel) => {

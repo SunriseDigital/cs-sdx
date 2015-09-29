@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public enum Order
   {

@@ -4,7 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Insert
   {

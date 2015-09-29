@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Condition : ICloneable
   {

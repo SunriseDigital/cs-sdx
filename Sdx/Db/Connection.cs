@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
-using Sdx.Db.Query;
+using Sdx.Db.Sql;
 
 namespace Sdx.Db
 {
@@ -129,7 +129,7 @@ namespace Sdx.Db
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
 
-      Query.Log query = null;
+      Sql.Log query = null;
       if (Sdx.Context.Current.DbProfiler != null)
       {
         query = Sdx.Context.Current.DbProfiler.Begin(command);
@@ -155,7 +155,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public int Execute(Query.Insert insert)
+    public int Execute(Sql.Insert insert)
     {
       using (var command = insert.Build())
       {
@@ -185,7 +185,7 @@ namespace Sdx.Db
         //Select.SetCommentのため、最後がコメントかチェックする
         var lastIndex = command.Parameters.Count - 1;
         var param = command.Parameters[lastIndex];
-        if (param.ParameterName == Query.Select.CommentParameterKey)
+        if (param.ParameterName == Sql.Select.CommentParameterKey)
         {
           command.Parameters.RemoveAt(lastIndex);
           comment = param.Value.ToString();
@@ -291,7 +291,7 @@ namespace Sdx.Db
       return command.Connection == this.DbConnection && command.Transaction == this.DbTransaction;
     }
 
-    public Dictionary<string, T> FetchDictionary<T>(Query.Select select)
+    public Dictionary<string, T> FetchDictionary<T>(Sql.Select select)
     {
       Dictionary<string, T> result;
       using (var command = select.Build())
@@ -302,7 +302,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public T FetchOne<T>(Query.Select select)
+    public T FetchOne<T>(Sql.Select select)
     {
       T result = default(T);
       using (var command = select.Build())
@@ -313,7 +313,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public List<T> FetchList<T>(Query.Select select)
+    public List<T> FetchList<T>(Sql.Select select)
     {
       List<T> result = null;
       using (var command = select.Build())
@@ -324,7 +324,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Query.Select select)
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Sql.Select select)
     {
       List<KeyValuePair<TKey, TValue>> result = null;
       using (var command = select.Build())
@@ -335,7 +335,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(Query.Select select)
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(Sql.Select select)
     {
       List<Dictionary<string, T>> result = null;
       using (var command = select.Build())
@@ -346,7 +346,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public T FetchRecord<T>(Query.Select select) where T : Record, new()
+    public T FetchRecord<T>(Sql.Select select) where T : Record, new()
     {
       var resultSet = this.FetchRecordSet<T>(select);
 
@@ -367,7 +367,7 @@ namespace Sdx.Db
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(Query.Select select) where T : Record, new()
+    public RecordSet<T> FetchRecordSet<T>(Sql.Select select) where T : Record, new()
     {
       var prop = typeof(T).GetProperty("Meta");
       if (prop == null)

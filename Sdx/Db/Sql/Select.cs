@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Select : ICloneable
   {
@@ -107,7 +107,7 @@ namespace Sdx.Db.Query
       return this.CreateContext(target, alias);
     }
 
-    public Context AddFrom(Sdx.Db.Query.Select target, string alias = null)
+    public Context AddFrom(Sdx.Db.Sql.Select target, string alias = null)
     {
       return this.CreateContext(target, alias);
     }
@@ -465,7 +465,7 @@ namespace Sdx.Db.Query
       var cloned = (Select)this.MemberwiseClone();
 
       //context
-      cloned.contextList = new List<Query.Context>();
+      cloned.contextList = new List<Sql.Context>();
       this.contextList.ForEach(context =>
       {
         var clonedContext = (Context)context.Clone();

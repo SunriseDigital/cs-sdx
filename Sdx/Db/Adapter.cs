@@ -2,7 +2,7 @@
 using System.Data.Common;
 using System.Collections.Generic;
 using System.Linq;
-using Sdx.Db.Query;
+using Sdx.Db.Sql;
 
 namespace Sdx.Db
 {
@@ -63,16 +63,16 @@ namespace Sdx.Db
       return this.Factory.CreateDataAdapter();
     }
 
-    public Query.Condition CreateCondition()
+    public Sql.Condition CreateCondition()
     {
-      return new Query.Condition();
+      return new Sql.Condition();
     }
 
     public string QuoteIdentifier(object obj)
     {
-      if (obj is Query.Expr)
+      if (obj is Sql.Expr)
       {
-        return (obj as Query.Expr).ToString();
+        return (obj as Sql.Expr).ToString();
       }
       else if(obj is string)
       {
@@ -95,14 +95,14 @@ namespace Sdx.Db
       return prefix + SecureConnectionString;
     }
 
-    public Query.Select CreateSelect()
+    public Sql.Select CreateSelect()
     {
-      return new Query.Select(this);
+      return new Sql.Select(this);
     }
 
-    public Query.Insert CreateInsert()
+    public Sql.Insert CreateInsert()
     {
-      return new Query.Insert(this);
+      return new Sql.Insert(this);
     }
 
   }

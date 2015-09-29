@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 
-using Sdx.Db.Query;
+using Sdx.Db.Sql;
 
 namespace Sdx.Db
 {

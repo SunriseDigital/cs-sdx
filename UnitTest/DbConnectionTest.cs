@@ -41,7 +41,7 @@ namespace UnitTest
       select
         .SetLimit(1)
         .AddFrom(new Test.Orm.Table.Shop())
-        .AddOrder("id", Sdx.Db.Query.Order.ASC);
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC);
 
       using (var conn = db.CreateConnection())
       {
@@ -101,7 +101,7 @@ namespace UnitTest
       var db = this.CreateTestDbList()[0].Adapter;
 
 
-      var profiler = new Sdx.Db.Query.Profiler();
+      var profiler = new Sdx.Db.Sql.Profiler();
       Sdx.Context.Current.DbProfiler = profiler;
 
       var command = db.CreateCommand();
@@ -155,11 +155,11 @@ namespace UnitTest
 
     private void RunFetchDictionaryList(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -179,9 +179,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -207,11 +207,11 @@ namespace UnitTest
 
     private void RunFetchKeyValuePairList(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -231,9 +231,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("id", "name", "main_image_id")//最初の二つ以外は無視
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -261,11 +261,11 @@ namespace UnitTest
 
     private void RunFetchList(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -283,9 +283,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("name", "main_image_id")//最初１つ以外は無視
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -303,9 +303,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 4, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 4, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -325,7 +325,7 @@ namespace UnitTest
       sel
         .AddFrom("shop")
         .AddColumns("created_at")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC).Select
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC).Select
         .SetLimit(2)
         ;
 
@@ -352,11 +352,11 @@ namespace UnitTest
     private void RunFetchOne(TestDb db)
     {
       //int
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)//２行目以降は無視
         ;
 
@@ -373,9 +373,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("name", "main_image_id")//二つ目以降は無視
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -393,9 +393,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 3, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 3, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("created_at", "main_image_id")//二つ目以降は無視
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -423,7 +423,7 @@ namespace UnitTest
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -440,9 +440,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -480,7 +480,7 @@ namespace UnitTest
       var select = db.Adapter.CreateSelect();
       select
         .AddFrom(new Test.Orm.Table.Shop())
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .Table.SetColumns("id");
 
       using (var con = db.Adapter.CreateConnection())
@@ -526,11 +526,11 @@ namespace UnitTest
 
     private void RunFetchListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -558,9 +558,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("name", "main_image_id")//最初１つ以外は無視
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -592,11 +592,11 @@ namespace UnitTest
 
     private void RunFetchDictionaryWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -622,9 +622,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -657,11 +657,11 @@ namespace UnitTest
 
     private void RunFetchDictionaryListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
       List<Dictionary<string, string>> list = null;
@@ -687,9 +687,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("id", "name", "main_image_id")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -721,11 +721,11 @@ namespace UnitTest
 
     private void RunFetchKeyValuePairListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -752,9 +752,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Query.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
         .AddColumns("id", "name", "main_image_id")//最初の二つ以外は無視
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
 
@@ -788,7 +788,7 @@ namespace UnitTest
 
     private void RunFetchRecordWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom(new Test.Orm.Table.Shop())
         .Where.Add("id", 1);
@@ -820,11 +820,11 @@ namespace UnitTest
 
     private void RunFetchRecordListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Query.Select(db.Adapter);
+      var sel = new Sdx.Db.Sql.Select(db.Adapter);
       sel
         .AddFrom(new Test.Orm.Table.Shop())
         .Where.Add("id", new string[] { "2", "3" }).Context
-        .AddOrder("id", Sdx.Db.Query.Order.DESC)
+        .AddOrder("id", Sdx.Db.Sql.Order.DESC)
         ;
 
       using (var con = db.Adapter.CreateConnection())

@@ -80,7 +80,7 @@ namespace UnitTest
 
     private void RunSelectSimple(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
 
       //AddColumn
       select.AddFrom("shop").AddColumns("*");
@@ -199,7 +199,7 @@ namespace UnitTest
 
     private void RunSelectSimpleInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
 
       select.AddFrom("shop").AddColumns("*");
 
@@ -207,8 +207,8 @@ namespace UnitTest
         "area",
         db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           )
       ).AddColumns("*");
 
@@ -223,8 +223,8 @@ namespace UnitTest
         "image",
         db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("main_image_id", "shop"),
-            new Sdx.Db.Query.Column("id", "image")
+            new Sdx.Db.Sql.Column("main_image_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "image")
           )
         );
 
@@ -233,10 +233,10 @@ namespace UnitTest
         "area",
         db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           ).Add(
-            new Sdx.Db.Query.Column("id", "area"),
+            new Sdx.Db.Sql.Column("id", "area"),
             1
           )
       ).AddColumns("*");
@@ -262,18 +262,18 @@ namespace UnitTest
 
     private void RunSelectMultipleInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .InnerJoin("area", db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           )
         ).InnerJoin("large_area", db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("large_area_id", "area"),
-            new Sdx.Db.Query.Column("id", "large_area")
+            new Sdx.Db.Sql.Column("large_area_id", "area"),
+            new Sdx.Db.Sql.Column("id", "large_area")
           )
         );
 
@@ -302,19 +302,19 @@ namespace UnitTest
 
     private void RunSelectNoColumnInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .InnerJoin("area", db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           )
         )
         .InnerJoin("large_area", db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("large_area_id", "area"),
-            new Sdx.Db.Query.Column("id", "large_area")
+            new Sdx.Db.Sql.Column("large_area_id", "area"),
+            new Sdx.Db.Sql.Column("id", "large_area")
           )
         );
 
@@ -338,22 +338,22 @@ namespace UnitTest
 
     private void RunSelectSameTableInnerJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumns("*");
 
       select.Context("shop")
         .InnerJoin("image", db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("main_image_id", "shop"),
-            new Sdx.Db.Query.Column("id", "main_image")
+            new Sdx.Db.Sql.Column("main_image_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "main_image")
           ), "main_image")
         .AddColumns("*");
 
       select.Context("shop")
         .InnerJoin("image", db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("sub_image_id", "shop"),
-            new Sdx.Db.Query.Column("id", "sub_image")
+            new Sdx.Db.Sql.Column("sub_image_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "sub_image")
           ), "sub_image")
         .AddColumns("*");
 
@@ -404,12 +404,12 @@ namespace UnitTest
 
     private void RunSelectLeftJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select.AddFrom("shop")
         .AddColumn("*")
         .LeftJoin("image", db.Adapter.CreateCondition().Add(
-            new Sdx.Db.Query.Column("main_image_id", "shop"),
-            new Sdx.Db.Query.Column("id", "image")
+            new Sdx.Db.Sql.Column("main_image_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "image")
         ));
 
       db.Command = select.Build();
@@ -431,12 +431,12 @@ namespace UnitTest
 
     private void RunSelectJoinOrder(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
-      var cshop = new Sdx.Db.Query.Column("main_image_id", "shop");
-      var cols = new Dictionary<int, Sdx.Db.Query.Column>();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
+      var cshop = new Sdx.Db.Sql.Column("main_image_id", "shop");
+      var cols = new Dictionary<int, Sdx.Db.Sql.Column>();
       for (int i = 1; i <= 7; i++)
       {
-        cols[i] = new Sdx.Db.Query.Column("id", "image" + i.ToString());
+        cols[i] = new Sdx.Db.Sql.Column("id", "image" + i.ToString());
       }
 
       select.AddFrom("shop").AddColumn("*");
@@ -472,7 +472,7 @@ namespace UnitTest
       select.Context("shop").LeftJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[6]), "image6");
       select.Context("shop").InnerJoin("image", db.Adapter.CreateCondition().Add(cshop, cols[7]), "image7");
 
-      select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
+      select.JoinOrder = Sdx.Db.Sql.JoinOrder.Natural;
 
       db.Command = select.Build();
       Assert.Equal(
@@ -501,7 +501,7 @@ namespace UnitTest
 
     private void RunSelectNonTableColumns(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
 
       //単純なAddColumns
       select.AddFrom("shop");
@@ -535,7 +535,7 @@ namespace UnitTest
       //AddColumn MAX
       select.ClearColumns().RemoveContext("shop").AddFrom("shop");
       select.AddColumn(
-        Sdx.Db.Query.Expr.Wrap("MAX(" + select.Context("shop").AppendName("id") + ")"),
+        Sdx.Db.Sql.Expr.Wrap("MAX(" + select.Context("shop").AppendName("id") + ")"),
         "max_id"
       );
 
@@ -558,7 +558,7 @@ namespace UnitTest
 
     private void RunSelectMultipleFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select.AddFrom("shop").AddColumn("*");
       select.AddFrom("area");
 
@@ -592,7 +592,7 @@ namespace UnitTest
 
     private void RunSelectWhereSimple(TestDb db)
     {
-      Sdx.Db.Query.Select select;
+      Sdx.Db.Sql.Select select;
 
       //selectに対する呼び出し
       select = db.Adapter.CreateSelect();
@@ -685,15 +685,15 @@ namespace UnitTest
 
     private void RunSelectRawSubqueryJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*")
         .InnerJoin(
-          Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
+          Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
           db.Adapter.CreateCondition().Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "sub_cat")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "sub_cat")
           ),
           "sub_cat"
         );
@@ -719,13 +719,13 @@ namespace UnitTest
 
     private void RunSelectSubqueryJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select sub = db.Adapter.CreateSelect();
       sub
         .AddFrom("area")
         .AddColumn("id")
@@ -734,8 +734,8 @@ namespace UnitTest
       select.Context("shop").InnerJoin(
         sub,
         db.Adapter.CreateCondition().Add(
-          new Sdx.Db.Query.Column("area_id", "shop"),
-          new Sdx.Db.Query.Column("id", "sub_cat")
+          new Sdx.Db.Sql.Column("area_id", "shop"),
+          new Sdx.Db.Sql.Column("id", "sub_cat")
         ), "sub_cat");
 
       db.Command = select.Build();
@@ -761,21 +761,21 @@ namespace UnitTest
 
     private void RunSelectSubqueryLeftJoin(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select sub = db.Adapter.CreateSelect();
       sub
         .AddFrom("area")
         .AddColumn("id")
         .Where.Add("id", "2");
 
       select.Context("shop").LeftJoin(sub, db.Adapter.CreateCondition().Add(
-        new Sdx.Db.Query.Column("area_id", "shop"),
-        new Sdx.Db.Query.Column("id", "sub_cat")
+        new Sdx.Db.Sql.Column("area_id", "shop"),
+        new Sdx.Db.Sql.Column("id", "sub_cat")
       ), "sub_cat");
 
       db.Command = select.Build();
@@ -801,19 +801,19 @@ namespace UnitTest
 
     private void RunSelectSubqueryWhere(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select sub = db.Adapter.CreateSelect();
       sub
         .AddFrom("area")
         .AddColumn("id")
         .Where.Add("id", "2");
 
-      select.Context("shop").Where.Add("area_id", sub, Sdx.Db.Query.Comparison.In);
+      select.Context("shop").Where.Add("area_id", sub, Sdx.Db.Sql.Comparison.In);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -838,14 +838,14 @@ namespace UnitTest
 
     private void RunSelectRawSubqueryFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*")
         .Where.Add("id", "1");
 
       select.AddFrom(
-        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
+        Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
         "sub_cat"
       );
 
@@ -871,13 +871,13 @@ namespace UnitTest
 
     private void RunSelectSubqueryFrom(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*")
         .Where.Add("id", "1");
 
-      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select sub = db.Adapter.CreateSelect();
       sub
         .AddFrom("area")
         .AddColumn("id")
@@ -908,7 +908,7 @@ namespace UnitTest
 
     private void RunSelectWhereIn(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*")
@@ -942,7 +942,7 @@ namespace UnitTest
     private void RunSelectGroupHaving(TestDb db)
     {
       //TableにGroup
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("id")
@@ -955,9 +955,9 @@ namespace UnitTest
       );
 
       select.Having.Add(
-        Sdx.Db.Query.Expr.Wrap("SUM(shop.id)"),
+        Sdx.Db.Sql.Expr.Wrap("SUM(shop.id)"),
         10,
-        Sdx.Db.Query.Comparison.GreaterEqual
+        Sdx.Db.Sql.Comparison.GreaterEqual
       );
 
       db.Command = select.Build();
@@ -978,9 +978,9 @@ namespace UnitTest
         .AddGroup("id");
 
       select.Having.Add(
-        Sdx.Db.Query.Expr.Wrap("SUM(id)"),
+        Sdx.Db.Sql.Expr.Wrap("SUM(id)"),
         20,
-        Sdx.Db.Query.Comparison.GreaterEqual
+        Sdx.Db.Sql.Comparison.GreaterEqual
       );
 
       db.Command = select.Build();
@@ -1005,12 +1005,12 @@ namespace UnitTest
 
     private void RunSelectOrderLimitOffset(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
       select
         .AddFrom("shop")
         .AddColumn("*");
 
-      select.AddOrder("id", Sdx.Db.Query.Order.DESC);
+      select.AddOrder("id", Sdx.Db.Sql.Order.DESC);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1077,7 +1077,7 @@ namespace UnitTest
       select
         .AddFrom("shop")
         .AddColumn("*")
-        .AddOrder("id", Sdx.Db.Query.Order.DESC);
+        .AddOrder("id", Sdx.Db.Sql.Order.DESC);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1105,7 +1105,7 @@ namespace UnitTest
         .AddFrom("shop")
         .AddColumn("id")
         .AddGroup("id")
-        .Having.Add("id", "2", Sdx.Db.Query.Comparison.GreaterEqual);
+        .Having.Add("id", "2", Sdx.Db.Sql.Comparison.GreaterEqual);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1129,7 +1129,7 @@ namespace UnitTest
 
     private void RunJoinCondition(TestDb db)
     {
-      Sdx.Db.Query.Select select = db.Adapter.CreateSelect();
+      Sdx.Db.Sql.Select select = db.Adapter.CreateSelect();
 
       //InnerJoin
       select = db.Adapter.CreateSelect();
@@ -1137,8 +1137,8 @@ namespace UnitTest
       select.Context("shop").InnerJoin(
         "area",
         db.Adapter.CreateCondition().Add(
-          new Sdx.Db.Query.Column("area_id", "shop"),
-          new Sdx.Db.Query.Column("id", "area")
+          new Sdx.Db.Sql.Column("area_id", "shop"),
+          new Sdx.Db.Sql.Column("id", "area")
         )
       ).AddColumns("*");
       db.Command = select.Build();
@@ -1156,10 +1156,10 @@ namespace UnitTest
         "area",
         db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           ).Add(
-            new Sdx.Db.Query.Column("id", "area"),
+            new Sdx.Db.Sql.Column("id", "area"),
             "1"
           )
       ).AddColumns("*");
@@ -1180,11 +1180,11 @@ namespace UnitTest
         "area",
         db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           ).Add(
-            new Sdx.Db.Query.Column("id", "area"),
-            Sdx.Db.Query.Expr.Wrap(99)
+            new Sdx.Db.Sql.Column("id", "area"),
+            Sdx.Db.Sql.Expr.Wrap(99)
           )
       ).AddColumns("*");
       db.Command = select.Build();
@@ -1205,12 +1205,12 @@ namespace UnitTest
         "area",
         db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           ).Add(
-            new Sdx.Db.Query.Column("id", "area"),
+            new Sdx.Db.Sql.Column("id", "area"),
             sub,
-            Sdx.Db.Query.Comparison.In
+            Sdx.Db.Sql.Comparison.In
           )
       ).AddColumns("*");
 
@@ -1230,12 +1230,12 @@ namespace UnitTest
         "area",
         db.Adapter.CreateCondition()
           .Add(
-            new Sdx.Db.Query.Column("area_id", "shop"),
-            new Sdx.Db.Query.Column("id", "area")
+            new Sdx.Db.Sql.Column("area_id", "shop"),
+            new Sdx.Db.Sql.Column("id", "area")
           ).Add(
-            new Sdx.Db.Query.Column("id", "area"),
+            new Sdx.Db.Sql.Column("id", "area"),
             sub,
-            Sdx.Db.Query.Comparison.In
+            Sdx.Db.Sql.Comparison.In
           )
       ).AddColumns("*").Where.Add("id", "99");
 
@@ -1261,12 +1261,12 @@ namespace UnitTest
           "area",
           db.Adapter.CreateCondition()
             .Add(
-              new Sdx.Db.Query.Column("area_id", "shop"),
-              new Sdx.Db.Query.Column("id", "area")
+              new Sdx.Db.Sql.Column("area_id", "shop"),
+              new Sdx.Db.Sql.Column("id", "area")
             ).Add(
               db.Adapter.CreateCondition()
-                .Add(new Sdx.Db.Query.Column("id", "area"), "1")
-                .AddOr(new Sdx.Db.Query.Column("id", "area"), "2")
+                .Add(new Sdx.Db.Sql.Column("id", "area"), "1")
+                .AddOr(new Sdx.Db.Sql.Column("id", "area"), "2")
             )
         )
         .AddColumns("*");
@@ -1286,12 +1286,12 @@ namespace UnitTest
           "area",
           db.Adapter.CreateCondition()
             .Add(
-              new Sdx.Db.Query.Column("area_id", "shop"),
-              new Sdx.Db.Query.Column("id", "area")
+              new Sdx.Db.Sql.Column("area_id", "shop"),
+              new Sdx.Db.Sql.Column("id", "area")
             ).Add(
               db.Adapter.CreateCondition()
-                .Add(new Sdx.Db.Query.Column("id", "shop"), "1")
-                .AddOr(new Sdx.Db.Query.Column("id", "shop"), "2")
+                .Add(new Sdx.Db.Sql.Column("id", "shop"), "1")
+                .AddOr(new Sdx.Db.Sql.Column("id", "shop"), "2")
             )
         )
         .AddColumns("*");
@@ -1321,12 +1321,12 @@ namespace UnitTest
         .AddFrom("shop")
         .AddColumn("*")
         .InnerJoin("area", db.Adapter.CreateCondition().Add(
-          new Sdx.Db.Query.Column("area_id", "shop"),
-          new Sdx.Db.Query.Column("id", "area")
+          new Sdx.Db.Sql.Column("area_id", "shop"),
+          new Sdx.Db.Sql.Column("id", "area")
          ))
         .InnerJoin("large_area", db.Adapter.CreateCondition().Add(
-          new Sdx.Db.Query.Column("large_area_id", "area"),
-          new Sdx.Db.Query.Column("id", "large_area")
+          new Sdx.Db.Sql.Column("large_area_id", "area"),
+          new Sdx.Db.Sql.Column("id", "large_area")
         ));
 
       select.Context("shop").Where.Add(
@@ -1443,7 +1443,7 @@ namespace UnitTest
         .AddFrom("shop")
         .AddColumn("id")
         .AddGroup("id")
-        .Having.Add("id", sub, Sdx.Db.Query.Comparison.In);
+        .Having.Add("id", sub, Sdx.Db.Sql.Comparison.In);
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1471,7 +1471,7 @@ namespace UnitTest
 
     private void RunSelectComment(TestDb db)
     {
-      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
 
       //
       var select = db.Adapter.CreateSelect();
@@ -1495,7 +1495,7 @@ namespace UnitTest
       //
       select
         .SetComment("Where and order limit")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(10)
         .Context("shop").Where.Add("area_id", 1);
 
@@ -1528,7 +1528,7 @@ namespace UnitTest
       //
       select
         .SetComment("Where and order limit from string")
-        .AddOrder("id", Sdx.Db.Query.Order.ASC)
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(10)
         .Context("shop").Where.Add("area_id", 1);
 
