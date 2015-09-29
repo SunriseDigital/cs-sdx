@@ -223,31 +223,5 @@ namespace UnitTest
       //存在しないキーで値を取得しようとした場合、例外になる。
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
     }
-
-    [Fact]
-    public void TestHashParams()
-    {
-      var url = new Sdx.Web.Url("http://example.com/path/to/api?list[key0]=value0&list[key1]=value1&list[key2]=value2");
-
-      //パスの各部品を取得
-      Assert.Equal("example.com", url.Domain);
-      Assert.Equal("http", url.Scheme);
-      Assert.Equal("/path/to/api", url.LocalPath);
-
-      //List で取得。※list[key0] と list[key1] は全く別のキーとして扱われます
-      var list = url.GetParamList("list[key0]");
-      list.Add("addedValue");
-      Assert.Equal("http://example.com/path/to/api?list[key0]=value0&list[key1]=value1&list[key2]=value2", url.Build());
-
-      //文字列でパラメータ取得。List内に複数の要素がある場合は最後の要素が取得できることを期待
-      url.SetParam("array[key0]", "newValue");
-      var str = url.GetParam("array[key0]");
-      Assert.Equal("newValue", str);
-      str = "addedStr";
-      Assert.Equal("http://example.com/path/to/api?list[key0]=value0&list[key1]=value1&list[key2]=value2&list[key0]=newValue", url.Build());
-
-      //存在しないキーで値を取得しようとした場合、例外になる。
-      Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
-    }
   }
 }
