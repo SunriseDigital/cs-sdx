@@ -78,12 +78,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var command = conn.CreateCommand();
-        command.CommandText = "SELECT * FROM shop WHERE name = @name";
-        var param = command.CreateParameter();
-        param.ParameterName = "@name";
-        param.Value = "FooBar";
-        command.Parameters.Add(param);
+        var command = CreateFooBarCommand(conn, "FooBar");
 
         var shop = conn.FetchDictionary<string>(command);
         Assert.Equal(id.ToString(), shop["id"]);
@@ -116,6 +111,18 @@ namespace UnitTest
       }
     }
 
+    private DbCommand CreateFooBarCommand(Sdx.Db.Connection conn, string name)
+    {
+      var command = conn.CreateCommand();
+      command.CommandText = "SELECT * FROM shop WHERE name = @name";
+      var param = command.CreateParameter();
+      param.ParameterName = "@name";
+      param.Value = name;
+      command.Parameters.Add(param);
+
+      return command;
+    }
+
     [Fact]
     public void TestInsertWithSubquery()
     {
@@ -127,8 +134,65 @@ namespace UnitTest
 
     private void RunInsertWithSubquery(TestDb testDb)
     {
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Query.Profiler();
+      var db = testDb.Adapter;
 
+      var insert = db.CreateInsert();
 
+      insert
+        .SetInto("shop")
+        .AddColumn("name")
+        .AddColumn("area_id")
+        .AddColumn("created_at");
+
+      var select = db.CreateSelect();
+      select
+        .AddColumn(Sdx.Db.Query.Expr.Wrap("'FooBarSubquery'"))
+        .AddFrom("shop")
+        .AddColumns("area_id", "created_at")
+        .Where.Add("id", 1)
+        ;
+
+      insert.SetSubquery(select);
+
+      using (var command = insert.Build())
+      {
+        Assert.Equal(
+          testDb.Sql(@"INSERT INTO {0}shop{1}
+            ({0}name{1}, {0}area_id{1}, {0}created_at{1})
+            (SELECT
+              'FooBarSubquery',
+              {0}shop{1}.{0}area_id{1},
+              {0}shop{1}.{0}created_at{1}
+            FROM {0}shop{1}
+            WHERE {0}shop{1}.{0}id{1} = @0)"),
+          command.CommandText
+        );
+
+        Assert.Equal(1, command.Parameters["@0"].Value);
+
+        ulong id = 0;
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+
+          conn.ExecuteNonQuery(command);
+
+          id = conn.FetchLastInsertId();
+
+          conn.Commit();
+        }
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+
+          var shop = conn.FetchDictionary<string>(CreateFooBarCommand(conn, "FooBarSubquery"));
+          Assert.Equal(id.ToString(), shop["id"]);
+          Assert.Equal("2", shop["area_id"]);
+        }
+      }
     }
 
     [Fact]

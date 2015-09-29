@@ -35,7 +35,7 @@ namespace Sdx.Db
       return con;
     }
 
-    public DbParameter CreateParameter(string key, string value)
+    public DbParameter CreateParameter(string key, object value)
     {
       DbParameter param = this.Factory.CreateParameter();
       param.ParameterName = key;

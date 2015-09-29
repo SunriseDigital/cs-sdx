@@ -263,7 +263,7 @@ namespace UnitTest
       );
 
       Assert.Equal(1, db.Command.Parameters.Count);
-      Assert.Equal("1", db.Command.Parameters["@0"].Value);
+      Assert.Equal(1, db.Command.Parameters["@0"].Value);
     }
 
     [Fact]
@@ -1008,7 +1008,7 @@ namespace UnitTest
       );
 
       Assert.Equal(1, db.Command.Parameters.Count);
-      Assert.Equal("10", db.Command.Parameters[0].Value);
+      Assert.Equal(10, db.Command.Parameters[0].Value);
 
       //selectに直接
       select = new Sdx.Db.Query.Select();
@@ -1032,7 +1032,7 @@ namespace UnitTest
       );
 
       Assert.Equal(1, db.Command.Parameters.Count);
-      Assert.Equal("20", db.Command.Parameters[0].Value);
+      Assert.Equal(20, db.Command.Parameters[0].Value);
     }
 
     [Fact]
@@ -1514,7 +1514,7 @@ namespace UnitTest
       );
 
       Assert.Equal(1, db.Command.Parameters.Count);
-      Assert.Equal("3", db.Command.Parameters["@0"].Value);
+      Assert.Equal(3, db.Command.Parameters["@0"].Value);
     }
 
     [Fact]

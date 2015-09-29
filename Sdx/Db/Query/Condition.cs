@@ -230,7 +230,7 @@ namespace Sdx.Db.Query
             inCond += ", ";
           }
           string holder = "@" + condCount.Value;
-          parameters.Add(select.Adapter.CreateParameter(holder, value.ToString()));
+          parameters.Add(select.Adapter.CreateParameter(holder, value));
           inCond += holder;
           condCount.Incr();
         }
@@ -240,7 +240,7 @@ namespace Sdx.Db.Query
       else
       {
         rightHand = "@" + condCount.Value;
-        parameters.Add(select.Adapter.CreateParameter(rightHand, cond.Value.ToString()));
+        parameters.Add(select.Adapter.CreateParameter(rightHand, cond.Value));
         condCount.Incr();
       }
 

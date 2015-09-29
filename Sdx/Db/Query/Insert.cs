@@ -16,6 +16,8 @@ namespace Sdx.Db.Query
 
     public string Into { get; set; }
 
+    public Select Subquery { get; set; }
+
     public Insert(Adapter adapter)
     {
       this.Adapter = adapter;
@@ -29,8 +31,8 @@ namespace Sdx.Db.Query
 
     public Insert AddPair(string column, object value)
     {
-      this.columns.Add(column);
-      this.values.Add(value);
+      this.AddColumn(column);
+      this.AddValue(value);
       return this;
     }
 
@@ -51,65 +53,70 @@ namespace Sdx.Db.Query
         }
       });
 
-      builder.Append(") VALUES (");
+      
 
-      count = 1;
-      var placeHolderNumber = 0;
-      this.values.ForEach(value => {
-        if(value is Select)
+      
+      var counter = new Counter();
+      if(this.Subquery != null)
+      {
+        builder.Append(") (");
+        var strSelect = this.Subquery.BuildSelectString(command.Parameters, counter);
+        builder.Append(strSelect);
+      }
+      else
+      {
+        builder.Append(") VALUES (");
+        count = 1;
+        this.values.ForEach(value =>
         {
-
-        }
-        else
-        {
-          var parameterName = "@" + placeHolderNumber;
+          var parameterName = "@" + counter.Value;
           builder.Append(parameterName);
 
           var param = command.CreateParameter();
           param.ParameterName = parameterName;
           param.Value = value;
           command.Parameters.Add(param);
-          ++placeHolderNumber;
-        }
+          counter.Incr();
 
-        ++count;
-        if (count <= this.columns.Count)
-        {
-          builder.Append(", ");
-        }
-      });
+          ++count;
+          if (count <= this.values.Count)
+          {
+            builder.Append(", ");
+          }
+        });
+      }
 
       builder.Append(")");
-
-      //var valuesBuilder = new StringBuilder();
-      //valuesBuilder.Append(" VALUES (");
-
-      //var count = values.Count;
-      //foreach (var kv in values)
-      //{
-      //  var parameterName = "@" + (values.Count - count);
-      //  builder.Append(this.Adapter.QuoteIdentifier(kv.Key));
-      //  valuesBuilder.Append(parameterName);
-
-      //  var param = command.CreateParameter();
-      //  param.ParameterName = parameterName;
-      //  param.Value = kv.Value;
-      //  command.Parameters.Add(param);
-
-      //  --count;
-      //  if (count > 0)
-      //  {
-      //    builder.Append(", ");
-      //    valuesBuilder.Append(", ");
-      //  }
-      //}
-
-      //builder.Append(")");
-      //valuesBuilder.Append(")");
 
       command.CommandText = builder.ToString();
 
       return command;
+    }
+
+    public Insert SetSubquery(Select select)
+    {
+      if(this.values.Count > 0)
+      {
+        throw new InvalidOperationException("Already has values.");
+      }
+      this.Subquery = select;
+      return this;
+    }
+
+    public Insert AddColumn(string column)
+    {
+      this.columns.Add(column);
+      return this;
+    }
+
+    public Insert AddValue(object value)
+    {
+      if(this.Subquery != null)
+      {
+        throw new InvalidOperationException("Already has subquery.");
+      }
+      this.values.Add(value);
+      return this;
     }
   }
 }
