@@ -66,14 +66,22 @@ namespace Sdx.Db.Sql
         count = 1;
         this.values.ForEach(value =>
         {
-          var parameterName = "@" + counter.Value;
-          builder.Append(parameterName);
+          if(value is Expr)
+          {
+            builder.Append(value.ToString());
+          }
+          else
+          {
+            var parameterName = "@" + counter.Value;
+            builder.Append(parameterName);
 
-          var param = command.CreateParameter();
-          param.ParameterName = parameterName;
-          param.Value = value;
-          command.Parameters.Add(param);
-          counter.Incr();
+            var param = command.CreateParameter();
+            param.ParameterName = parameterName;
+            param.Value = value;
+            command.Parameters.Add(param);
+            counter.Incr();
+          }
+
 
           ++count;
           if (count <= this.values.Count)

@@ -137,6 +137,7 @@ namespace UnitTest
       Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var db = testDb.Adapter;
 
+      //複数カラムのサブクエリ
       var insert = db.CreateInsert();
 
       insert
@@ -193,6 +194,52 @@ namespace UnitTest
           Assert.Equal("2", shop["area_id"]);
         }
       }
+
+      //単一カラムのサブクエリLiteral
+      insert = db.CreateInsert();
+
+      var now = DateTime.Now;
+      insert
+        .SetInto("shop")
+        .AddPair("name", "SimpleLiteralSub")
+        .AddPair("area_id", Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 4)"))
+        .AddPair("created_at", now);
+
+      using (var command = insert.Build())
+      {
+        Assert.Equal(testDb.Sql(@"INSERT
+          INTO {0}shop{1}
+            ({0}name{1}, {0}area_id{1}, {0}created_at{1})
+          VALUES
+            (@0, (SELECT id FROM area WHERE id = 4), @1)"), command.CommandText);
+
+        Assert.Equal("SimpleLiteralSub", command.Parameters["@0"].Value);
+        Assert.Equal(now, command.Parameters["@1"].Value);
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+          conn.ExecuteNonQuery(command);
+          conn.Commit();
+        }
+      }
+
+      //確認
+      select = db.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("name", "SimpleLiteralSub");
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Equal("SimpleLiteralSub", shop.GetValue("name"));
+        Assert.Equal(4, shop.GetValue("area_id"));
+      }
+
     }
 
 
