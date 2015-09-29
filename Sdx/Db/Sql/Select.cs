@@ -176,7 +176,7 @@ namespace Sdx.Db.Sql
       if (this.where.Count > 0)
       {
         selectString += " WHERE ";
-        selectString += this.where.Build(this, parameters, condCount);
+        selectString += this.where.Build(this.Adapter, parameters, condCount);
       }
 
       //GROUP
@@ -200,7 +200,7 @@ namespace Sdx.Db.Sql
       if (this.having.Count > 0)
       {
         selectString += " HAVING ";
-        selectString += this.having.Build(this, parameters, condCount);
+        selectString += this.having.Build(this.Adapter, parameters, condCount);
       }
 
       //ORDER
@@ -261,7 +261,7 @@ namespace Sdx.Db.Sql
       {
         joinString += " ON "
           + String.Format(
-            context.JoinCondition.Build(this, parameters, condCount),
+            context.JoinCondition.Build(this.Adapter, parameters, condCount),
             this.Adapter.QuoteIdentifier(context.ParentContext.Name),
             this.Adapter.QuoteIdentifier(context.Name)
           );

@@ -165,7 +165,7 @@ namespace Sdx.Db.Sql
       this.wheres.Add(holder);
     }
 
-    internal string Build(Select select, DbParameterCollection parameters, Counter condCount)
+    internal string Build(Adapter adapter, DbParameterCollection parameters, Counter condCount)
     {
       string whereString = "";
 
@@ -179,11 +179,11 @@ namespace Sdx.Db.Sql
         if (holder.Value is Condition)
         {
           Condition where = holder.Value as Condition;
-          whereString += where.Build(select, parameters, condCount);
+          whereString += where.Build(adapter, parameters, condCount);
         }
         else
         {
-          whereString += this.BuildConditionString(select, parameters, holder, condCount);
+          whereString += this.BuildConditionString(adapter, parameters, holder, condCount);
         }
       });
 
@@ -195,13 +195,13 @@ namespace Sdx.Db.Sql
       return whereString;
     }
 
-    private string BuildPlaceholderAndParameters(Select select, DbParameterCollection parameters, Holder cond, Counter condCount)
+    private string BuildPlaceholderAndParameters(Adapter adapter, DbParameterCollection parameters, Holder cond, Counter condCount)
     {
       string rightHand;
 
       if (cond.Value is Column)
       {
-        rightHand = ((Column)cond.Value).Build(select.Adapter);
+        rightHand = ((Column)cond.Value).Build(adapter);
       }
       else if (cond.Value is Expr)
       {
@@ -213,7 +213,7 @@ namespace Sdx.Db.Sql
         Select sub = (Select)cond.Value;
         if (sub.Adapter == null)
         {
-          sub.Adapter = select.Adapter;
+          sub.Adapter = adapter;
         }
         rightHand = "(" + sub.BuildSelectString(parameters, condCount) + ")";
       }
@@ -230,7 +230,7 @@ namespace Sdx.Db.Sql
             inCond += ", ";
           }
           string holder = "@" + condCount.Value;
-          parameters.Add(select.Adapter.CreateParameter(holder, value));
+          parameters.Add(adapter.CreateParameter(holder, value));
           inCond += holder;
           condCount.Incr();
         }
@@ -240,21 +240,21 @@ namespace Sdx.Db.Sql
       else
       {
         rightHand = "@" + condCount.Value;
-        parameters.Add(select.Adapter.CreateParameter(rightHand, cond.Value));
+        parameters.Add(adapter.CreateParameter(rightHand, cond.Value));
         condCount.Incr();
       }
 
       return rightHand;
     }
 
-    private string BuildConditionString(Select select, DbParameterCollection parameters, Holder cond, Counter condCount)
+    private string BuildConditionString(Adapter adapter, DbParameterCollection parameters, Holder cond, Counter condCount)
     {
       if (cond.Type == Type.Comparison)
       {
-        var value = this.BuildPlaceholderAndParameters(select, parameters, cond, condCount);
+        var value = this.BuildPlaceholderAndParameters(adapter, parameters, cond, condCount);
         return String.Format(
           "{0}{1}{2}",
-          cond.Column.Build(select.Adapter),
+          cond.Column.Build(adapter),
           cond.Comparison.SqlString(),
           value
         );
@@ -263,11 +263,11 @@ namespace Sdx.Db.Sql
       {
         if (cond.Comparison == Comparison.Equal)
         {
-          return cond.Column.Build(select.Adapter) + " IS NULL";
+          return cond.Column.Build(adapter) + " IS NULL";
         }
         else if(cond.Comparison == Comparison.NotEqual)
         {
-          return cond.Column.Build(select.Adapter) + " IS NOT NULL";
+          return cond.Column.Build(adapter) + " IS NOT NULL";
         }
 
         throw new InvalidOperationException("Illeagal Comparison is specified.");
@@ -277,10 +277,10 @@ namespace Sdx.Db.Sql
         var minMax = (string[])cond.Value;
 
         cond.Value = minMax[0];
-        var min = this.BuildPlaceholderAndParameters(select, parameters, cond, condCount);
+        var min = this.BuildPlaceholderAndParameters(adapter, parameters, cond, condCount);
 
         cond.Value = minMax[1];
-        var max = this.BuildPlaceholderAndParameters(select, parameters, cond, condCount);
+        var max = this.BuildPlaceholderAndParameters(adapter, parameters, cond, condCount);
 
         //元に戻さないと2回で上のキャストがこけてしまう。
         cond.Value = minMax;
@@ -301,7 +301,7 @@ namespace Sdx.Db.Sql
 
         return String.Format(
           condFormat,
-          cond.Column.Build(select.Adapter),
+          cond.Column.Build(adapter),
           min,
           max
         );
