@@ -44,7 +44,7 @@ namespace Sdx.Web
       }
     }
 
-    private string BuildQueryString(Dictionary<string,string> param)
+    private string BuildQueryString(List<Dictionary<string,string>> param)
     {
       if (param.Count == 0)
       {
@@ -53,8 +53,8 @@ namespace Sdx.Web
 
       var sb = new StringBuilder();
       sb.Append("?");
-      param.ToList().ForEach(
-        kv => sb.AppendFormat("{0}={1}&", kv.Key, kv.Value)
+      param.ForEach(
+        dic => sb.AppendFormat("{0}={1}&", dic.First().Key, dic.First().Value)
       );
 
       return sb.ToString().TrimEnd('&');
@@ -67,22 +67,20 @@ namespace Sdx.Web
       );
       return path;
     }
-    /*
+
     public string Build()
     {
       string path = this.BuildPath();
-      string query = this.BuildQueryString(this.Param);
+      string query = this.BuildQueryString(this.ParamList);
       return path + query;
     }
 
     public string Build(Dictionary<string, string> add)
     {
+      var tmpList = new List<Dictionary<string, string>>() { add };
       string path = this.BuildPath();
       string query = this.BuildQueryString(
-        this.Param
-          .Where(p => add.ContainsKey(p.Key) == false)
-          .Concat(add)
-          .ToDictionary(p => p.Key, p => p.Value)
+        this.ParamList.Concat(tmpList).ToList()
       );
       return path + query;
     }
@@ -91,9 +89,9 @@ namespace Sdx.Web
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
-        this.Param
-          .Where(p => exclude.Contains(p.Key) == false)
-          .ToDictionary(p => p.Key, p => p.Value)
+        this.ParamList
+          .Where(dic => exclude.Contains(dic.First().Key) == false)
+          .ToList()
       );
       return path + query;
     }
@@ -102,13 +100,13 @@ namespace Sdx.Web
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
-        this.Param
-          .Where(p => exclude.Contains(p.Key) == false)
-          .ToDictionary(p => p.Key, p => p.Value)
+        this.ParamList
+          .Where(dic => exclude.Contains(dic.First().Key) == false)
+          .ToList()
       );
       return path + query;
     }
-    */
+
     public string Domain
     {
       get; set;
