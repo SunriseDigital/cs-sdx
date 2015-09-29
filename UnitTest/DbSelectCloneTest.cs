@@ -24,14 +24,14 @@ namespace UnitTest
 
     private Sdx.Db.Query.Select CreateCommonSelect(TestDb db)
     {
-      var select = new Sdx.Db.Query.Select();
+      var select = db.Adapter.CreateSelect();
 
       //FROM + JOIN
       select
         .AddFrom(new Test.Orm.Table.Shop())
         .InnerJoin(new Test.Orm.Table.Menu());
 
-      Sdx.Db.Query.Select sub = new Sdx.Db.Query.Select();
+      Sdx.Db.Query.Select sub = db.Adapter.CreateSelect();
       sub
         .AddFrom("area")
         .AddColumn("id")
@@ -68,8 +68,6 @@ namespace UnitTest
       select.Context("sub_area").AddColumn("id");
       select.Context("sub_area_1").AddColumn("id");
       select.Context("main_image").AddColumn("id");
-
-      select.Adapter = db.Adapter;
 
       return select;
     }

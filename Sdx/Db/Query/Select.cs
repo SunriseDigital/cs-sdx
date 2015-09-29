@@ -50,7 +50,7 @@ namespace Sdx.Db.Query
         return this.adapter;
       }
 
-      set
+      internal set
       {
         this.adapter = value;
         this.adapter.InitSelectEvent(this);

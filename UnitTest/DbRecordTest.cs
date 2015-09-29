@@ -607,8 +607,6 @@ namespace UnitTest
         .Context.AddOrder("id", Sdx.Db.Query.Order.ASC).Table.Select
         .SetLimit(2);
 
-      select.Adapter = db.Adapter;
-
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();

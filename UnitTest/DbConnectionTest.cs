@@ -500,7 +500,6 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        select.Adapter = db.Adapter;
         var command = select.Build();
 
         string id = null;
