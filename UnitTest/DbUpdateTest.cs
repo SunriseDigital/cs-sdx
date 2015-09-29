@@ -195,6 +195,8 @@ namespace UnitTest
       }
     }
 
+
+
     [Fact]
     public void TestUpdate()
     {
@@ -206,36 +208,155 @@ namespace UnitTest
 
     private void RunUpdate(TestDb testDb)
     {
-      //var db = new Sdx.Db.SqlServerAdapter();
-      //db.ConnectionString = "SomeConnectionString...";
+      var db = testDb.Adapter;
 
-      //using (var conn = db.CreateConnection())
-      //{
-      //  conn.Open();
-      //  using (var transaction = conn.BeginTransaction())
-      //  {
-      //    db.Insert("shop", new Dictionary<string, string> {
-      //      { "name", "FooBar" },
-      //      { "area_id", "1"}
-      //    });
-      //  }
-      //}
+      var update = db.CreateUpdate();
 
-      //var db = testDb.Adapter;
+      update
+        .SetTable("shop")
+        .AddPair("name", "UpdateTest")
+        .AddPair("area_id", 3)
+        .Where.Add("id", 2);
 
-      //var shop = new Test.Orm.Shop();
-      //shop
-      //  .Set("name", "FooBar")
-      //  .Set("area_id", "1");
+      using (var command = update.Build())
+      {
+        Assert.Equal(testDb.Sql(@"UPDATE
+          {0}shop{1}
+          SET
+            {0}name{1} = @0,
+            {0}area_id{1} = @1
+          WHERE {0}shop{1}.{0}id{1} = @2"), command.CommandText);
 
-      //using (var conn = db.CreateConnection())
-      //{
-      //  conn.Open();
-      //  using (var transaction = conn.BeginTransaction())
-      //  {
-      //    shop.Save(transaction);
-      //  }
-      //}
+        Assert.Equal("UpdateTest", command.Parameters["@0"].Value);
+        Assert.Equal(3, command.Parameters["@1"].Value);
+        Assert.Equal(2, command.Parameters["@2"].Value);
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+          conn.ExecuteNonQuery(command);
+          conn.Commit();
+        }
+      }
+
+      //確認
+      var select = db.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", 2);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Equal("UpdateTest", shop.GetValue("name"));
+        Assert.Equal(3, shop.GetValue("area_id"));
+      }
+    }
+
+    [Fact]
+    public void TestUpdateSubquery()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunUpdateSubquery(db);
+      }
+    }
+
+    private void RunUpdateSubquery(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var update = db.CreateUpdate();
+
+      //Literal
+      update
+        .SetTable("shop")
+        .AddPair("area_id", Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 5)"))
+        .Where.Add("id", 3);
+
+      using (var command = update.Build())
+      {
+        Assert.Equal(testDb.Sql(@"UPDATE {0}shop{1}
+          SET
+            {0}area_id{1} = (SELECT id FROM area WHERE id = 5) 
+          WHERE {0}shop{1}.{0}id{1} = @0"), command.CommandText);
+
+        Assert.Equal(3, command.Parameters["@0"].Value);
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+          conn.ExecuteNonQuery(command);
+          conn.Commit();
+        }
+      }
+
+      //確認
+      var select = db.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", 3);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Equal(5, shop.GetValue("area_id"));
+      }
+
+      //Select
+      update = db.CreateUpdate();
+
+      select = db.CreateSelect();
+
+      select
+        .AddFrom("area")
+        .AddColumn("id")
+        .Where.Add("id", 4);
+
+      //Literal
+      update
+        .SetTable("shop")
+        .AddPair("area_id", select)
+        .Where.Add("id", 3);
+
+      using (var command = update.Build())
+      {
+        Assert.Equal(testDb.Sql(@"UPDATE {0}shop{1}
+          SET
+            {0}area_id{1} = (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0)
+            WHERE {0}shop{1}.{0}id{1} = @1"), command.CommandText);
+
+        Assert.Equal(4, command.Parameters["@0"].Value);
+        Assert.Equal(3, command.Parameters["@1"].Value);
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+          conn.ExecuteNonQuery(command);
+          conn.Commit();
+        }
+      }
+
+      //確認
+      select = db.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", 3);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Equal(4, shop.GetValue("area_id"));
+      }
     }
   }
 }

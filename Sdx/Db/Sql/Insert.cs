@@ -53,9 +53,6 @@ namespace Sdx.Db.Sql
         }
       });
 
-      
-
-      
       var counter = new Counter();
       if(this.Subquery != null)
       {

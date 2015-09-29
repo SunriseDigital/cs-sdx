@@ -105,5 +105,9 @@ namespace Sdx.Db
       return new Sql.Insert(this);
     }
 
+    public Sql.Update CreateUpdate()
+    {
+      return new Sql.Update(this);
+    }
   }
 }

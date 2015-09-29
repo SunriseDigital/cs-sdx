@@ -67,6 +67,7 @@
     <Compile Include="Db\Record.cs" />
     <Compile Include="Db\RecordSet.cs" />
     <Compile Include="Db\SqlServerAdapter.cs" />
+    <Compile Include="Db\Sql\Update.cs" />
     <Compile Include="Db\Table.cs" />
     <Compile Include="Db\TableMeta.cs" />
     <Compile Include="Diagnostics\Debug.cs" />

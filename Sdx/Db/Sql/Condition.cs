@@ -59,7 +59,7 @@ namespace Sdx.Db.Sql
       }
     }
 
-    public string ContextName { get; private set; }
+    public string ContextName { get; internal set; }
 
     public Condition AddOr(Condition condition)
     {
