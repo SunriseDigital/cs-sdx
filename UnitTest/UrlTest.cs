@@ -195,9 +195,9 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestArrayParams()
+    public void TestSameKeyNameParams()
     {
-      var url = new Sdx.Web.Url("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2");
+      var url = new Sdx.Web.Url("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2");
 
       //パスの各部品を取得
       Assert.Equal("example.com", url.Domain);
@@ -205,40 +205,40 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //List<string> でパラメータ取得
-      var list = url.GetParamList("array[]");
+      var list = url.GetParamList("sameKey");
       Assert.Equal("value0", list[0]);
       Assert.Equal("value1", list[1]);
-      Assert.Equal("value1", list[2]);
+      Assert.Equal("value2", list[2]);
 
       //取得したListに値は追加してもBuild時に生成されるURL文字列に影響ないことを期待
       list.Add("addedValue");
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2", url.Build());
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2", url.Build());
 
       //文字列でパラメータ取得。Listの最終要素が取得できることを期待
-      var str = url.GetParam("array[]");
+      var str = url.GetParam("sameKey");
       Assert.Equal("value2", str);
       str = "addedStr";
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2", url.Build());
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2", url.Build());
 
       //Setメソッドでパラメータ追加
       url.SetParam("newKey", "newValue");
       Assert.Equal("newValue", url.GetParam("newKey"));
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
       //Build()の引数でパラメータ追加
       var tmpParam = new Dictionary<string, string>() { {"tmpKey", "tmpValue"} };
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue&tmpKey=tmpValue", url.Build(tmpParam));
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&tmpKey=tmpValue", url.Build(tmpParam));
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
       //Build()の引数でパラメータ削除テスト
-      var exclude = new List<string>() { "array[]" };
+      var exclude = new List<string>() { "sameKey" };
       Assert.Equal("http://example.com/path/to/api?newKey=newValue", url.Build(exclude));
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
       //値が空文字の Dictionary を追加
       var empValDic = new Dictionary<string, string>() { { "empKey", "" } };
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue&empKey=", url.Build(empValDic));
-      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&empKey=", url.Build(empValDic));
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
       //存在しないキーで値を取得しようとした場合、例外になる。
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
