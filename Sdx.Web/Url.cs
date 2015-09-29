@@ -12,7 +12,7 @@ namespace Sdx.Web
     {
       //@var System.Uri
       var uri = new Uri(urlStr);
-      this.Param = new Dictionary<string, string>();
+      this.ParamList = new List<Dictionary<string,string>>();
 
       //パス用の情報を保存
       this.Scheme = uri.Scheme;
@@ -23,22 +23,24 @@ namespace Sdx.Web
       if (uri.Query.Contains('?'))
       {
         string query = uri.Query.Trim('?');
+        var QueryStringList = new List<string>();
 
         //パラメータの項目数が複数か単独か
         if(query.Contains('&'))
         {
-          string[] paramArray = query.Split('&');
-          paramArray.ToList().ForEach(str =>
-          {
-            string[] tmp = str.Split('=');
-            this.Param[tmp[0]] = tmp[1];
-          });
+          QueryStringList = query.Split('&').ToList();
         }
         else
         {
-          string[] tmp = query.Split('=');
-          this.Param[tmp[0]] = tmp[1];
+          QueryStringList.Add(query);
         }
+
+        QueryStringList.ToList().ForEach(str =>
+        {
+          string[] tmp = str.Split('=');
+          var param = new Dictionary<string, string>() { { tmp[0], tmp[1] } };
+          this.ParamList.Add(param);
+        });
       }
     }
 
@@ -65,7 +67,7 @@ namespace Sdx.Web
       );
       return path;
     }
-
+    /*
     public string Build()
     {
       string path = this.BuildPath();
@@ -106,7 +108,7 @@ namespace Sdx.Web
       );
       return path + query;
     }
-
+    */
     public string Domain
     {
       get; set;
@@ -117,7 +119,7 @@ namespace Sdx.Web
       get; set;
     }
 
-    private Dictionary<string, string> Param
+    private List<Dictionary<string,string>> ParamList
     {
       get; set;
     }
@@ -129,18 +131,27 @@ namespace Sdx.Web
 
     public void SetParam(string key, string value)
     {
-      this.Param[key] = value;
+      var tmp = new Dictionary<string,string>(){{key, value}};
+      this.ParamList.Add(tmp);
     }
 
     public string GetParam(string key)
     {
-      return this.Param[key];
+      return this.GetParamList(key).Last();
     }
 
-    //まだ使用しないのでとりあえず定義だけ
     public List<string> GetParamList(string key)
     {
-      return new List<string>() { "" };
+      var list = new List<string>();
+      this.ParamList.ForEach(dic =>
+      {
+        if (dic.ContainsKey(key))
+        {
+          list.Add(dic.First().Value);
+        }
+      });
+
+      return list;
     }
   }
 }
