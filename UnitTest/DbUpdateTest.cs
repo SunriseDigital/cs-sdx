@@ -240,9 +240,60 @@ namespace UnitTest
         Assert.Equal(4, shop.GetValue("area_id"));
       }
 
+      //単一カラムのサブクエリSelect
+      insert = db.CreateInsert();
+
+      select = db.CreateSelect();
+
+      select
+        .AddFrom("area")
+        .AddColumn("id")
+        .Where.Add("id", 5);
+
+      now = DateTime.Now;
+      insert
+        .SetInto("shop")
+        .AddPair("name", "SimpleSelectSub")
+        .AddPair("area_id", select)
+        .AddPair("created_at", now);
+
+      using (var command = insert.Build())
+      {
+        Assert.Equal(testDb.Sql(@"INSERT
+          INTO {0}shop{1}
+          ({0}name{1}, {0}area_id{1}, {0}created_at{1})
+          VALUES (@0,
+            (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @1),
+            @2)"), command.CommandText);
+
+        Assert.Equal("SimpleSelectSub", command.Parameters["@0"].Value);
+        Assert.Equal(5, command.Parameters["@1"].Value);
+        Assert.Equal(now, command.Parameters["@2"].Value);
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+          conn.ExecuteNonQuery(command);
+          conn.Commit();
+        }
+      }
+
+      //確認
+      select = db.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("name", "SimpleSelectSub");
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Equal("SimpleSelectSub", shop.GetValue("name"));
+        Assert.Equal(5, shop.GetValue("area_id"));
+      }
     }
-
-
 
     [Fact]
     public void TestUpdate()

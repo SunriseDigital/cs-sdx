@@ -66,7 +66,15 @@ namespace Sdx.Db.Sql
         count = 1;
         this.values.ForEach(value =>
         {
-          if(value is Expr)
+          if (value is Select)
+          {
+            var select = value as Select;
+            builder
+              .Append('(')
+              .Append(select.BuildSelectString(command.Parameters, counter))
+              .Append(')');
+          }
+          else if(value is Expr)
           {
             builder.Append(value.ToString());
           }
