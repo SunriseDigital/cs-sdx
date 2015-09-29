@@ -94,7 +94,7 @@ namespace UnitTest
       Assert.Equal("http", url.Scheme);
       Assert.Equal("/path/to/api", url.LocalPath);
 
-      //パラメータの追加(プロパティ経由)
+      //パラメータの追加(メソッドで)
       url.SetParam("key", "value");
       Assert.Equal("value", url.GetParam("key"));
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
@@ -150,7 +150,7 @@ namespace UnitTest
       Assert.Equal("http", url.Scheme);
       Assert.Equal("/path/to/api", url.LocalPath);
 
-      //パラメータの追加(プロパティ経由)
+      //パラメータの追加(メソッドで)
       url.SetParam("key", "value");
       Assert.Equal("value", url.GetParam("key"));
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
@@ -219,6 +219,26 @@ namespace UnitTest
       Assert.Equal("value2", str);
       str = "addedStr";
       Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2", url.Build());
+
+      //Setメソッドでパラメータ追加
+      url.SetParam("newKey", "newValue");
+      Assert.Equal("newValue", url.GetParam("newKey"));
+      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
+
+      //Build()の引数でパラメータ追加
+      var tmpParam = new Dictionary<string, string>() { {"tmpKey", "tmpValue"} };
+      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue&tmpKey=tmpValue", url.Build(tmpParam));
+      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
+
+      //Build()の引数でパラメータ削除テスト
+      var exclude = new List<string>() { "array[]" };
+      Assert.Equal("http://example.com/path/to/api?newKey=newValue", url.Build(exclude));
+      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
+
+      //値が空文字の Dictionary を追加
+      var empValDic = new Dictionary<string, string>() { { "empKey", "" } };
+      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue&empKey=", url.Build(empValDic));
+      Assert.Equal("http://example.com/path/to/api?array[]=value0&array[]=value1&array[]=value2&newKey=newValue", url.Build());
 
       //存在しないキーで値を取得しようとした場合、例外になる。
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
