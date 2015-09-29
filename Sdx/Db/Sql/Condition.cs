@@ -25,7 +25,7 @@ namespace Sdx.Db.Sql
 
     private List<Holder> wheres = new List<Holder>();
     private List<Condition> childConditions = new List<Condition>();
-
+    private Context context;
 
     internal int Count
     {
@@ -34,7 +34,32 @@ namespace Sdx.Db.Sql
 
     internal bool EnableBracket { get; set; }
 
-    public Context Context { get; internal set; }
+    /// <summary>
+    /// FluentSyntax時にContextに復帰するためのプロパティ。
+    /// カラムに付与されるテーブル名はContextNameが使用されます。
+    /// </summary>
+    public Context Context
+    {
+      get
+      {
+        return this.context;
+      }
+
+      internal set
+      {
+        this.context = value;
+        if (value != null)
+        {
+          this.ContextName = value.Name;
+        }
+        else
+        {
+          this.ContextName = null;
+        }
+      }
+    }
+
+    public string ContextName { get; private set; }
 
     public Condition AddOr(Condition condition)
     {
@@ -96,17 +121,23 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    private void FixContext(Context context)
+    /// <summary>
+    /// 自分の持っているConditionにContextNameをセット。
+    /// </summary>
+    /// <param name="contextName"></param>
+    /// <param name="context"></param>
+    private void FixContext(string contextName)
     {
-      this.Context = context;
+      this.ContextName = contextName;
+
       this.wheres.ForEach(holder => {
         if (holder.Column == null) return;
-        var contextName = context == null ? null : context.Name;
-        holder.Column.ContextName = contextName;
+        var cName = contextName == null ? null : contextName;
+        holder.Column.ContextName = cName;
       });
 
       this.childConditions.ForEach(condition => {
-        condition.FixContext(context);
+        condition.FixContext(contextName);
       });
     }
 
@@ -114,9 +145,9 @@ namespace Sdx.Db.Sql
     {
       condition.EnableBracket = true;
       this.childConditions.Add(condition);
-      if (this.Context != null)
+      if (this.ContextName != null)
       {
-        condition.FixContext(this.Context);
+        condition.FixContext(this.ContextName);
       }
 
       this.Add(new Holder
@@ -134,9 +165,9 @@ namespace Sdx.Db.Sql
       {
         column = new Column(columnName);
 
-        if (this.Context != null)
+        if (this.ContextName != null)
         {
-          column.ContextName = this.Context.Name;
+          column.ContextName = this.ContextName;
         }
       }
       else
