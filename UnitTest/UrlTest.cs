@@ -248,6 +248,16 @@ namespace UnitTest
       //存在しないキーで値を取得しようとした場合、例外になる。
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
       Assert.Throws<KeyNotFoundException>(() => url.GetParamList("unknown"));
+
+      //Setメソッドで同じキーのパラメータを追加。上書きはされず値が増えるだけ。取得は新しく追加したほうが優先される。
+      url.SetParam("newKey", "newValue2");
+      Assert.Equal("newValue2", url.GetParam("newKey"));
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&newKey=newValue2", url.Build());
+
+      //Build()の引数で同じキーのパラメータ追加。戻り値だけは上書きされる。
+      var addParam = new Dictionary<string, string>() { { "newKey", "newValue3" } };
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue3", url.Build(addParam));
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&newKey=newValue2", url.Build());
     }
   }
 }
