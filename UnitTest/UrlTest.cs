@@ -17,7 +17,6 @@ namespace UnitTest
   [TestClass]
   public class UrlTest : BaseTest
   {
-/*
     [Fact]
     public void TestMultipleParams()
     {
@@ -194,7 +193,7 @@ namespace UnitTest
       //存在しないキーを指定して、想定した例外になっているかを確認する
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
     }
-*/
+
     [Fact]
     public void TestSameKeyNameParams()
     {
