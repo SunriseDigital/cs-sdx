@@ -80,7 +80,10 @@ namespace Sdx.Web
       var tmpList = new List<Dictionary<string, string>>() { add };
       string path = this.BuildPath();
       string query = this.BuildQueryString(
-        this.ParamList.Concat(tmpList).ToList()
+        this.ParamList
+          .Where(dic => add.ContainsKey(dic.First().Key) == false)
+          .Concat(tmpList)
+          .ToList()
       );
       return path + query;
     }
