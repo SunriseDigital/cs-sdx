@@ -247,7 +247,8 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
       //存在しないキーで値を取得しようとした場合、例外になる。
-      //Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Throws<KeyNotFoundException>(() => url.GetParamList("unknown"));
     }
   }
 }
