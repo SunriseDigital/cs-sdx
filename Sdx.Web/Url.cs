@@ -145,7 +145,7 @@ namespace Sdx.Web
       {
         if (dic.ContainsKey(key))
         {
-          list.Add(dic.First().Value);
+          list.Add(dic[key]);
         }
       });
 
