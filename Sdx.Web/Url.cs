@@ -149,6 +149,12 @@ namespace Sdx.Web
         }
       });
 
+      //存在しないキーを指定された場合以外は、必ず何かしら list に入っているので
+      //この段階で例外を投げる
+      if (list.Count == 0)
+      {
+        throw new KeyNotFoundException();
+      }
       return list;
     }
   }
