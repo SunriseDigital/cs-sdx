@@ -259,5 +259,39 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue3", url.Build(addParam));
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&newKey=newValue2", url.Build());
     }
+
+    [Fact]
+    public void TestNullCharValueParams()
+    {
+      var url = new Sdx.Web.Url("http://example.com/path/to/api?key=&key=&key=&foo=&foo=&foo=bar");
+
+      //Path
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("/path/to/api", url.LocalPath);
+
+      //Param
+      Assert.Equal("", url.GetParam("key"));
+      Assert.Equal("bar", url.GetParam("foo"));
+
+      //ParamList
+      var keyList = url.GetParamList("key");
+      Assert.Equal("", keyList[0]);
+      Assert.Equal("", keyList[1]);
+      Assert.Equal("", keyList[2]);
+
+      var fooList = url.GetParamList("foo");
+      Assert.Equal("", fooList[0]);
+      Assert.Equal("", fooList[1]);
+      Assert.Equal("bar", fooList[2]);
+
+      //Null を Set
+      url.SetParam("key", null);
+      Assert.Equal("http://example.com/path/to/api?key=&key=&key=&foo=&foo=&foo=bar&key=", url.Build());
+
+      //空文字を Set
+      url.SetParam("foo", "");
+      Assert.Equal("http://example.com/path/to/api?key=&key=&key=&foo=&foo=&foo=bar&key=&foo=", url.Build());
+    }
   }
 }
