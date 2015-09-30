@@ -53,9 +53,11 @@ namespace Sdx.Web
 
       var sb = new StringBuilder();
       sb.Append("?");
-      param.ForEach(
-        dic => sb.AppendFormat("{0}={1}&", dic.First().Key, dic.First().Value)
-      );
+      param.ForEach(dic => {
+        if(dic.Count > 0) {
+          sb.AppendFormat("{0}={1}&", dic.First().Key, dic.First().Value);
+        }
+      });
 
       return sb.ToString().TrimEnd('&');
     }
