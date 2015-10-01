@@ -32,7 +32,7 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //新しくパラメータを追加した場合、正しくクエリが生成されているか
-      url.SetParam("key", "value");
+      url.AddParam("key", "value");
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
       //Setterではなくコンストラクタの引数にパラメータを渡した場合の挙動
@@ -41,9 +41,9 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&new=newValue", url.Build(param));
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
-      //同じキー名のパラメータを引数に渡した場合の挙動。上書きされることを期待
+      //同じキー名のパラメータを引数に渡した場合の挙動。
       var dic = new Dictionary<string, string>() { { "key", "newValue" } };
-      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=newValue", url.Build(dic));
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value&key=newValue", url.Build(dic));
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
       //コンストラクタの引数に配列を渡した場合の挙動。指定したキーがクエリから除かれているようにする。
@@ -57,9 +57,9 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build(list));
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build());
 
-      //空の Dictionary を追加
+      //空の Dictionary を追加。この場合は除くキーの指定が何もないので、引数なしBuildと何も変わらないことを期待
       var empDic = new Dictionary<string, string>();
-      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(empDic));
+      Assert.Equal(url.Build(empDic), url.Build());
 
       //値が空になっている Dictionary を追加
       // * 値が空文字の場合
@@ -80,6 +80,14 @@ namespace UnitTest
 
       //存在しないキーを指定して、想定した例外になっているかを確認する
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+
+      //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
+      url.SetParam("key", "newValue");
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=newValue", url.Build());
+
+      //RemoveParam のテスト
+      url.RemoveParam("key");
+      Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build());
     }
 
     [Fact]
@@ -95,7 +103,7 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //パラメータの追加(メソッドで)
-      url.SetParam("key", "value");
+      url.AddParam("key", "value");
       Assert.Equal("value", url.GetParam("key"));
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build());
 
@@ -136,6 +144,14 @@ namespace UnitTest
 
       //存在しないキーを指定して、想定した例外になっているかを確認する
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+
+      //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
+      url.SetParam("key", "newValue");
+      Assert.Equal("http://example.com/path/to/api?key=newValue", url.Build());
+
+      //RemoveParam のテスト
+      url.RemoveParam("key");
+      Assert.Equal("http://example.com/path/to/api", url.Build());
     }
 
     [Fact]
@@ -151,7 +167,7 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //パラメータの追加(メソッドで)
-      url.SetParam("key", "value");
+      url.AddParam("key", "value");
       Assert.Equal("value", url.GetParam("key"));
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build());
 
@@ -192,6 +208,14 @@ namespace UnitTest
 
       //存在しないキーを指定して、想定した例外になっているかを確認する
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+
+      //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
+      url.SetParam("key", "newValue");
+      Assert.Equal("http://example.com/path/to/api?foo=bar&key=newValue", url.Build());
+
+      //RemoveParam のテスト
+      url.RemoveParam("foo");
+      Assert.Equal("http://example.com/path/to/api?key=newValue", url.Build());
     }
 
     [Fact]
@@ -214,14 +238,14 @@ namespace UnitTest
       list.Add("addedValue");
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2", url.Build());
 
-      //文字列でパラメータ取得。Listの最終要素が取得できることを期待
+      //文字列でパラメータ取得。Listの最初の要素の値が取得できることを期待
       var str = url.GetParam("sameKey");
-      Assert.Equal("value2", str);
+      Assert.Equal("value0", str);
       str = "addedStr";
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2", url.Build());
 
-      //Setメソッドでパラメータ追加
-      url.SetParam("newKey", "newValue");
+      //Addメソッドでパラメータ追加
+      url.AddParam("newKey", "newValue");
       Assert.Equal("newValue", url.GetParam("newKey"));
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
@@ -249,15 +273,23 @@ namespace UnitTest
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
       Assert.Throws<KeyNotFoundException>(() => url.GetParams("unknown"));
 
-      //Setメソッドで同じキーのパラメータを追加。上書きはされず値が増えるだけ。取得は新しく追加したほうが優先される。
-      url.SetParam("newKey", "newValue2");
-      Assert.Equal("newValue2", url.GetParam("newKey"));
+      //Addメソッドで同じキーのパラメータを追加。上書きはされず値が増えるだけ。取得は最初に見つかったほうを取得。
+      url.AddParam("newKey", "newValue2");
+      Assert.Equal("newValue", url.GetParam("newKey"));
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&newKey=newValue2", url.Build());
 
-      //Build()の引数で同じキーのパラメータ追加。戻り値だけは上書きされる。
+      //Build()の引数で同じキーのパラメータ追加。Addと同様だが、引数なしBuild()の結果には影響しない
       var addParam = new Dictionary<string, string>() { { "newKey", "newValue3" } };
-      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue3", url.Build(addParam));
+      Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&newKey=newValue2&newKey=newValue3", url.Build(addParam));
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&newKey=newValue2", url.Build());
+
+      //SetParam のテスト。同じキーの値が既にあったら全て削除してから新しい値をセットする
+      url.SetParam("sameKey", "value3");
+      Assert.Equal("http://example.com/path/to/api?newKey=newValue&newKey=newValue2&sameKey=value3", url.Build());
+
+      //RemoveParam のテスト。同じキーの値が複数あったら、その全てを削除する
+      url.RemoveParam("newKey");
+      Assert.Equal("http://example.com/path/to/api?sameKey=value3", url.Build());
     }
 
     [Fact]
@@ -272,7 +304,7 @@ namespace UnitTest
 
       //Param
       Assert.Equal("", url.GetParam("key"));
-      Assert.Equal("bar", url.GetParam("foo"));
+      Assert.Equal("", url.GetParam("foo"));
 
       //ParamList
       var keyList = url.GetParams("key");
@@ -287,11 +319,19 @@ namespace UnitTest
 
       //Null を Set
       url.SetParam("key", null);
-      Assert.Equal("http://example.com/path/to/api?key=&key=&key=&foo=&foo=&foo=bar&key=", url.Build());
+      Assert.Equal("http://example.com/path/to/api?foo=&foo=&foo=bar&key=", url.Build());
 
       //空文字を Set
       url.SetParam("foo", "");
-      Assert.Equal("http://example.com/path/to/api?key=&key=&key=&foo=&foo=&foo=bar&key=&foo=", url.Build());
+      Assert.Equal("http://example.com/path/to/api?key=&foo=", url.Build());
+
+      //Null を Add
+      url.AddParam("key", null);
+      Assert.Equal("http://example.com/path/to/api?key=&foo=&key=", url.Build());
+
+      //空文字を Add
+      url.AddParam("foo", "");
+      Assert.Equal("http://example.com/path/to/api?key=&foo=&key=&foo=", url.Build());
     }
   }
 }
