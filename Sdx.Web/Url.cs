@@ -127,13 +127,18 @@ namespace Sdx.Web
 
     public void SetParam(string key, string value)
     {
-      this.ParamList.RemoveAll(kv => kv.Key == key);
+      this.RemoveParam(key);
       this.AddParam(key, value);
     }
 
     public void AddParam(string key, string value)
     {
       this.ParamList.Add(new KeyValuePair<string,string>(key, value));
+    }
+
+    public void RemoveParam(string key)
+    {
+      this.ParamList.RemoveAll(kv => kv.Key == key);
     }
 
     /// <summary>
