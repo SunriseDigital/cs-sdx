@@ -43,7 +43,7 @@ namespace Sdx.Web
       }
     }
 
-    private string BuildQueryString(List<Dictionary<string,string>> param)
+    private string BuildQueryString(List<KeyValuePair<string,string>> param)
     {
       if (param.Count == 0)
       {
@@ -52,11 +52,7 @@ namespace Sdx.Web
 
       var sb = new StringBuilder();
       sb.Append("?");
-      param.ForEach(dic => {
-        if(dic.Count > 0) {
-          sb.AppendFormat("{0}={1}&", dic.First().Key, dic.First().Value);
-        }
-      });
+      param.ForEach(kv => sb.AppendFormat("{0}={1}&", kv.Key, kv.Value));
 
       return sb.ToString().TrimEnd('&');
     }
@@ -78,12 +74,10 @@ namespace Sdx.Web
 
     public string Build(Dictionary<string, string> add)
     {
-      var tmpList = new List<Dictionary<string, string>>() { add };
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
-          .Where(dic => add.ContainsKey(dic.First().Key) == false)
-          .Concat(tmpList)
+          .Concat(add.ToList())
           .ToList()
       );
       return path + query;
@@ -94,7 +88,7 @@ namespace Sdx.Web
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
-          .Where(dic => exclude.Contains(dic.First().Key) == false)
+          .Where(kv => exclude.Contains(kv.Key) == false)
           .ToList()
       );
       return path + query;
@@ -105,7 +99,7 @@ namespace Sdx.Web
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
-          .Where(dic => exclude.Contains(dic.First().Key) == false)
+          .Where(kv => exclude.Contains(kv.Key) == false)
           .ToList()
       );
       return path + query;
