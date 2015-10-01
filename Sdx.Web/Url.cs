@@ -133,8 +133,13 @@ namespace Sdx.Web
 
     public void SetParam(string key, string value)
     {
-      var tmp = new Dictionary<string,string>(){{key, value}};
-      this.ParamList.Add(tmp);
+      this.ParamList.RemoveAll(kv => kv.Key == key);
+      this.AddParam(key, value);
+    }
+
+    public void AddParam(string key, string value)
+    {
+      this.ParamList.Add(new KeyValuePair<string,string>(key, value));
     }
 
     public string GetParam(string key)
