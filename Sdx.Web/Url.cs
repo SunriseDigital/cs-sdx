@@ -144,17 +144,17 @@ namespace Sdx.Web
 
     public string GetParam(string key)
     {
-      return this.GetParamList(key).Last();
+      return this.GetParams(key).First();
     }
 
     public List<string> GetParams(string key)
     {
       var list = new List<string>();
-      this.ParamList.ForEach(dic =>
+      this.ParamList.ForEach(kv =>
       {
-        if (dic.ContainsKey(key))
+        if (kv.Key == key)
         {
-          list.Add(dic[key]);
+          list.Add(kv.Value);
         }
       });
 
