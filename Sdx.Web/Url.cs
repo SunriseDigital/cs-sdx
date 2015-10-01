@@ -142,6 +142,9 @@ namespace Sdx.Web
       this.ParamList.Add(new KeyValuePair<string,string>(key, value));
     }
 
+    /// <summary>
+    /// 指定された key で検索し "最初に一致した" 要素の値を返す
+    /// </summary>
     public string GetParam(string key)
     {
       return this.GetParams(key).First();
