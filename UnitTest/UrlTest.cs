@@ -205,7 +205,7 @@ namespace UnitTest
       Assert.Equal("/path/to/api", url.LocalPath);
 
       //List<string> でパラメータ取得
-      var list = url.GetParamList("sameKey");
+      var list = url.GetParams("sameKey");
       Assert.Equal("value0", list[0]);
       Assert.Equal("value1", list[1]);
       Assert.Equal("value2", list[2]);
@@ -247,7 +247,7 @@ namespace UnitTest
 
       //存在しないキーで値を取得しようとした場合、例外になる。
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
-      Assert.Throws<KeyNotFoundException>(() => url.GetParamList("unknown"));
+      Assert.Throws<KeyNotFoundException>(() => url.GetParams("unknown"));
 
       //Setメソッドで同じキーのパラメータを追加。上書きはされず値が増えるだけ。取得は新しく追加したほうが優先される。
       url.SetParam("newKey", "newValue2");
@@ -275,12 +275,12 @@ namespace UnitTest
       Assert.Equal("bar", url.GetParam("foo"));
 
       //ParamList
-      var keyList = url.GetParamList("key");
+      var keyList = url.GetParams("key");
       Assert.Equal("", keyList[0]);
       Assert.Equal("", keyList[1]);
       Assert.Equal("", keyList[2]);
 
-      var fooList = url.GetParamList("foo");
+      var fooList = url.GetParams("foo");
       Assert.Equal("", fooList[0]);
       Assert.Equal("", fooList[1]);
       Assert.Equal("bar", fooList[2]);

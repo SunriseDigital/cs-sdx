@@ -147,7 +147,7 @@ namespace Sdx.Web
       return this.GetParamList(key).Last();
     }
 
-    public List<string> GetParamList(string key)
+    public List<string> GetParams(string key)
     {
       var list = new List<string>();
       this.ParamList.ForEach(dic =>
