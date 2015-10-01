@@ -12,7 +12,7 @@ namespace Sdx.Web
     {
       //@var System.Uri
       var uri = new Uri(urlStr);
-      this.ParamList = new List<Dictionary<string,string>>();
+      this.ParamList = new List<KeyValuePair<string,string>>();
 
       //パス用の情報を保存
       this.Scheme = uri.Scheme;
@@ -35,11 +35,10 @@ namespace Sdx.Web
           QueryStringList.Add(query);
         }
 
-        QueryStringList.ToList().ForEach(str =>
+        QueryStringList.ForEach(str =>
         {
           string[] tmp = str.Split('=');
-          var param = new Dictionary<string, string>() { { tmp[0], tmp[1] } };
-          this.ParamList.Add(param);
+          this.ParamList.Add(new KeyValuePair<string, string>(tmp[0], tmp[1]));
         });
       }
     }
@@ -122,7 +121,7 @@ namespace Sdx.Web
       get; set;
     }
 
-    private List<Dictionary<string,string>> ParamList
+    private List<KeyValuePair<string, string>> ParamList
     {
       get; set;
     }
