@@ -12,7 +12,7 @@ namespace Sdx.Web
     {
       //@var System.Uri
       var uri = new Uri(urlStr);
-      this.ParamList = new List<KeyValuePair<string,string>>();
+      this.ParamList = new List<Tuple<string,string>>();
       this.RoopCount = new Dictionary<string, int>();
 
       //パス用の情報を保存
@@ -39,13 +39,13 @@ namespace Sdx.Web
         QueryStringList.ForEach(str =>
         {
           string[] tmp = str.Split('=');
-          this.ParamList.Add(new KeyValuePair<string, string>(tmp[0], tmp[1]));
+          this.ParamList.Add(Tuple.Create(tmp[0], tmp[1]));
           this.AddRoopCount(tmp[0]);
         });
       }
     }
 
-    private string BuildQueryString(List<KeyValuePair<string,string>> param)
+    private string BuildQueryString(List<Tuple<string,string>> param)
     {
       if (param.Count == 0)
       {
@@ -54,7 +54,7 @@ namespace Sdx.Web
 
       var sb = new StringBuilder();
       sb.Append("?");
-      param.ForEach(kv => sb.AppendFormat("{0}={1}&", kv.Key, kv.Value));
+      param.ForEach(tp => sb.AppendFormat("{0}={1}&", tp.Item1, tp.Item2));
 
       return sb.ToString().TrimEnd('&');
     }
@@ -76,10 +76,12 @@ namespace Sdx.Web
 
     public string Build(Dictionary<string, string> add)
     {
+      var tpList = new List<Tuple<string, string>>();
+      tpList.Add(Tuple.Create(add.First().Key, add.First().Value));
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
-          .Concat(add.ToList())
+          .Concat(tpList)
           .ToList()
       );
       return path + query;
@@ -90,7 +92,7 @@ namespace Sdx.Web
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
-          .Where(kv => exclude.Contains(kv.Key) == false)
+          .Where(tp => exclude.Contains(tp.Item1) == false)
           .ToList()
       );
       return path + query;
@@ -101,7 +103,7 @@ namespace Sdx.Web
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
-          .Where(kv => exclude.Contains(kv.Key) == false)
+          .Where(tp => exclude.Contains(tp.Item1) == false)
           .ToList()
       );
       return path + query;
@@ -117,7 +119,7 @@ namespace Sdx.Web
       get; set;
     }
 
-    private List<KeyValuePair<string, string>> ParamList
+    private List<Tuple<string, string>> ParamList
     {
       get; set;
     }
@@ -135,13 +137,13 @@ namespace Sdx.Web
 
     public void AddParam(string key, string value)
     {
-      this.ParamList.Add(new KeyValuePair<string,string>(key, value));
+      this.ParamList.Add(Tuple.Create(key, value));
       this.AddRoopCount(key);
     }
 
     public void RemoveParam(string key)
     {
-      this.ParamList.RemoveAll(kv => kv.Key == key);
+      this.ParamList.RemoveAll(tp => tp.Item1 == key);
       this.RoopCount[key] = 0;
     }
 
@@ -156,11 +158,11 @@ namespace Sdx.Web
     public List<string> GetParams(string key)
     {
       var list = new List<string>();
-      foreach(var kv in this.ParamList)
+      foreach(var tp in this.ParamList)
       {
-        if (kv.Key == key)
+        if (tp.Item1 == key)
         {
-          list.Add(kv.Value);
+          list.Add(tp.Item2);
           if (list.Count == this.RoopCount[key])
           {
             break;
