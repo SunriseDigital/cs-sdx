@@ -124,6 +124,11 @@ namespace Sdx.Web
       get; set;
     }
 
+    /// <summary>
+    /// セットされたパラメータを管理するプロパティ
+    /// Tuple<Item1 = パラメータのキー, Item2=パラメータの値> で
+    /// セットされます
+    /// </summary>
     private List<Tuple<string, string>> ParamList
     {
       get; set;
