@@ -6,7 +6,7 @@ namespace Test.Config
   {
     public Dir2()
     {
-      this.BaseDir = Path.GetFullPath(".")
+      this.BaseDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)
         + Path.DirectorySeparatorChar
         + "config"
         + Path.DirectorySeparatorChar
