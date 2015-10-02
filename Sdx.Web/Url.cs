@@ -13,6 +13,7 @@ namespace Sdx.Web
       //@var System.Uri
       var uri = new Uri(urlStr);
       this.ParamList = new List<KeyValuePair<string,string>>();
+      this.RoopCount = new Dictionary<string, int>();
 
       //パス用の情報を保存
       this.Scheme = uri.Scheme;
@@ -39,6 +40,7 @@ namespace Sdx.Web
         {
           string[] tmp = str.Split('=');
           this.ParamList.Add(new KeyValuePair<string, string>(tmp[0], tmp[1]));
+          this.AddRoopCount(tmp[0]);
         });
       }
     }
@@ -134,11 +136,13 @@ namespace Sdx.Web
     public void AddParam(string key, string value)
     {
       this.ParamList.Add(new KeyValuePair<string,string>(key, value));
+      this.AddRoopCount(key);
     }
 
     public void RemoveParam(string key)
     {
       this.ParamList.RemoveAll(kv => kv.Key == key);
+      this.RoopCount[key] = 0;
     }
 
     /// <summary>
@@ -152,13 +156,17 @@ namespace Sdx.Web
     public List<string> GetParams(string key)
     {
       var list = new List<string>();
-      this.ParamList.ForEach(kv =>
+      foreach(var kv in this.ParamList)
       {
         if (kv.Key == key)
         {
           list.Add(kv.Value);
+          if (list.Count == this.RoopCount[key])
+          {
+            break;
+          }
         }
-      });
+      }
 
       //存在しないキーを指定された場合以外は、必ず何かしら list に入っているので
       //この段階で例外を投げる
@@ -167,6 +175,28 @@ namespace Sdx.Web
         throw new KeyNotFoundException();
       }
       return list;
+    }
+
+    /// <summary>
+    /// ParamList の各キー毎のループ回数を管理するプロパティ
+    /// 同じ名前のキーがセットされたらカウントをアップし、
+    /// 削除されたらカウントを0に戻す
+    /// </summary>
+    private Dictionary<string, int> RoopCount
+    {
+      get; set;
+    }
+
+    private void AddRoopCount(string key)
+    {
+      if (this.RoopCount.ContainsKey(key))
+      {
+        this.RoopCount[key]++;
+      }
+      else
+      {
+        this.RoopCount[key] = 1;
+      }
     }
   }
 }
