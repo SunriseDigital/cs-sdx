@@ -25,7 +25,7 @@ namespace UnitTest
     public void TestYaml()
     {
       var loader = new Sdx.Config<Sdx.Data.TreeYaml>();
-      loader.BaseDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "config";
+      loader.BaseDir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "config";
 
       this.AssertTree(loader.Get("test", "yml"));
       this.AssertTree(loader.Get("test.yml"));
@@ -74,7 +74,7 @@ namespace UnitTest
     public void TestAssertMemoryCache()
     {
       var config = new Sdx.Config<Sdx.Data.TreeYaml>();
-      config.BaseDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "config";
+      config.BaseDir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "config";
 
       var testReceipt = config.Get("test.yml").Get("receipt");
       Assert.Equal(testReceipt, config.Get("test.yml").Get("receipt"));
@@ -103,7 +103,7 @@ namespace UnitTest
     public void TestDirectory()
     {
       var config = new Sdx.Config<Sdx.Data.TreeYaml>();
-      config.BaseDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "config";
+      config.BaseDir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "config";
 
       Assert.Equal("hoge", config.Get("dir/foo.yml").Get("bar").Value);
     }
@@ -134,7 +134,7 @@ namespace UnitTest
     public void TestEncoding()
     {
       var config = new Sdx.Config<Sdx.Data.TreeYaml>();
-      config.BaseDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location) + Path.DirectorySeparatorChar + "config";
+      config.BaseDir = AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + "config";
 
       var sjis = config.Get("sjis.yml");
       //UT8で読んだら文字化けしてるのでちゃんと見えないはず
