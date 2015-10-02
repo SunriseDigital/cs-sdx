@@ -76,6 +76,11 @@ namespace Sdx.Web
 
     public string Build(Dictionary<string, string> add)
     {
+      if(add.Count == 0)
+      {
+        return this.Build();
+      }
+
       var tpList = new List<Tuple<string, string>>();
       tpList.Add(Tuple.Create(add.First().Key, add.First().Value));
       string path = this.BuildPath();
