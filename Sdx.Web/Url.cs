@@ -20,28 +20,15 @@ namespace Sdx.Web
       this.Domain = uri.Host;
       this.LocalPath = uri.LocalPath;
 
-      //クエリ文字列があればパラメータ毎に連想配列でしまっておく
-      if (uri.Query.Contains('?'))
+      //クエリーを分解して保存
+      foreach (var str in uri.Query.Trim('?').Split('&'))
       {
-        string query = uri.Query.Trim('?');
-        var QueryStringList = new List<string>();
-
-        //パラメータの項目数が複数か単独か
-        if(query.Contains('&'))
+        string[] tmp = str.Split('=');
+        if (tmp.Length > 1)
         {
-          QueryStringList = query.Split('&').ToList();
-        }
-        else
-        {
-          QueryStringList.Add(query);
-        }
-
-        QueryStringList.ForEach(str =>
-        {
-          string[] tmp = str.Split('=');
           this.ParamList.Add(Tuple.Create(tmp[0], tmp[1]));
           this.AddRoopCount(tmp[0]);
-        });
+        }
       }
     }
 
