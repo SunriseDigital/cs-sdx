@@ -333,5 +333,46 @@ namespace UnitTest
       url.AddParam("foo", "");
       Assert.Equal("http://example.com/path/to/api?key=&foo=&key=&foo=", url.Build());
     }
+
+    [Fact]
+    public void TestControlMultipleParams()
+    {
+      var url = new Sdx.Web.Url("http://example.com/path/to/api");
+
+      //Path
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("/path/to/api", url.LocalPath);
+
+      //テスト用パラメータ各種
+      var paramsSet = new Dictionary<string, string>() {
+        {"key", "value"},
+        {"hoge", "fuga"},
+        {"foo", "bar"}
+      };
+      var paramsEmp = new Dictionary<string, string>() {
+        {"key", ""},
+        {"hoge", ""},
+        {"foo", ""}
+      };
+      var paramsAdd = new Dictionary<string, string>() {
+        {"newKey", "newValue"},
+        {"matsu", "take"}
+      };
+
+      //Build() で追加
+      Assert.Equal("http://example.com/path/to/api?key=value&hoge=fuga&foo=bar", url.Build(paramsSet));
+      Assert.Equal("http://example.com/path/to/api", url.Build());
+      Assert.Equal("http://example.com/path/to/api?key=&hoge=&foo=", url.Build(paramsEmp));
+      Assert.Equal("http://example.com/path/to/api", url.Build());
+
+    　//Build() で削除
+      var paramsRemove = new List<string>() { "key", "hoge", "foo" };
+      url.SetParam("key", "value");
+      url.SetParam("hoge", "fuga");
+      url.SetParam("foo", "bar");
+      Assert.Equal("http://example.com/path/to/api", url.Build(paramsRemove));
+      Assert.Equal("http://example.com/path/to/api?key=value&hoge=fuga&foo=bar", url.Build());
+    }
   }
 }
