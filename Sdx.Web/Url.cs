@@ -79,18 +79,7 @@ namespace Sdx.Web
       return path + query;
     }
 
-    public string Build(List<string> exclude)
-    {
-      string path = this.BuildPath();
-      string query = this.BuildQueryString(
-        this.ParamList
-          .Where(tp => exclude.Contains(tp.Item1) == false)
-          .ToList()
-      );
-      return path + query;
-    }
-
-    public string Build(string[] exclude)
+    public string Build(IEnumerable<string> exclude)
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
