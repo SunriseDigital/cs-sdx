@@ -107,5 +107,10 @@ namespace Sdx.Diagnostics
       double result = (double)ticks / Stopwatch.Frequency;
       return result.ToString("N" + precision.ToString());
     }
+
+    public static void Console(object value)
+    {
+      System.Console.WriteLine(Dump(value));
+    }
   }
 }
