@@ -137,7 +137,12 @@ namespace Sdx.Web
     /// </summary>
     public string GetParam(string key)
     {
-      return this.GetParams(key).First();
+      var list = this.GetParams(key);
+      if(list.Count == 0)
+      {
+        throw new KeyNotFoundException();
+      }
+      return list[0];
     }
 
     public List<string> GetParams(string key)
@@ -153,13 +158,6 @@ namespace Sdx.Web
             break;
           }
         }
-      }
-
-      //存在しないキーを指定された場合以外は、必ず何かしら list に入っているので
-      //この段階で例外を投げる
-      if (list.Count == 0)
-      {
-        throw new KeyNotFoundException();
       }
       return list;
     }
