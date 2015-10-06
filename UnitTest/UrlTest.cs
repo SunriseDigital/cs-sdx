@@ -408,5 +408,24 @@ namespace UnitTest
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
       Assert.Empty(url.GetParams("unknown"));
     }
+
+    [Fact]
+    public void TestVariousUrl()
+    {
+      //日本語とエンコード済みの"&"を含めた場合の挙動
+      var url = new Sdx.Web.Url("http://example.com/path/to/テスト?key=価値&ＨＯＧＥ=fuga&multi=AAA%26BBB");
+      Assert.Equal("/path/to/テスト", url.LocalPath);
+      Assert.Equal("価値", url.GetParam("key"));
+      Assert.Equal("fuga", url.GetParam("ＨＯＧＥ"));
+      Assert.Equal("AAA&BBB", url.GetParam("multi"));
+      Assert.Equal("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%EF%BC%A8%EF%BC%AF%EF%BC%A7%EF%BC%A5=fuga&multi=AAA%26BBB", url.Build());
+
+      //省略せず書いたURLの場合の挙動
+      url = new Sdx.Web.Url("http://user:pass@exmample.com:8080/abc?key=【テスト】内容");
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("【テスト】内容", url.GetParam("key"));
+
+    }
   }
 }
