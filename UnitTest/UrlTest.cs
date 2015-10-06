@@ -88,6 +88,10 @@ namespace UnitTest
       //RemoveParam のテスト
       url.RemoveParam("key");
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -152,6 +156,10 @@ namespace UnitTest
       //RemoveParam のテスト
       url.RemoveParam("key");
       Assert.Equal("http://example.com/path/to/api", url.Build());
+
+      // has メソッドのテスト
+      Assert.False(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -216,6 +224,10 @@ namespace UnitTest
       //RemoveParam のテスト
       url.RemoveParam("foo");
       Assert.Equal("http://example.com/path/to/api?key=newValue", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("key"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -290,6 +302,10 @@ namespace UnitTest
       //RemoveParam のテスト。同じキーの値が複数あったら、その全てを削除する
       url.RemoveParam("newKey");
       Assert.Equal("http://example.com/path/to/api?sameKey=value3", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("sameKey"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -332,6 +348,11 @@ namespace UnitTest
       //空文字を Add
       url.AddParam("foo", "");
       Assert.Equal("http://example.com/path/to/api?key=&foo=&key=&foo=", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("key"));
+      Assert.True(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -373,6 +394,12 @@ namespace UnitTest
       url.SetParam("foo", "bar");
       Assert.Equal("http://example.com/path/to/api", url.Build(paramsRemove));
       Assert.Equal("http://example.com/path/to/api?key=value&hoge=fuga&foo=bar", url.Build());
+
+      //has メソッド
+      Assert.True(url.HasParam("key"));
+      Assert.True(url.HasParam("hoge"));
+      Assert.True(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
     }
   }
 }
