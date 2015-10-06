@@ -32,7 +32,7 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Update AddPair(string column, object value)
+    public Update AddColumnValue(string column, object value)
     {
       this.keys.Add(column);
       this.values.Add(value);

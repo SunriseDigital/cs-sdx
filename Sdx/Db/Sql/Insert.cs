@@ -29,7 +29,7 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Insert AddPair(string column, object value)
+    public Insert AddColumnValue(string column, object value)
     {
       this.AddColumn(column);
       this.AddValue(value);

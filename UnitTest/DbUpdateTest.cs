@@ -45,9 +45,9 @@ namespace UnitTest
       now = now.AddTicks(-(now.Ticks % TimeSpan.TicksPerSecond));
       insert
          .SetInto("shop")
-         .AddPair("name", "FooBar")
-         .AddPair("area_id", 1)
-         .AddPair("created_at", now);
+         .AddColumnValue("name", "FooBar")
+         .AddColumnValue("area_id", 1)
+         .AddColumnValue("created_at", now);
 
       ulong id = 0;
       using (var command = insert.Build())
@@ -201,9 +201,9 @@ namespace UnitTest
       var now = DateTime.Now;
       insert
         .SetInto("shop")
-        .AddPair("name", "SimpleLiteralSub")
-        .AddPair("area_id", Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 4)"))
-        .AddPair("created_at", now);
+        .AddColumnValue("name", "SimpleLiteralSub")
+        .AddColumnValue("area_id", Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 4)"))
+        .AddColumnValue("created_at", now);
 
       using (var command = insert.Build())
       {
@@ -253,9 +253,9 @@ namespace UnitTest
       now = DateTime.Now;
       insert
         .SetInto("shop")
-        .AddPair("name", "SimpleSelectSub")
-        .AddPair("area_id", select)
-        .AddPair("created_at", now);
+        .AddColumnValue("name", "SimpleSelectSub")
+        .AddColumnValue("area_id", select)
+        .AddColumnValue("created_at", now);
 
       using (var command = insert.Build())
       {
@@ -312,8 +312,8 @@ namespace UnitTest
 
       update
         .SetTable("shop")
-        .AddPair("name", "UpdateTest")
-        .AddPair("area_id", 3)
+        .AddColumnValue("name", "UpdateTest")
+        .AddColumnValue("area_id", 3)
         .Where.Add("id", 2);
 
       using (var command = update.Build())
@@ -372,7 +372,7 @@ namespace UnitTest
       //Literal
       update
         .SetTable("shop")
-        .AddPair("area_id", Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 5)"))
+        .AddColumnValue("area_id", Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 5)"))
         .Where.Add("id", 3);
 
       using (var command = update.Build())
@@ -420,7 +420,7 @@ namespace UnitTest
       //Literal
       update
         .SetTable("shop")
-        .AddPair("area_id", select)
+        .AddColumnValue("area_id", select)
         .Where.Add("id", 3);
 
       using (var command = update.Build())
