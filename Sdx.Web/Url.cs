@@ -68,8 +68,7 @@ namespace Sdx.Web
         return this.Build();
       }
 
-      var tpList = new List<Tuple<string, string>>();
-      tpList.Add(Tuple.Create(add.First().Key, add.First().Value));
+      var tpList = add.Select(kv => Tuple.Create(kv.Key, kv.Value)).ToList();
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
