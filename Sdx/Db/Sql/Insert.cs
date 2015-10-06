@@ -8,9 +8,7 @@ namespace Sdx.Db.Sql
 {
   public class Insert
   {
-    private List<string> columns = new List<string>();
-
-    private List<object> values = new List<object>();
+    private List<Column> columns = new List<Column>();
 
     public Adapter Adapter { get; private set; }
 
@@ -29,10 +27,11 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Insert AddColumnValue(string column, object value)
+    public Insert AddColumnValue(string columnName, object value)
     {
-      this.AddColumn(column);
-      this.AddValue(value);
+      var column = new Column(columnName);
+      column.Value = value;
+      this.columns.Add(column);
       return this;
     }
 
@@ -43,15 +42,12 @@ namespace Sdx.Db.Sql
       var builder = new StringBuilder();
       builder.AppendFormat("INSERT INTO " + this.Adapter.QuoteIdentifier(this.Into) + " (");
 
-      var count = 1;
       this.columns.ForEach(column => {
-        builder.Append(this.Adapter.QuoteIdentifier(column));
-        ++count;
-        if (count <= this.columns.Count)
-        {
-          builder.Append(", ");
-        }
+        builder.Append(column.Build(this.Adapter));
+        builder.Append(", ");
       });
+
+      builder.Remove(builder.Length - 2, 2);
 
       var counter = new Counter();
       if(this.Subquery != null)
@@ -63,20 +59,19 @@ namespace Sdx.Db.Sql
       else
       {
         builder.Append(") VALUES (");
-        count = 1;
-        this.values.ForEach(value =>
+        this.columns.ForEach(column =>
         {
-          if (value is Select)
+          if (column.Value is Select)
           {
-            var select = value as Select;
+            var select = column.Value as Select;
             builder
               .Append('(')
               .Append(select.BuildSelectString(command.Parameters, counter))
               .Append(')');
           }
-          else if(value is Expr)
+          else if(column.Value is Expr)
           {
-            builder.Append(value.ToString());
+            builder.Append(column.Value.ToString());
           }
           else
           {
@@ -85,18 +80,15 @@ namespace Sdx.Db.Sql
 
             var param = command.CreateParameter();
             param.ParameterName = parameterName;
-            param.Value = value;
+            param.Value = column.Value;
             command.Parameters.Add(param);
             counter.Incr();
           }
 
-
-          ++count;
-          if (count <= this.values.Count)
-          {
-            builder.Append(", ");
-          }
+          builder.Append(", ");
         });
+
+        builder.Remove(builder.Length - 2, 2);
       }
 
       builder.Append(")");
@@ -108,27 +100,14 @@ namespace Sdx.Db.Sql
 
     public Insert SetSubquery(Select select)
     {
-      if(this.values.Count > 0)
-      {
-        throw new InvalidOperationException("Already has values.");
-      }
       this.Subquery = select;
       return this;
     }
 
-    public Insert AddColumn(string column)
+    public Insert AddColumn(string columnName)
     {
+      var column = new Column(columnName);
       this.columns.Add(column);
-      return this;
-    }
-
-    public Insert AddValue(object value)
-    {
-      if(this.Subquery != null)
-      {
-        throw new InvalidOperationException("Already has subquery.");
-      }
-      this.values.Add(value);
       return this;
     }
   }
