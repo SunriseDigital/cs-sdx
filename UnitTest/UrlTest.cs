@@ -78,8 +78,9 @@ namespace UnitTest
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(unknownArray));
 
-      //存在しないキーを指定して、想定した例外になっているかを確認する
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
       url.SetParam("key", "newValue");
@@ -146,8 +147,9 @@ namespace UnitTest
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build(unknownArray));
 
-      //存在しないキーを指定して、想定した例外になっているかを確認する
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
       url.SetParam("key", "newValue");
@@ -214,8 +216,9 @@ namespace UnitTest
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build(unknownArray));
 
-      //存在しないキーを指定して、想定した例外になっているかを確認する
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
       url.SetParam("key", "newValue");
@@ -281,9 +284,9 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&empKey=", url.Build(empValDic));
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
-      //存在しないキーで値を取得しようとした場合、例外になる。
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
-      Assert.Throws<KeyNotFoundException>(() => url.GetParams("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Addメソッドで同じキーのパラメータを追加。上書きはされず値が増えるだけ。取得は最初に見つかったほうを取得。
       url.AddParam("newKey", "newValue2");
@@ -400,6 +403,10 @@ namespace UnitTest
       Assert.True(url.HasParam("hoge"));
       Assert.True(url.HasParam("foo"));
       Assert.False(url.HasParam("unknown"));
+
+      //unknown key
+      Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
     }
   }
 }
