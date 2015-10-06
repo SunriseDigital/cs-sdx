@@ -29,7 +29,6 @@ namespace Sdx.Db.Sql
     public Update SetTable(string table)
     {
       this.Table = table;
-      this.Where.ContextName = table;
       return this;
     }
 

@@ -323,7 +323,7 @@ namespace UnitTest
           SET
             {0}name{1} = @0,
             {0}area_id{1} = @1
-          WHERE {0}shop{1}.{0}id{1} = @2"), command.CommandText);
+          WHERE {0}id{1} = @2"), command.CommandText);
 
         Assert.Equal("UpdateTest", command.Parameters["@0"].Value);
         Assert.Equal(3, command.Parameters["@1"].Value);
@@ -380,7 +380,7 @@ namespace UnitTest
         Assert.Equal(testDb.Sql(@"UPDATE {0}shop{1}
           SET
             {0}area_id{1} = (SELECT id FROM area WHERE id = 5) 
-          WHERE {0}shop{1}.{0}id{1} = @0"), command.CommandText);
+          WHERE {0}id{1} = @0"), command.CommandText);
 
         Assert.Equal(3, command.Parameters["@0"].Value);
 
@@ -428,7 +428,7 @@ namespace UnitTest
         Assert.Equal(testDb.Sql(@"UPDATE {0}shop{1}
           SET
             {0}area_id{1} = (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0)
-            WHERE {0}shop{1}.{0}id{1} = @1"), command.CommandText);
+            WHERE {0}id{1} = @1"), command.CommandText);
 
         Assert.Equal(4, command.Parameters["@0"].Value);
         Assert.Equal(3, command.Parameters["@1"].Value);
