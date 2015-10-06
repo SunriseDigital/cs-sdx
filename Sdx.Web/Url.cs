@@ -164,6 +164,11 @@ namespace Sdx.Web
       return list;
     }
 
+    public bool HasParam(string key)
+    {
+      return this.ParamList.Any(tp => tp.Item1 == key);
+    }
+
     /// <summary>
     /// ParamList の各キー毎のループ回数を管理するプロパティ
     /// 同じ名前のキーがセットされたらカウントをアップし、
