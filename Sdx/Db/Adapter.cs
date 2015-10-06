@@ -46,7 +46,7 @@ namespace Sdx.Db
 
     internal abstract void InitSelectEvent(Select select);
 
-    internal abstract ulong FetchLastInsertId(Connection connection);
+    internal abstract object FetchLastInsertId(Connection connection);
 
     public DbCommand CreateCommand()
     {
@@ -108,6 +108,11 @@ namespace Sdx.Db
     public Sql.Update CreateUpdate()
     {
       return new Sql.Update(this);
+    }
+
+    public Sql.Delete CreateDelete()
+    {
+      return new Sql.Delete(this);
     }
   }
 }

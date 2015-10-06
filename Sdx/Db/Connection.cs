@@ -119,7 +119,7 @@ namespace Sdx.Db
       return command;
     }
 
-    public ulong FetchLastInsertId()
+    public object FetchLastInsertId()
     {
       return this.Adapter.FetchLastInsertId(this);
     }

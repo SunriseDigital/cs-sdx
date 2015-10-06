@@ -42,11 +42,11 @@ namespace Sdx.Db
       };
     }
 
-    internal override ulong FetchLastInsertId(Connection connection)
+    internal override object FetchLastInsertId(Connection connection)
     {
       var command = connection.CreateCommand();
       command.CommandText = "SELECT @@IDENTITY";
-      return Convert.ToUInt64(connection.ExecuteScalar(command));
+      return connection.ExecuteScalar(command);
     }
   }
 }

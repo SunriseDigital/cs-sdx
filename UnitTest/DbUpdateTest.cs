@@ -49,7 +49,7 @@ namespace UnitTest
          .AddColumnValue("area_id", 1)
          .AddColumnValue("created_at", now);
 
-      ulong id = 0;
+      object id = 0;
       using (var command = insert.Build())
       {
         Assert.Equal(
@@ -172,7 +172,7 @@ namespace UnitTest
 
         Assert.Equal(1, command.Parameters["@0"].Value);
 
-        ulong id = 0;
+        object id = 0;
         using (var conn = db.CreateConnection())
         {
           conn.Open();
@@ -454,6 +454,89 @@ namespace UnitTest
         var shop = conn.FetchRecord<Test.Orm.Shop>(select);
 
         Assert.Equal(4, shop.GetValue("area_id"));
+      }
+    }
+
+    [Fact]
+    public void TestDelete()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunDelete(db);
+      }
+    }
+
+    private void RunDelete(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      //まずは入れてみる
+      var insert = db.CreateInsert();
+      insert
+        .AddColumnValue("name", "Delete")
+        .AddColumnValue("area_id", 1)
+        .AddColumnValue("created_at", DateTime.Now)
+        .SetInto("shop")
+         ;
+
+      object id = 0;
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        conn.Execute(insert);
+        id = conn.FetchLastInsertId();
+        conn.Commit();
+      }
+
+      //確認
+      var select = db.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", id);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Equal("Delete", shop.GetValue("name"));
+      }
+
+      //delete
+      var delete = db.CreateDelete();
+
+      delete
+        .SetFrom("shop")
+        .Where.Add("id", id);
+
+      using (var command = delete.Build())
+      {
+        Assert.Equal(testDb.Sql(@"DELETE FROM {0}shop{1} WHERE {0}id{1} = @0"), command.CommandText);
+        Assert.Equal(id, command.Parameters["@0"].Value);
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+          var count = conn.ExecuteNonQuery(command);
+          Assert.Equal(1, count);
+          conn.Commit();
+        }
+      }
+
+      //確認
+      select = db.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", id);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Null(shop);
       }
     }
   }

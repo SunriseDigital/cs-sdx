@@ -58,6 +58,7 @@
     <Compile Include="Db\Sql\Condition.cs" />
     <Compile Include="Db\Sql\Context.cs" />
     <Compile Include="Db\Sql\Counter.cs" />
+    <Compile Include="Db\Sql\Delete.cs" />
     <Compile Include="Db\Sql\Enums.cs" />
     <Compile Include="Db\Sql\Expr.cs" />
     <Compile Include="Db\Sql\Insert.cs" />
