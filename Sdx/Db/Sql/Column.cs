@@ -7,24 +7,24 @@ namespace Sdx.Db.Sql
 {
   public class Column
   {
-    private object name;
+    private object target;
 
     public Column(object columnName)
     {
       if(columnName is Expr)
       {
-        name = columnName;
+        target = columnName;
       }
       else if( columnName is string)
       {
         var strName = columnName as string;
         if (strName == "*")
         {
-          name = Expr.Wrap(strName);
+          target = Expr.Wrap(strName);
         }
         else
         {
-          name = columnName;
+          target = columnName;
         }
       }
       else
@@ -40,13 +40,15 @@ namespace Sdx.Db.Sql
 
     public string Alias { get; internal set; }
 
-    public string ContextName { get; internal set; }
+    internal string ContextName { get; set; }
 
-    public Order Order { get; internal set; }
+    internal Order Order { get; set; }
+
+    internal object Value { get; set; }
 
     public object Target
     {
-      get { return this.name; }
+      get { return this.target; }
     }
 
     public string Name
@@ -58,19 +60,19 @@ namespace Sdx.Db.Sql
           return this.Alias;
         }
 
-        return this.name.ToString();
+        return this.target.ToString();
       }
     }
 
     private string QuotedName(Adapter db)
     {
-      if(this.name is Expr)
+      if(this.target is Expr)
       {
-        return db.QuoteIdentifier(this.name as Expr);
+        return db.QuoteIdentifier(this.target as Expr);
       }
       else
       {
-        return db.QuoteIdentifier(this.name as String);
+        return db.QuoteIdentifier(this.target as String);
       }
     }
 

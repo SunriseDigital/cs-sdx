@@ -14,8 +14,7 @@ namespace Sdx.Db.Sql
   /// </summary>
   public class Update
   {
-    private List<string> keys = new List<string>();
-    private List<object> values = new List<object>();
+    private List<Column> columns = new List<Column>();
 
     public Adapter Adapter { get; private set; }
     public string Table { get; set; }
@@ -32,10 +31,11 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Update AddColumnValue(string column, object value)
+    public Update AddColumnValue(string columnName, object value)
     {
-      this.keys.Add(column);
-      this.values.Add(value);
+      var column = new Column(columnName);
+      column.Value = value;
+      this.columns.Add(column);
       return this;
     }
 
@@ -51,25 +51,23 @@ namespace Sdx.Db.Sql
 
       //SET句
       var counter = new Counter();
-      var index = 0;
-      this.keys.ForEach(column => {
+      this.columns.ForEach(column => {
         builder
-          .Append(this.Adapter.QuoteIdentifier(column))
+          .Append(column.Build(this.Adapter))
           .Append(" = ");
 
-        var value = this.values[index];
 
-        if(value is Select)
+        if(column.Value is Select)
         {
-          var select = value as Select;
+          var select = column.Value as Select;
           builder
             .Append('(')
             .Append(select.BuildSelectString(command.Parameters, counter))
             .Append(')');
         }
-        else if (value is Expr)
+        else if (column.Value is Expr)
         {
-          builder.Append(value.ToString());
+          builder.Append(column.Value.ToString());
         }
         else
         {
@@ -78,19 +76,16 @@ namespace Sdx.Db.Sql
 
           var param = command.CreateParameter();
           param.ParameterName = placeHolder;
-          param.Value = value;
+          param.Value = column.Value;
           command.Parameters.Add(param);
 
           counter.Incr();
         }
 
-        if(index < this.keys.Count - 1)
-        {
-          builder.Append(", ");
-        }
-
-        ++index;
+        builder.Append(", ");
       });
+
+      builder.Remove(builder.Length - 2, 2);
 
       if (this.Where.Count > 0)
       {
