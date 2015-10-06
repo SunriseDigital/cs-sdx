@@ -13,7 +13,7 @@ namespace Sdx.Web
       //@var System.Uri
       var uri = new Uri(urlStr);
       this.ParamList = new List<Tuple<string,string>>();
-      this.RoopCount = new Dictionary<string, int>();
+      this.ParamCount = new Dictionary<string, int>();
 
       //パス用の情報を保存
       this.Scheme = uri.Scheme;
@@ -27,7 +27,7 @@ namespace Sdx.Web
         if (tmp.Length > 1)
         {
           this.ParamList.Add(Tuple.Create(tmp[0], tmp[1]));
-          this.AddRoopCount(tmp[0]);
+          this.AddParamCount(tmp[0]);
         }
       }
     }
@@ -123,13 +123,13 @@ namespace Sdx.Web
     public void AddParam(string key, string value)
     {
       this.ParamList.Add(Tuple.Create(key, value));
-      this.AddRoopCount(key);
+      this.AddParamCount(key);
     }
 
     public void RemoveParam(string key)
     {
       this.ParamList.RemoveAll(tp => tp.Item1 == key);
-      this.RoopCount[key] = 0;
+      this.ParamCount[key] = 0;
     }
 
     /// <summary>
@@ -153,7 +153,7 @@ namespace Sdx.Web
         if (tp.Item1 == key)
         {
           list.Add(tp.Item2);
-          if (list.Count == this.RoopCount[key])
+          if (list.Count == this.ParamCount[key])
           {
             break;
           }
@@ -172,20 +172,20 @@ namespace Sdx.Web
     /// 同じ名前のキーがセットされたらカウントをアップし、
     /// 削除されたらカウントを0に戻す
     /// </summary>
-    private Dictionary<string, int> RoopCount
+    private Dictionary<string, int> ParamCount
     {
       get; set;
     }
 
-    private void AddRoopCount(string key)
+    private void AddParamCount(string key)
     {
-      if (this.RoopCount.ContainsKey(key))
+      if (this.ParamCount.ContainsKey(key))
       {
-        this.RoopCount[key]++;
+        this.ParamCount[key]++;
       }
       else
       {
-        this.RoopCount[key] = 1;
+        this.ParamCount[key] = 1;
       }
     }
   }
