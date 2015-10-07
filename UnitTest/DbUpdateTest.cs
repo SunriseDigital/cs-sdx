@@ -561,18 +561,33 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
+
         var shop = conn.FetchRecord<Test.Orm.Shop>(select);
-        Console.WriteLine(shop.ToString());
+        Assert.False(shop.IsUpdated);
+
         var newName = Sdx.Util.String.GenRandom(10);
         var dateTime = Sdx.Util.Datetime.RoundTicks(DateTime.Now);
         shop.SetValue("name", newName);
+        Assert.True(shop.IsUpdated);
         shop.SetValue("area_id", 2);
         shop.SetValue("main_image_id", 1);
-        shop.SetValue("created_at", dateTime);
+        shop.SetValue("created_at", dateTime.ToString("yyyy-MM-dd HH:mm:ss"));
+
+        Assert.Equal(newName, shop.GetString("name"));
+        Assert.Equal(2, shop.GetInt32("area_id"));
+        Assert.Equal(1, shop.GetInt32("main_image_id"));
+        Assert.Equal(dateTime, shop.GetDateTime("created_at"));
 
         conn.BeginTransaction();
         shop.Save(conn);
         conn.Commit();
+
+        Assert.False(shop.IsUpdated);
+
+        Assert.Equal(newName, shop.GetString("name"));
+        Assert.Equal(2, shop.GetInt32("area_id"));
+        Assert.Equal(1, shop.GetInt32("main_image_id"));
+        Assert.Equal(dateTime, shop.GetDateTime("created_at"));
 
         var updatedShop = conn.FetchRecord<Test.Orm.Shop>(select);
         Assert.Equal(newName, updatedShop.GetString("name"));
@@ -581,8 +596,64 @@ namespace UnitTest
         Assert.Equal(null, updatedShop.GetValue("sub_image_id"));
         Assert.Equal(dateTime, updatedShop.GetDateTime("created_at"));
       }
+    }
 
+    [Fact]
+    public void TestRecordSaveAndDelete()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunRecordSaveAndDelete(db);
+      }
+    }
 
+    private void RunRecordSaveAndDelete(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var shop = new Test.Orm.Shop();
+      Assert.False(shop.IsUpdated);
+      Assert.True(shop.IsNew);
+
+      var newName = Sdx.Util.String.GenRandom(10);
+      var dateTime = Sdx.Util.Datetime.RoundTicks(DateTime.Now);
+      shop.SetValue("name", newName);
+      Assert.True(shop.IsUpdated);
+      shop.SetValue("area_id", 3);
+      shop.SetValue("main_image_id", 2);
+      shop.SetValue("created_at", dateTime);
+
+      Assert.Equal(newName, shop.GetString("name"));
+      Assert.Equal(3, shop.GetInt32("area_id"));
+      Assert.Equal(2, shop.GetInt32("main_image_id"));
+      Assert.Equal(dateTime, shop.GetDateTime("created_at"));
+      Assert.True(shop.IsNew);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        shop.Save(conn);
+        conn.Commit();
+
+        Assert.False(shop.IsUpdated);
+        Assert.False(shop.IsNew);
+
+        var id = shop.GetValue("id");
+        Assert.NotNull(id);
+
+        var select = db.CreateSelect();
+        select
+            .AddFrom(new Test.Orm.Table.Shop())
+            .Where.Add("id", id);
+
+        var newShop = conn.FetchRecord<Test.Orm.Shop>(select);
+
+        Assert.Equal(newName, newShop.GetString("name"));
+        Assert.Equal(3, newShop.GetInt32("area_id"));
+        Assert.Equal(2, shop.GetInt32("main_image_id"));
+        Assert.Equal(dateTime, newShop.GetDateTime("created_at"));
+      }
     }
   }
 }

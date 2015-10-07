@@ -16,7 +16,7 @@ namespace Sdx.Db
 
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
-    private Dictionary<string, object> updatedValue = new Dictionary<string, object>();
+    private Dictionary<string, object> updatedValues = new Dictionary<string, object>();
 
     internal string ContextName { get; set; }
 
@@ -84,12 +84,12 @@ namespace Sdx.Db
 
     public object GetValue(string key)
     {
-      if (this.updatedValue.ContainsKey(key))
+      if (this.updatedValues.ContainsKey(key))
       {
-        return this.updatedValue[key];
+        return this.updatedValues[key];
       }
 
-      if(IsNew)
+      if (IsNew)
       {
         return null;
       }
@@ -97,7 +97,7 @@ namespace Sdx.Db
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if(!this.list[0].ContainsKey(keyWithContext))
       {
-        throw new KeyNotFoundException("Missing " + keyWithContext + " key.");
+        return null;
       }
       var value = this.list[0][keyWithContext];
 
@@ -112,6 +112,11 @@ namespace Sdx.Db
     public string GetString(string key)
     {
       return Convert.ToString(this.GetValue(key));
+    }
+
+    public bool HasValue(string key)
+    {
+      return this.GetValue(key) != null;
     }
 
     public Record ClearRecordCache(string contextName = null)
@@ -228,37 +233,67 @@ namespace Sdx.Db
       }
     }
 
+    public bool IsUpdated
+    {
+      get
+      {
+        return this.updatedValues.Count != 0;
+      }
+    }
+
     public void SetValue(string columnName, object value)
     {
-      var column = this.OwnMeta.GetColumn(columnName);
-
+      this.OwnMeta.CheckColumn(columnName);
       if(!value.Equals(this.GetValue(columnName)))
       {
-        if(column.Type == typeof(DateTime) && !(value is DateTime))
-        {
-          value = Convert.ToDateTime(value);
-        }
-
-        this.updatedValue[columnName] = value;
+        this.updatedValues[columnName] = value;
       }
     }
 
     public void Save(Connection conn)
     {
-      if(updatedValue.Count == 0)
+      if(updatedValues.Count == 0)
       {
         return;
       }
 
       if (this.IsNew)
       {
-        throw new NotImplementedException();
+        var insert = conn.Adapter.CreateInsert();
+        insert.SetInto(this.OwnMeta.Name);
+
+        foreach (var columnValue in this.updatedValues)
+        {
+          insert.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        conn.Execute(insert);
+
+        //値を保存後も取得できるようにする
+        var newValues = new Dictionary<string, object>();
+        foreach(var columnValue in this.updatedValues)
+        {
+          var key = Record.BuildColumnAliasWithContextName(columnValue.Key, this.ContextName);
+          newValues[key] = columnValue.Value;
+        }
+
+        //保存に成功し、PkeyがNullだったらAutoincrementのはず。
+        //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
+        var pkey = this.OwnMeta.Pkeys[0];
+        var pkeyValue = this.GetValue(pkey);
+        if (pkeyValue == null)
+        {
+          var key = Record.BuildColumnAliasWithContextName(pkey, this.ContextName);
+          newValues[key] = conn.FetchLastInsertId();
+        }
+
+        this.list.Add(newValues);
       }
       else
       {
         var update = conn.Adapter.CreateUpdate();
         update.SetTable(this.OwnMeta.Name);
-        foreach (var columnValue in this.updatedValue)
+        foreach (var columnValue in this.updatedValues)
         {
           update.AddColumnValue(columnValue.Key, columnValue.Value);
         }
@@ -279,7 +314,19 @@ namespace Sdx.Db
         });
 
         conn.Execute(update);
+
+        //値を保存後も取得できるようにする
+        foreach(var row in this.list)
+        {
+          foreach(var columnValue in updatedValues)
+          {
+            var key = Record.BuildColumnAliasWithContextName(columnValue.Key, this.ContextName);
+            row[key] = columnValue.Value;
+          }
+        }
       }
+
+      this.updatedValues.Clear();
     }
 
     public override string ToString()

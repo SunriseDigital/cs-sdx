@@ -615,14 +615,8 @@ namespace UnitTest
         Assert.Equal("天祥", shops[0].GetString("name"));
         Assert.Equal("エスペリア", shops[1].GetString("name"));
 
-        //取得しなかったキーは取得を試みると例外になる。
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          shops[0].GetString("area_id");
-        }));
-
-        Assert.IsType<KeyNotFoundException>(ex);
-        Assert.Equal("Missing area_id@shop key.", ex.Message);
-        ;
+        //取得しなかったキーはNULL
+        Assert.Null(shops[0].GetValue("area_id"));
       }
     }
 
