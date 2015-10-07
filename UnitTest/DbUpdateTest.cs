@@ -631,6 +631,7 @@ namespace UnitTest
 
       using (var conn = db.CreateConnection())
       {
+        //新規保存
         conn.Open();
         conn.BeginTransaction();
         shop.Save(conn);
@@ -653,6 +654,18 @@ namespace UnitTest
         Assert.Equal(3, newShop.GetInt32("area_id"));
         Assert.Equal(2, shop.GetInt32("main_image_id"));
         Assert.Equal(dateTime, newShop.GetDateTime("created_at"));
+        Assert.False(newShop.IsDeleted);
+
+        //削除
+        conn.BeginTransaction();
+        newShop.Delete(conn);
+        conn.Commit();
+
+        Assert.True(newShop.IsDeleted);
+
+        //確認
+        var deletedShop = conn.FetchRecord<Test.Orm.Shop>(select);
+        Assert.Null(deletedShop);
       }
     }
   }

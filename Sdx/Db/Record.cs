@@ -241,6 +241,8 @@ namespace Sdx.Db
       }
     }
 
+    public bool IsDeleted { get; private set; }
+
     public void SetValue(string columnName, object value)
     {
       this.OwnMeta.CheckColumn(columnName);
@@ -250,8 +252,47 @@ namespace Sdx.Db
       }
     }
 
+    private void AppendPkeyWhere(Condition where)
+    {
+      if (this.OwnMeta.Pkeys.Count == 0)
+      {
+        throw new InvalidOperationException("Missing Pkey data in " + this.OwnMeta.Name + " table");
+      }
+
+      this.OwnMeta.Pkeys.ForEach(column =>
+      {
+        var value = this.GetValue(column);
+        if (value == null)
+        {
+          throw new InvalidOperationException("Primary key " + column + " is null.");
+        }
+        where.Add(column, value);
+      });
+    }
+
+    public void Delete(Connection conn)
+    {
+      if (this.IsNew)
+      {
+        return;
+      }
+
+      var delete = conn.Adapter.CreateDelete();
+      delete.From = OwnMeta.Name;
+      AppendPkeyWhere(delete.Where);
+
+      conn.Execute(delete);
+
+      IsDeleted = true;
+    }
+
     public void Save(Connection conn)
     {
+      if (IsDeleted)
+      {
+        throw new InvalidOperationException("This record is already deleted.");
+      }
+
       if(updatedValues.Count == 0)
       {
         return;
@@ -298,20 +339,7 @@ namespace Sdx.Db
           update.AddColumnValue(columnValue.Key, columnValue.Value);
         }
 
-        if(this.OwnMeta.Pkeys.Count == 0)
-        {
-          throw new InvalidOperationException("Missing Pkey data in " + this.OwnMeta.Name + " table");
-        }
-
-        this.OwnMeta.Pkeys.ForEach(column =>
-        {
-          var value = this.GetValue(column);
-          if(value == null)
-          {
-            throw new InvalidOperationException("Primary key " + column + " is null.");
-          }
-          update.Where.Add(column, value);
-        });
+        this.AppendPkeyWhere(update.Where);
 
         conn.Execute(update);
 
