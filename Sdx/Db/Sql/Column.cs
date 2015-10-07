@@ -9,6 +9,14 @@ namespace Sdx.Db.Sql
   {
     private object target;
 
+    public string Alias { get; internal set; }
+
+    internal string ContextName { get; set; }
+
+    internal Order Order { get; set; }
+
+    internal object Value { get; set; }
+
     public Column(object columnName)
     {
       if(columnName is Expr)
@@ -37,14 +45,6 @@ namespace Sdx.Db.Sql
     {
       this.ContextName = contextName;
     }
-
-    public string Alias { get; internal set; }
-
-    internal string ContextName { get; set; }
-
-    internal Order Order { get; set; }
-
-    internal object Value { get; set; }
 
     public object Target
     {

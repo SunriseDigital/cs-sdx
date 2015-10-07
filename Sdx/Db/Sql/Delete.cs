@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 using System.Text;
 
 namespace Sdx.Db.Sql
@@ -41,6 +42,15 @@ namespace Sdx.Db.Sql
 
       command.CommandText = builder.ToString();
       return command;
+    }
+
+    public object Clone()
+    {
+      var cloned = (Delete)this.MemberwiseClone();
+
+      cloned.Where = (Condition)this.Where.Clone();
+
+      return cloned;
     }
   }
 }

@@ -110,5 +110,19 @@ namespace Sdx.Db.Sql
       this.columns.Add(column);
       return this;
     }
+
+    public object Clone()
+    {
+      var cloned = (Insert)this.MemberwiseClone();
+
+      cloned.columns = new List<Column>(this.columns);
+
+      if(this.Subquery != null)
+      {
+        cloned.Subquery = (Select)this.Subquery.Clone();
+      }
+
+      return cloned;
+    }
   }
 }

@@ -1,8 +1,9 @@
-﻿using System.Data.Common;
+﻿using System;
+using System.Data.Common;
 
 namespace Sdx.Db
 {
-  public interface INonQueryBuilder
+  public interface INonQueryBuilder : ICloneable
   {
     DbCommand Build();
   }

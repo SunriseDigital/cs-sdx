@@ -96,5 +96,15 @@ namespace Sdx.Db.Sql
       command.CommandText = builder.ToString();
       return command;
     }
+
+    public object Clone()
+    {
+      var cloned = (Update)this.MemberwiseClone();
+
+      cloned.columns = new List<Column>(this.columns);
+      cloned.Where = (Condition)this.Where.Clone();
+
+      return cloned;
+    }
   }
 }
