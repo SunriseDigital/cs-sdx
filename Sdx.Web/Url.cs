@@ -122,6 +122,11 @@ namespace Sdx.Web
 
     public void AddParam(string key, string value)
     {
+      //value が null の場合、直後の EscapeUriString() でコケるのでチェック
+      if(value == null)
+      {
+        value = "";
+      }
       this.ParamList.Add(Tuple.Create(Uri.EscapeUriString(key), Uri.EscapeUriString(value)));
       this.AddParamCount(Uri.EscapeUriString(key));
     }
