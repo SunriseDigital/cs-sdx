@@ -27,7 +27,7 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Select()
+    public Select(Adapter adapter)
     {
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Condition();
@@ -35,10 +35,7 @@ namespace Sdx.Db.Sql
 
       //intは0で初期化されてしまうのでセットされていない状態を識別するため（`LIMIT 0`を可能にするため）-1をセット
       this.Limit = -1;
-    }
 
-    public Select(Adapter adapter) : this()
-    {
       this.Adapter = adapter;
     }
 

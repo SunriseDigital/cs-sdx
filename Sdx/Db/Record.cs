@@ -170,9 +170,8 @@ namespace Sdx.Db
         {
           var relations = table.OwnMeta.Relations[contextName];
 
-          var sel = new Select();
+          var sel = new Select(this.select.Adapter);
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
-          sel.Adapter = this.select.Adapter;
           sel.AddFrom((Table)Activator.CreateInstance(relations.TableType))
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
