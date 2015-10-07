@@ -167,7 +167,7 @@ namespace Sdx.Web
 
     public bool HasParam(string key)
     {
-      return this.ParamCount.Any(kv => kv.Key == key);
+      return this.ParamCount.Any(kv => kv.Key == Uri.EscapeUriString(key));
     }
 
     /// <summary>
