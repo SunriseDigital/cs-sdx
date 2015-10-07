@@ -412,20 +412,23 @@ namespace UnitTest
     [Fact]
     public void TestVariousUrl()
     {
-      //日本語とエンコード済みの"&"を含めた場合の挙動
-      var url = new Sdx.Web.Url("http://example.com/path/to/テスト?key=価値&ＨＯＧＥ=fuga&multi=AAA%26BBB");
+      //値に日本語、キーに日本語、エンコード済みの"&"、その他記号を含めた場合の挙動
+      var url = new Sdx.Web.Url("http://example.com/path/to/テスト?key=価値&ほげ=f_u/g-a&multi=AAA%26BBB&kakko=【かっこ】");
       Assert.Equal("/path/to/テスト", url.LocalPath);
       Assert.Equal("価値", url.GetParam("key"));
-      Assert.Equal("fuga", url.GetParam("ＨＯＧＥ"));
+      Assert.Equal("f_u/g-a", url.GetParam("ほげ"));
       Assert.Equal("AAA&BBB", url.GetParam("multi"));
-      Assert.Equal("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%EF%BC%A8%EF%BC%AF%EF%BC%A7%EF%BC%A5=fuga&multi=AAA%26BBB", url.Build());
+      Assert.Equal("【かっこ】", url.GetParam("kakko"));
+      Assert.Equal("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%E3%81%BB%E3%81%92=f_u/g-a&multi=AAA%26BBB&kakko=%E3%80%90%E3%81%8B%E3%81%A3%E3%81%93%E3%80%91", url.Build());
 
-      //省略せず書いたURLの場合の挙動
-      url = new Sdx.Web.Url("http://user:pass@exmample.com:8080/abc?key=【テスト】内容");
-      Assert.Equal("http", url.Scheme);
-      Assert.Equal("example.com", url.Domain);
-      Assert.Equal("【テスト】内容", url.GetParam("key"));
-
+      //上記で Build() した URL を使った場合の挙動。テスト内容は全く同じで、Buildの結果も同じであることを期待
+      url = new Sdx.Web.Url("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%E3%81%BB%E3%81%92=f_u/g-a&multi=AAA%26BBB&kakko=%E3%80%90%E3%81%8B%E3%81%A3%E3%81%93%E3%80%91");
+      Assert.Equal("/path/to/テスト", url.LocalPath);
+      Assert.Equal("価値", url.GetParam("key"));
+      Assert.Equal("f_u/g-a", url.GetParam("ほげ"));
+      Assert.Equal("AAA&BBB", url.GetParam("multi"));
+      Assert.Equal("【かっこ】", url.GetParam("kakko"));
+      Assert.Equal("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%E3%81%BB%E3%81%92=f_u/g-a&multi=AAA%26BBB&kakko=%E3%80%90%E3%81%8B%E3%81%A3%E3%81%93%E3%80%91", url.Build());
     }
   }
 }
