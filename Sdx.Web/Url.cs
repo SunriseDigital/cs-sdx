@@ -15,7 +15,7 @@ namespace Sdx.Web
       this.ParamList = new List<Tuple<string,string>>();
       this.ParamCount = new Dictionary<string, int>();
 
-      //パス用の情報を保存
+      //System.Uri を通しただけでは Host, LocalPath は未エスケープなのでここでする
       this.Scheme = uri.Scheme;
       this.Domain = uri.Host;
       this.LocalPath = uri.LocalPath;
@@ -49,7 +49,7 @@ namespace Sdx.Web
     private string BuildPath()
     {
       string path = string.Format(
-        "{0}://{1}{2}", this.Scheme, this.Domain, this.LocalPath
+        "{0}://{1}{2}", Uri.EscapeUriString(this.Scheme), Uri.EscapeUriString(this.Domain), Uri.EscapeUriString(this.LocalPath)
       );
       return path;
     }
@@ -122,14 +122,14 @@ namespace Sdx.Web
 
     public void AddParam(string key, string value)
     {
-      this.ParamList.Add(Tuple.Create(key, value));
-      this.AddParamCount(key);
+      this.ParamList.Add(Tuple.Create(Uri.EscapeUriString(key), Uri.EscapeUriString(value)));
+      this.AddParamCount(Uri.EscapeUriString(key));
     }
 
     public void RemoveParam(string key)
     {
-      this.ParamList.RemoveAll(tp => tp.Item1 == key);
-      this.ParamCount[key] = 0;
+      this.ParamList.RemoveAll(tp => tp.Item1 == Uri.EscapeUriString(key));
+      this.ParamCount[Uri.EscapeUriString(key)] = 0;
     }
 
     /// <summary>
@@ -147,13 +147,14 @@ namespace Sdx.Web
 
     public List<string> GetParams(string key)
     {
+      var escapedKey = Uri.EscapeUriString(key);
       var list = new List<string>();
       foreach(var tp in this.ParamList)
       {
-        if (tp.Item1 == key)
+        if (tp.Item1 == escapedKey)
         {
-          list.Add(tp.Item2);
-          if (list.Count == this.ParamCount[key])
+          list.Add(Uri.UnescapeDataString(tp.Item2));
+          if (list.Count == this.ParamCount[escapedKey])
           {
             break;
           }
@@ -164,7 +165,7 @@ namespace Sdx.Web
 
     public bool HasParam(string key)
     {
-      return this.ParamList.Any(tp => tp.Item1 == key);
+      return this.ParamCount.Any(kv => kv.Key == key);
     }
 
     /// <summary>
