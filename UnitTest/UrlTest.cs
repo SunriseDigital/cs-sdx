@@ -429,6 +429,14 @@ namespace UnitTest
       Assert.Equal("AAA&BBB", url.GetParam("multi"));
       Assert.Equal("【かっこ】", url.GetParam("kakko"));
       Assert.Equal("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%E3%81%BB%E3%81%92=f_u/g-a&multi=AAA%26BBB&kakko=%E3%80%90%E3%81%8B%E3%81%A3%E3%81%93%E3%80%91", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("key"));
+      Assert.True(url.HasParam("ほげ"));
+      Assert.True(url.HasParam("multi"));
+      Assert.True(url.HasParam("kakko"));
+      Assert.False(url.HasParam("unknown"));
+      Assert.False(url.HasParam("あんのうん"));
     }
   }
 }
