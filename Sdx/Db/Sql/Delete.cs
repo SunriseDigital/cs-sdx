@@ -10,7 +10,7 @@ namespace Sdx.Db.Sql
     public string From { get; set; }
     public Condition Where { get; private set; } = new Condition();
 
-    public Delete(Adapter adapter)
+    internal Delete(Adapter adapter)
     {
       this.Adapter = adapter;
     }

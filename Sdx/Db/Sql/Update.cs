@@ -20,7 +20,7 @@ namespace Sdx.Db.Sql
     public string Table { get; set; }
     public Condition Where { get; private set; } = new Condition();
 
-    public Update(Adapter adapter)
+    internal Update(Adapter adapter)
     {
       this.Adapter = adapter;
     }

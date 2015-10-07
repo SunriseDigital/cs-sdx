@@ -27,7 +27,7 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Select(Adapter adapter)
+    internal Select(Adapter adapter)
     {
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Condition();

@@ -16,7 +16,7 @@ namespace Sdx.Db.Sql
 
     public Select Subquery { get; set; }
 
-    public Insert(Adapter adapter)
+    internal Insert(Adapter adapter)
     {
       this.Adapter = adapter;
     }

@@ -155,7 +155,7 @@ namespace UnitTest
 
     private void RunFetchDictionaryList(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
@@ -207,7 +207,7 @@ namespace UnitTest
 
     private void RunFetchKeyValuePairList(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name")
@@ -261,7 +261,7 @@ namespace UnitTest
 
     private void RunFetchList(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("name", "main_image_id")
@@ -352,7 +352,7 @@ namespace UnitTest
     private void RunFetchOne(TestDb db)
     {
       //int
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("id")
@@ -526,7 +526,7 @@ namespace UnitTest
 
     private void RunFetchListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("name", "main_image_id")
@@ -592,7 +592,7 @@ namespace UnitTest
 
     private void RunFetchDictionaryWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
@@ -657,7 +657,7 @@ namespace UnitTest
 
     private void RunFetchDictionaryListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name", "main_image_id")
@@ -721,7 +721,7 @@ namespace UnitTest
 
     private void RunFetchKeyValuePairListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop").Select
         .AddColumns("id", "name")
@@ -788,7 +788,7 @@ namespace UnitTest
 
     private void RunFetchRecordWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom(new Test.Orm.Table.Shop())
         .Where.Add("id", 1);
@@ -820,7 +820,7 @@ namespace UnitTest
 
     private void RunFetchRecordListWithConnection(TestDb db)
     {
-      var sel = new Sdx.Db.Sql.Select(db.Adapter);
+      var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom(new Test.Orm.Table.Shop())
         .Where.Add("id", new string[] { "2", "3" }).Context
