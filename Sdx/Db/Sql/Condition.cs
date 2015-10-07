@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 
 namespace Sdx.Db.Sql
 {
@@ -196,34 +197,37 @@ namespace Sdx.Db.Sql
       this.wheres.Add(holder);
     }
 
-    internal string Build(Adapter adapter, DbParameterCollection parameters, Counter condCount)
+    internal void Build(StringBuilder builder, Adapter adapter, DbParameterCollection parameters, Counter condCount)
     {
-      string whereString = "";
+      if (this.EnableBracket)
+      {
+        builder.Append("(");
+      }
 
+      var first = true;
       wheres.ForEach(holder =>
       {
-        if (whereString.Length > 0)
+        if (!first)
         {
-          whereString += holder.Logical.SqlString();
+          builder.Append(holder.Logical.SqlString());
         }
+        first = false;
 
         if (holder.Value is Condition)
         {
           Condition where = holder.Value as Condition;
-          whereString += where.Build(adapter, parameters, condCount);
+          where.Build(builder, adapter, parameters, condCount);
         }
         else
         {
-          whereString += this.BuildConditionString(adapter, parameters, holder, condCount);
+          builder.Append(this.BuildConditionString(adapter, parameters, holder, condCount));
         }
       });
 
       if (this.EnableBracket)
       {
-        whereString = "(" + whereString + ")";
+        builder.Append(")");
       }
-
-      return whereString;
     }
 
     private string BuildPlaceholderAndParameters(Adapter adapter, DbParameterCollection parameters, Holder cond, Counter condCount)

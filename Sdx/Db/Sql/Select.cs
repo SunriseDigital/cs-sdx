@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 
 namespace Sdx.Db.Sql
 {
@@ -125,149 +126,157 @@ namespace Sdx.Db.Sql
 
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
-      string selectString = "SELECT";
+      var builder = new StringBuilder();
+      builder.Append("SELECT ");
 
-      var columnString = this.BuildColumsString();
-      if (columnString.Length > 0)
+      if (this.AppendColumnString(builder))
       {
-        selectString += " " + columnString;
+        builder.Append(" ");
       }
-      selectString += " FROM ";
+
+      builder.Append("FROM ");
 
       //FROMを追加
-      var fromString = "";
-      foreach (Context context in this.contextList.Where(t => t.JoinType == JoinType.From))
+      var hasFrom = false;
+      foreach (Context context in this.ContextList.Where(t => t.JoinType == JoinType.From))
       {
-        if (fromString != "")
-        {
-          fromString += ", ";
-        }
-        fromString += this.BuildJoinString(context, parameters, condCount);
+        hasFrom = true;
+        this.BuildJoinString(builder, context, parameters, condCount);
+        builder.Append(", ");
       }
 
-      selectString += fromString;
+      if (hasFrom)
+      {
+        builder.Remove(builder.Length - 2, 2);
+      }
 
       if (AfterFromFunc != null)
       {
-        selectString += this.AfterFromFunc(this);
+        builder.Append(this.AfterFromFunc(this));
       }
 
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Inner))
         {
-          selectString += this.BuildJoinString(context, parameters, condCount);
+          this.BuildJoinString(builder, context, parameters, condCount);
         }
 
-        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Left))
+        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Left))
         {
-          selectString += this.BuildJoinString(context, parameters, condCount);
+          this.BuildJoinString(builder, context, parameters, condCount);
         }
       }
       else
       {
-        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          selectString += this.BuildJoinString(context, parameters, condCount);
+          this.BuildJoinString(builder, context, parameters, condCount);
         }
       }
 
-      if (this.where.Count > 0)
+      if (this.Where.Count > 0)
       {
-        selectString += " WHERE ";
-        selectString += this.where.Build(this.Adapter, parameters, condCount);
+        builder.Append(" WHERE ");
+        this.Where.Build(builder, this.Adapter, parameters, condCount);
       }
 
       //GROUP
       if (this.GroupList.Count > 0)
       {
-        var groupString = "";
+        builder.Append(" GROUP BY ");
         this.GroupList.ForEach(column =>
         {
-          if (groupString != "")
-          {
-            groupString += ", ";
-          }
-
-          groupString += column.Build(this.Adapter);
+          builder
+            .Append(column.Build(this.Adapter))
+            .Append(", ");
         });
 
-        selectString += " GROUP BY " + groupString;
+        builder.Remove(builder.Length - 2, 2);
       }
 
       //Having
-      if (this.having.Count > 0)
+      if (this.Having.Count > 0)
       {
-        selectString += " HAVING ";
-        selectString += this.having.Build(this.Adapter, parameters, condCount);
+        builder.Append(" HAVING ");
+        this.Having.Build(builder, this.Adapter, parameters, condCount);
       }
 
       //ORDER
-      if (this.orders.Count > 0)
+      if (this.OrderList.Count > 0)
       {
+        builder.Append(" ORDER BY ");
         var orderString = "";
-        this.orders.ForEach(column => {
+        this.OrderList.ForEach(column =>
+        {
           if (orderString.Length > 0)
           {
             orderString += ", ";
           }
-          orderString += column.Build(this.Adapter) + " " + column.Order.SqlString();
+
+          builder
+            .Append(column.Build(this.Adapter))
+            .Append(" ")
+            .Append(column.Order.SqlString())
+            .Append(", ");
         });
 
-        selectString += " ORDER BY " + orderString;
+        builder.Remove(builder.Length - 2, 2);
       }
 
 
       if (AfterOrderFunc != null)
       {
-        selectString += this.AfterOrderFunc(this);
+        builder.Append(this.AfterOrderFunc(this));
       }
 
-      return selectString;
+      return builder.ToString();
     }
 
-    private string BuildJoinString(Context context, DbParameterCollection parameters, Counter condCount)
+    private void BuildJoinString(StringBuilder builder, Context context, DbParameterCollection parameters, Counter condCount)
     {
-      string joinString = "";
-
       if (context.JoinType != JoinType.From)
       {
-        joinString += " " + context.JoinType.SqlString() + " ";
+        builder
+          .Append(" ")
+          .Append(context.JoinType.SqlString())
+          .Append(" ");
       }
 
       if (context.Target is Select)
       {
         Select select = context.Target as Select;
-        if (select.Adapter == null)
-        {
-          select.Adapter = this.Adapter;
-        }
-
         string subquery = select.BuildSelectString(parameters, condCount);
-        joinString += "(" + subquery + ")";
+        builder
+          .Append("(")
+          .Append(subquery)
+          .Append(")");
       }
       else
       {
-        joinString += this.Adapter.QuoteIdentifier(context.Target);
+        builder.Append(this.Adapter.QuoteIdentifier(context.Target));
       }
 
       if (context.Alias != null)
       {
-        joinString += " AS " + this.Adapter.QuoteIdentifier(context.Name);
+        builder
+          .Append(" AS ")
+          .Append(this.Adapter.QuoteIdentifier(context.Name));
       }
 
       if (context.JoinCondition != null)
       {
-        joinString += " ON "
-          + String.Format(
-            context.JoinCondition.Build(this.Adapter, parameters, condCount),
+        var jcBuilder = new StringBuilder();
+        context.JoinCondition.Build(jcBuilder, this.Adapter, parameters, condCount);
+        builder
+          .Append(" ON ")
+          .AppendFormat(
+            jcBuilder.ToString(),
             this.Adapter.QuoteIdentifier(context.ParentContext.Name),
             this.Adapter.QuoteIdentifier(context.Name)
           );
       }
-
-      return joinString;
     }
 
     public DbCommand Build()
@@ -366,20 +375,23 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    internal string BuildColumsString()
+    internal bool AppendColumnString(StringBuilder builder)
     {
-      var result = "";
-      this.columns.ForEach((column) =>
+      var hasColumn = false;
+      this.ColumnList.ForEach((column) =>
       {
-        if (result.Length > 0)
-        {
-          result += ", ";
-        }
-
-        result += column.Build(this.Adapter);
+        hasColumn = true;
+        builder
+          .Append(column.Build(this.Adapter))
+          .Append(", ");
       });
 
-      return result;
+      if (hasColumn)
+      {
+        builder.Remove(builder.Length - 2, 2);
+      }
+
+      return hasColumn;
     }
 
     /// <summary>

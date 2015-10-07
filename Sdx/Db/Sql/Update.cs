@@ -89,9 +89,8 @@ namespace Sdx.Db.Sql
 
       if (this.Where.Count > 0)
       {
-        builder
-          .Append(" WHERE ")
-          .Append(this.Where.Build(this.Adapter, command.Parameters, counter));
+        builder.Append(" WHERE ");
+        this.Where.Build(builder, this.Adapter, command.Parameters, counter);
       }
 
       command.CommandText = builder.ToString();
