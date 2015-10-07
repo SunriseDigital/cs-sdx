@@ -42,7 +42,13 @@ namespace Sdx.Db
         this.Name = name;
       }
 
+      public Column(string name, Type type) : this(name)
+      {
+        this.Type = type;
+      }
+
       public string Name { get; private set; }
+      public Type Type { get; private set; }
     }
 
     public Adapter Adapter { get; set; }

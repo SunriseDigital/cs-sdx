@@ -53,6 +53,7 @@
     <Compile Include="Db\Adapter.cs" />
     <Compile Include="Db\Connection.cs" />
     <Compile Include="Db\DbException.cs" />
+    <Compile Include="Db\Sql\INonQueryBuilder.cs" />
     <Compile Include="Db\MySqlAdapter.cs" />
     <Compile Include="Db\Sql\Column.cs" />
     <Compile Include="Db\Sql\Condition.cs" />

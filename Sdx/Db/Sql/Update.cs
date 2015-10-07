@@ -12,7 +12,7 @@ namespace Sdx.Db.Sql
   /// 必要な場合はDbCommandを直接生成してください。
   /// Where句のサブクエリおよび、単一カラムのサブクエリーによる値の指定には対応しています。
   /// </summary>
-  public class Update
+  public class Update : INonQueryBuilder
   {
     private List<Column> columns = new List<Column>();
 

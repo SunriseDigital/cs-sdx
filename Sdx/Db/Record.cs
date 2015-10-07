@@ -16,6 +16,8 @@ namespace Sdx.Db
 
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
+    private Dictionary<string, object> updatedValue = new Dictionary<string, object>();
+
     internal string ContextName { get; set; }
 
     internal Select Select
@@ -82,12 +84,29 @@ namespace Sdx.Db
 
     public object GetValue(string key)
     {
+      if (this.updatedValue.ContainsKey(key))
+      {
+        return this.updatedValue[key];
+      }
+
+      if(IsNew)
+      {
+        return null;
+      }
+
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if(!this.list[0].ContainsKey(keyWithContext))
       {
         throw new KeyNotFoundException("Missing " + keyWithContext + " key.");
       }
-      return this.list[0][keyWithContext];
+      var value = this.list[0][keyWithContext];
+
+      if(value is DBNull)
+      {
+        return null;
+      }
+
+      return value;
     }
 
     public string GetString(string key)
@@ -199,6 +218,93 @@ namespace Sdx.Db
     internal static string BuildColumnAliasWithContextName(string columnName, string contextName)
     {
       return columnName + "@" + contextName;
+    }
+
+    public bool IsNew
+    {
+      get
+      {
+        return this.list.Count == 0;
+      }
+    }
+
+    public void SetValue(string columnName, object value)
+    {
+      var column = this.OwnMeta.GetColumn(columnName);
+
+      if(!value.Equals(this.GetValue(columnName)))
+      {
+        if(column.Type == typeof(DateTime) && !(value is DateTime))
+        {
+          value = Convert.ToDateTime(value);
+        }
+
+        this.updatedValue[columnName] = value;
+      }
+    }
+
+    public void Save(Connection conn)
+    {
+      if(updatedValue.Count == 0)
+      {
+        return;
+      }
+
+      if (this.IsNew)
+      {
+        throw new NotImplementedException();
+      }
+      else
+      {
+        var update = conn.Adapter.CreateUpdate();
+        update.SetTable(this.OwnMeta.Name);
+        foreach (var columnValue in this.updatedValue)
+        {
+          update.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        if(this.OwnMeta.Pkeys.Count == 0)
+        {
+          throw new InvalidOperationException("Missing Pkey data in " + this.OwnMeta.Name + " table");
+        }
+
+        this.OwnMeta.Pkeys.ForEach(column =>
+        {
+          var value = this.GetValue(column);
+          if(value == null)
+          {
+            throw new InvalidOperationException("Primary key " + column + " is null.");
+          }
+          update.Where.Add(column, value);
+        });
+
+        conn.Execute(update);
+      }
+    }
+
+    public override string ToString()
+    {
+      var builder = new StringBuilder();
+      builder
+        .Append(this.OwnMeta.Name)
+        .Append(": {")
+        ;
+      this.OwnMeta.Columns.ForEach(column => 
+      {
+        builder
+          .Append(column.Name)
+          .Append(": ")
+          .Append('"')
+          .Append(this.GetString(column.Name))
+          .Append("\", ")
+          ;
+      });
+
+      builder
+        .Remove(builder.Length - 2, 2)
+        .Append("}");
+
+      return builder.ToString();
     }
   }
 }

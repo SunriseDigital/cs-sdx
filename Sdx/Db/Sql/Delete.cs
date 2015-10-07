@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Sdx.Db.Sql
 {
-  public class Delete
+  public class Delete : INonQueryBuilder
   {
     public Adapter Adapter { get; private set; }
     public string From { get; set; }

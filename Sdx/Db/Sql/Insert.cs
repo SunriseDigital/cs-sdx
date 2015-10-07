@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Sdx.Db.Sql
 {
-  public class Insert
+  public class Insert : INonQueryBuilder
   {
     private List<Column> columns = new List<Column>();
 

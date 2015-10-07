@@ -155,9 +155,9 @@ namespace Sdx.Db
       return result;
     }
 
-    public int Execute(Sql.Insert insert)
+    public int Execute(INonQueryBuilder builder)
     {
-      using (var command = insert.Build())
+      using (var command = builder.Build())
       {
         return this.ExecuteNonQuery(command);
       }

@@ -33,6 +33,10 @@ namespace Sdx.Db
         throw new NotSupportedException(tableType + "is not Sdx.Db.Table subclass");
       }
       this.TableType = tableType;
+
+      this.Columns.ForEach(column => {
+        this.columnsCache[column.Name] = column;
+      });
     }
 
     public string Name { get; private set; }
@@ -41,6 +45,27 @@ namespace Sdx.Db
     public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; private set; }
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }
+
+    private Dictionary<string, Table.Column> columnsCache = new Dictionary<string, Table.Column>();
+
+    public bool HasColumn(string columnName)
+    {
+      return this.columnsCache.ContainsKey(columnName);
+    }
+
+    public void CheckColumn(string columnName)
+    {
+      if (!this.HasColumn(columnName))
+      {
+        throw new KeyNotFoundException("Missing " + columnName + " in " + this.TableType);
+      }
+    }
+
+    public Table.Column GetColumn(string columnName)
+    {
+      this.CheckColumn(columnName);
+      return this.columnsCache[columnName];
+    }
 
     public Sql.Condition CreateJoinCondition(string contextName)
     {

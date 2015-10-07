@@ -40,9 +40,9 @@ namespace UnitTest
 
       var insert = db.CreateInsert();
 
-      var now = DateTime.Now;
       //mysqlで保存時にミリ秒は丸められてテストがこけるのでtruncateします。
-      now = now.AddTicks(-(now.Ticks % TimeSpan.TicksPerSecond));
+      var now = Sdx.Util.Datetime.RoundTicks(DateTime.Now);
+      
       insert
          .SetInto("shop")
          .AddColumnValue("name", "FooBar")
@@ -538,6 +538,51 @@ namespace UnitTest
 
         Assert.Null(shop);
       }
+    }
+
+    [Fact]
+    public void TestRecordUpdate()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunRecordUpdate(db);
+      }
+    }
+
+    private void RunRecordUpdate(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+          .AddFrom(new Test.Orm.Table.Shop())
+          .Where.Add("id", 6);
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        Console.WriteLine(shop.ToString());
+        var newName = Sdx.Util.String.GenRandom(10);
+        var dateTime = Sdx.Util.Datetime.RoundTicks(DateTime.Now);
+        shop.SetValue("name", newName);
+        shop.SetValue("area_id", 2);
+        shop.SetValue("main_image_id", 1);
+        shop.SetValue("created_at", dateTime);
+
+        conn.BeginTransaction();
+        shop.Save(conn);
+        conn.Commit();
+
+        var updatedShop = conn.FetchRecord<Test.Orm.Shop>(select);
+        Assert.Equal(newName, updatedShop.GetString("name"));
+        Assert.Equal(2, updatedShop.GetInt32("area_id"));
+        Assert.Equal(1, updatedShop.GetInt32("main_image_id"));
+        Assert.Equal(null, updatedShop.GetValue("sub_image_id"));
+        Assert.Equal(dateTime, updatedShop.GetDateTime("created_at"));
+      }
+
+
     }
   }
 }
