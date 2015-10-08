@@ -406,5 +406,92 @@ namespace Sdx.Db
         return (T)value;
       }
     }
+
+    public void Save(Record record)
+    {
+      if (record.IsDeleted)
+      {
+        throw new InvalidOperationException("This record is already deleted.");
+      }
+
+      if (record.UpdatedValues.Count == 0)
+      {
+        return;
+      }
+
+      if (record.IsNew)
+      {
+        var insert = this.Adapter.CreateInsert();
+        insert.SetInto(record.OwnMeta.Name);
+
+        foreach (var columnValue in record.UpdatedValues)
+        {
+          insert.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        this.Execute(insert);
+
+        //値を保存後も取得できるようにする
+        var newValues = new Dictionary<string, object>();
+        foreach (var columnValue in record.UpdatedValues)
+        {
+          var key = Record.BuildColumnAliasWithContextName(columnValue.Key, record.ContextName);
+          newValues[key] = columnValue.Value;
+        }
+
+        //保存に成功し、PkeyがNullだったらAutoincrementのはず。
+        //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
+        var pkey = record.OwnMeta.Pkeys[0];
+        var pkeyValue = record.GetValue(pkey);
+        if (pkeyValue == null)
+        {
+          var key = Record.BuildColumnAliasWithContextName(pkey, record.ContextName);
+          newValues[key] = this.FetchLastInsertId();
+        }
+
+        record.ValuesList.Add(newValues);
+      }
+      else
+      {
+        var update = this.Adapter.CreateUpdate();
+        update.SetTable(record.OwnMeta.Name);
+        foreach (var columnValue in record.UpdatedValues)
+        {
+          update.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        record.AppendPkeyWhere(update.Where);
+
+        this.Execute(update);
+
+        //値を保存後も取得できるようにする
+        foreach (var row in record.ValuesList)
+        {
+          foreach (var columnValue in record.UpdatedValues)
+          {
+            var key = Record.BuildColumnAliasWithContextName(columnValue.Key, record.ContextName);
+            row[key] = columnValue.Value;
+          }
+        }
+      }
+
+      record.UpdatedValues.Clear();
+    }
+
+    public void Delete(Record record)
+    {
+      if (record.IsNew)
+      {
+        return;
+      }
+
+      var delete = this.Adapter.CreateDelete();
+      delete.From = record.OwnMeta.Name;
+      record.AppendPkeyWhere(delete.Where);
+
+      this.Execute(delete);
+
+      record.IsDeleted = true;
+    }
   }
 }

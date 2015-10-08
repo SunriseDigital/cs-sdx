@@ -579,7 +579,7 @@ namespace UnitTest
         Assert.Equal(dateTime, shop.GetDateTime("created_at"));
 
         conn.BeginTransaction();
-        shop.Save(conn);
+        conn.Save(shop);
         conn.Commit();
 
         Assert.False(shop.IsUpdated);
@@ -634,7 +634,7 @@ namespace UnitTest
         //新規保存
         conn.Open();
         conn.BeginTransaction();
-        shop.Save(conn);
+        conn.Save(shop);
         conn.Commit();
 
         Assert.False(shop.IsUpdated);
@@ -658,7 +658,7 @@ namespace UnitTest
 
         //削除
         conn.BeginTransaction();
-        newShop.Delete(conn);
+        conn.Delete(newShop);
         conn.Commit();
 
         Assert.True(newShop.IsDeleted);

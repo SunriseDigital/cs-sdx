@@ -10,27 +10,12 @@ namespace Sdx.Db
 {
   public class Record
   {
-    private Select select;
-
-    private List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
-
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
-    private Dictionary<string, object> updatedValues = new Dictionary<string, object>();
-
     internal string ContextName { get; set; }
-
-    internal Select Select
-    {
-      get
-      {
-        return this.select;
-      }
-      set
-      {
-        this.select = value;
-      }
-    }
+    internal Dictionary<string, object> UpdatedValues { get; } = new Dictionary<string, object>();
+    internal List<Dictionary<string, object>> ValuesList { get; } = new List<Dictionary<string, object>>();
+    internal Select Select { get; set; }
 
     public TableMeta OwnMeta
     {
@@ -84,9 +69,9 @@ namespace Sdx.Db
 
     public object GetValue(string key)
     {
-      if (this.updatedValues.ContainsKey(key))
+      if (this.UpdatedValues.ContainsKey(key))
       {
-        return this.updatedValues[key];
+        return this.UpdatedValues[key];
       }
 
       if (IsNew)
@@ -95,11 +80,11 @@ namespace Sdx.Db
       }
 
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
-      if(!this.list[0].ContainsKey(keyWithContext))
+      if(!this.ValuesList[0].ContainsKey(keyWithContext))
       {
         return null;
       }
-      var value = this.list[0][keyWithContext];
+      var value = this.ValuesList[0][keyWithContext];
 
       if(value is DBNull)
       {
@@ -169,7 +154,7 @@ namespace Sdx.Db
         return (RecordSet<T>)this.recordCache[contextName];
       }
 
-      if (this.select.HasContext(contextName)) //already joined
+      if (this.Select.HasContext(contextName)) //already joined
       {
         if (selectHook != null)
         {
@@ -177,7 +162,7 @@ namespace Sdx.Db
         }
 
         var resultSet = new RecordSet<T>();
-        resultSet.Build(this.list, this.select, contextName);
+        resultSet.Build(this.ValuesList, this.Select, contextName);
         //キャッシュする
         this.recordCache[contextName] = resultSet;
         return resultSet;
@@ -189,12 +174,12 @@ namespace Sdx.Db
           throw new ArgumentNullException("connection");
         }
 
-        var table = this.select.Context(this.ContextName).Table;
+        var table = this.Select.Context(this.ContextName).Table;
         if (table.OwnMeta.Relations.ContainsKey(contextName))
         {
           var relations = table.OwnMeta.Relations[contextName];
 
-          var sel = new Select(this.select.Adapter);
+          var sel = new Select(this.Select.Adapter);
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
           sel.AddFrom((Table)Activator.CreateInstance(relations.TableType))
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
@@ -217,7 +202,7 @@ namespace Sdx.Db
 
     internal void AddRow(Dictionary<string, object> row)
     {
-      this.list.Add(row);
+      this.ValuesList.Add(row);
     }
 
     internal static string BuildColumnAliasWithContextName(string columnName, string contextName)
@@ -229,7 +214,7 @@ namespace Sdx.Db
     {
       get
       {
-        return this.list.Count == 0;
+        return this.ValuesList.Count == 0;
       }
     }
 
@@ -237,22 +222,22 @@ namespace Sdx.Db
     {
       get
       {
-        return this.updatedValues.Count != 0;
+        return this.UpdatedValues.Count != 0;
       }
     }
 
-    public bool IsDeleted { get; private set; }
+    public bool IsDeleted { get; internal set; }
 
     public void SetValue(string columnName, object value)
     {
       this.OwnMeta.CheckColumn(columnName);
       if(!value.Equals(this.GetValue(columnName)))
       {
-        this.updatedValues[columnName] = value;
+        this.UpdatedValues[columnName] = value;
       }
     }
 
-    private void AppendPkeyWhere(Condition where)
+    internal void AppendPkeyWhere(Condition where)
     {
       if (this.OwnMeta.Pkeys.Count == 0)
       {
@@ -268,93 +253,6 @@ namespace Sdx.Db
         }
         where.Add(column, value);
       });
-    }
-
-    public void Delete(Connection conn)
-    {
-      if (this.IsNew)
-      {
-        return;
-      }
-
-      var delete = conn.Adapter.CreateDelete();
-      delete.From = OwnMeta.Name;
-      AppendPkeyWhere(delete.Where);
-
-      conn.Execute(delete);
-
-      IsDeleted = true;
-    }
-
-    public void Save(Connection conn)
-    {
-      if (IsDeleted)
-      {
-        throw new InvalidOperationException("This record is already deleted.");
-      }
-
-      if(updatedValues.Count == 0)
-      {
-        return;
-      }
-
-      if (this.IsNew)
-      {
-        var insert = conn.Adapter.CreateInsert();
-        insert.SetInto(this.OwnMeta.Name);
-
-        foreach (var columnValue in this.updatedValues)
-        {
-          insert.AddColumnValue(columnValue.Key, columnValue.Value);
-        }
-
-        conn.Execute(insert);
-
-        //値を保存後も取得できるようにする
-        var newValues = new Dictionary<string, object>();
-        foreach(var columnValue in this.updatedValues)
-        {
-          var key = Record.BuildColumnAliasWithContextName(columnValue.Key, this.ContextName);
-          newValues[key] = columnValue.Value;
-        }
-
-        //保存に成功し、PkeyがNullだったらAutoincrementのはず。
-        //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
-        var pkey = this.OwnMeta.Pkeys[0];
-        var pkeyValue = this.GetValue(pkey);
-        if (pkeyValue == null)
-        {
-          var key = Record.BuildColumnAliasWithContextName(pkey, this.ContextName);
-          newValues[key] = conn.FetchLastInsertId();
-        }
-
-        this.list.Add(newValues);
-      }
-      else
-      {
-        var update = conn.Adapter.CreateUpdate();
-        update.SetTable(this.OwnMeta.Name);
-        foreach (var columnValue in this.updatedValues)
-        {
-          update.AddColumnValue(columnValue.Key, columnValue.Value);
-        }
-
-        this.AppendPkeyWhere(update.Where);
-
-        conn.Execute(update);
-
-        //値を保存後も取得できるようにする
-        foreach(var row in this.list)
-        {
-          foreach(var columnValue in updatedValues)
-          {
-            var key = Record.BuildColumnAliasWithContextName(columnValue.Key, this.ContextName);
-            row[key] = columnValue.Value;
-          }
-        }
-      }
-
-      this.updatedValues.Clear();
     }
 
     public override string ToString()
