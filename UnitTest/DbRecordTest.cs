@@ -638,7 +638,8 @@ namespace UnitTest
 
       select
         .AddFrom(new Test.Orm.Table.Shop())
-        .AddOrder("id", Sdx.Db.Sql.Order.ASC).Select
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+      select
         .SetLimit(1);
       ;
 

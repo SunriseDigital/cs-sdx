@@ -157,7 +157,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -211,7 +212,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("id", "name")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -266,7 +268,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -330,7 +333,8 @@ namespace UnitTest
       sel
         .AddFrom("shop")
         .AddColumns("created_at")
-        .AddOrder("id", Sdx.Db.Sql.Order.ASC).Select
+        .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+      sel
         .SetLimit(2)
         ;
 
@@ -359,7 +363,8 @@ namespace UnitTest
       //int
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)//２行目以降は無視
@@ -428,7 +433,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -527,7 +533,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -594,7 +601,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -660,7 +668,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -725,7 +734,8 @@ namespace UnitTest
     {
       var sel = db.Adapter.CreateSelect();
       sel
-        .AddFrom("shop").Select
+        .AddFrom("shop");
+      sel
         .AddColumns("id", "name")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)

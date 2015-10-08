@@ -24,7 +24,7 @@ namespace Sdx.Db.Sql
 
     public string Alias { get; internal set; }
 
-    public Select Select { get; internal set; }
+    internal Select Select { get; set; }
 
     /// <summary>
     /// <see cref="Alias"/>があったら<see cref="Alias"/>。なかったら<see cref="Target"/>の文字列表現を返す。
