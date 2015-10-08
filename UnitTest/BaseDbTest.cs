@@ -213,10 +213,9 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
 
     private static void ExecuteSqlFile(Sdx.Db.Connection con, string dataFilePath)
     {
-      var filePath = new Uri(Assembly.GetExecutingAssembly().CodeBase).LocalPath;
-      var dir = Path.GetDirectoryName(filePath);
+      var fullPath = System.AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + dataFilePath;
       //setup.sqlを流し込みます。
-      using (StreamReader stream = new StreamReader(dir+"/"+dataFilePath, Encoding.GetEncoding("UTF-8")))
+      using (StreamReader stream = new StreamReader(fullPath, Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
         DbTransaction sqlTran = con.BeginTransaction();
