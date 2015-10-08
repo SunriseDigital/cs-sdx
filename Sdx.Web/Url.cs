@@ -93,9 +93,17 @@ namespace Sdx.Web
       get; set;
     }
 
+    private string localPath;
     public string LocalPath
     {
-      get; set;
+      get
+      {
+        return Uri.UnescapeDataString(this.localPath);
+      }
+      set
+      {
+        this.localPath = Uri.EscapeUriString(value);
+      }
     }
 
     /// <summary>
