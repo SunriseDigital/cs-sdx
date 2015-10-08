@@ -373,8 +373,8 @@ namespace Sdx.Db.Sql
         cloned.childConditions.Add((Condition)condition.Clone());
       });
 
-      //ContextはSelectやContextのプロパティ経由でアクセスされたときにセットされる
-      //一時的な変数なのでコピーの必要はないと思われます。
+      //ContextはSelectやContextのプロパティ経由でアクセスされたときにセットされる一時的な変数なのでクリアする。
+      cloned.Context = null;
 
       return cloned;
     }
