@@ -15,7 +15,6 @@ namespace Sdx.Web
       this.ParamList = new List<Tuple<string,string>>();
       this.ParamCount = new Dictionary<string, int>();
 
-      //System.Uri を通しただけでは Host, LocalPath は未エスケープなのでここでする
       this.Scheme = uri.Scheme;
       this.Domain = uri.Host;
       this.LocalPath = uri.LocalPath;
