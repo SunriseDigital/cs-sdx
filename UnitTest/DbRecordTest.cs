@@ -178,7 +178,9 @@ namespace UnitTest
 
       select.AddFrom(new Test.Orm.Table.Shop())
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
-        .Where.Add("name", new List<string>() { "ビーナスラッシュ", "Freeve" }).Context
+        .Where
+          .Add("name", new List<string>() { "ビーナスラッシュ", "Freeve" });
+      select.Context("shop")
         .InnerJoin(new Test.Orm.Table.ShopCategory())
          ;
 

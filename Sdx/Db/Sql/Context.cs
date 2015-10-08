@@ -207,7 +207,7 @@ namespace Sdx.Db.Sql
       get
       {
         Condition where = this.Select.Where;
-        where.Context = this;
+        where.ContextName = this.Name;
         return where;
         //ここは下記のようにするとContextの代入ができません。
         //this.Select.Condition.Context = this;
@@ -233,7 +233,7 @@ namespace Sdx.Db.Sql
       get
       {
         Condition having = this.Select.Having;
-        having.Context = this;
+        having.ContextName = this.Name;
         return having;
       }
     }

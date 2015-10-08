@@ -26,7 +26,6 @@ namespace Sdx.Db.Sql
 
     private List<Holder> wheres = new List<Holder>();
     private List<Condition> childConditions = new List<Condition>();
-    private Context context;
 
     internal int Count
     {
@@ -35,32 +34,7 @@ namespace Sdx.Db.Sql
 
     internal bool EnableBracket { get; set; }
 
-    /// <summary>
-    /// FluentSyntax時にContextに復帰するためのプロパティ。
-    /// カラムに付与されるテーブル名はContextNameが使用されます。
-    /// </summary>
-    public Context Context
-    {
-      get
-      {
-        return this.context;
-      }
-
-      internal set
-      {
-        this.context = value;
-        if (value != null)
-        {
-          this.ContextName = value.Name;
-        }
-        else
-        {
-          this.ContextName = null;
-        }
-      }
-    }
-
-    public string ContextName { get; internal set; }
+    internal string ContextName { private get; set; }
 
     public Condition AddOr(Condition condition)
     {
@@ -374,7 +348,7 @@ namespace Sdx.Db.Sql
       });
 
       //ContextはSelectやContextのプロパティ経由でアクセスされたときにセットされる一時的な変数なのでクリアする。
-      cloned.Context = null;
+      cloned.ContextName = null;
 
       return cloned;
     }

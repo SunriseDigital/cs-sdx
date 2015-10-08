@@ -179,7 +179,9 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where
+          .Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -231,7 +233,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("id", "name", "main_image_id")//最初の二つ以外は無視
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -283,7 +286,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("name", "main_image_id")//最初１つ以外は無視
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -303,7 +307,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 4, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 4, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -373,7 +378,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("name", "main_image_id")//二つ目以降は無視
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -393,7 +399,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 3, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 3, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("created_at", "main_image_id")//二つ目以降は無視
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -440,7 +447,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -549,7 +557,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("name", "main_image_id")//最初１つ以外は無視
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -613,7 +622,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -678,7 +688,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("id", "name", "main_image_id")
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -743,7 +754,8 @@ namespace UnitTest
       sel = db.Adapter.CreateSelect();
       sel
         .AddFrom("shop")
-        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan).Context.Select
+        .Where.Add("id", 2, Sdx.Db.Sql.Comparison.GreaterThan);
+      sel
         .AddColumns("id", "name", "main_image_id")//最初の二つ以外は無視
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
@@ -814,8 +826,9 @@ namespace UnitTest
       var sel = db.Adapter.CreateSelect();
       sel
         .AddFrom(new Test.Orm.Table.Shop())
-        .Where.Add("id", new string[] { "2", "3" }).Context
         .AddOrder("id", Sdx.Db.Sql.Order.DESC)
+        .Where
+          .Add("id", new string[] { "2", "3" })
         ;
 
       using (var con = db.Adapter.CreateConnection())

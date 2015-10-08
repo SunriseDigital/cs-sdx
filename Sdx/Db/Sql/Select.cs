@@ -455,7 +455,7 @@ namespace Sdx.Db.Sql
     {
       get
       {
-        this.where.Context = null;
+        this.where.ContextName = null;
         return this.where;
       }
     }
@@ -479,7 +479,7 @@ namespace Sdx.Db.Sql
     {
       get
       {
-        this.having.Context = null;
+        this.having.ContextName = null;
         return this.having;
       }
     }
