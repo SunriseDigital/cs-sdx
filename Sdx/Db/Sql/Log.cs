@@ -3,7 +3,7 @@ using System.Data.Common;
 using System.Diagnostics;
 using System.Collections.Generic;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Log
   {
@@ -103,5 +103,29 @@ namespace Sdx.Db.Query
     }
 
     public string Comment { get; internal set; }
+
+    public override string ToString()
+    {
+      if(this.parameters.Count > 0)
+      {
+        return string.Format(
+          "[{0} {1}] {2}\n{3}",
+          this.FormatedElapsedTime,
+          this.Comment,
+          this.CommandText,
+          this.FormatedParameters
+        );
+      }
+      else
+      {
+        return string.Format(
+        "[{0} {1}] {2}",
+          this.FormatedElapsedTime,
+          this.Comment,
+          this.CommandText
+        );
+      }
+      
+    }
   }
 }

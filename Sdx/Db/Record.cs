@@ -4,31 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Data;
 
-using Sdx.Db.Query;
+using Sdx.Db.Sql;
 
 namespace Sdx.Db
 {
   public class Record
   {
-    private Select select;
-
-    private List<Dictionary<string, object>> list = new List<Dictionary<string, object>>();
-
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
     internal string ContextName { get; set; }
-
-    internal Select Select
-    {
-      get
-      {
-        return this.select;
-      }
-      set
-      {
-        this.select = value;
-      }
-    }
+    internal Dictionary<string, object> UpdatedValues { get; } = new Dictionary<string, object>();
+    internal List<Dictionary<string, object>> ValuesList { get; } = new List<Dictionary<string, object>>();
+    internal Select Select { get; set; }
 
     public TableMeta OwnMeta
     {
@@ -82,12 +69,29 @@ namespace Sdx.Db
 
     public object GetValue(string key)
     {
-      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
-      if(!this.list[0].ContainsKey(keyWithContext))
+      if (this.UpdatedValues.ContainsKey(key))
       {
-        throw new KeyNotFoundException("Missing " + keyWithContext + " key.");
+        return this.UpdatedValues[key];
       }
-      return this.list[0][keyWithContext];
+
+      if (IsNew)
+      {
+        return null;
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
+      if(!this.ValuesList[0].ContainsKey(keyWithContext))
+      {
+        return null;
+      }
+      var value = this.ValuesList[0][keyWithContext];
+
+      if(value is DBNull)
+      {
+        return null;
+      }
+
+      return value;
     }
 
     public string GetString(string key)
@@ -95,15 +99,9 @@ namespace Sdx.Db
       return Convert.ToString(this.GetValue(key));
     }
 
-    public T GetRecord<T>(string contextName) where T : Record, new()
+    public bool HasValue(string key)
     {
-      var records = this.GetRecordSet<T>(contextName);
-      if (records.Count == 0)
-      {
-        return null;
-      }
-
-      return records[0];
+      return this.GetValue(key) != null;
     }
 
     public Record ClearRecordCache(string contextName = null)
@@ -123,7 +121,28 @@ namespace Sdx.Db
       return this;
     }
 
+    public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    {
+      return this.GetRecord<T>(contextName, null, selectHook);
+    }
+
+    public T GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    {
+      var records = this.GetRecordSet<T>(contextName, connection, selectHook);
+      if (records.Count == 0)
+      {
+        return null;
+      }
+
+      return records[0];
+    }
+
     public RecordSet<T> GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    {
+      return this.GetRecordSet<T>(contextName, null, selectHook);
+    }
+
+    public RecordSet<T> GetRecordSet<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
     {
       if (this.recordCache.ContainsKey(contextName))
       {
@@ -135,7 +154,7 @@ namespace Sdx.Db
         return (RecordSet<T>)this.recordCache[contextName];
       }
 
-      if (this.select.HasContext(contextName)) //already joined
+      if (this.Select.HasContext(contextName)) //already joined
       {
         if (selectHook != null)
         {
@@ -143,21 +162,25 @@ namespace Sdx.Db
         }
 
         var resultSet = new RecordSet<T>();
-        resultSet.Build(this.list, this.select, contextName);
+        resultSet.Build(this.ValuesList, this.Select, contextName);
         //キャッシュする
         this.recordCache[contextName] = resultSet;
         return resultSet;
       }
       else //no join
       {
-        var table = this.select.Context(this.ContextName).Table;
+        if (connection == null)
+        {
+          throw new ArgumentNullException("connection");
+        }
+
+        var table = this.Select.Context(this.ContextName).Table;
         if (table.OwnMeta.Relations.ContainsKey(contextName))
         {
           var relations = table.OwnMeta.Relations[contextName];
 
-          var sel = new Select();
+          var sel = new Select(this.Select.Adapter);
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
-          sel.Adapter = this.select.Adapter;
           sel.AddFrom((Table)Activator.CreateInstance(relations.TableType))
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
@@ -166,7 +189,7 @@ namespace Sdx.Db
             selectHook.Invoke(sel);
           }
 
-          var resultSet = this.select.Adapter.FetchRecordSet<T>(sel);
+          RecordSet<T> resultSet = connection.FetchRecordSet<T>(sel);
 
           //キャッシュする
           this.recordCache[contextName] = resultSet;
@@ -179,12 +202,82 @@ namespace Sdx.Db
 
     internal void AddRow(Dictionary<string, object> row)
     {
-      this.list.Add(row);
+      this.ValuesList.Add(row);
     }
 
     internal static string BuildColumnAliasWithContextName(string columnName, string contextName)
     {
       return columnName + "@" + contextName;
+    }
+
+    public bool IsNew
+    {
+      get
+      {
+        return this.ValuesList.Count == 0;
+      }
+    }
+
+    public bool IsUpdated
+    {
+      get
+      {
+        return this.UpdatedValues.Count != 0;
+      }
+    }
+
+    public bool IsDeleted { get; internal set; }
+
+    public void SetValue(string columnName, object value)
+    {
+      this.OwnMeta.CheckColumn(columnName);
+      if(!value.Equals(this.GetValue(columnName)))
+      {
+        this.UpdatedValues[columnName] = value;
+      }
+    }
+
+    internal void AppendPkeyWhere(Condition where)
+    {
+      if (this.OwnMeta.Pkeys.Count == 0)
+      {
+        throw new InvalidOperationException("Missing Pkey data in " + this.OwnMeta.Name + " table");
+      }
+
+      this.OwnMeta.Pkeys.ForEach(column =>
+      {
+        var value = this.GetValue(column);
+        if (value == null)
+        {
+          throw new InvalidOperationException("Primary key " + column + " is null.");
+        }
+        where.Add(column, value);
+      });
+    }
+
+    public override string ToString()
+    {
+      var builder = new StringBuilder();
+      builder
+        .Append(this.OwnMeta.Name)
+        .Append(": {")
+        ;
+      this.OwnMeta.Columns.ForEach(column => 
+      {
+        builder
+          .Append(column.Name)
+          .Append(": ")
+          .Append('"')
+          .Append(this.GetString(column.Name))
+          .Append("\", ")
+          ;
+      });
+
+      builder
+        .Remove(builder.Length - 2, 2)
+        .Append("}");
+
+      return builder.ToString();
     }
   }
 }

@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Select : ICloneable
   {
@@ -17,16 +18,35 @@ namespace Sdx.Db.Query
     private Condition having;
 
     public string Comment { get; set; }
+
+    /// <summary>
+    /// FROM句の後ろに付与される。
+    /// SelectをAdapterにセットした時Adapter.InitSelectEventをコールし、そこでセットされます。
+    /// 返り値は追加する文字列。" FOR UPDATE"の様に頭にスペースを挿入してください。
+    /// </summary>
     internal Func<Select, string> AfterFromFunc { get; set; }
+
+    /// <summary>
+    /// ORDER句の後ろに付与される。
+    /// <seealso cref="AfterFromFunc"/>
+    /// </summary>
     internal Func<Select, string> AfterOrderFunc { get; set; }
 
+    /// <summary>
+    /// コメントを付与します。SQLには影響しません。
+    /// このコメントは<see cref="Log.Comment"/>から取得可能。
+    /// つまり<see cref="Profiler"/>をONにしないと意味がありません。
+    /// <see cref="Profiler"/>は<see cref="Sdx.Context.DbProfiler"/>にセットするとONになります。
+    /// </summary>
+    /// <param name="comment"></param>
+    /// <returns></returns>
     public Select SetComment(string comment)
     {
       this.Comment = comment;
       return this;
     }
 
-    public Select()
+    internal Select(Adapter adapter)
     {
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Condition();
@@ -34,10 +54,7 @@ namespace Sdx.Db.Query
 
       //intは0で初期化されてしまうのでセットされていない状態を識別するため（`LIMIT 0`を可能にするため）-1をセット
       this.Limit = -1;
-    }
 
-    public Select(Adapter adapter) : this()
-    {
       this.Adapter = adapter;
     }
 
@@ -50,7 +67,7 @@ namespace Sdx.Db.Query
         return this.adapter;
       }
 
-      set
+      internal set
       {
         this.adapter = value;
         this.adapter.InitSelectEvent(this);
@@ -77,6 +94,10 @@ namespace Sdx.Db.Query
       get { return this.columns; }
     }
 
+    /// <summary>
+    /// デフォルトではINNER JOINを先に、LEFT JOINを後にします。
+    /// <see cref="JoinOrder.Natural"/>をセットするとAddした順番にORDERされます。
+    /// </summary>
     public JoinOrder JoinOrder { get; set; }
 
     /// <summary>
@@ -107,7 +128,11 @@ namespace Sdx.Db.Query
       return this.CreateContext(target, alias);
     }
 
-    public Context AddFrom(Sdx.Db.Query.Select target, string alias = null)
+    /// <summary>
+    /// サブクエリーをJOINします。
+    /// From句を追加。繰り返しコールすると繰り返し追加します。
+    /// </summary>
+    public Context AddFrom(Sdx.Db.Sql.Select target, string alias = null)
     {
       return this.CreateContext(target, alias);
     }
@@ -125,151 +150,163 @@ namespace Sdx.Db.Query
 
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
-      string selectString = "SELECT";
+      var builder = new StringBuilder();
+      builder.Append("SELECT ");
 
-      var columnString = this.BuildColumsString();
-      if (columnString.Length > 0)
+      if (this.AppendColumnString(builder))
       {
-        selectString += " " + columnString;
+        builder.Append(" ");
       }
-      selectString += " FROM ";
+
+      builder.Append("FROM ");
 
       //FROMを追加
-      var fromString = "";
-      foreach (Context context in this.contextList.Where(t => t.JoinType == JoinType.From))
+      var hasFrom = false;
+      foreach (Context context in this.ContextList.Where(t => t.JoinType == JoinType.From))
       {
-        if (fromString != "")
-        {
-          fromString += ", ";
-        }
-        fromString += this.BuildJoinString(context, parameters, condCount);
+        hasFrom = true;
+        this.BuildJoinString(builder, context, parameters, condCount);
+        builder.Append(", ");
       }
 
-      selectString += fromString;
+      if (hasFrom)
+      {
+        builder.Remove(builder.Length - 2, 2);
+      }
 
       if (AfterFromFunc != null)
       {
-        selectString += this.AfterFromFunc(this);
+        builder.Append(this.AfterFromFunc(this));
       }
 
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Inner))
         {
-          selectString += this.BuildJoinString(context, parameters, condCount);
+          this.BuildJoinString(builder, context, parameters, condCount);
         }
 
-        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Left))
+        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Left))
         {
-          selectString += this.BuildJoinString(context, parameters, condCount);
+          this.BuildJoinString(builder, context, parameters, condCount);
         }
       }
       else
       {
-        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
-          selectString += this.BuildJoinString(context, parameters, condCount);
+          this.BuildJoinString(builder, context, parameters, condCount);
         }
       }
 
-      if (this.where.Count > 0)
+      if (this.Where.Count > 0)
       {
-        selectString += " WHERE ";
-        selectString += this.where.Build(this, parameters, condCount);
+        builder.Append(" WHERE ");
+        this.Where.Build(builder, this.Adapter, parameters, condCount);
       }
 
       //GROUP
       if (this.GroupList.Count > 0)
       {
-        var groupString = "";
+        builder.Append(" GROUP BY ");
         this.GroupList.ForEach(column =>
         {
-          if(groupString != "")
-          {
-            groupString += ", ";
-          }
-
-          groupString += column.Build(this.Adapter);
+          builder
+            .Append(column.Build(this.Adapter))
+            .Append(", ");
         });
 
-        selectString += " GROUP BY " + groupString;
+        builder.Remove(builder.Length - 2, 2);
       }
 
       //Having
-      if(this.having.Count > 0)
+      if (this.Having.Count > 0)
       {
-        selectString += " HAVING ";
-        selectString += this.having.Build(this, parameters, condCount);
+        builder.Append(" HAVING ");
+        this.Having.Build(builder, this.Adapter, parameters, condCount);
       }
 
       //ORDER
-      if(this.orders.Count > 0)
+      if (this.OrderList.Count > 0)
       {
+        builder.Append(" ORDER BY ");
         var orderString = "";
-        this.orders.ForEach(column => { 
-          if(orderString.Length > 0)
+        this.OrderList.ForEach(column =>
+        {
+          if (orderString.Length > 0)
           {
             orderString += ", ";
           }
-          orderString += column.Build(this.Adapter) + " " + column.Order.SqlString();
+
+          builder
+            .Append(column.Build(this.Adapter))
+            .Append(" ")
+            .Append(column.Order.SqlString())
+            .Append(", ");
         });
 
-        selectString += " ORDER BY " + orderString;
+        builder.Remove(builder.Length - 2, 2);
       }
 
 
       if (AfterOrderFunc != null)
       {
-        selectString += this.AfterOrderFunc(this);
+        builder.Append(this.AfterOrderFunc(this));
       }
 
-      return selectString;
+      return builder.ToString();
     }
 
-    private string BuildJoinString(Context context, DbParameterCollection parameters, Counter condCount)
+    private void BuildJoinString(StringBuilder builder, Context context, DbParameterCollection parameters, Counter condCount)
     {
-      string joinString = "";
-
       if (context.JoinType != JoinType.From)
       {
-        joinString += " " + context.JoinType.SqlString() + " ";
+        builder
+          .Append(" ")
+          .Append(context.JoinType.SqlString())
+          .Append(" ");
       }
 
       if (context.Target is Select)
       {
         Select select = context.Target as Select;
-        if (select.Adapter == null)
-        {
-          select.Adapter = this.Adapter;
-        }
-        
         string subquery = select.BuildSelectString(parameters, condCount);
-        joinString += "(" + subquery + ")";
+        builder
+          .Append("(")
+          .Append(subquery)
+          .Append(")");
       }
       else
       {
-        joinString += this.Adapter.QuoteIdentifier(context.Target);
+        builder.Append(this.Adapter.QuoteIdentifier(context.Target));
       }
 
       if (context.Alias != null)
       {
-        joinString += " AS " + this.Adapter.QuoteIdentifier(context.Name);
+        builder
+          .Append(" AS ")
+          .Append(this.Adapter.QuoteIdentifier(context.Name));
       }
 
       if (context.JoinCondition != null)
       {
-        joinString += " ON "
-          + String.Format(
-            context.JoinCondition.Build(this, parameters, condCount),
+        var jcBuilder = new StringBuilder();
+        context.JoinCondition.Build(jcBuilder, this.Adapter, parameters, condCount);
+        builder
+          .Append(" ON ")
+          .AppendFormat(
+            jcBuilder.ToString(),
             this.Adapter.QuoteIdentifier(context.ParentContext.Name),
             this.Adapter.QuoteIdentifier(context.Name)
           );
       }
-
-      return joinString;
     }
 
+    /// <summary>
+    /// SELECT文を組み立てて<see cref="DbCommand"/>を返します。
+    /// </summary>
+    /// <returns></returns>
     public DbCommand Build()
     {
       if (this.Adapter == null)
@@ -290,6 +327,11 @@ namespace Sdx.Db.Query
       return command;
     }
 
+    /// <summary>
+    /// FROM句/JOIN句にテーブルが追加されているかチェックします。計算量はO(n)。
+    /// </summary>
+    /// <param name="contextName"></param>
+    /// <returns></returns>
     public bool HasContext(string contextName)
     {
       int findIndex = this.contextList.FindIndex(context =>
@@ -322,7 +364,7 @@ namespace Sdx.Db.Query
     /// <summary>
     /// 追加したカラムをクリアする。
     /// </summary>
-    /// <param contextName="context">Contextを渡すとそのテーブルのカラムのみをクリアします。</param>
+    /// <param contextName="context">contextNameを渡すとそのテーブルのカラムのみをクリアします。</param>
     /// <returns></returns>
     public Select ClearColumns(string contextName = null)
     {
@@ -334,12 +376,12 @@ namespace Sdx.Db.Query
       {
         this.columns.RemoveAll(column => column.ContextName != null && column.ContextName == contextName);
       }
-      
+
       return this;
     }
 
     /// <summary>
-    /// エイリアスの付与はできません。
+    /// カラムを複数追加します。エイリアスの付与はできません。
     /// </summary>
     /// <param contextName="columns">Sdx.Adapter.Query.Expr[]|String[] 配列の中にExprを混ぜられるようにobjectなってます。</param>
     /// <returns></returns>
@@ -353,7 +395,7 @@ namespace Sdx.Db.Query
     }
 
     /// <summary>
-    /// 
+    /// カラムを一つ追加します。
     /// </summary>
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
@@ -366,20 +408,23 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    internal string BuildColumsString()
+    internal bool AppendColumnString(StringBuilder builder)
     {
-      var result = "";
-      this.columns.ForEach((column) =>
+      var hasColumn = false;
+      this.ColumnList.ForEach((column) =>
       {
-        if (result.Length > 0)
-        {
-          result += ", ";
-        }
-
-        result += column.Build(this.Adapter);
+        hasColumn = true;
+        builder
+          .Append(column.Build(this.Adapter))
+          .Append(", ");
       });
 
-      return result;
+      if (hasColumn)
+      {
+        builder.Remove(builder.Length - 2, 2);
+      }
+
+      return hasColumn;
     }
 
     /// <summary>
@@ -403,6 +448,9 @@ namespace Sdx.Db.Query
       return this;
     }
 
+    /// <summary>
+    /// WHERE句の付与はこのプロパティー経由で行います。
+    /// </summary>
     public Condition Where
     {
       get
@@ -413,7 +461,7 @@ namespace Sdx.Db.Query
     }
 
     /// <summary>
-    /// 繰り返しコールすると繰り返し追加します。
+    /// GROUP句を追加します。繰り返しコールすると繰り返し追加します。
     /// </summary>
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <returns></returns>
@@ -424,7 +472,10 @@ namespace Sdx.Db.Query
       return this;
     }
 
-    public Condition Having 
+    /// <summary>
+    /// HAVING句はこのプロパティー経由で行います。
+    /// </summary>
+    public Condition Having
     {
       get
       {
@@ -437,6 +488,12 @@ namespace Sdx.Db.Query
 
     public int Offset { get; private set; }
 
+    /// <summary>
+    /// LIMIT句とOFFSET句を付与します。<see cref="Select"/>を返すのでFluentSyntaxが可能です。
+    /// </summary>
+    /// <param name="limit"></param>
+    /// <param name="offset"></param>
+    /// <returns></returns>
     public Select SetLimit(int limit, int offset = 0)
     {
       this.Limit = limit;
@@ -446,7 +503,7 @@ namespace Sdx.Db.Query
 
 
     /// <summary>
-    /// 繰り返しコールすると繰り返し追加します。
+    /// ORDER句を追加します。繰り返しコールすると繰り返し追加します。
     /// </summary>
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="order"></param>
@@ -465,7 +522,7 @@ namespace Sdx.Db.Query
       var cloned = (Select)this.MemberwiseClone();
 
       //context
-      cloned.contextList = new List<Query.Context>();
+      cloned.contextList = new List<Sql.Context>();
       this.contextList.ForEach(context =>
       {
         var clonedContext = (Context)context.Clone();

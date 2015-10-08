@@ -15,11 +15,11 @@ namespace Sdx.Db
     {
       get
       {
-        return Regex.Replace(this.ConnectionString, "(P|p)assword=[^;]+", "${1}assword=" + PWD_FOR_SECURE_CONNECTION_STRING);
+        return Regex.Replace(this.ConnectionString, "(P|p)assword=[^;]+", "${1}assword=" + PasswordForSecureConnectionString);
       }
     }
 
-    internal override void InitSelectEvent(Query.Select select)
+    internal override void InitSelectEvent(Sql.Select select)
     {
       //AfterFromFunc(ForUpdate)
       select.AfterFromFunc = (sel) => {
@@ -40,6 +40,13 @@ namespace Sdx.Db
 
         return "";
       };
+    }
+
+    internal override object FetchLastInsertId(Connection connection)
+    {
+      var command = connection.CreateCommand();
+      command.CommandText = "SELECT @@IDENTITY";
+      return connection.ExecuteScalar(command);
     }
   }
 }

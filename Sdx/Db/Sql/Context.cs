@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using System.Data.Common;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
+  /// <summary>
+  /// <see cref="Sql.Select"/>の中でFROM句やJOINしたテーブルを表現するクラス。
+  /// <see cref="Db.Table"/>と明確に区別するためContextという名前になってます。
+  /// またテーブルだけではなくJOINしたサブクエリーも<see cref="Context"/>です。
+  /// </summary>
   public class Context : ICloneable
   {
     public Context(Select select)
@@ -12,7 +17,8 @@ namespace Sdx.Db.Query
     }
 
     /// <summary>
-    /// string|Sdx.Db.Query.Expr|Sdx.Db.Query.Select
+    /// 対象のテーブルまたはサブクエリー。型は
+    /// <see cref="string"/>|<see cref="Expr"/>|<see cref="Sql.Select"/>です。
     /// </summary>
     public object Target { get; internal set; }
 
@@ -20,6 +26,9 @@ namespace Sdx.Db.Query
 
     public Select Select { get; internal set; }
 
+    /// <summary>
+    /// <see cref="Alias"/>があったら<see cref="Alias"/>。なかったら<see cref="Target"/>の文字列表現を返す。
+    /// </summary>
     public string Name
     {
       get 
@@ -33,6 +42,14 @@ namespace Sdx.Db.Query
       }
     }
 
+    /// <summary>
+    /// Joinの起点メソッド
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="joinType"></param>
+    /// <param name="condition"></param>
+    /// <param name="alias"></param>
+    /// <returns></returns>
     private Context AddJoin(object target, JoinType joinType, Condition condition, string alias = null)
     {
       Context joinContext = new Context(this.Select);
@@ -70,6 +87,21 @@ namespace Sdx.Db.Query
       return this.InnerJoin(target, null, alias);
     }
 
+    public Context InnerJoin(Select target, Condition condition, string alias = null)
+    {
+      return this.AddJoin(target, JoinType.Inner, condition, alias);
+    }
+
+    public Context InnerJoin(Expr target, Condition condition, string alias = null)
+    {
+      return this.AddJoin(target, JoinType.Inner, condition, alias);
+    }
+
+    public Context InnerJoin(string target, Condition condition, string alias = null)
+    {
+      return this.AddJoin(target, JoinType.Inner, condition, alias);
+    }
+
     public Context LeftJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
     {
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Left, condition, alias);
@@ -91,20 +123,9 @@ namespace Sdx.Db.Query
       return this.LeftJoin(target, null, alias);
     }
 
-
-    public Context InnerJoin(Select target, Condition condition, string alias = null)
-    {
-      return this.AddJoin(target, JoinType.Inner, condition, alias);
-    }
-
     public Context LeftJoin(Select target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Left, condition, alias);
-    }
-
-    public Context InnerJoin(Expr target, Condition condition, string alias = null)
-    {
-      return this.AddJoin(target, JoinType.Inner, condition, alias);
     }
 
     public Context LeftJoin(Expr target, Condition condition, string alias = null)
@@ -112,22 +133,25 @@ namespace Sdx.Db.Query
       return this.AddJoin(target, JoinType.Left, condition, alias);
     }
 
-    public Context InnerJoin(string target, Condition condition, string alias = null)
-    {
-      return this.AddJoin(target, JoinType.Inner, condition, alias);
-    }
-
     public Context LeftJoin(string target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Left, condition, alias);
     }
 
+    /// <summary>
+    /// JOINしたテーブルの場合、JOIN先テーブルの<see cref="Context"/>を返します。
+    /// FROM句のテーブルだった場合はNULLが返ります。
+    /// </summary>
     public Context ParentContext { get; private set; }
 
     internal Condition JoinCondition { get; private set; }
 
     internal JoinType JoinType { get; set; }
 
+    /// <summary>
+    /// <see cref="Sql.Select"/>からこのテーブルのカラムをすべて除きます。
+    /// </summary>
+    /// <returns></returns>
     public Context ClearColumns()
     {
       this.Select.ClearColumns(this.Name);
@@ -135,6 +159,7 @@ namespace Sdx.Db.Query
     }
 
     /// <summary>
+    /// <see cref="Sql.Select"/>にこのテーブルのテーブル名付きカラムを複数追加します。
     /// エイリアスの付与はできません。
     /// </summary>
     /// <param name="columns">Sdx.Adapter.Query.Expr[]|String[] 配列の中にExprを混ぜられるようにobjectなってます。</param>
@@ -148,6 +173,12 @@ namespace Sdx.Db.Query
       return this;
     }
 
+    /// <summary>
+    /// <see cref="Sql.Select"/>にこのテーブルのカラムを一つ追加します。
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <param name="alias"></param>
+    /// <returns></returns>
     public Context AddColumn(object columnName, string alias = null)
     {
       var column = new Column(columnName);
@@ -157,11 +188,20 @@ namespace Sdx.Db.Query
       return this;
     }
 
+    /// <summary>
+    /// カラム名にこの<see cref="Context"/>の名前をクオートして付与します。カラム名もクオートされます。
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns></returns>
     public string AppendName(string column)
     {
       return this.Select.Adapter.QuoteIdentifier(this.Name) + "." + this.Select.Adapter.QuoteIdentifier(column);
     }
 
+    /// <summary>
+    /// <see cref="Sql.Select"/>にWHERE句を付与します。
+    /// このプロパティー経由で付与されるWHERE句はカラム名にこの<see cref="Context"/>の名前が付与されます。
+    /// </summary>
     public Condition Where
     {
       get
@@ -184,6 +224,10 @@ namespace Sdx.Db.Query
       }
     }
 
+    /// <summary>
+    /// <see cref="Sql.Select"/>にHAVING句を付与します。
+    /// このプロパティー経由で付与されるHAVING句はカラム名にこの<see cref="Context"/>の名前が付与されます。
+    /// </summary>
     public Condition Having
     {
       get
@@ -194,6 +238,11 @@ namespace Sdx.Db.Query
       }
     }
 
+    /// <summary>
+    /// GROUP句を付与します。カラム名にこの<see cref="Context"/>の名前が付与されます。
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <returns></returns>
     public Context AddGroup(object columnName)
     {
       var column = new Column(columnName);
@@ -202,6 +251,12 @@ namespace Sdx.Db.Query
       return this;
     }
 
+    /// <summary>
+    /// ORDER句を付与します。カラム名にこの<see cref="Context"/>の名前が付与されます。
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <param name="order"></param>
+    /// <returns></returns>
     public Context AddOrder(object columnName, Order order)
     {
       var column = new Column(columnName);
@@ -212,6 +267,9 @@ namespace Sdx.Db.Query
       return this;
     }
 
+    /// <summary>
+    /// <see cref="Db.Table"/>を使ってFROM句/JOIN句に追加された<see cref="Context"/>からはこのプロパティーから<see cref="Db.Table"/>が取得できます。
+    /// </summary>
     public Table Table { get; internal set; }
 
     public object Clone()

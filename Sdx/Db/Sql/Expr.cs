@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Expr
   {
@@ -13,7 +13,7 @@ namespace Sdx.Db.Query
 
     public static Expr Wrap(object unquotedValue)
     {
-      return new Sdx.Db.Query.Expr(unquotedValue);
+      return new Sdx.Db.Sql.Expr(unquotedValue);
     }
 
     public override string ToString()
