@@ -458,15 +458,6 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestSecureConnectionString()
-    {
-      foreach (TestDb db in this.CreateTestDbList())
-      {
-        Assert.NotEqual(-1, db.Adapter.ToString().IndexOf(Sdx.Db.Adapter.PWD_FOR_SECURE_CONNECTION_STRING));
-      }
-    }
-
-    [Fact]
     public void TestFetchOneWithConnection()
     {
       foreach (TestDb db in this.CreateTestDbList())

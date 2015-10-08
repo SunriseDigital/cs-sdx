@@ -10,7 +10,7 @@ namespace Sdx.Db
   {
     internal DbProviderFactory Factory { get; private set; }
     private DbCommandBuilder builder;
-    public const string PWD_FOR_SECURE_CONNECTION_STRING = "******";
+    protected const string PasswordForSecureConnectionString = "******";
 
     protected abstract DbProviderFactory GetFactory();
 

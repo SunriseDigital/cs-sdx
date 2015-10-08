@@ -15,7 +15,7 @@ namespace Sdx.Db
     {
       get
       {
-        return Regex.Replace(this.ConnectionString, "(P|p)assword=[^;]+", "${1}assword=" + PWD_FOR_SECURE_CONNECTION_STRING);
+        return Regex.Replace(this.ConnectionString, "(P|p)assword=[^;]+", "${1}assword=" + PasswordForSecureConnectionString);
       }
     }
 

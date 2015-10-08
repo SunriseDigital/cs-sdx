@@ -39,7 +39,7 @@ namespace Sdx.Db
     {
       get
       {
-        return Regex.Replace(this.ConnectionString, "(P|p)wd=[^;]+", "${1}wd=" + PWD_FOR_SECURE_CONNECTION_STRING);
+        return Regex.Replace(this.ConnectionString, "(P|p)wd=[^;]+", "${1}wd=" + PasswordForSecureConnectionString);
       }
     }
 
