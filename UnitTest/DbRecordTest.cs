@@ -376,11 +376,10 @@ namespace UnitTest
       Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
-      select
-         .AddFrom(new Test.Orm.Table.Shop())
-         .LeftJoin(new Test.Orm.Table.Image(), "main_image").ParentContext
-         .LeftJoin(new Test.Orm.Table.Image(), "sub_image").ParentContext
-         .Where.Add("name", "Freeve");
+      var cShop = select.AddFrom(new Test.Orm.Table.Shop());
+      cShop.LeftJoin(new Test.Orm.Table.Image(), "main_image");
+      cShop.LeftJoin(new Test.Orm.Table.Image(), "sub_image");
+      cShop.Where.Add("name", "Freeve");
 
       using (var conn = db.Adapter.CreateConnection())
       {
@@ -413,11 +412,10 @@ namespace UnitTest
       Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
       var select = db.Adapter.CreateSelect();
 
-      select
-         .AddFrom(new Test.Orm.Table.Shop())
-         .LeftJoin(new Test.Orm.Table.Image(), "main_image").ParentContext
-         .LeftJoin(new Test.Orm.Table.Image(), "sub_image").ParentContext
-         .Where.Add("name", "ビーナスラッシュ");
+      var cShop = select.AddFrom(new Test.Orm.Table.Shop());
+      cShop.LeftJoin(new Test.Orm.Table.Image(), "main_image");
+      cShop.LeftJoin(new Test.Orm.Table.Image(), "sub_image");
+      cShop.Where.Add("name", "ビーナスラッシュ");
 
       using (var conn = db.Adapter.CreateConnection())
       {

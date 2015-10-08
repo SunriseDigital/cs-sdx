@@ -527,6 +527,11 @@ namespace Sdx.Db.Sql
       {
         var clonedContext = (Context)context.Clone();
         clonedContext.Select = cloned;
+        if(context.ParentContext != null)
+        {
+          Console.WriteLine(cloned.Context(context.ParentContext.Name));
+          clonedContext.ParentContext = cloned.Context(context.ParentContext.Name);
+        }
         cloned.contextList.Add(clonedContext);
       });
 
