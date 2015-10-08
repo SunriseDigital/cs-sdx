@@ -18,9 +18,28 @@ namespace Sdx.Db.Sql
     private Condition having;
 
     public string Comment { get; set; }
+
+    /// <summary>
+    /// FROM句の後ろに付与される。
+    /// SelectをAdapterにセットした時Adapter.InitSelectEventをコールし、そこでセットされます。
+    /// 返り値は追加する文字列。" FOR UPDATE"の様に頭にスペースを挿入してください。
+    /// </summary>
     internal Func<Select, string> AfterFromFunc { get; set; }
+
+    /// <summary>
+    /// ORDER句の後ろに付与される。
+    /// <seealso cref="AfterFromFunc"/>
+    /// </summary>
     internal Func<Select, string> AfterOrderFunc { get; set; }
 
+    /// <summary>
+    /// コメントを付与します。SQLには影響しません。
+    /// このコメントは<see cref="Log.Comment"/>から取得可能。
+    /// つまり<see cref="Profiler"/>をONにしないと意味がありません。
+    /// <see cref="Profiler"/>は<see cref="Sdx.Context.DbProfiler"/>にセットするとONになります。
+    /// </summary>
+    /// <param name="comment"></param>
+    /// <returns></returns>
     public Select SetComment(string comment)
     {
       this.Comment = comment;
@@ -75,6 +94,10 @@ namespace Sdx.Db.Sql
       get { return this.columns; }
     }
 
+    /// <summary>
+    /// デフォルトではINNER JOINを先に、LEFT JOINを後にします。
+    /// <see cref="JoinOrder.Natural"/>をセットするとAddした順番にORDERされます。
+    /// </summary>
     public JoinOrder JoinOrder { get; set; }
 
     /// <summary>
@@ -105,6 +128,10 @@ namespace Sdx.Db.Sql
       return this.CreateContext(target, alias);
     }
 
+    /// <summary>
+    /// サブクエリーをJOINします。
+    /// From句を追加。繰り返しコールすると繰り返し追加します。
+    /// </summary>
     public Context AddFrom(Sdx.Db.Sql.Select target, string alias = null)
     {
       return this.CreateContext(target, alias);
@@ -276,6 +303,10 @@ namespace Sdx.Db.Sql
       }
     }
 
+    /// <summary>
+    /// SELECT文を組み立てて<see cref="DbCommand"/>を返します。
+    /// </summary>
+    /// <returns></returns>
     public DbCommand Build()
     {
       if (this.Adapter == null)
@@ -296,6 +327,11 @@ namespace Sdx.Db.Sql
       return command;
     }
 
+    /// <summary>
+    /// FROM句/JOIN句にテーブルが追加されているかチェックします。計算量はO(n)。
+    /// </summary>
+    /// <param name="contextName"></param>
+    /// <returns></returns>
     public bool HasContext(string contextName)
     {
       int findIndex = this.contextList.FindIndex(context =>
@@ -328,7 +364,7 @@ namespace Sdx.Db.Sql
     /// <summary>
     /// 追加したカラムをクリアする。
     /// </summary>
-    /// <param contextName="context">Contextを渡すとそのテーブルのカラムのみをクリアします。</param>
+    /// <param contextName="context">contextNameを渡すとそのテーブルのカラムのみをクリアします。</param>
     /// <returns></returns>
     public Select ClearColumns(string contextName = null)
     {
@@ -345,7 +381,7 @@ namespace Sdx.Db.Sql
     }
 
     /// <summary>
-    /// エイリアスの付与はできません。
+    /// カラムを複数追加します。エイリアスの付与はできません。
     /// </summary>
     /// <param contextName="columns">Sdx.Adapter.Query.Expr[]|String[] 配列の中にExprを混ぜられるようにobjectなってます。</param>
     /// <returns></returns>
@@ -359,7 +395,7 @@ namespace Sdx.Db.Sql
     }
 
     /// <summary>
-    /// 
+    /// カラムを一つ追加します。
     /// </summary>
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
@@ -412,6 +448,9 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    /// <summary>
+    /// WHERE句の付与はこのプロパティー経由で行います。
+    /// </summary>
     public Condition Where
     {
       get
@@ -422,7 +461,7 @@ namespace Sdx.Db.Sql
     }
 
     /// <summary>
-    /// 繰り返しコールすると繰り返し追加します。
+    /// GROUP句を追加します。繰り返しコールすると繰り返し追加します。
     /// </summary>
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <returns></returns>
@@ -433,6 +472,9 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    /// <summary>
+    /// HAVING句はこのプロパティー経由で行います。
+    /// </summary>
     public Condition Having
     {
       get
@@ -446,6 +488,12 @@ namespace Sdx.Db.Sql
 
     public int Offset { get; private set; }
 
+    /// <summary>
+    /// LIMIT句とOFFSET句を付与します。<see cref="Select"/>を返すのでFluentSyntaxが可能です。
+    /// </summary>
+    /// <param name="limit"></param>
+    /// <param name="offset"></param>
+    /// <returns></returns>
     public Select SetLimit(int limit, int offset = 0)
     {
       this.Limit = limit;
@@ -455,7 +503,7 @@ namespace Sdx.Db.Sql
 
 
     /// <summary>
-    /// 繰り返しコールすると繰り返し追加します。
+    /// ORDER句を追加します。繰り返しコールすると繰り返し追加します。
     /// </summary>
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="order"></param>
