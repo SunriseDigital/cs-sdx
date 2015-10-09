@@ -30,7 +30,7 @@ namespace UnitTest
     {
       var dic = new OrderedDictionary<string, int>();
 
-      for(var i=0; i<1000; i++)
+      for(var i=0; i<10; i++)
       {
         this.RunOrderedDictionary(dic);
       }
@@ -83,6 +83,12 @@ namespace UnitTest
         Assert.Equal(expected[i], kv.Key);
         i++;
       }
+
+      i = 0;
+      dic.ForEach((key, value) => {
+        Assert.Equal(expected[i], key);
+        i++;
+      });
 
       //削除
       dic.Remove("key2");

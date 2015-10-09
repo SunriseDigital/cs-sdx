@@ -112,6 +112,13 @@ namespace Sdx.Collection
       }
     }
 
+    public void ForEach(Action<TKey, TValue> action)
+    {
+      this.list.ForEach(key => {
+        action(key, this.dictionary[key]);
+      });
+    }
+
     IEnumerator IEnumerable.GetEnumerator()
     {
       return this.GetEnumerator();
