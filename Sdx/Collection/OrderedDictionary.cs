@@ -44,6 +44,11 @@ namespace Sdx.Collection
       }
     }
 
+    /// <summary>
+    /// O(1)
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public TValue this[TKey key]
     {
       get
@@ -78,17 +83,29 @@ namespace Sdx.Collection
       this.dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
     }
 
+    /// <summary>
+    /// O(1)
+    /// </summary>
+    /// <param name="item"></param>
     public void Add(KeyValuePair<TKey, TValue> item)
     {
       this[item.Key] = item.Value;
     }
 
+    /// <summary>
+    /// O(n) しかもnはcapacity
+    /// </summary>
     public void Clear()
     {
       this.list.Clear();
       this.dictionary.Clear();
     }
 
+    /// <summary>
+    /// O(1)
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public bool Contains(KeyValuePair<TKey, TValue> item)
     {
       return this.dictionary.ContainsKey(item.Key);
@@ -99,6 +116,11 @@ namespace Sdx.Collection
       this.CopyTo(array, arrayIndex);
     }
 
+    /// <summary>
+    /// O(n)
+    /// </summary>
+    /// <param name="item"></param>
+    /// <returns></returns>
     public bool Remove(KeyValuePair<TKey, TValue> item)
     {
       return this.Remove(item.Key);
@@ -124,16 +146,31 @@ namespace Sdx.Collection
       return this.GetEnumerator();
     }
 
+    /// <summary>
+    /// O(1)
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public bool ContainsKey(TKey key)
     {
       return this.dictionary.ContainsKey(key);
     }
 
+    /// <summary>
+    /// O(1)
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
     public void Add(TKey key, TValue value)
     {
       this[key] = value;
     }
 
+    /// <summary>
+    /// O(n)
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public bool Remove(TKey key)
     {
       var resList = this.list.Remove(key);
