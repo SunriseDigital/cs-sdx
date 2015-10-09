@@ -696,15 +696,21 @@ namespace UnitTest
             new Sdx.Db.Sql.Column("id", "sub_cat")
           ),
           "sub_cat"
-        );
+        ).Where.Add("id", 13);
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT id FROM area WHERE id = 1) AS {0}sub_cat{1} ON {0}shop{1}.{0}area_id{1} = {0}sub_cat{1}.{0}id{1}"),
+       db.Sql(@"SELECT {0}shop{1}.*
+                FROM {0}shop{1}
+                INNER JOIN 
+                  (SELECT id FROM area WHERE id = 1) AS {0}sub_cat{1}
+                    ON {0}shop{1}.{0}area_id{1} = {0}sub_cat{1}.{0}id{1}
+                WHERE {0}sub_cat{1}.{0}id{1} = @0"),
        db.Command.CommandText
       );
 
-      Assert.Equal(0, db.Command.Parameters.Count);
+      Assert.Equal(1, db.Command.Parameters.Count);
+      Assert.Equal(13, db.Command.Parameters[0].Value);
     }
 
     [Fact]
@@ -736,17 +742,26 @@ namespace UnitTest
         db.Adapter.CreateCondition().Add(
           new Sdx.Db.Sql.Column("area_id", "shop"),
           new Sdx.Db.Sql.Column("id", "sub_cat")
-        ), "sub_cat");
+        ), "sub_cat").Where.Add("id", 12);
 
       db.Command = select.Build();
       Assert.Equal(
-       db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} INNER JOIN (SELECT {0}area{1}.{0}id{1} FROM {0}area{1} WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.{0}area_id{1} = {0}sub_cat{1}.{0}id{1} WHERE {0}shop{1}.{0}id{1} = @1"),
+       db.Sql(@"SELECT {0}shop{1}.*
+                  FROM {0}shop{1} 
+                  INNER JOIN 
+                    (SELECT {0}area{1}.{0}id{1} 
+                      FROM {0}area{1} 
+                      WHERE {0}area{1}.{0}id{1} = @0) AS {0}sub_cat{1} ON {0}shop{1}.{0}area_id{1} = {0}sub_cat{1}.{0}id{1} 
+                  WHERE {0}shop{1}.{0}id{1} = @1 AND {0}sub_cat{1}.{0}id{1} = @2"),
        db.Command.CommandText
       );
 
-      Assert.Equal(2, db.Command.Parameters.Count);
+      Assert.Equal(3, db.Command.Parameters.Count);
       Assert.Equal("2", db.Command.Parameters[0].Value);//サブクエリのWhereの方が先にAddされる
       Assert.Equal("1", db.Command.Parameters[1].Value);
+      Assert.Equal(12, db.Command.Parameters[2].Value);
+
+
     }
 
     [Fact]
