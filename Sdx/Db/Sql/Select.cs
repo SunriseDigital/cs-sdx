@@ -10,7 +10,8 @@ namespace Sdx.Db.Sql
   {
     public const string CommentParameterKey = "##Sdx.Db.Query.Select.Comment##";
 
-    private List<Context> contextList = new List<Context>();
+    private ICollection<Context> contextList = new List<Context>();
+    private IDictionary<string, Context> contextCache = new Dictionary<string, Context>(30);
     private List<Column> columns = new List<Column>();
     private List<Column> groups = new List<Column>();
     private List<Column> orders = new List<Column>();
@@ -74,11 +75,6 @@ namespace Sdx.Db.Sql
       }
     }
 
-    internal List<Context> ContextList
-    {
-      get { return this.contextList; }
-    }
-
     internal List<Column> GroupList
     {
       get { return this.groups; }
@@ -105,7 +101,7 @@ namespace Sdx.Db.Sql
     /// </summary>
     public Context AddFrom(Sdx.Db.Table target, string alias = null)
     {
-      var context = this.CreateContext(target.OwnMeta.Name, alias);
+      var context = this.CreateContext(target.OwnMeta.Name, alias, JoinType.From);
       context.Table = target;
       target.Context = context;
       target.AddAllColumnsFromMeta();
@@ -117,7 +113,7 @@ namespace Sdx.Db.Sql
     /// </summary>
     public Context AddFrom(Expr target, string alias = null)
     {
-      return this.CreateContext(target, alias);
+      return this.CreateContext(target, alias, JoinType.From);
     }
 
     /// <summary>
@@ -125,7 +121,7 @@ namespace Sdx.Db.Sql
     /// </summary>
     public Context AddFrom(String target, string alias = null)
     {
-      return this.CreateContext(target, alias);
+      return this.CreateContext(target, alias, JoinType.From);
     }
 
     /// <summary>
@@ -134,16 +130,20 @@ namespace Sdx.Db.Sql
     /// </summary>
     public Context AddFrom(Sdx.Db.Sql.Select target, string alias = null)
     {
-      return this.CreateContext(target, alias);
+      return this.CreateContext(target, alias, JoinType.From);
     }
 
-    private Context CreateContext(object target, string alias)
+    internal Context CreateContext(object target, string alias, JoinType jointType)
     {
       Context context = new Context(this);
       context.Alias = alias;
-      context.JoinType = JoinType.From;
+      context.JoinType = jointType;
       context.Target = target;
+
+      this.RemoveContext(context.Name);
+
       this.contextList.Add(context);
+      this.contextCache[context.Name] = context;
 
       return context;
     }
@@ -162,7 +162,7 @@ namespace Sdx.Db.Sql
 
       //FROMを追加
       var hasFrom = false;
-      foreach (Context context in this.ContextList.Where(t => t.JoinType == JoinType.From))
+      foreach (Context context in this.contextList.Where(t => t.JoinType == JoinType.From))
       {
         hasFrom = true;
         this.BuildJoinString(builder, context, parameters, condCount);
@@ -182,19 +182,19 @@ namespace Sdx.Db.Sql
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Inner))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner))
         {
           this.BuildJoinString(builder, context, parameters, condCount);
         }
 
-        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Left))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Left))
         {
           this.BuildJoinString(builder, context, parameters, condCount);
         }
       }
       else
       {
-        foreach (var context in this.ContextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
+        foreach (var context in this.contextList.Where(t => t.JoinType == JoinType.Inner || t.JoinType == JoinType.Left))
         {
           this.BuildJoinString(builder, context, parameters, condCount);
         }
@@ -334,12 +334,7 @@ namespace Sdx.Db.Sql
     /// <returns></returns>
     public bool HasContext(string contextName)
     {
-      int findIndex = this.contextList.FindIndex(context =>
-      {
-        return context.Name == contextName;
-      });
-
-      return findIndex != -1;
+      return this.contextCache.ContainsKey(contextName);
     }
 
 
@@ -350,12 +345,9 @@ namespace Sdx.Db.Sql
     /// <returns></returns>
     public Context Context(string contextName)
     {
-      foreach (Context context in this.contextList)
+      if (this.contextCache.ContainsKey(contextName))
       {
-        if (context.Name == contextName)
-        {
-          return context;
-        }
+        return this.contextCache[contextName];
       }
 
       throw new InvalidOperationException("Missing " + contextName + " context.");
@@ -434,15 +426,12 @@ namespace Sdx.Db.Sql
     /// <returns></returns>
     public Select RemoveContext(string contextName)
     {
-      int findIndex = this.contextList.FindIndex(jt =>
+      if(this.contextCache.ContainsKey(contextName))
       {
-        return jt.Name == contextName;
-      });
-
-      if (findIndex != -1)
-      {
-        this.ClearColumns(this.contextList[findIndex].Name);
-        this.contextList.RemoveAt(findIndex);
+        var context = this.contextCache[contextName];
+        this.ClearColumns(contextName);
+        this.contextList.Remove(context);
+        this.contextCache.Remove(contextName);
       }
 
       return this;
@@ -455,7 +444,7 @@ namespace Sdx.Db.Sql
     {
       get
       {
-        this.where.Context = null;
+        this.where.ContextName = null;
         return this.where;
       }
     }
@@ -479,7 +468,7 @@ namespace Sdx.Db.Sql
     {
       get
       {
-        this.having.Context = null;
+        this.having.ContextName = null;
         return this.having;
       }
     }
@@ -522,13 +511,21 @@ namespace Sdx.Db.Sql
       var cloned = (Select)this.MemberwiseClone();
 
       //context
-      cloned.contextList = new List<Sql.Context>();
-      this.contextList.ForEach(context =>
+      cloned.contextList = new List<Context>();
+      cloned.contextCache = new Dictionary<string, Context>();
+      foreach (var context in this.contextList)
       {
         var clonedContext = (Context)context.Clone();
         clonedContext.Select = cloned;
+
+        if (context.ParentContext != null)
+        {
+          clonedContext.ParentContext = cloned.Context(context.ParentContext.Name);
+        }
+
         cloned.contextList.Add(clonedContext);
-      });
+        cloned.contextCache[clonedContext.Name] = clonedContext;
+      }
 
       //コピーコンストラクタはシャローコピーです。
       cloned.columns = new List<Column>(this.columns);

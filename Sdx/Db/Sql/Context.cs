@@ -24,7 +24,7 @@ namespace Sdx.Db.Sql
 
     public string Alias { get; internal set; }
 
-    public Select Select { get; internal set; }
+    internal Select Select { get; set; }
 
     /// <summary>
     /// <see cref="Alias"/>があったら<see cref="Alias"/>。なかったら<see cref="Target"/>の文字列表現を返す。
@@ -52,17 +52,11 @@ namespace Sdx.Db.Sql
     /// <returns></returns>
     private Context AddJoin(object target, JoinType joinType, Condition condition, string alias = null)
     {
-      Context joinContext = new Context(this.Select);
+      Context joinContext = this.Select.CreateContext(target, alias, joinType);
 
       joinContext.ParentContext = this;
-      joinContext.Target = target;
-      joinContext.Alias = alias;
       joinContext.JoinCondition = condition;
-      joinContext.JoinType = joinType;
 
-      this.Select.RemoveContext(joinContext.Name);
-
-      this.Select.ContextList.Add(joinContext);
       return joinContext;
     }
 
@@ -142,7 +136,7 @@ namespace Sdx.Db.Sql
     /// JOINしたテーブルの場合、JOIN先テーブルの<see cref="Context"/>を返します。
     /// FROM句のテーブルだった場合はNULLが返ります。
     /// </summary>
-    public Context ParentContext { get; private set; }
+    internal Context ParentContext { get; set; }
 
     internal Condition JoinCondition { get; private set; }
 
@@ -207,7 +201,7 @@ namespace Sdx.Db.Sql
       get
       {
         Condition where = this.Select.Where;
-        where.Context = this;
+        where.ContextName = this.Name;
         return where;
         //ここは下記のようにするとContextの代入ができません。
         //this.Select.Condition.Context = this;
@@ -233,7 +227,7 @@ namespace Sdx.Db.Sql
       get
       {
         Condition having = this.Select.Having;
-        having.Context = this;
+        having.ContextName = this.Name;
         return having;
       }
     }
@@ -282,15 +276,14 @@ namespace Sdx.Db.Sql
         cloned.Table.Context = cloned;
       }
 
-      if (this.ParentContext != null)
-      {
-        cloned.ParentContext = (Context)this.ParentContext.Clone();
-      }
-
       if (this.Target is Select)
       {
         cloned.Target = ((Select)this.Target).Clone();
       }
+
+      cloned.Select = null;
+      cloned.ParentContext = null;
+      /// <see cref="Select"/>と<see cref="ParentContext"/>は<see cref="Sql.Select.Clone"/>ですげ替えを行っています。
 
       return cloned;
     }

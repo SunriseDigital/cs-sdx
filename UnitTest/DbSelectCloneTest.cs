@@ -110,16 +110,6 @@ namespace UnitTest
           );
         }
 
-        Assert.Equal(
-          origin,
-          origin.Context(contextName).Select
-        );
-
-        Assert.Equal(
-          cloned,
-          cloned.Context(contextName).Select
-        );
-
         if (origin.Context(contextName).Table != null)
         {
           Assert.NotEqual(
