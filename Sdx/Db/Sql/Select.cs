@@ -160,12 +160,14 @@ namespace Sdx.Db.Sql
 
       //FROMを追加
       var hasFrom = false;
-      foreach (var keyValue in this.contextList.Where(kv => kv.Value.JoinType == JoinType.From))
-      {
-        hasFrom = true;
-        this.BuildJoinString(builder, keyValue.Value, parameters, condCount);
-        builder.Append(", ");
-      }
+      this.contextList.ForEach((name, context) => {
+        if(context.JoinType == JoinType.From)
+        {
+          hasFrom = true;
+          this.BuildJoinString(builder, context, parameters, condCount);
+          builder.Append(", ");
+        }
+      });
 
       if (hasFrom)
       {
@@ -180,22 +182,28 @@ namespace Sdx.Db.Sql
       //JOIN
       if (this.JoinOrder == JoinOrder.InnerFront)
       {
-        foreach (var keyValue in this.contextList.Where(kv => kv.Value.JoinType == JoinType.Inner))
-        {
-          this.BuildJoinString(builder, keyValue.Value, parameters, condCount);
-        }
+        this.contextList.ForEach((name, context) => {
+          if (context.JoinType == JoinType.Inner)
+          {
+            this.BuildJoinString(builder, context, parameters, condCount);
+          }
+        });
 
-        foreach (var keyValue in this.contextList.Where(kv => kv.Value.JoinType == JoinType.Left))
-        {
-          this.BuildJoinString(builder, keyValue.Value, parameters, condCount);
-        }
+        this.contextList.ForEach((name, context) => {
+          if (context.JoinType == JoinType.Left)
+          {
+            this.BuildJoinString(builder, context, parameters, condCount);
+          }
+        });
       }
       else
       {
-        foreach (var keyValue in this.contextList.Where(kv => kv.Value.JoinType == JoinType.Inner || kv.Value.JoinType == JoinType.Left))
-        {
-          this.BuildJoinString(builder, keyValue.Value, parameters, condCount);
-        }
+        this.contextList.ForEach((name, context) => {
+          if (context.JoinType == JoinType.Inner || context.JoinType == JoinType.Left)
+          {
+            this.BuildJoinString(builder, context, parameters, condCount);
+          }
+        });
       }
 
       if (this.Where.Count > 0)
