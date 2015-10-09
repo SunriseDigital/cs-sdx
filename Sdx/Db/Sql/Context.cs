@@ -52,17 +52,11 @@ namespace Sdx.Db.Sql
     /// <returns></returns>
     private Context AddJoin(object target, JoinType joinType, Condition condition, string alias = null)
     {
-      Context joinContext = new Context(this.Select);
+      Context joinContext = this.Select.CreateContext(target, alias, joinType);
 
       joinContext.ParentContext = this;
-      joinContext.Target = target;
-      joinContext.Alias = alias;
       joinContext.JoinCondition = condition;
-      joinContext.JoinType = joinType;
 
-      this.Select.RemoveContext(joinContext.Name);
-
-      this.Select.ContextList.Add(joinContext);
       return joinContext;
     }
 
