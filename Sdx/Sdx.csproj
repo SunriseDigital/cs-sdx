@@ -46,25 +46,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collection\OrderedDictionary.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Data\Tree.cs" />
     <Compile Include="Data\TreeYaml.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Db\Adapter.cs" />
+    <Compile Include="Db\Connection.cs" />
     <Compile Include="Db\DbException.cs" />
+    <Compile Include="Db\Sql\INonQueryBuilder.cs" />
     <Compile Include="Db\MySqlAdapter.cs" />
-    <Compile Include="Db\Query\Column.cs" />
-    <Compile Include="Db\Query\Condition.cs" />
-    <Compile Include="Db\Query\Context.cs" />
-    <Compile Include="Db\Query\Counter.cs" />
-    <Compile Include="Db\Query\Enums.cs" />
-    <Compile Include="Db\Query\Expr.cs" />
-    <Compile Include="Db\Query\Log.cs" />
-    <Compile Include="Db\Query\Profiler.cs" />
-    <Compile Include="Db\Query\Select.cs" />
+    <Compile Include="Db\Sql\Column.cs" />
+    <Compile Include="Db\Sql\Condition.cs" />
+    <Compile Include="Db\Sql\Context.cs" />
+    <Compile Include="Db\Sql\Counter.cs" />
+    <Compile Include="Db\Sql\Delete.cs" />
+    <Compile Include="Db\Sql\Enums.cs" />
+    <Compile Include="Db\Sql\Expr.cs" />
+    <Compile Include="Db\Sql\Insert.cs" />
+    <Compile Include="Db\Sql\Log.cs" />
+    <Compile Include="Db\Sql\Profiler.cs" />
+    <Compile Include="Db\Sql\Select.cs" />
     <Compile Include="Db\Record.cs" />
     <Compile Include="Db\RecordSet.cs" />
     <Compile Include="Db\SqlServerAdapter.cs" />
+    <Compile Include="Db\Sql\Update.cs" />
     <Compile Include="Db\Table.cs" />
     <Compile Include="Db\TableMeta.cs" />
     <Compile Include="Diagnostics\Debug.cs" />
@@ -74,6 +80,9 @@
     <Compile Include="Web\Holder.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />
+    <Compile Include="Util\Datetime.cs" />
+    <Compile Include="Util\Random.cs" />
+    <Compile Include="Util\String.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Common;
 
-namespace Sdx.Db.Query
+namespace Sdx.Db.Sql
 {
   public class Profiler
   {

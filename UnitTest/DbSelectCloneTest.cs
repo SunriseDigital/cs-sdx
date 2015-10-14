@@ -22,16 +22,16 @@ namespace UnitTest
       BaseDbTest.InitilizeClass(context);
     }
 
-    private Sdx.Db.Query.Select CreateCommonSelect(TestDb db)
+    private Sdx.Db.Sql.Select CreateCommonSelect(TestDb db)
     {
-      var select = new Sdx.Db.Query.Select();
+      var select = db.Adapter.CreateSelect();
 
       //FROM + JOIN
       select
         .AddFrom(new Test.Orm.Table.Shop())
         .InnerJoin(new Test.Orm.Table.Menu());
 
-      Sdx.Db.Query.Select sub = new Sdx.Db.Query.Select();
+      Sdx.Db.Sql.Select sub = db.Adapter.CreateSelect();
       sub
         .AddFrom("area")
         .AddColumn("id")
@@ -40,17 +40,17 @@ namespace UnitTest
       select.Context("shop").InnerJoin(
         sub,
         db.Adapter.CreateCondition().Add(
-          new Sdx.Db.Query.Column("area_id", "shop"),
-          new Sdx.Db.Query.Column("id", "sub_area")
+          new Sdx.Db.Sql.Column("area_id", "shop"),
+          new Sdx.Db.Sql.Column("id", "sub_area")
         ),
         "sub_area"
       );
 
       select.Context("shop").InnerJoin(
-        Sdx.Db.Query.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
+        Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM area WHERE id = 1)"),
         db.Adapter.CreateCondition().Add(
-          new Sdx.Db.Query.Column("area_id", "shop"),
-          new Sdx.Db.Query.Column("id", "sub_area_1")
+          new Sdx.Db.Sql.Column("area_id", "shop"),
+          new Sdx.Db.Sql.Column("id", "sub_area_1")
         ),
         "sub_area_1"
       );
@@ -58,8 +58,8 @@ namespace UnitTest
       select.Context("shop").InnerJoin(
         "image",
         db.Adapter.CreateCondition().Add(
-          new Sdx.Db.Query.Column("main_image_id", "shop"),
-          new Sdx.Db.Query.Column("id", "main_image")
+          new Sdx.Db.Sql.Column("main_image_id", "shop"),
+          new Sdx.Db.Sql.Column("id", "main_image")
         ),
         "main_image"
       );
@@ -68,8 +68,6 @@ namespace UnitTest
       select.Context("sub_area").AddColumn("id");
       select.Context("sub_area_1").AddColumn("id");
       select.Context("main_image").AddColumn("id");
-
-      select.Adapter = db.Adapter;
 
       return select;
     }
@@ -87,7 +85,7 @@ namespace UnitTest
     private void RunContext(TestDb db)
     {
       var origin = this.CreateCommonSelect(db);
-      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+      var cloned = (Sdx.Db.Sql.Select)origin.Clone();
 
       foreach (var contextName in new String[] { "shop", "menu", "sub_area", "sub_area_1", "main_image" })
       {
@@ -96,7 +94,7 @@ namespace UnitTest
           cloned.Context(contextName)
         );
 
-        if (origin.Context(contextName).Target is Sdx.Db.Query.Select)
+        if (origin.Context(contextName).Target is Sdx.Db.Sql.Select)
         {
           Assert.NotEqual(
             origin.Context(contextName).Target,
@@ -111,16 +109,6 @@ namespace UnitTest
             cloned.Context(contextName).Target
           );
         }
-
-        Assert.Equal(
-          origin,
-          origin.Context(contextName).Select
-        );
-
-        Assert.Equal(
-          cloned,
-          cloned.Context(contextName).Select
-        );
 
         if (origin.Context(contextName).Table != null)
         {
@@ -155,7 +143,7 @@ namespace UnitTest
     private void RunColumn(TestDb db)
     {
       var origin = this.CreateCommonSelect(db);
-      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+      var cloned = (Sdx.Db.Sql.Select)origin.Clone();
 
       cloned.Context("main_image").ClearColumns();
 
@@ -175,7 +163,7 @@ namespace UnitTest
     private void RunGroup(TestDb db)
     {
       var origin = this.CreateCommonSelect(db);
-      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+      var cloned = (Sdx.Db.Sql.Select)origin.Clone();
 
       cloned.Context("shop").AddGroup("id");
 
@@ -195,9 +183,9 @@ namespace UnitTest
     private void RunOrder(TestDb db)
     {
       var origin = this.CreateCommonSelect(db);
-      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+      var cloned = (Sdx.Db.Sql.Select)origin.Clone();
 
-      cloned.Context("shop").AddOrder("id", Sdx.Db.Query.Order.ASC);
+      cloned.Context("shop").AddOrder("id", Sdx.Db.Sql.Order.ASC);
 
       Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
     }
@@ -216,7 +204,7 @@ namespace UnitTest
     private void RunWhere(TestDb db)
     {
       var origin = this.CreateCommonSelect(db);
-      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+      var cloned = (Sdx.Db.Sql.Select)origin.Clone();
 
       cloned.Where.Add("id", "1");
 
@@ -236,9 +224,9 @@ namespace UnitTest
     private void RunHaving(TestDb db)
     {
       var origin = this.CreateCommonSelect(db);
-      var cloned = (Sdx.Db.Query.Select)origin.Clone();
+      var cloned = (Sdx.Db.Sql.Select)origin.Clone();
 
-      cloned.Having.Add(Sdx.Db.Query.Expr.Wrap("shop.id"), "1");
+      cloned.Having.Add(Sdx.Db.Sql.Expr.Wrap("shop.id"), "1");
 
       Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
     }

@@ -42,7 +42,13 @@ namespace Sdx.Db
         this.Name = name;
       }
 
+      public Column(string name, Type type) : this(name)
+      {
+        this.Type = type;
+      }
+
       public string Name { get; private set; }
+      public Type Type { get; private set; }
     }
 
     public Adapter Adapter { get; set; }
@@ -102,7 +108,7 @@ namespace Sdx.Db
       return this;
     }
 
-    public Query.Context Context
+    public Sql.Context Context
     {
       get; set;
     }
@@ -119,7 +125,7 @@ namespace Sdx.Db
     /// <summary>
     /// テーブル経由でカラムを変更したとき、カラムの並び順が呼び出し順になってるのが自然だと思ったので、Table内でSelectを保持するようになっています。
     /// </summary>
-    public Query.Select Select
+    public Sql.Select Select
     {
       get
       {

@@ -11,7 +11,7 @@ namespace Sdx.Db
       return DbProviderFactories.GetFactory("MySql.Data.MySqlClient");
     }
 
-    internal override void InitSelectEvent(Query.Select select)
+    internal override void InitSelectEvent(Sql.Select select)
     {
       //AfterOrderFunc(Limit/Offset+ForUpdate)
       select.AfterOrderFunc = (sel) => {
@@ -39,8 +39,15 @@ namespace Sdx.Db
     {
       get
       {
-        return Regex.Replace(this.ConnectionString, "(P|p)wd=[^;]+", "${1}wd=" + PWD_FOR_SECURE_CONNECTION_STRING);
+        return Regex.Replace(this.ConnectionString, "(P|p)wd=[^;]+", "${1}wd=" + PasswordForSecureConnectionString);
       }
+    }
+
+    internal override object FetchLastInsertId(Connection connection)
+    {
+      var command = connection.CreateCommand();
+      command.CommandText = "SELECT LAST_INSERT_ID()";
+      return connection.ExecuteScalar(command);
     }
   }
 }

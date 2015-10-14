@@ -18,6 +18,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 using System;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace UnitTest
 {
@@ -62,7 +63,7 @@ namespace UnitTest
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.SqlServerAdapter();
-      testDb.Adapter.ConnectionString = DbQueryTest.SqlServerConnectionString;
+      testDb.Adapter.ConnectionString = DbSelectTest.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
@@ -70,7 +71,7 @@ namespace UnitTest
 
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.MySqlAdapter();
-      testDb.Adapter.ConnectionString = DbQueryTest.MySqlConnectionString;
+      testDb.Adapter.ConnectionString = DbSelectTest.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);
@@ -210,10 +211,11 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       Console.WriteLine("ResetSqlServerDatabase");
     }
 
-    private static void ExecuteSqlFile(DbConnection con, string dataFilePath)
+    private static void ExecuteSqlFile(Sdx.Db.Connection con, string dataFilePath)
     {
+      var fullPath = System.AppDomain.CurrentDomain.BaseDirectory + Path.DirectorySeparatorChar + dataFilePath;
       //setup.sqlを流し込みます。
-      using (StreamReader stream = new StreamReader(dataFilePath, Encoding.GetEncoding("UTF-8")))
+      using (StreamReader stream = new StreamReader(fullPath, Encoding.GetEncoding("UTF-8")))
       {
         String setupSql = stream.ReadToEnd();
         DbTransaction sqlTran = con.BeginTransaction();
@@ -254,11 +256,10 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
     {
       using (var con = adapter.CreateConnection())
       {
-        command.Connection = con;
         con.Open();
-        
+
         Console.WriteLine("execDbCommand");
-        var reader = adapter.ExecuteReader(command);
+        var reader = con.ExecuteReader(command);
         while (reader.Read())
         {
           var row = new Dictionary<string, object>();

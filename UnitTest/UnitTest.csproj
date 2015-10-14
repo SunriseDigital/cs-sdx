@@ -37,7 +37,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'TravisCI|AnyCPU'">
     <OutputPath>bin\TravisCI\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -64,13 +64,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
+    <Compile Include="CollectionTest.cs" />
     <Compile Include="ContextTest.cs" />
-    <Compile Include="DbAdapterTest.cs" />
+    <Compile Include="DbConnectionTest.cs" />
     <Compile Include="ConfigTest.cs" />
-    <Compile Include="DbQueryTest.cs" />
+    <Compile Include="DbSelectTest.cs" />
     <Compile Include="DbRecordTest.cs" />
     <Compile Include="DbSelectCloneTest.cs" />
     <Compile Include="DbTableTest.cs" />
+    <Compile Include="DbUpdateTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

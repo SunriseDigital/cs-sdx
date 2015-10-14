@@ -88,7 +88,7 @@ namespace Sdx.Diagnostics
       }
 
       long totalElapsed = 0;
-      Sdx.Db.Query.Log slowQuery = null;
+      Sdx.Db.Sql.Log slowQuery = null;
       var queryString = new StringBuilder();
 
       if(Sdx.Context.Current.DbProfiler.Queries.Count > 0)
@@ -131,7 +131,7 @@ namespace Sdx.Diagnostics
       ));
     }
 
-    private string buildQueryString(Sdx.Db.Query.Log query)
+    private string buildQueryString(Sdx.Db.Sql.Log query)
     {
       return String.Format(
         QueryBlockFormat,

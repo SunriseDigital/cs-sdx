@@ -33,6 +33,10 @@ namespace Sdx.Db
         throw new NotSupportedException(tableType + "is not Sdx.Db.Table subclass");
       }
       this.TableType = tableType;
+
+      this.Columns.ForEach(column => {
+        this.columnsCache[column.Name] = column;
+      });
     }
 
     public string Name { get; private set; }
@@ -42,9 +46,30 @@ namespace Sdx.Db
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }
 
-    public Query.Condition CreateJoinCondition(string contextName)
+    private Dictionary<string, Table.Column> columnsCache = new Dictionary<string, Table.Column>();
+
+    public bool HasColumn(string columnName)
     {
-      var cond = new Query.Condition();
+      return this.columnsCache.ContainsKey(columnName);
+    }
+
+    public void CheckColumn(string columnName)
+    {
+      if (!this.HasColumn(columnName))
+      {
+        throw new KeyNotFoundException("Missing " + columnName + " in " + this.TableType);
+      }
+    }
+
+    public Table.Column GetColumn(string columnName)
+    {
+      this.CheckColumn(columnName);
+      return this.columnsCache[columnName];
+    }
+
+    public Sql.Condition CreateJoinCondition(string contextName)
+    {
+      var cond = new Sql.Condition();
 
       if(!this.Relations.ContainsKey(contextName))
       {
@@ -53,8 +78,8 @@ namespace Sdx.Db
 
       var relation = this.Relations[contextName];
       cond.Add(
-        new Query.Column(relation.ForeignKey, this.Name),
-        new Query.Column(relation.ReferenceKey, contextName)
+        new Sql.Column(relation.ForeignKey, this.Name),
+        new Sql.Column(relation.ReferenceKey, contextName)
       );
 
       return cond;
