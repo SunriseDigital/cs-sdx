@@ -13,35 +13,21 @@ namespace Sdx.Web
       //@var System.Uri
       var uri = new Uri(urlStr);
       this.ParamList = new List<Tuple<string,string>>();
-      this.RoopCount = new Dictionary<string, int>();
+      this.ParamCount = new Dictionary<string, int>();
 
-      //パス用の情報を保存
       this.Scheme = uri.Scheme;
       this.Domain = uri.Host;
       this.LocalPath = uri.LocalPath;
 
-      //クエリ文字列があればパラメータ毎に連想配列でしまっておく
-      if (uri.Query.Contains('?'))
+      //クエリーを分解して保存
+      foreach (var str in uri.Query.Trim('?').Split('&'))
       {
-        string query = uri.Query.Trim('?');
-        var QueryStringList = new List<string>();
-
-        //パラメータの項目数が複数か単独か
-        if(query.Contains('&'))
+        string[] tmp = str.Split('=');
+        if (tmp.Length > 1)
         {
-          QueryStringList = query.Split('&').ToList();
-        }
-        else
-        {
-          QueryStringList.Add(query);
-        }
-
-        QueryStringList.ForEach(str =>
-        {
-          string[] tmp = str.Split('=');
           this.ParamList.Add(Tuple.Create(tmp[0], tmp[1]));
-          this.AddRoopCount(tmp[0]);
-        });
+          this.AddParamCount(tmp[0]);
+        }
       }
     }
 
@@ -62,7 +48,7 @@ namespace Sdx.Web
     private string BuildPath()
     {
       string path = string.Format(
-        "{0}://{1}{2}", this.Scheme, this.Domain, this.LocalPath
+        "{0}://{1}{2}", Uri.EscapeUriString(this.Scheme), Uri.EscapeUriString(this.Domain), Uri.EscapeUriString(this.LocalPath)
       );
       return path;
     }
@@ -81,8 +67,7 @@ namespace Sdx.Web
         return this.Build();
       }
 
-      var tpList = new List<Tuple<string, string>>();
-      tpList.Add(Tuple.Create(add.First().Key, add.First().Value));
+      var tpList = add.Select(kv => Tuple.Create(kv.Key, kv.Value)).ToList();
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
@@ -92,18 +77,7 @@ namespace Sdx.Web
       return path + query;
     }
 
-    public string Build(List<string> exclude)
-    {
-      string path = this.BuildPath();
-      string query = this.BuildQueryString(
-        this.ParamList
-          .Where(tp => exclude.Contains(tp.Item1) == false)
-          .ToList()
-      );
-      return path + query;
-    }
-
-    public string Build(string[] exclude)
+    public string Build(IEnumerable<string> exclude)
     {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
@@ -119,9 +93,17 @@ namespace Sdx.Web
       get; set;
     }
 
+    private string localPath;
     public string LocalPath
     {
-      get; set;
+      get
+      {
+        return Uri.UnescapeDataString(this.localPath);
+      }
+      set
+      {
+        this.localPath = Uri.EscapeUriString(value);
+      }
     }
 
     /// <summary>
@@ -147,14 +129,16 @@ namespace Sdx.Web
 
     public void AddParam(string key, string value)
     {
-      this.ParamList.Add(Tuple.Create(key, value));
-      this.AddRoopCount(key);
+      //value が null の場合、直後の EscapeUriString() でコケるので空文字を入れておく
+      value = value ?? "";
+      this.ParamList.Add(Tuple.Create(Uri.EscapeUriString(key), Uri.EscapeUriString(value)));
+      this.AddParamCount(Uri.EscapeUriString(key));
     }
 
     public void RemoveParam(string key)
     {
-      this.ParamList.RemoveAll(tp => tp.Item1 == key);
-      this.RoopCount[key] = 0;
+      this.ParamList.RemoveAll(tp => tp.Item1 == Uri.EscapeUriString(key));
+      this.ParamCount[Uri.EscapeUriString(key)] = 0;
     }
 
     /// <summary>
@@ -162,52 +146,56 @@ namespace Sdx.Web
     /// </summary>
     public string GetParam(string key)
     {
-      return this.GetParams(key).First();
+      var list = this.GetParams(key);
+      if(list.Count == 0)
+      {
+        throw new KeyNotFoundException();
+      }
+      return list[0];
     }
 
     public List<string> GetParams(string key)
     {
+      var escapedKey = Uri.EscapeUriString(key);
       var list = new List<string>();
       foreach(var tp in this.ParamList)
       {
-        if (tp.Item1 == key)
+        if (tp.Item1 == escapedKey)
         {
-          list.Add(tp.Item2);
-          if (list.Count == this.RoopCount[key])
+          list.Add(Uri.UnescapeDataString(tp.Item2));
+          if (list.Count == this.ParamCount[escapedKey])
           {
             break;
           }
         }
       }
-
-      //存在しないキーを指定された場合以外は、必ず何かしら list に入っているので
-      //この段階で例外を投げる
-      if (list.Count == 0)
-      {
-        throw new KeyNotFoundException();
-      }
       return list;
     }
 
+    public bool HasParam(string key)
+    {
+      return this.ParamCount.Any(kv => kv.Key == Uri.EscapeUriString(key));
+    }
+
     /// <summary>
-    /// ParamList の各キー毎のループ回数を管理するプロパティ
+    /// ParamList の各キー毎の要素数を管理するプロパティ
     /// 同じ名前のキーがセットされたらカウントをアップし、
     /// 削除されたらカウントを0に戻す
     /// </summary>
-    private Dictionary<string, int> RoopCount
+    private Dictionary<string, int> ParamCount
     {
       get; set;
     }
 
-    private void AddRoopCount(string key)
+    private void AddParamCount(string key)
     {
-      if (this.RoopCount.ContainsKey(key))
+      if (this.ParamCount.ContainsKey(key))
       {
-        this.RoopCount[key]++;
+        this.ParamCount[key]++;
       }
       else
       {
-        this.RoopCount[key] = 1;
+        this.ParamCount[key] = 1;
       }
     }
   }

@@ -78,8 +78,9 @@ namespace UnitTest
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga&key=value", url.Build(unknownArray));
 
-      //存在しないキーを指定して、想定した例外になっているかを確認する
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
       url.SetParam("key", "newValue");
@@ -88,6 +89,10 @@ namespace UnitTest
       //RemoveParam のテスト
       url.RemoveParam("key");
       Assert.Equal("http://example.com/path/to/api?foo=bar&hoge=huga", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -142,8 +147,9 @@ namespace UnitTest
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?key=value", url.Build(unknownArray));
 
-      //存在しないキーを指定して、想定した例外になっているかを確認する
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
       url.SetParam("key", "newValue");
@@ -152,6 +158,10 @@ namespace UnitTest
       //RemoveParam のテスト
       url.RemoveParam("key");
       Assert.Equal("http://example.com/path/to/api", url.Build());
+
+      // has メソッドのテスト
+      Assert.False(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -206,8 +216,9 @@ namespace UnitTest
       var unknownArray = new string[] { "unknown" };
       Assert.Equal("http://example.com/path/to/api?foo=bar&key=value", url.Build(unknownArray));
 
-      //存在しないキーを指定して、想定した例外になっているかを確認する
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Set メソッドのテスト。同じ名前のキーがある場合は上書きされる
       url.SetParam("key", "newValue");
@@ -216,6 +227,10 @@ namespace UnitTest
       //RemoveParam のテスト
       url.RemoveParam("foo");
       Assert.Equal("http://example.com/path/to/api?key=newValue", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("key"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -269,9 +284,9 @@ namespace UnitTest
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue&empKey=", url.Build(empValDic));
       Assert.Equal("http://example.com/path/to/api?sameKey=value0&sameKey=value1&sameKey=value2&newKey=newValue", url.Build());
 
-      //存在しないキーで値を取得しようとした場合、例外になる。
+      //存在しないキーを指定した場合の挙動
       Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
-      Assert.Throws<KeyNotFoundException>(() => url.GetParams("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
 
       //Addメソッドで同じキーのパラメータを追加。上書きはされず値が増えるだけ。取得は最初に見つかったほうを取得。
       url.AddParam("newKey", "newValue2");
@@ -290,6 +305,10 @@ namespace UnitTest
       //RemoveParam のテスト。同じキーの値が複数あったら、その全てを削除する
       url.RemoveParam("newKey");
       Assert.Equal("http://example.com/path/to/api?sameKey=value3", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("sameKey"));
+      Assert.False(url.HasParam("unknown"));
     }
 
     [Fact]
@@ -332,6 +351,92 @@ namespace UnitTest
       //空文字を Add
       url.AddParam("foo", "");
       Assert.Equal("http://example.com/path/to/api?key=&foo=&key=&foo=", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("key"));
+      Assert.True(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
+    }
+
+    [Fact]
+    public void TestControlMultipleParams()
+    {
+      var url = new Sdx.Web.Url("http://example.com/path/to/api");
+
+      //Path
+      Assert.Equal("example.com", url.Domain);
+      Assert.Equal("http", url.Scheme);
+      Assert.Equal("/path/to/api", url.LocalPath);
+
+      //テスト用パラメータ各種
+      var paramsSet = new Dictionary<string, string>() {
+        {"key", "value"},
+        {"hoge", "fuga"},
+        {"foo", "bar"}
+      };
+      var paramsEmp = new Dictionary<string, string>() {
+        {"key", ""},
+        {"hoge", ""},
+        {"foo", ""}
+      };
+      var paramsAdd = new Dictionary<string, string>() {
+        {"newKey", "newValue"},
+        {"matsu", "take"}
+      };
+
+      //Build() で追加
+      Assert.Equal("http://example.com/path/to/api?key=value&hoge=fuga&foo=bar", url.Build(paramsSet));
+      Assert.Equal("http://example.com/path/to/api", url.Build());
+      Assert.Equal("http://example.com/path/to/api?key=&hoge=&foo=", url.Build(paramsEmp));
+      Assert.Equal("http://example.com/path/to/api", url.Build());
+
+    　//Build() で削除
+      var paramsRemove = new List<string>() { "key", "hoge", "foo" };
+      url.SetParam("key", "value");
+      url.SetParam("hoge", "fuga");
+      url.SetParam("foo", "bar");
+      Assert.Equal("http://example.com/path/to/api", url.Build(paramsRemove));
+      Assert.Equal("http://example.com/path/to/api?key=value&hoge=fuga&foo=bar", url.Build());
+
+      //has メソッド
+      Assert.True(url.HasParam("key"));
+      Assert.True(url.HasParam("hoge"));
+      Assert.True(url.HasParam("foo"));
+      Assert.False(url.HasParam("unknown"));
+
+      //unknown key
+      Assert.Throws<KeyNotFoundException>(() => url.GetParam("unknown"));
+      Assert.Empty(url.GetParams("unknown"));
+    }
+
+    [Fact]
+    public void TestVariousUrl()
+    {
+      //値に日本語、キーに日本語、エンコード済みの"&"、その他記号を含めた場合の挙動
+      var url = new Sdx.Web.Url("http://example.com/path/to/テスト?key=価値&ほげ=f_u/g-a&multi=AAA%26BBB&kakko=【かっこ】");
+      Assert.Equal("/path/to/テスト", url.LocalPath);
+      Assert.Equal("価値", url.GetParam("key"));
+      Assert.Equal("f_u/g-a", url.GetParam("ほげ"));
+      Assert.Equal("AAA&BBB", url.GetParam("multi"));
+      Assert.Equal("【かっこ】", url.GetParam("kakko"));
+      Assert.Equal("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%E3%81%BB%E3%81%92=f_u/g-a&multi=AAA%26BBB&kakko=%E3%80%90%E3%81%8B%E3%81%A3%E3%81%93%E3%80%91", url.Build());
+
+      //上記で Build() した エンコード済み URL を使った場合の挙動。エンコード済みのものはさらにエンコードはされない。
+      url = new Sdx.Web.Url("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%E3%81%BB%E3%81%92=f_u/g-a&multi=AAA%26BBB&kakko=%E3%80%90%E3%81%8B%E3%81%A3%E3%81%93%E3%80%91");
+      Assert.Equal("/path/to/テスト", url.LocalPath);
+      Assert.Equal("価値", url.GetParam("key"));
+      Assert.Equal("f_u/g-a", url.GetParam("ほげ"));
+      Assert.Equal("AAA&BBB", url.GetParam("multi"));
+      Assert.Equal("【かっこ】", url.GetParam("kakko"));
+      Assert.Equal("http://example.com/path/to/%E3%83%86%E3%82%B9%E3%83%88?key=%E4%BE%A1%E5%80%A4&%E3%81%BB%E3%81%92=f_u/g-a&multi=AAA%26BBB&kakko=%E3%80%90%E3%81%8B%E3%81%A3%E3%81%93%E3%80%91", url.Build());
+
+      // has メソッドのテスト
+      Assert.True(url.HasParam("key"));
+      Assert.True(url.HasParam("ほげ"));
+      Assert.True(url.HasParam("multi"));
+      Assert.True(url.HasParam("kakko"));
+      Assert.False(url.HasParam("unknown"));
+      Assert.False(url.HasParam("あんのうん"));
     }
   }
 }
