@@ -22,6 +22,10 @@ namespace Sdx.Diagnostics
 
     public void Log(Object value, String title = "")
     {
+      if(Out == null)
+      {
+        return;
+      }
       var currentTicks = Context.Current.Timer.ElapsedTicks;
       var delta = 0L;
       if(prevTimerElapsedTicks > 0)
