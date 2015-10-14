@@ -78,6 +78,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="UrlTest.cs" />
     <Compile Include="Test\Orm\LargeArea.cs" />
     <Compile Include="Test\Orm\Category.cs" />
     <Compile Include="Test\Orm\Image.cs" />
@@ -135,7 +136,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
