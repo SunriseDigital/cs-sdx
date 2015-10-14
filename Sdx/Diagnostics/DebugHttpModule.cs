@@ -58,11 +58,14 @@ namespace Sdx.Diagnostics
 
     private void Application_EndRequest(object source, EventArgs a)
     {
-      //Debug.Log
-      HttpApplication application = (HttpApplication)source;
-      HttpContext context = application.Context;
+      if (Sdx.Context.Current.IsDebugMode)
+      {
+        //Debug.Log
+        HttpApplication application = (HttpApplication)source;
+        HttpContext context = application.Context;
 
-      WriteLogs(context);
+        WriteLogs(context);
+      }
     }
 
     private void WriteLogs(HttpContext context)
@@ -71,10 +74,7 @@ namespace Sdx.Diagnostics
 
       debugString.Append("<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both;\">");
       this.AppendDebugLogs(debugString);
-      if(Sdx.Context.Current.IsDebugMode)
-      {
-        this.AppendDbQueryLogs(debugString);
-      }
+      this.AppendDbQueryLogs(debugString);
       debugString.Append("</div>");
 
       context.Response.Write(debugString.ToString());
