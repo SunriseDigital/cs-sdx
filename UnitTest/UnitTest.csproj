@@ -119,10 +119,6 @@
       <Project>{ed186d94-5ab8-4707-b0a8-60fbd4237d2d}</Project>
       <Name>Sdx</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Sdx.Web\Sdx.Web.csproj">
-      <Project>{a91e7e02-005e-4329-97ae-38dcfd6a2493}</Project>
-      <Name>Sdx.Web</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
