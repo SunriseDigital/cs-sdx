@@ -118,11 +118,11 @@ namespace UnitTest
         var reader = con.ExecuteReader(command);
       }
 
-      Assert.Equal(1, profiler.Queries.Count);
-      Assert.True(profiler.Queries[0].ElapsedTime > 0);
-      Assert.True(profiler.Queries[0].FormatedElapsedTime is String);
-      Assert.Equal("SELECT * FROM shop WHERE id > @id", profiler.Queries[0].CommandText);
-      Assert.Equal("@id : 1", profiler.Queries[0].FormatedParameters);
+      Assert.Equal(3, profiler.Logs.Count);
+      Assert.True(profiler.Logs[0].ElapsedTime > 0);
+      Assert.True(profiler.Logs[0].FormatedElapsedTime is String);
+      Assert.Equal("SELECT * FROM shop WHERE id > @id", profiler.Logs[1].CommandText);
+      Assert.Equal("@id : 1", profiler.Logs[1].FormatedParameters);
 
 
       command.CommandText = "SELECT * FROM shop WHERE id > @id AND name = @name";
@@ -137,11 +137,11 @@ namespace UnitTest
         var reader = con.ExecuteReader(command);
       }
 
-      Assert.Equal(2, profiler.Queries.Count);
-      Assert.True(profiler.Queries[1].ElapsedTime > 0);
-      Assert.True(profiler.Queries[1].FormatedElapsedTime is String);
-      Assert.Equal("SELECT * FROM shop WHERE id > @id AND name = @name", profiler.Queries[1].CommandText);
-      Assert.Equal("  @id : 1" + System.Environment.NewLine + "@name : foobar", profiler.Queries[1].FormatedParameters);
+      Assert.Equal(6, profiler.Logs.Count);
+      Assert.True(profiler.Logs[1].ElapsedTime > 0);
+      Assert.True(profiler.Logs[1].FormatedElapsedTime is String);
+      Assert.Equal("SELECT * FROM shop WHERE id > @id AND name = @name", profiler.Logs[4].CommandText);
+      Assert.Equal("  @id : 1" + System.Environment.NewLine + "@name : foobar", profiler.Logs[4].FormatedParameters);
     }
 
     [Fact]
@@ -858,6 +858,55 @@ namespace UnitTest
         Assert.Equal(2, set[1].GetInt32("id"));
         Assert.Equal("エスペリア", set[1].GetString("name"));
       }
+    }
+
+    [Fact]
+    public void TestProfiler()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunProfiler(db);
+      }
+    }
+
+    private void RunProfiler(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var context = Sdx.Context.Current;
+      var prevProfiler = context.DbProfiler;
+      context.DbProfiler = new Sdx.Db.Sql.Profiler();
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+
+        Assert.Equal(1, context.DbProfiler.Logs.Count);
+        Assert.Equal("OPEN", context.DbProfiler.Logs[0].CommandText);
+
+        conn.BeginTransaction();
+        Assert.Equal(2, context.DbProfiler.Logs.Count);
+        Assert.Equal("BEGIN TRANSACTION", context.DbProfiler.Logs[1].CommandText);
+
+        conn.Commit();
+        Assert.Equal(3, context.DbProfiler.Logs.Count);
+        Assert.Equal("COMMIT", context.DbProfiler.Logs[2].CommandText);
+      }
+
+      Assert.Equal(4, context.DbProfiler.Logs.Count);
+      Assert.Equal("CLOSE", context.DbProfiler.Logs[3].CommandText);
+
+      context.DbProfiler = new Sdx.Db.Sql.Profiler();
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        conn.Rollback();
+        Assert.Equal(3, context.DbProfiler.Logs.Count);
+        Assert.Equal("ROLLBACK", context.DbProfiler.Logs[2].CommandText);
+      }
+
+      context.DbProfiler = prevProfiler;
     }
   }
 }

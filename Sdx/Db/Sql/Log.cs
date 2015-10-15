@@ -40,6 +40,11 @@ namespace Sdx.Db.Sql
       }
     }
 
+    public Log(string commandText) : this()
+    {
+      this.commandText = commandText;
+    }
+
     public Adapter Adapter { get; internal set; }
 
     internal void Begin()

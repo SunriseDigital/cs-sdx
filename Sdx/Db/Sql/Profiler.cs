@@ -11,20 +11,28 @@ namespace Sdx.Db.Sql
       
     }
 
-    List<Log> queries = new List<Log>();
+    List<Log> logs = new List<Log>();
 
-    public List<Log> Queries
+    public List<Log> Logs
     {
       get
       {
-        return this.queries;
+        return this.logs;
       }
     }
 
     internal Log Begin(DbCommand command)
     {
       var query = new Log(command);
-      this.queries.Add(query);
+      this.logs.Add(query);
+      query.Begin();
+      return query;
+    }
+
+    internal Log Begin(string commandText)
+    {
+      var query = new Log(commandText);
+      this.logs.Add(query);
       query.Begin();
       return query;
     }

@@ -69,6 +69,7 @@ namespace Sdx.Db
           this.DbTransaction = null;
         }
 
+        this.Close();
         this.DbConnection.Dispose();
         this.DbConnection = null;
 
@@ -78,16 +79,60 @@ namespace Sdx.Db
       }
     }
 
+    public void Close()
+    {
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("CLOSE");
+      }
+
+      this.DbConnection.Close();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
+    }
+
     public void Open()
     {
       this.ThrowExceptionIfDisposed();
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("OPEN");
+      }
+
       this.DbConnection.Open();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
+      
     }
 
     public DbTransaction BeginTransaction()
     {
       this.ThrowExceptionIfDisposed();
+
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("BEGIN TRANSACTION");
+      }
+
       this.DbTransaction = this.DbConnection.BeginTransaction();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
+
       return this.DbTransaction;
     }
 
@@ -98,7 +143,20 @@ namespace Sdx.Db
       {
         throw new InvalidOperationException("Missing DbTransaction");
       }
+
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("COMMIT");
+      }
+
       this.DbTransaction.Commit();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
     }
 
     public void Rollback()
@@ -108,11 +166,25 @@ namespace Sdx.Db
       {
         throw new InvalidOperationException("Missing DbTransaction");
       }
+
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("ROLLBACK");
+      }
+
       this.DbTransaction.Rollback();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
     }
 
     public DbCommand CreateCommand()
     {
+      this.ThrowExceptionIfDisposed();
       var command = this.Adapter.CreateCommand();
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
@@ -121,18 +193,20 @@ namespace Sdx.Db
 
     public object FetchLastInsertId()
     {
+      this.ThrowExceptionIfDisposed();
       return this.Adapter.FetchLastInsertId(this);
     }
 
     private T ExecuteCommand<T>(DbCommand command, string comment, Func<T> func)
     {
+      this.ThrowExceptionIfDisposed();
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
 
-      Sql.Log query = null;
+      Sql.Log log = null;
       if (Sdx.Context.Current.DbProfiler != null)
       {
-        query = Sdx.Context.Current.DbProfiler.Begin(command);
+        log = Sdx.Context.Current.DbProfiler.Begin(command);
       }
 
       T result = default(T);
@@ -145,11 +219,11 @@ namespace Sdx.Db
         throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText);
       }
 
-      if (query != null)
+      if (log != null)
       {
-        query.End();
-        query.Adapter = this.Adapter;
-        query.Comment = comment;
+        log.End();
+        log.Adapter = this.Adapter;
+        log.Comment = comment;
       }
 
       return result;
@@ -199,6 +273,7 @@ namespace Sdx.Db
 
     private T Fetch<T>(DbCommand command, Func<DbDataReader, T> func)
     {
+      this.ThrowExceptionIfDisposed();
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
       using (var reader = this.ExecuteReader(command))
