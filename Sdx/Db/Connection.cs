@@ -118,7 +118,21 @@ namespace Sdx.Db
     public DbTransaction BeginTransaction()
     {
       this.ThrowExceptionIfDisposed();
+
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("BEGIN TRANSACTION");
+      }
+
       this.DbTransaction = this.DbConnection.BeginTransaction();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
+
       return this.DbTransaction;
     }
 
@@ -129,7 +143,20 @@ namespace Sdx.Db
       {
         throw new InvalidOperationException("Missing DbTransaction");
       }
+
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("COMMIT");
+      }
+
       this.DbTransaction.Commit();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
     }
 
     public void Rollback()
@@ -139,7 +166,20 @@ namespace Sdx.Db
       {
         throw new InvalidOperationException("Missing DbTransaction");
       }
+
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("ROLLBACK");
+      }
+
       this.DbTransaction.Rollback();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
     }
 
     public DbCommand CreateCommand()

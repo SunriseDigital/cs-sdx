@@ -882,10 +882,29 @@ namespace UnitTest
 
         Assert.Equal(1, context.DbProfiler.Logs.Count);
         Assert.Equal("OPEN", context.DbProfiler.Logs[0].CommandText);
+
+        conn.BeginTransaction();
+        Assert.Equal(2, context.DbProfiler.Logs.Count);
+        Assert.Equal("BEGIN TRANSACTION", context.DbProfiler.Logs[1].CommandText);
+
+        conn.Commit();
+        Assert.Equal(3, context.DbProfiler.Logs.Count);
+        Assert.Equal("COMMIT", context.DbProfiler.Logs[2].CommandText);
       }
 
-      Assert.Equal(2, context.DbProfiler.Logs.Count);
-      Assert.Equal("CLOSE", context.DbProfiler.Logs[1].CommandText);
+      Assert.Equal(4, context.DbProfiler.Logs.Count);
+      Assert.Equal("CLOSE", context.DbProfiler.Logs[3].CommandText);
+
+      context.DbProfiler = new Sdx.Db.Sql.Profiler();
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        conn.Rollback();
+        Assert.Equal(3, context.DbProfiler.Logs.Count);
+        Assert.Equal("ROLLBACK", context.DbProfiler.Logs[2].CommandText);
+      }
 
       context.DbProfiler = prevProfiler;
     }
