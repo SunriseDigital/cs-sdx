@@ -81,7 +81,7 @@
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />
     <Compile Include="Util\Datetime.cs" />
-    <Compile Include="Util\Random.cs" />
+    <Compile Include="Util\Number.cs" />
     <Compile Include="Util\String.cs" />
   </ItemGroup>
   <ItemGroup>
