@@ -53,7 +53,7 @@ namespace Sdx.Db.Sql
       var counter = new Counter();
       this.columns.ForEach(column => {
         builder
-          .Append(column.Build(this.Adapter))
+          .Append(column.Build(this.Adapter, command.Parameters, counter))
           .Append(" = ");
 
 

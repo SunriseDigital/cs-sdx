@@ -210,7 +210,7 @@ namespace Sdx.Db.Sql
 
       if (cond.Value is Column)
       {
-        rightHand = ((Column)cond.Value).Build(adapter);
+        rightHand = ((Column)cond.Value).Build(adapter, parameters, condCount);
       }
       else if (cond.Value is Expr)
       {
@@ -263,7 +263,7 @@ namespace Sdx.Db.Sql
         var value = this.BuildPlaceholderAndParameters(adapter, parameters, cond, condCount);
         return String.Format(
           "{0}{1}{2}",
-          cond.Column.Build(adapter),
+          cond.Column.Build(adapter, parameters, condCount),
           cond.Comparison.SqlString(),
           value
         );
@@ -272,11 +272,11 @@ namespace Sdx.Db.Sql
       {
         if (cond.Comparison == Comparison.Equal)
         {
-          return cond.Column.Build(adapter) + " IS NULL";
+          return cond.Column.Build(adapter, parameters, condCount) + " IS NULL";
         }
         else if(cond.Comparison == Comparison.NotEqual)
         {
-          return cond.Column.Build(adapter) + " IS NOT NULL";
+          return cond.Column.Build(adapter, parameters, condCount) + " IS NOT NULL";
         }
 
         throw new InvalidOperationException("Illeagal Comparison is specified.");
@@ -310,7 +310,7 @@ namespace Sdx.Db.Sql
 
         return String.Format(
           condFormat,
-          cond.Column.Build(adapter),
+          cond.Column.Build(adapter, parameters, condCount),
           min,
           max
         );

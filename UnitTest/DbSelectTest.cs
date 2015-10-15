@@ -1743,5 +1743,51 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         con.Commit();
       }
     }
+
+    [Fact]
+    public void TestSelectSubqueryColumn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSelectSubqueryColumn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSelectSubqueryColumn(TestDb testDb)
+    {
+      Sdx.Db.Sql.Select select = testDb.Adapter.CreateSelect();
+      select.AddFrom("shop");
+      select.AddColumn(Sdx.Db.Sql.Expr.Wrap("(SELECT id FROM shop sub WHERE shop.id = sub.id)"), "sub_id");
+
+      testDb.Command = select.Build();
+
+      Assert.Equal(testDb.Sql(@"SELECT
+      (SELECT id FROM shop sub WHERE shop.id = sub.id) AS {0}sub_id{1}
+      FROM {0}shop{1}"), testDb.Command.CommandText);
+
+
+      select = testDb.Adapter.CreateSelect();
+      select.AddFrom("shop");
+
+      var sub = testDb.Adapter.CreateSelect();
+      sub
+        .AddFrom("shop", "sub")
+        .AddColumn("id");
+      sub.Where.Add(
+        new Sdx.Db.Sql.Column("id", "shop"),
+        new Sdx.Db.Sql.Column("id", "sub")
+      );
+
+      select.AddColumn(sub, "sub_id");
+
+      testDb.Command = select.Build();
+
+      Assert.Equal(testDb.Sql(@"SELECT
+          (SELECT {0}sub{1}.{0}id{1}
+            FROM {0}shop{1} AS {0}sub{1}
+            WHERE {0}shop{1}.{0}id{1} = {0}sub{1}.{0}id{1}) AS {0}sub_id{1}
+        FROM {0}shop{1}"), testDb.Command.CommandText);
+    }
   }
 }

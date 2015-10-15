@@ -38,18 +38,19 @@ namespace Sdx.Db.Sql
     public DbCommand Build()
     {
       var command = this.Adapter.CreateCommand();
+      var counter = new Counter();
 
       var builder = new StringBuilder();
       builder.AppendFormat("INSERT INTO " + this.Adapter.QuoteIdentifier(this.Into) + " (");
 
       this.columns.ForEach(column => {
-        builder.Append(column.Build(this.Adapter));
+        builder.Append(column.Build(this.Adapter, command.Parameters, counter));
         builder.Append(", ");
       });
 
       builder.Remove(builder.Length - 2, 2);
 
-      var counter = new Counter();
+      
       if(this.Subquery != null)
       {
         builder.Append(") (");

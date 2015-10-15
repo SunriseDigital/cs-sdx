@@ -151,7 +151,7 @@ namespace Sdx.Db.Sql
       var builder = new StringBuilder();
       builder.Append("SELECT ");
 
-      if (this.AppendColumnString(builder))
+      if (this.AppendColumnString(builder, parameters, condCount))
       {
         builder.Append(" ");
       }
@@ -219,7 +219,7 @@ namespace Sdx.Db.Sql
         this.GroupList.ForEach(column =>
         {
           builder
-            .Append(column.Build(this.Adapter))
+            .Append(column.Build(this.Adapter, parameters, condCount))
             .Append(", ");
         });
 
@@ -246,7 +246,7 @@ namespace Sdx.Db.Sql
           }
 
           builder
-            .Append(column.Build(this.Adapter))
+            .Append(column.Build(this.Adapter, parameters, condCount))
             .Append(" ")
             .Append(column.Order.SqlString())
             .Append(", ");
@@ -387,8 +387,26 @@ namespace Sdx.Db.Sql
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column);
+        this.AddColumnObject(column, null);
       }
+      return this;
+    }
+
+    public Select AddColumn(Select subquery, string alias = null)
+    {
+      this.AddColumnObject(subquery, alias);
+      return this;
+    }
+
+    public Select AddColumn(Expr expr, string alias = null)
+    {
+      this.AddColumnObject(expr, alias);
+      return this;
+    }
+
+    public Select AddColumn(string columnName, string alias = null)
+    {
+      this.AddColumnObject(columnName, alias);
       return this;
     }
 
@@ -398,22 +416,21 @@ namespace Sdx.Db.Sql
     /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="alias"></param>
     /// <returns></returns>
-    public Select AddColumn(object columnName, string alias = null)
+    private void AddColumnObject(object columnName, string alias)
     {
       var column = new Column(columnName);
       column.Alias = alias;
       this.columns.Add(column);
-      return this;
     }
 
-    internal bool AppendColumnString(StringBuilder builder)
+    internal bool AppendColumnString(StringBuilder builder, DbParameterCollection parameters, Counter condCount)
     {
       var hasColumn = false;
       this.ColumnList.ForEach((column) =>
       {
         hasColumn = true;
         builder
-          .Append(column.Build(this.Adapter))
+          .Append(column.Build(this.Adapter, parameters, condCount))
           .Append(", ");
       });
 

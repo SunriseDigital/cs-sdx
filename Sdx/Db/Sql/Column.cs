@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 
@@ -23,6 +24,10 @@ namespace Sdx.Db.Sql
       {
         target = columnName;
       }
+      else if (columnName is Select)
+      {
+        target = columnName;
+      }
       else if( columnName is string)
       {
         var strName = columnName as string;
@@ -37,7 +42,7 @@ namespace Sdx.Db.Sql
       }
       else
       {
-        throw new NotSupportedException("columnName support only Sdx.Db.Query.Expr or string, " + columnName.GetType() + " given.");
+        throw new NotSupportedException("columnName support only Expr or string or Select, " + columnName.GetType() + " given.");
       }
     }
 
@@ -64,11 +69,16 @@ namespace Sdx.Db.Sql
       }
     }
 
-    private string QuotedName(Adapter db)
+    private string QuotedName(Adapter db, DbParameterCollection parameters, Counter condCount)
     {
       if(this.target is Expr)
       {
         return db.QuoteIdentifier(this.target as Expr);
+      }
+      else if(this.target is Select)
+      {
+        var select = this.target as Select;
+        return "(" + select.BuildSelectString(parameters, condCount) + ")";
       }
       else
       {
@@ -76,16 +86,16 @@ namespace Sdx.Db.Sql
       }
     }
 
-    internal string Build(Adapter db)
+    internal string Build(Adapter db, DbParameterCollection parameters, Counter condCount)
     {
       var sql = "";
       if(this.ContextName != null)
       {
-        sql = db.QuoteIdentifier(this.ContextName) + "." + this.QuotedName(db);
+        sql = db.QuoteIdentifier(this.ContextName) + "." + this.QuotedName(db, parameters, condCount);
       }
       else
       {
-        sql = this.QuotedName(db);
+        sql = this.QuotedName(db, parameters, condCount);
       }
 
       if(this.Alias != null)
