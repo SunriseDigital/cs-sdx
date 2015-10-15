@@ -69,12 +69,30 @@ namespace Sdx.Db
           this.DbTransaction = null;
         }
 
+        this.Close();
         this.DbConnection.Dispose();
         this.DbConnection = null;
 
         this.Adapter = null;
 
         GC.SuppressFinalize(this);
+      }
+    }
+
+    public void Close()
+    {
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("CLOSE");
+      }
+
+      this.DbConnection.Close();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
       }
     }
 
