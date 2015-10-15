@@ -21,5 +21,10 @@ namespace Sdx.Util
 
       return builder.ToString();
     }
+
+    public static string Truncate(string text, int max, string substitute = "…")
+    {
+      return text.Length <= max ? text : text.Substring(0, max) + substitute;
+    }
   }
 }
