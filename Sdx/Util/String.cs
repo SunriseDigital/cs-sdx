@@ -21,5 +21,17 @@ namespace Sdx.Util
 
       return builder.ToString();
     }
+
+    /// <summary>
+    /// 文字列を指定した数(インデックス)から最後まで削除し末尾に代替テキストを挿入します
+    /// </summary>
+    /// <param name="text">対象の文字列</param>
+    /// <param name="max">文字数</param>
+    /// <param name="substitute">最後に付ける文字列(デフォルトは「…」)</param>
+    /// <returns>string カットされた文字列</returns>
+    public static string Truncate(string text, int max, string substitute = "…")
+    {
+      return text.Length <= max ? text : text.Substring(0, max) + substitute;
+    }
   }
 }
