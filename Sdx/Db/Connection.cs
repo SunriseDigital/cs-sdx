@@ -81,7 +81,20 @@ namespace Sdx.Db
     public void Open()
     {
       this.ThrowExceptionIfDisposed();
+      Sql.Log log = null;
+      if (Sdx.Context.Current.DbProfiler != null)
+      {
+        log = Sdx.Context.Current.DbProfiler.Begin("OPEN");
+      }
+
       this.DbConnection.Open();
+
+      if (log != null)
+      {
+        log.End();
+        log.Adapter = this.Adapter;
+      }
+      
     }
 
     public DbTransaction BeginTransaction()
@@ -113,6 +126,7 @@ namespace Sdx.Db
 
     public DbCommand CreateCommand()
     {
+      this.ThrowExceptionIfDisposed();
       var command = this.Adapter.CreateCommand();
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
@@ -121,18 +135,20 @@ namespace Sdx.Db
 
     public object FetchLastInsertId()
     {
+      this.ThrowExceptionIfDisposed();
       return this.Adapter.FetchLastInsertId(this);
     }
 
     private T ExecuteCommand<T>(DbCommand command, string comment, Func<T> func)
     {
+      this.ThrowExceptionIfDisposed();
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
 
-      Sql.Log query = null;
+      Sql.Log log = null;
       if (Sdx.Context.Current.DbProfiler != null)
       {
-        query = Sdx.Context.Current.DbProfiler.Begin(command);
+        log = Sdx.Context.Current.DbProfiler.Begin(command);
       }
 
       T result = default(T);
@@ -145,11 +161,11 @@ namespace Sdx.Db
         throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText);
       }
 
-      if (query != null)
+      if (log != null)
       {
-        query.End();
-        query.Adapter = this.Adapter;
-        query.Comment = comment;
+        log.End();
+        log.Adapter = this.Adapter;
+        log.Comment = comment;
       }
 
       return result;
@@ -199,6 +215,7 @@ namespace Sdx.Db
 
     private T Fetch<T>(DbCommand command, Func<DbDataReader, T> func)
     {
+      this.ThrowExceptionIfDisposed();
       command.Connection = this.DbConnection;
       command.Transaction = this.DbTransaction;
       using (var reader = this.ExecuteReader(command))

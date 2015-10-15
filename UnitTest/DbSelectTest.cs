@@ -1502,8 +1502,8 @@ namespace UnitTest
         conn.Open();
         var rset = conn.FetchRecordSet<Test.Orm.Shop>(select);
 
-        Assert.Equal(1, profiler.Queries.Count);
-        Assert.Equal("No where comment", profiler.Queries[0].Comment);
+        Assert.Equal(1, profiler.Logs.Count);
+        Assert.Equal("No where comment", profiler.Logs[0].Comment);
       }
 
 
@@ -1518,8 +1518,8 @@ namespace UnitTest
       {
         conn.Open();
         var rset = conn.FetchRecordSet<Test.Orm.Shop>(select);
-        Assert.Equal(2, profiler.Queries.Count);
-        Assert.Equal("Where and order limit", profiler.Queries[1].Comment);
+        Assert.Equal(2, profiler.Logs.Count);
+        Assert.Equal("Where and order limit", profiler.Logs[1].Comment);
       }
 
       //
@@ -1535,8 +1535,8 @@ namespace UnitTest
       {
         con.Open();
         var reader = con.ExecuteReader(command);
-        Assert.Equal(3, profiler.Queries.Count);
-        Assert.Equal("No where form string", profiler.Queries[2].Comment);
+        Assert.Equal(3, profiler.Logs.Count);
+        Assert.Equal("No where form string", profiler.Logs[2].Comment);
       }
 
 
@@ -1552,8 +1552,8 @@ namespace UnitTest
       {
         con.Open();
         var reader = con.ExecuteReader(command);
-        Assert.Equal(4, profiler.Queries.Count);
-        Assert.Equal("Where and order limit from string", profiler.Queries[3].Comment);
+        Assert.Equal(4, profiler.Logs.Count);
+        Assert.Equal("Where and order limit from string", profiler.Logs[3].Comment);
       }
     }
 

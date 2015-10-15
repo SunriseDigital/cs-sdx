@@ -91,7 +91,7 @@ namespace Sdx.Diagnostics
       Sdx.Db.Sql.Log slowQuery = null;
       var queryString = new StringBuilder();
 
-      if(Sdx.Context.Current.DbProfiler.Queries.Count > 0)
+      if(Sdx.Context.Current.DbProfiler.Logs.Count > 0)
       {
         queryString.Append(SubTitleDiv);
         queryString.Append("all queries");
@@ -99,7 +99,7 @@ namespace Sdx.Diagnostics
       }
 
       queryString.Append(@"<ol style=""margin: 0; padding: 0; list-style-position: inside;"">");
-      Sdx.Context.Current.DbProfiler.Queries.ForEach(query => {
+      Sdx.Context.Current.DbProfiler.Logs.ForEach(query => {
         queryString.Append("<li>");
         queryString.Append(this.buildQueryString(query));
         queryString.Append("</li>");
@@ -126,7 +126,7 @@ namespace Sdx.Diagnostics
 
       debugString.Append(String.Format(
         LogBlockFormat,
-        Sdx.Context.Current.DbProfiler.Queries.Count + " queries " + Sdx.Diagnostics.Debug.FormatStopwatchTicks(totalElapsed) + " sec",
+        Sdx.Context.Current.DbProfiler.Logs.Count + " queries " + Sdx.Diagnostics.Debug.FormatStopwatchTicks(totalElapsed) + " sec",
         slowQueryString.ToString() + queryString.ToString()
       ));
     }
