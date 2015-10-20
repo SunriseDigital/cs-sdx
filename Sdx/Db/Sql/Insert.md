@@ -1,4 +1,4 @@
-# Sdx.Db.Sql.Update
+# Sdx.Db.Sql.Insert
 
 ## 概要
 

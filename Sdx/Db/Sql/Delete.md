@@ -1,4 +1,4 @@
-# Sdx.Db.Sql.Update
+# Sdx.Db.Sql.Delete
 
 ## 概要
 
