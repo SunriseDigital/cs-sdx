@@ -2,7 +2,7 @@
 
 ## 概要
 
-SELECT文を生成します。
+SELECT文を生成します。ｔ
 
 ## 使い方
 
@@ -14,15 +14,16 @@ SELECT文を生成します。
 using System.Data.Common;
 ```
 
-`Select`は最終的に`Build`メソッドでSQLを生成しますが、DB毎に識別子のクオートの仕方が違うため`Adapter`のインスタンスが必要です。
+`Select`は最終的に`Build`メソッドでSQLを生成しますが、DB毎に識別子のクオートの仕方が違うため`Adapter`のインスタンスが必要です。`Adapter`から生成してください。
 
 ```c#
-var select = new Sdx.Db.Query.Select();
+var db = new Sdx.Db.SqlServerAdapter();
+db.ConnectionString = "**接続文字列**";
+
+var select = db.CreateSelect();
 
 select.AddFrom("shop");
 select.AddColumn("*");
-select.Adapter = new Sdx.Db.SqlServerAdapter();
-select.Adapter.ConnectionString = "**接続文字列**";
 DbCommand command = select.Build();
 ```
 ※以下、全ての例で`ConnectionString`の設定は省略します。
@@ -52,10 +53,8 @@ SELECT * FROM [shop], [area];
 #### テーブルを指定したカラムの追加
 
 
-
 ```c#
-//Adapterを引数に取るコンストラクタも有ります。
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 Sdx.Db.Query.Context shopContext = select.AddFrom("shop");
 shopContext.AddColumn("*");
@@ -73,7 +72,7 @@ SELECT [shop].* FROM [shop];
 複数のカラムを追加する`AddColumns`メソッドもあります。`AddColumns`は可変引数を受け付けます。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 Sdx.Db.Query.Context shopContext =  select.AddFrom("shop");
 
@@ -95,7 +94,7 @@ SELECT [shop].[id], [shop].[name] FROM [shop];
 各カラム系メソッドは自分自身を返しますので、いわゆる[Fluent interface](http://martinfowler.com/bliki/FluentInterface.html)が利用できます。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 select.AddFrom("shop")
   .AddColumn("id")
@@ -126,7 +125,7 @@ select.AddColumn(
 #### テーブルのエイリアス
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 select.AddFrom("shop", "s").AddColumn("*");
 DbCommand command = select.Build();
@@ -145,7 +144,7 @@ SELECT [s].* FROM [shop] AS [s];
 まずは`Select.AddColumn`
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 select.AddFrom("shop")
   .AddColumn("id", "shop_id")
@@ -164,7 +163,7 @@ SELECT [shop].[id] AS [shop_id], [shop].[name] AS [shop_name] FROM [shop];
 JOINは`Sdx.Db.Query.Context`の`InnerJoin`あるいは`LeftJoin`を使用します。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 select
   .AddFrom("shop")
@@ -262,7 +261,7 @@ FROM
 同じテーブルを複数回JOINする場合はテーブルにエイリアスを付与する必要があります。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 select
   .AddFrom("shop")
@@ -303,7 +302,7 @@ FROM
 生成されるSQLのJOINの順番は、デフォルトで、`INNER JOIN`を先に、`LEFT JOIN`を後に行います。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 
 select
   .AddFrom("shop")
@@ -347,7 +346,7 @@ FROM
 この挙動が気に入らない場合、JOINを呼んだ順番にJOINすることも可能です。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select.JoinOrder = Sdx.Db.Query.JoinOrder.Natural;
 ```
 
@@ -424,7 +423,7 @@ public enum Comparison
 #### Select.Whereに対する呼び出し
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select.AddFrom("shop").AddColumn("*");
 select.Where.Add("id", "1");
 ```
@@ -439,7 +438,7 @@ SELECT [shop].* FROM [shop] WHERE [id] = @0;
 #### Context.Whereに対する呼び出し
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select.AddFrom("shop").AddColumn("*");
 select.Context("shop").Where.Add("id", "1");
 ```
@@ -454,7 +453,7 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
 `Add`の3番目の引数`Comparison`を指定しなくても自動的にINが使用されます。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select.AddFrom("shop").AddColumn("*");
 select.Context("shop").Where.Add("id", new string[] { "1", "2" });
 ```
@@ -468,13 +467,13 @@ SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
 #### WHERE句にサブクエリ
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select
   .AddFrom("shop")
   .AddColumn("*")
   .Where.Add("id", "1");
 
-var sub = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var sub = db.CreateSelect();
 sub
   .AddFrom("area")
   .AddColumn("id")
@@ -508,7 +507,7 @@ AND [shop].[area_id] IN(
 `Where.Add()`に`Sdx.Db.Query.Condition`をセットすると子供のWhere句はカッコで括られます。これを利用するとORを含む複雑なWhere句が生成可能です。`Sdx.Db.Query.Condition`は`Adapter.CreateCondition()`から生成可能です。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select.AddFrom("shop").AddColumn("*");
 
 select.Where
@@ -560,7 +559,7 @@ ORDER句は`Select.AddOrder()`、`Context.AddOrder`で行います。`Context`�
 #### Select.AddOrder()
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select
   .AddFrom("shop")
   .AddColumn("*");
@@ -575,7 +574,7 @@ SELECT [shop].* FROM [shop] ORDER BY [id] DESC
 #### Context.AddOrder()
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select
   .AddFrom("shop")
   .AddColumn("*")
@@ -593,7 +592,7 @@ GROUP句はORDER句同様、`Select.AddGroup()`/`Context.AddGroup()`がありま
 
 #### Select.AddGroup()/Select.Having
 ```c#
-select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+select = db.CreateSelect();
 select.AddFrom("shop");
 
 select
@@ -614,7 +613,7 @@ SELECT [id] FROM [shop] GROUP BY [id] HAVING SUM(shop.id) >= @0
 
 #### Context.AddGroup()/Context.Having
 ```c#
-select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+select = db.CreateSelect();
 select
   .AddFrom("shop")
   .AddColumn("id")
@@ -634,7 +633,7 @@ SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
 LIMIT/OFFSET句は`Select.Limit`/`Select.Offset`のプロパティにセットします。SqlServerでは、OFFSET/FETCH句が生成されます（SqlServer2012以前では機能しませんので注意してください）。
 
 ```c#
-var select = new Sdx.Db.Query.Select(new Sdx.Db.SqlServerAdapter());
+var select = db.CreateSelect();
 select
   .AddFrom("shop")
   .AddColumn("*");
