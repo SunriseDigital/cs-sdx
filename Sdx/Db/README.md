@@ -6,7 +6,7 @@
 
 ## Namesapces
 
-* [Query](Query)
+* [Sql](Sql)
 
 ## Classes
 

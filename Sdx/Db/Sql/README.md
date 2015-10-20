@@ -1,9 +1,12 @@
-# Sdx.Db.Query
+# Sdx.Db.Sql
 
 ## 概要
 
-DBへのクエリ、SQLの組み立て。
+SQLの組み立て。
 
 ## Classes
 
 * [Select](Select.md)
+* [Update](Update.md)
+* [Insert](Insert.md)
+* [Delete](Delete.md)
