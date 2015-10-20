@@ -367,7 +367,7 @@ select.AddFrom("shop")
 
 `Select` `Context`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Condition`のインスタンスで、一連の`Select`の中で`Context`からアクセスしても同じインスタンスが参照されます。
 
-`Condition`は`Add`というメソッドを持っていて、これでWhere句をセットしていきます。
+`Condition`は`Add`というメソッドを持っていて、これでWhere句をセットしていきます。`Context`から呼んだ時はカラム名にテーブル名が付与されます。
 
 ```c#
 Add(object column, object value, Comparison comparison)
@@ -518,11 +518,13 @@ OR
 
 #### Whereのfluent syntaxについて
 
-Where.Add系メソッドは続けて条件を付与できるようにするため、自分自身を返します。`Context`にアクセスする時は`Context`プロパティを利用してください。
+Where.Add系メソッドは続けて条件を付与できるようにするため、自分自身を返すので注意してください。別のテーブルのカラムにWHERE句を付与したい場合は`select.Context()`で取得しなおすか、変数に代入しておいてください。
 
 ```c#
-select.AddFrom("shop")
-  .Where.Add("id", 1).Context
+var cShop = select.AddFrom("shop")
+  .Where.Add("id", 1);
+
+cShop
   .InnerJoin("area", db.CreateCondition().Add(
     new Sdx.Db.Query.Column("area_id", "shop"),
     new Sdx.Db.Query.Column("id", "area")
