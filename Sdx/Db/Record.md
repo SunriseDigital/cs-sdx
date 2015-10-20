@@ -8,9 +8,9 @@
 
 ### クラスの準備
 
-`Record`は`Adapter.FetchRecord<T:Record>(DbCommand command)`あるいは`Adapter.FetchRecord<T:Record>(Select select)`で生成しますが、組み立てるのにテーブルの定義が必要です。テーブルの定義は`Sdx.Db.Table`クラスのサブクラスを作成して行います。
+`Record`は`Connection.FetchRecord<T:Record>(Select select)`で生成しますが、組み立てるのにテーブルの定義が必要です。テーブルの定義は`Sdx.Db.Table`クラスのサブクラスを作成して行います。
 
-`Record`クラス自体も、各テーブルごとに固有のユーティリティーメソッドを持たせたいので、サブクラスを作成します。
+また、固有のユーティリティーメソッドを持たせたいので、`Record`クラスもサブクラスを作成します。
 
 下記のDBを元に解説をします。
 
@@ -18,7 +18,7 @@
 
 #### Tableクラス
 
-基本的な設定です。Tableクラス自体は各SELECTの中でJOINに利用され、JOIN時のデータを保有するため、複数生成されるクラスです。Tableの定義自体はユニークなものなので`Sdx.Db.TableMeta`クラスのインスタンスとしてstaticなプロパティに保持します。本来はテーブル同士の関係も定義しますが、話を単純にするため、最初の例では省略します。
+一番基本的となる設定です。Tableクラス自体は各SELECTの中でJOINに利用され、JOIN時のデータを保有するため、複数生成されるクラスです。Tableの定義自体は複数生成する必要が無いなものなので`Sdx.Db.TableMeta`クラスのインスタンスとしてstaticなプロパティに保持します。本来はテーブル同士の関係も定義しますが、話を単純にするため、最初の例では省略します。
 
 ```c#
 using System.Collections.Generic;
@@ -62,7 +62,7 @@ namespace Test.Orm.Table
 1. テーブル名
 1. 主キー
 1. カラムのリスト
-1. 他テーブルとの関連（`Relation`）
+1. 他テーブルとの関連（`Relation`の辞書）
 1. Recordクラスのタイプ
 1. Tableクラスのタイプ
 
@@ -149,20 +149,25 @@ namespace Test.Orm.Table
 #### 単純な問い合わせ
 
 ```c#
-var select = new Sdx.Db.Query.Select();
-select.AddFrom(new Test.Orm.Table.Shop());
-
 var db = new Sdx.Db.SqlServerAdapter();
 db.ConnectionString = "DB CONNECTION STRING";
-var shops = db.FetchRecordSet<Test.Orm.Shop>(select);
+
+var select = db.CreateSelect();
+select.AddFrom(new Test.Orm.Table.Shop());
+
+using(var conn = db.CreateConnection())
+{
+  conn.Open();
+  var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+}
 ```
 
 `Select.AddFrom`にTableのインスタンスをセットすると、カラムはTableMetaに設定したカラムが自動で全て追加されます。
 
-`Adapter.FetchRecordSet<>(select)`/`Adapter.FetchRecord<>(select)`はジェネリックメソッドでタイプには取得したいRecordクラスの型を渡します。通常はFROM句にしていしたテーブルのRecordを渡します。
+`Connection.FetchRecordSet<T>(select)`/`Connection.FetchRecord<T>(select)`はジェネリックメソッドでタイプには取得したいRecordクラスの型を渡します。通常はFROM句にしていしたテーブルのRecordを渡します。
 
 
-カラムを変更したい場合はSetColumns`Table.SetColumn()`/`Table.ClearColumn()`/`Table.AddColumn()`などのTableの絡む操作系メソッドを使用してください。
+カラムを変更したい場合はSetColumns`Table.SetColumn()`/`Table.ClearColumn()`/`Table.AddColumn()`などのTableのカラム操作系メソッドを使用してください。
 
 ```c#
 select
@@ -183,8 +188,7 @@ INSERT INTO menu (name, shop_id) VALUES ('牛肉の激辛水煮', (SELECT id FRO
 ```
 
 ```c#
-var select = new Sdx.Db.Query.Select();
-
+var select = db.CreateSelect();
 select
    .AddFrom(new Test.Orm.Table.Shop())
    .AddOrder("id", Sdx.Db.Query.Order.ASC)
@@ -198,16 +202,21 @@ select.Context("shop")
 select.Context("shop")
     .Where.Add("name", "天府舫");
 
-var shops = db.FetchRecordSet<Test.Orm.Shop>(select);
-Assert.Equal(1, db.Profiler.Queries.Count);//データベースへの問い合わせは回数をチェック
+using(var conn = db.CreateConnection())
+{
+  conn.Open();
+  var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
 
-Assert.Equal(1, shops.Count);
-Assert.Equal("天府舫", shops[0].GetString("name"));
+  Assert.Equal(1, shops.Count);
+  Assert.Equal("天府舫", shops[0].GetString("name"));
 
-var menuList = shops[0].GetRecordSet<Test.Orm.Menu>("menu");
-Assert.Equal(1, db.Profiler.Queries.Count);//新たに問い合わせはしていない
-Assert.Equal(3, menuList.Count);
-Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
-Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));
-Assert.Equal("牛肉の激辛水煮", menuList[2].GetString("name"));
+  //メニューを取得
+  var menuList = shops[0].GetRecordSet<Test.Orm.Menu>("menu");
+  Assert.Equal(1, db.Profiler.Queries.Count);//新たに問い合わせはしていない
+  Assert.Equal(3, menuList.Count);
+  Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
+  Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));
+  Assert.Equal("牛肉の激辛水煮", menuList[2].GetString("name"));
+}
+
 ```
