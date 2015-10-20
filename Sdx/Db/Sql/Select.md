@@ -195,12 +195,10 @@ SELECT [shop].* FROM, [area].* [shop] INNER JOIN [area] ON [shop].area_id = [are
 
 `InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Sdx.Db.Query.Condition`のインスタンスで渡します。`Condition`は`*** = @@@`の様な条件式を生成する汎用的なクラスです。`Condition`にはJOIN条件の条件の他にWhere句やHaving句の生成にも利用されます。JOIN条件でよく使用する`column_name1 = column_name2`の式を生成するには、`Sdx.Db.Query.Column`のインスタンスを両方の引数に設定してください。
 
-※ `Condition`の生成には本来`Adapter`は必要ではありません。`Adapter.CreateCondition()`は`(new Sdx.Db.Query.Condition()).Add(...`と記述しなくてもいいようにするためのショートカットです。識別子のクオートには`Select.Adapter`が使用されます。
-
 
 #### 同じテーブルをJOINする
 
-JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回した場合、一度しかJOINは行われません。
+JOINするエイリアス名（テーブル名）は一つの`Select`の中でユニークでなければなりません。同じテーブル名でJOINを２回コールしても、一度しかJOINは行われません。
 
 ```c#
 select.AddFrom("shop").AddColumn("*");
@@ -363,31 +361,11 @@ select.AddFrom("shop")
   .AddColumn("id", 1)//これはarea.id
 ```
 
-上記の例の`.AddColumn("id")`は`shop`ではなく、`area`の`id`です。`area`の`Context`から`shop`の`Context`にアクセスするには`ParentContext`プロパティを使うか`Select`プロパティを利用します。
-
-```c#
-select.AddFrom("shop")
-  .InnerJoin("area", db.CreateCondition().Add(
-    new Sdx.Db.Query.Column("area_id", "shop"),
-    new Sdx.Db.Query.Column("id", "area")
-  )).ParentContext
-  .AddColumn("id", 1)//これはshop.id
-```
-
-```c#
-select.AddFrom("shop")
-  .InnerJoin("area", db.CreateCondition().Add(
-    new Sdx.Db.Query.Column("area_id", "shop"),
-    new Sdx.Db.Query.Column("id", "area")
-  )).Select.Context("shop")
-  .AddColumn("id", 1)//これはshop.id
-```
-
 
 <br><br><br>
 ### WHERE句
 
-`Select` `Context`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Condition`のインスタンスで、一つの`Select`の中では同じインスタンスが参照されます。
+`Select` `Context`共、`Where`というプロパティを持っています。`Where`は`Sdx.Db.Query.Condition`のインスタンスで、一連の`Select`の中で`Context`からアクセスしても同じインスタンスが参照されます。
 
 `Condition`は`Add`というメソッドを持っていて、これでWhere句をセットしていきます。
 
