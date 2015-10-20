@@ -518,18 +518,21 @@ OR
 
 #### Whereのfluent syntaxについて
 
-Where.Add系メソッドは続けて条件を付与できるようにするため、自分自身を返すので注意してください。別のテーブルのカラムにWHERE句を付与したい場合は`select.Context()`で取得しなおすか、変数に代入しておいてください。
+Where.Add系メソッドは続けて条件を付与できるようにするため、自分自身を返すので注意してください。別のテーブルのカラムにWHERE句を付与したい場合は`select.Context()`で取得しなおしてください。
 
 ```c#
-var cShop = select.AddFrom("shop")
+select
+  .AddFrom("shop")
   .Where.Add("id", 1);
 
-cShop
+select.Context("shop")
   .InnerJoin("area", db.CreateCondition().Add(
     new Sdx.Db.Query.Column("area_id", "shop"),
     new Sdx.Db.Query.Column("id", "area")
   ));
 ```
+
+※ `select.Context()`の計算量はDictinaryのインデクサの計算量に準じます。
 
 <br><br><br>
 ### ORDER句
