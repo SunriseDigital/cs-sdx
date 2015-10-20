@@ -8,7 +8,7 @@
 
 ### クラスの準備
 
-`Record`は`Connection.FetchRecord<T:Record>(Select select)`で生成しますが、組み立てるのにテーブルの定義が必要です。テーブルの定義は`Sdx.Db.Table`クラスのサブクラスを作成して行います。
+`Record`は`Connection.FetchRecord/FetchRecordSet<T:Record>(Select select)`で生成しますが、組み立てるのにテーブルの定義が必要です。テーブルの定義は`Sdx.Db.Table`クラスのサブクラスを作成して行います。
 
 また、固有のユーティリティーメソッドを持たせたいので、`Record`クラスもサブクラスを作成します。
 
