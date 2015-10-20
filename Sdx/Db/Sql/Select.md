@@ -547,7 +547,7 @@ select
   .AddFrom("shop")
   .AddColumn("*");
 
-select.AddOrder("id", Sdx.Db.Sql.AddOrder.DESC);
+select.AddOrder("id", Sdx.Db.Sql.Order.DESC);
 ```
 
 ```sql
@@ -561,7 +561,7 @@ var select = db.CreateSelect();
 select
   .AddFrom("shop")
   .AddColumn("*")
-  .AddOrder("id", Sdx.Db.Sql.AddOrder.ASC);
+  .AddOrder("id", Sdx.Db.Sql.Order.ASC);
 ```
 
 ```sql
@@ -621,7 +621,7 @@ select
   .AddFrom("shop")
   .AddColumn("*");
 
-select.AddOrder("id", Sdx.Db.Sql.AddOrder.DESC);
+select.AddOrder("id", Sdx.Db.Sql.Order.DESC);
 select.SetLimit(10, 20);
 ```
 
