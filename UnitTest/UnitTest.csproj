@@ -32,7 +32,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'TravisCI|AnyCPU' ">
     <StartAction>Program</StartAction>
-    <StartProgram>$(ProgramFiles)\Gallio\bin\Gallio.Icarus.exe</StartProgram>
+    <StartProgram>$(MSBuildThisFileDirectory)\xunit\xunit.gui.clr4.x86.exe</StartProgram>
     <StartArguments>$(AssemblyName).dll</StartArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'TravisCI|AnyCPU'">
