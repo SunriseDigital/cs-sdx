@@ -1,34 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Sdx.Html
 {
-  public class Attr : ICloneable
+  public class Attr
   {
     public static Attr Create()
     {
       return new Attr();
     }
 
-    private Collection.OrderedDictionary<string, object> attributes = new Collection.OrderedDictionary<string, object>();
+    private Collection.OrderedDictionary<string, object> attrDictionary = new Collection.OrderedDictionary<string, object>();
 
     /// <summary>
     /// クラス属性を追加します。
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="values"></param>
     /// <returns></returns>
-    public Attr AddClass(string value)
+    public Attr AddClass(params string[] values)
     {
-      if (!this.attributes.ContainsKey("class"))
+      if (!this.attrDictionary.ContainsKey("class"))
       {
-        this.attributes["class"] = new List<string>();
+        this.attrDictionary["class"] = new List<string>();
       }
 
-      var classes = (List<string>)this.attributes["class"];
+      var classes = (List<string>)this.attrDictionary["class"];
 
-      classes.Add(value);
+      foreach(var val in values)
+      {
+        if (!classes.Contains(val))
+        {
+          classes.Add(val);
+        }
+      }
 
       return this;
     }
@@ -41,7 +46,7 @@ namespace Sdx.Html
     /// <returns></returns>
     public Attr Set(string key, string value)
     {
-      this.attributes[key] = value;
+      this.attrDictionary[key] = value;
       return this;
     }
 
@@ -52,7 +57,7 @@ namespace Sdx.Html
     /// <returns></returns>
     public Attr Remove(string key)
     {
-      this.attributes.Remove(key);
+      this.attrDictionary.Remove(key);
       return this;
     }
 
@@ -60,18 +65,21 @@ namespace Sdx.Html
     /// クラス属性を削除します。存在しないクラスを指定した場合、何も起きません。
     /// 全てのclass属性が削除されると`class=""`も出力されません。
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="values"></param>
     /// <returns></returns>
-    public Attr RemoveClass(string value)
+    public Attr RemoveClass(params string[] values)
     {
-      if(this.attributes.ContainsKey("class"))
+      if(this.attrDictionary.ContainsKey("class"))
       {
-        var values = (List<string>)this.attributes["class"];
-        values.Remove(value);
-
-        if(values.Count == 0)
+        var classes = (List<string>)this.attrDictionary["class"];
+        foreach (var val in values)
         {
-          this.attributes.Remove("class");
+          classes.Remove(val);
+        }
+
+        if(classes.Count == 0)
+        {
+          this.attrDictionary.Remove("class");
         }
       }
 
@@ -86,12 +94,12 @@ namespace Sdx.Html
     /// <returns></returns>
     public Attr SetStyle(string key, string value)
     {
-      if (!this.attributes.ContainsKey("style"))
+      if (!this.attrDictionary.ContainsKey("style"))
       {
-        this.attributes["style"] = new Collection.OrderedDictionary<string, string>();
+        this.attrDictionary["style"] = new Collection.OrderedDictionary<string, string>();
       }
 
-      var styles = (Collection.OrderedDictionary<string, string>)this.attributes["style"];
+      var styles = (Collection.OrderedDictionary<string, string>)this.attrDictionary["style"];
 
       styles[key] = value;
 
@@ -105,7 +113,7 @@ namespace Sdx.Html
     /// <returns></returns>
     public Attr Add(string value)
     {
-      this.attributes[value] = value;
+      this.attrDictionary[value] = value;
       return this;
     }
 
@@ -117,14 +125,14 @@ namespace Sdx.Html
     /// <returns></returns>
     public Attr RemoveStyle(string key)
     {
-      if (this.attributes.ContainsKey("style"))
+      if (this.attrDictionary.ContainsKey("style"))
       {
-        var values = (Collection.OrderedDictionary<string, string>)this.attributes["style"];
+        var values = (Collection.OrderedDictionary<string, string>)this.attrDictionary["style"];
         values.Remove(key);
 
         if (values.Count == 0)
         {
-          this.attributes.Remove("style");
+          this.attrDictionary.Remove("style");
         }
       }
 
@@ -135,25 +143,70 @@ namespace Sdx.Html
     /// 属性文字列を組み立てます。
     /// </summary>
     /// <returns></returns>
-    public string Render()
+    public string Render(Attr attribute = null)
     {
       var builder = new StringBuilder();
-      this.attributes.ForEach((key, value) => {
+
+      if (attribute == null)
+      {
+        this.BuildAttribute(this.attrDictionary, builder);
+      }
+      else
+      {
+        var tmpAttrDic = this.CloneAttrDictionary();
+        attribute.attrDictionary.ForEach((key, value) => {
+          if(key == "class" && tmpAttrDic.ContainsKey(key))
+          {
+            var tmpClasses = (List<string>)tmpAttrDic["class"];
+            var argClasses = (List<string>)value;
+            argClasses.ForEach(val => {
+              if(!tmpClasses.Contains(val))
+              {
+                tmpClasses.Add(val);
+              }
+            });
+          }
+          else if (key == "style" && tmpAttrDic.ContainsKey(key))
+          {
+            var tmpStyles = (Collection.OrderedDictionary<string, string>)tmpAttrDic["style"];
+            var argStyles = (Collection.OrderedDictionary<string, string>)value;
+            argStyles.ForEach((k, v) => {
+              tmpStyles[k] = v;
+            });
+          }
+          else
+          {
+            tmpAttrDic[key] = value;
+          }
+        });
+
+        this.BuildAttribute(tmpAttrDic, builder);
+      }
+
+
+      
+
+      return builder.ToString();
+    }
+
+    private void BuildAttribute(Collection.OrderedDictionary<string, object> attrDictionary, StringBuilder builder)
+    {
+      attrDictionary.ForEach((key, value) => {
         if (key == "class")
         {
           builder.Append("class=\"");
-          var classes = (List<string>) value;
+          var classes = (List<string>)value;
           classes.ForEach(val => {
             builder.Append(val).Append(' ');
           });
-          if(classes.Count > 0)
+          if (classes.Count > 0)
           {
             builder.Remove(builder.Length - 1, 1);
           }
 
           builder.Append("\" ");
         }
-        else if(key == "style")
+        else if (key == "style")
         {
           builder.Append("style=\"");
           var styles = (Collection.OrderedDictionary<string, string>)value;
@@ -165,7 +218,7 @@ namespace Sdx.Html
               .Append("; ");
           });
 
-          if(styles.Count > 0)
+          if (styles.Count > 0)
           {
             builder.Remove(builder.Length - 1, 1);
           }
@@ -183,35 +236,31 @@ namespace Sdx.Html
 
       });
 
-      if (this.attributes.Count > 0)
+      if (this.attrDictionary.Count > 0)
       {
         builder.Remove(builder.Length - 1, 1);
       }
-
-      return builder.ToString();
     }
 
-    public object Clone()
+    private Collection.OrderedDictionary<string, object> CloneAttrDictionary()
     {
-      var cloned = (Attr)this.MemberwiseClone();
-
-      cloned.attributes = new Collection.OrderedDictionary<string, object>();
-      this.attributes.ForEach((key, value) => {
+      var newDictionary = new Collection.OrderedDictionary<string, object>();
+      this.attrDictionary.ForEach((key, value) => {
         if(key == "class")
         {
-          cloned.attributes[key] = new List<string>((List<string>)value);
+          newDictionary[key] = new List<string>((List<string>)value);
         }
         else if (key == "style")
         {
-          cloned.attributes[key] = new Collection.OrderedDictionary<string, string>((Collection.OrderedDictionary<string, string>)value);
+          newDictionary[key] = new Collection.OrderedDictionary<string, string>((Collection.OrderedDictionary<string, string>)value);
         }
         else
         {
-          cloned.attributes[key] = value;
+          newDictionary[key] = value;
         }
       });
 
-      return cloned;
+      return newDictionary;
     }
   }
 }

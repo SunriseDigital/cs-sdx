@@ -24,20 +24,13 @@ namespace UnitTest
       attr.AddClass("foo");
       Assert.Equal("class=\"foo\"", attr.Render());
 
-      attr.AddClass("bar");
-      Assert.Equal("class=\"foo bar\"", attr.Render());
+      attr.AddClass("bar", "hoge", "huga");
+      Assert.Equal("class=\"foo bar hoge huga\"", attr.Render());
+
+      attr.RemoveClass("hoge", "huga");
 
       attr.Set("data-attr", "datavalue");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\"", attr.Render());
-
-      //attr.Remove("data-attr");
-      //Assert.Equal("class=\"foo bar\"", attr.Render());
-
-      //attr.RemoveClass("foo");
-      //Assert.Equal("class=\"bar\"", attr.Render());
-
-      //attr.RemoveClass("bar");
-      //Assert.Equal("", attr.Render());
 
       attr.SetStyle("width", "100px");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px;\"", attr.Render());
@@ -48,32 +41,42 @@ namespace UnitTest
       attr.Add("disabled");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", attr.Render());
 
-      //一度取っておく
-      var clonedAttr = (Sdx.Html.Attr)attr.Clone();
+      //temp add
+
+      Assert.Equal(
+        "class=\"foo bar hoge\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"",
+        attr.Render(Sdx.Html.Attr.Create().AddClass("hoge", "bar"))
+      );
+
+      Assert.Equal(
+        "class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 150px; height: 200px; border: 1px;\" disabled=\"disabled\"",
+        attr.Render(Sdx.Html.Attr.Create().SetStyle("border", "1px").SetStyle("width", "150px"))
+      );
+
+      Assert.Equal(
+        "class=\"foo bar\" data-attr=\"update\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\" data-attr2=\"datavalue2\"",
+        attr.Render(Sdx.Html.Attr.Create().Set("data-attr", "update").Set("data-attr2", "datavalue2"))
+      );
+
+      //Remove
 
       attr.Remove("disabled");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\"", attr.Render());
-      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", clonedAttr.Render());
-
+      
       attr.RemoveStyle("width");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"height: 200px;\"", attr.Render());
-      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", clonedAttr.Render());
-
+      
       attr.RemoveStyle("height");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\"", attr.Render());
-      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", clonedAttr.Render());
-
+      
       attr.RemoveClass("foo");
       Assert.Equal("class=\"bar\" data-attr=\"datavalue\"", attr.Render());
-      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", clonedAttr.Render());
-
+      
       attr.RemoveClass("bar");
       Assert.Equal("data-attr=\"datavalue\"", attr.Render());
-      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", clonedAttr.Render());
-
+      
       attr.Remove("data-attr");
       Assert.Equal("", attr.Render());
-      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", clonedAttr.Render());
     }
   }
 }
