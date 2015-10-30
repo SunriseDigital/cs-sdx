@@ -1,15 +1,43 @@
-﻿namespace Sdx.Html
-{
-  public class VoidTag : Tag
-  {
-    public VoidTag() : base() { }
-    public VoidTag(string name) : base(name) { }
+﻿using System;
+using System.Text;
 
-    public override string RenderEndTag()
+namespace Sdx.Html
+{
+  public class VoidTag : IHtml
+  {
+    private string tagName;
+    private Attr attribute;
+
+    public Attr Attr
     {
-      return "";
+      get
+      {
+        return this.attribute;
+      }
     }
 
-    protected override void init() { }
+    public VoidTag(string tagName)
+    {
+      this.tagName = tagName;
+      this.attribute = new Attr();
+    }
+
+    public string Render(Attr attribute = null)
+    {
+      var builder = new StringBuilder();
+      builder
+        .Append("<")
+        .Append(this.tagName);
+
+      if (this.attribute.Count > 0)
+      {
+        builder.Append(" ");
+        this.attribute.Render(builder, attribute);
+      }
+
+      builder.Append(">");
+
+      return builder.ToString();
+    }
   }
 }

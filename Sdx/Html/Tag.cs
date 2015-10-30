@@ -18,42 +18,42 @@ namespace Sdx.Html
       }
     }
 
-    public Tag()
-    {
-      this.attribute = new Attr();
-      init();
-    }
-
-    protected virtual void init()
-    {
-      this.children = new List<IHtml>();
-    }
-
-    public Tag(string tagName) : this()
+    public Tag(string tagName)
     {
       this.tagName = tagName;
+      this.attribute = new Attr();
+      this.children = new List<IHtml>();
     }
 
     public Tag AddHtml(IHtml html)
     {
-      Sdx.Context.Current.Debug.Log(this.children);
       this.children.Add(html);
       return this;
     }
 
     public string RenderStartTag(Attr attribute = null)
     {
-      if(this.attribute.Count > 0)
-      {
-        return "<" + this.tagName + " " + this.attribute.Render(attribute) + ">";
-      }
-      else
-      {
-        return "<" + this.tagName + ">";
-      }
+      var builder = new StringBuilder();
+      this.RenderStartTag(builder, attribute);
+      return builder.ToString();
     }
 
-    public virtual string RenderEndTag()
+    private void RenderStartTag(StringBuilder builder, Attr attribute)
+    {
+      builder
+        .Append("<")
+        .Append(this.tagName);
+
+      if (this.attribute.Count > 0)
+      {
+        builder.Append(" ");
+        this.attribute.Render(builder, attribute);
+      }
+
+      builder.Append(">");
+    }
+
+    public string RenderEndTag()
     {
       return "</" + this.tagName + ">";
     }
@@ -61,7 +61,7 @@ namespace Sdx.Html
     public virtual string Render(Attr attribute = null)
     {
       var builder = new StringBuilder();
-      builder.Append(RenderStartTag(attribute));
+      this.RenderStartTag(builder, attribute);
 
       if (this.children != null)
       {

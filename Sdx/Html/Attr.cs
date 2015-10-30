@@ -147,28 +147,22 @@ namespace Sdx.Html
       return this;
     }
 
-    /// <summary>
-    /// 属性文字列を組み立てます。
-    /// </summary>
-    /// <returns></returns>
-    public string Render(Attr attribute = null)
+    internal void Render(StringBuilder builder, Attr attribute)
     {
-      var builder = new StringBuilder();
-
       if (attribute == null)
       {
-        this.BuildAttribute(this.attrDictionary, builder);
+        this.RenderWithDictionary(builder, this.attrDictionary);
       }
       else
       {
         var tmpAttrDic = this.CloneAttrDictionary();
         attribute.attrDictionary.ForEach((key, value) => {
-          if(key == "class" && tmpAttrDic.ContainsKey(key))
+          if (key == "class" && tmpAttrDic.ContainsKey(key))
           {
             var tmpClasses = (List<string>)tmpAttrDic["class"];
             var argClasses = (List<string>)value;
             argClasses.ForEach(val => {
-              if(!tmpClasses.Contains(val))
+              if (!tmpClasses.Contains(val))
               {
                 tmpClasses.Add(val);
               }
@@ -188,16 +182,22 @@ namespace Sdx.Html
           }
         });
 
-        this.BuildAttribute(tmpAttrDic, builder);
+        this.RenderWithDictionary(builder, tmpAttrDic);
       }
+    }
 
-
-      
-
+    /// <summary>
+    /// 属性文字列を組み立てます。
+    /// </summary>
+    /// <returns></returns>
+    public string Render(Attr attribute = null)
+    {
+      var builder = new StringBuilder();
+      this.Render(builder, attribute);
       return builder.ToString();
     }
 
-    private void BuildAttribute(Collection.OrderedDictionary<string, object> attrDictionary, StringBuilder builder)
+    private void RenderWithDictionary(StringBuilder builder, Collection.OrderedDictionary<string, object> attrDictionary)
     {
       attrDictionary.ForEach((key, value) => {
         if (key == "class")
