@@ -111,5 +111,18 @@ namespace UnitTest
         div.Render()
       );
     }
+
+    [Fact]
+    public void TestForm()
+    {
+      var form = new Sdx.Html.Form();
+      Assert.Equal("<form method=\"post\"></form>", form.Render());
+
+      form.Action = "/foo/bar";
+      Assert.Equal("<form method=\"post\" action=\"/foo/bar\"></form>", form.Render());
+
+      form.Method = Sdx.Html.Form.MethodType.Get;
+      Assert.Equal("<form method=\"get\" action=\"/foo/bar\"></form>", form.Render());
+    }
   }
 }

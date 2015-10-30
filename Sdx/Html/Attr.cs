@@ -21,6 +21,33 @@ namespace Sdx.Html
       }
     }
 
+    public string this[string key]
+    {
+      get
+      {
+        if(key == "class")
+        {
+          return String.Join(" ", ((List<string>)this.attrDictionary[key]));
+        }
+        else if(key == "style")
+        {
+          var builder = new StringBuilder();
+          var styles = (Collection.OrderedDictionary<string, string>)this.attrDictionary[key];
+          this.RenderStyle(builder, styles);
+          return builder.ToString();
+        }
+        else
+        {
+          return this.attrDictionary[key].ToString();
+        }
+      }
+
+      set
+      {
+        this.Set(key, value);
+      }
+    }
+
     /// <summary>
     /// クラス属性を追加します。
     /// </summary>
@@ -197,6 +224,22 @@ namespace Sdx.Html
       return builder.ToString();
     }
 
+    private void RenderStyle(StringBuilder builder, Collection.OrderedDictionary<string, string> styles)
+    {
+      styles.ForEach((styleKey, styleValue) => {
+        builder
+          .Append(styleKey)
+          .Append(": ")
+          .Append(styleValue)
+          .Append("; ");
+      });
+
+      if (styles.Count > 0)
+      {
+        builder.Remove(builder.Length - 1, 1);
+      }
+    }
+
     private void RenderWithDictionary(StringBuilder builder, Collection.OrderedDictionary<string, object> attrDictionary)
     {
       attrDictionary.ForEach((key, value) => {
@@ -218,19 +261,7 @@ namespace Sdx.Html
         {
           builder.Append("style=\"");
           var styles = (Collection.OrderedDictionary<string, string>)value;
-          styles.ForEach((styleKey, styleValue) => {
-            builder
-              .Append(styleKey)
-              .Append(": ")
-              .Append(styleValue)
-              .Append("; ");
-          });
-
-          if (styles.Count > 0)
-          {
-            builder.Remove(builder.Length - 1, 1);
-          }
-
+          this.RenderStyle(builder, styles);
           builder.Append("\" ");
         }
         else
