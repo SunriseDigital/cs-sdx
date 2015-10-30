@@ -79,6 +79,14 @@ namespace Sdx.Html
       }
     }
 
+    public Element this[string name]
+    {
+      get
+      {
+        return this.elements[name];
+      }
+    }
+
     public string Render(Attr attribute = null)
     {
       var builder = new StringBuilder();

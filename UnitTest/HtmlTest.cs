@@ -136,11 +136,16 @@ namespace UnitTest
     {
       var form = new Sdx.Html.Form();
       var loginId = new Sdx.Html.InputText();
+
       loginId.Name = "login_id";
+      Assert.Equal("<input type=\"text\" value=\"\">", loginId.Render());
+
+      //loginId.Value = "test_user";
+      //Assert.Equal("<input type=\"text\" value=\"test_user\">", loginId.Render());
 
       form.SetElement(loginId);
-
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"\"></form>", form.Render());
+      Assert.Equal("<input type=\"text\" value=\"\">", form["login_id"].Render());
     }
   }
 }
