@@ -123,6 +123,12 @@ namespace UnitTest
 
       form.Method = Sdx.Html.Form.MethodType.Get;
       Assert.Equal("<form method=\"get\" action=\"/foo/bar\"></form>", form.Render());
+
+
+      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        form.SetActionToCurrent();
+      }));
+      Assert.IsType<InvalidOperationException>(ex);
     }
   }
 }

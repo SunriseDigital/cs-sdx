@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Web;
 
 namespace Sdx.Html
 {
@@ -28,6 +29,16 @@ namespace Sdx.Html
       {
         this.tag.Attr.Set("action", value);
       }
+    }
+
+    public void SetActionToCurrent()
+    {
+      if(HttpContext.Current == null)
+      {
+        throw new InvalidOperationException("Missing HttpContext.Current.");
+      }
+
+      this.Action = HttpContext.Current.Request.RawUrl;
     }
 
     public MethodType Method
