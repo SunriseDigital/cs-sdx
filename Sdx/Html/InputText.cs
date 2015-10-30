@@ -8,7 +8,7 @@ namespace Sdx.Html
     {
     }
 
-    protected override IHtml CreateTag()
+    protected override AbstractTag CreateTag()
     {
       var tag = new VoidTag("input");
       tag.Attr.Set("type", "text");

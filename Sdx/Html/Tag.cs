@@ -4,24 +4,12 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class Tag : IHtml
+  public class Tag : AbstractTag
   {
-    private string tagName;
     private List<IHtml> children;
-    private Attr attribute;
 
-    public Attr Attr
+    public Tag(string tagName) : base(tagName)
     {
-      get
-      {
-        return this.attribute;
-      }
-    }
-
-    public Tag(string tagName)
-    {
-      this.tagName = tagName;
-      this.attribute = new Attr();
       this.children = new List<IHtml>();
     }
 
@@ -38,29 +26,13 @@ namespace Sdx.Html
       return builder.ToString();
     }
 
-    internal void RenderStartTag(StringBuilder builder, Attr attribute)
-    {
-      builder
-        .Append("<")
-        .Append(this.tagName);
-
-      if (this.attribute.Count > 0)
-      {
-        builder.Append(" ");
-        this.attribute.Render(builder, attribute);
-      }
-
-      builder.Append(">");
-    }
-
     public string RenderEndTag()
     {
       return "</" + this.tagName + ">";
     }
 
-    public string Render(Attr attribute = null)
+    public override void Render(StringBuilder builder, Attr attribute = null)
     {
-      var builder = new StringBuilder();
       this.RenderStartTag(builder, attribute);
 
       foreach (IHtml elem in children)
@@ -69,7 +41,6 @@ namespace Sdx.Html
       }
 
       builder.Append(RenderEndTag());
-      return builder.ToString();
     }
   }
 }

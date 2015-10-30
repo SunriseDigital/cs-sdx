@@ -7,10 +7,15 @@ namespace Sdx.Html
 {
   public abstract class Element : IHtml
   {
-    private IHtml tag;
+    private AbstractTag tag;
     public string Name { get; set; }
 
-    protected abstract IHtml CreateTag();
+    protected abstract AbstractTag CreateTag();
+
+    public void Render(StringBuilder builder, Attr attribute = null)
+    {
+      this.tag.Render(builder, attribute);
+    }
 
     public string Render(Attr attribute = null)
     {

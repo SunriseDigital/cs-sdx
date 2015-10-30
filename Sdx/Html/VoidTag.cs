@@ -3,41 +3,16 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class VoidTag : IHtml
+  public class VoidTag : AbstractTag
   {
-    private string tagName;
-    private Attr attribute;
-
-    public Attr Attr
+    public VoidTag(string tagName):base(tagName)
     {
-      get
-      {
-        return this.attribute;
-      }
+
     }
 
-    public VoidTag(string tagName)
+    public override void Render(StringBuilder builder, Attr attribute = null)
     {
-      this.tagName = tagName;
-      this.attribute = new Attr();
-    }
-
-    public string Render(Attr attribute = null)
-    {
-      var builder = new StringBuilder();
-      builder
-        .Append("<")
-        .Append(this.tagName);
-
-      if (this.attribute.Count > 0)
-      {
-        builder.Append(" ");
-        this.attribute.Render(builder, attribute);
-      }
-
-      builder.Append(">");
-
-      return builder.ToString();
+      this.RenderStartTag(builder, attribute);
     }
   }
 }

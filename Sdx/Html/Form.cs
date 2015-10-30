@@ -79,20 +79,23 @@ namespace Sdx.Html
       }
     }
 
-    public string Render(Attr attribute = null)
+    public void Render(StringBuilder builder, Attr attribute = null)
     {
-      var builder = new StringBuilder();
-
       this.tag.RenderStartTag(builder, attribute);
 
-      foreach(var kv in this.elements)
+      foreach (var kv in this.elements)
       {
         var elem = kv.Value;
-        builder.Append(elem.Render());
+        elem.Render(builder);
       }
 
       builder.Append(this.tag.RenderEndTag());
+    }
 
+    public string Render(Attr attribute = null)
+    {
+      var builder = new StringBuilder();
+      this.Render(builder, attribute);
       return builder.ToString();
     }
 

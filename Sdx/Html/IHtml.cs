@@ -13,5 +13,7 @@ namespace Sdx.Html
     /// <param name="attribute">タグの属性</param>
     /// <returns></returns>
     string Render(Attr attribute = null);
+
+    void Render(StringBuilder builder, Attr attribute = null);
   }
 }
