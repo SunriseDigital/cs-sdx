@@ -38,7 +38,7 @@ namespace Sdx.Html
       return builder.ToString();
     }
 
-    private void RenderStartTag(StringBuilder builder, Attr attribute)
+    internal void RenderStartTag(StringBuilder builder, Attr attribute)
     {
       builder
         .Append("<")
@@ -58,17 +58,14 @@ namespace Sdx.Html
       return "</" + this.tagName + ">";
     }
 
-    public virtual string Render(Attr attribute = null)
+    public string Render(Attr attribute = null)
     {
       var builder = new StringBuilder();
       this.RenderStartTag(builder, attribute);
 
-      if (this.children != null)
+      foreach (IHtml elem in children)
       {
-        foreach (IHtml elem in children)
-        {
-          builder.Append(elem.Render());
-        }
+        builder.Append(elem.Render());
       }
 
       builder.Append(RenderEndTag());

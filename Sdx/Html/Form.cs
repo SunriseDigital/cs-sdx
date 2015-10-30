@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using System.Web;
 
 namespace Sdx.Html
@@ -12,6 +14,7 @@ namespace Sdx.Html
     }
 
     private Tag tag = new Tag("form");
+    private Dictionary<string, Element> elements = new Dictionary<string, Element>();
 
     public Form()
     {
@@ -78,7 +81,29 @@ namespace Sdx.Html
 
     public string Render(Attr attribute = null)
     {
-      return this.tag.Render(attribute);
+      var builder = new StringBuilder();
+
+      this.tag.RenderStartTag(builder, attribute);
+
+      foreach(var kv in this.elements)
+      {
+        var elem = kv.Value;
+        builder.Append(elem.Render());
+      }
+
+      builder.Append(this.tag.RenderEndTag());
+
+      return builder.ToString();
+    }
+
+    public void SetElement(Element element)
+    {
+      if(element.Name == null)
+      {
+        throw new InvalidOperationException("Element name is null.");
+      }
+
+      this.elements[element.Name] = element;
     }
   }
 }

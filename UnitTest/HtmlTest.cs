@@ -130,5 +130,17 @@ namespace UnitTest
       }));
       Assert.IsType<InvalidOperationException>(ex);
     }
+
+    [Fact]
+    public void TestFormInputText()
+    {
+      var form = new Sdx.Html.Form();
+      var loginId = new Sdx.Html.InputText();
+      loginId.Name = "login_id";
+
+      form.SetElement(loginId);
+
+      Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"\"></form>", form.Render());
+    }
   }
 }
