@@ -37,6 +37,11 @@ namespace UnitTest
   }
   public class BaseTest : Xunit.IUseFixture<Fixture>, IDisposable
   {
+    public BaseTest()
+    {
+      Sdx.Context.Current.Debug.Out = Console.Out;
+    }
+
     public void SetFixture(Fixture fixture)
     {
       fixture.TestClass = this;

@@ -13,6 +13,14 @@ namespace Sdx.Html
 
     private Collection.OrderedDictionary<string, object> attrDictionary = new Collection.OrderedDictionary<string, object>();
 
+    public int Count
+    {
+      get
+      {
+        return this.attrDictionary.Count;
+      }
+    }
+
     /// <summary>
     /// クラス属性を追加します。
     /// </summary>

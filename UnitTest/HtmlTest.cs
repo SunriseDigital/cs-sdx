@@ -78,5 +78,20 @@ namespace UnitTest
       attr.Remove("data-attr");
       Assert.Equal("", attr.Render());
     }
+
+    [Fact]
+    public void TestHtml()
+    {
+      Sdx.Html.ITag html = null;
+
+      html = new Sdx.Html.Tag("div");
+      Assert.Equal("<div></div>", html.Render());
+
+      html.Attr.AddClass("foo");
+      Assert.Equal("<div class=\"foo\"></div>", html.Render());
+
+      html = new Sdx.Html.VoidTag("br");
+      Assert.Equal("<br>", html.Render());
+    }
   }
 }

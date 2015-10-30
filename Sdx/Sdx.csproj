@@ -77,6 +77,9 @@
     <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
     <Compile Include="Diagnostics\DebugHttpModule.cs" />
     <Compile Include="Html\Attr.cs" />
+    <Compile Include="Html\ITag.cs" />
+    <Compile Include="Html\Tag.cs" />
+    <Compile Include="Html\VoidTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\Holder.cs" />
     <Compile Include="Web\Url.cs" />
