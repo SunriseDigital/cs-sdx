@@ -82,7 +82,7 @@ namespace UnitTest
     [Fact]
     public void TestHtml()
     {
-      Sdx.Html.ITag html = null;
+      Sdx.Html.Tag html = null;
 
       html = new Sdx.Html.Tag("div");
       Assert.Equal("<div></div>", html.Render());
@@ -90,8 +90,28 @@ namespace UnitTest
       html.Attr.AddClass("foo");
       Assert.Equal("<div class=\"foo\"></div>", html.Render());
 
+      html.AddHtml(new Sdx.Html.RawText("bar"));
+      Assert.Equal("<div class=\"foo\">bar</div>", html.Render());
+
       html = new Sdx.Html.VoidTag("br");
       Assert.Equal("<br>", html.Render());
+
+      var div = new Sdx.Html.Tag("div");
+      var p = new Sdx.Html.Tag("p");
+      div.AddHtml(p);
+
+      p.AddHtml(new Sdx.Html.RawText("日本語"));
+      p.AddHtml(new Sdx.Html.VoidTag("br"));
+      p.AddHtml(new Sdx.Html.RawText("English"));
+
+      var span = new Sdx.Html.Tag("span");
+      span.AddHtml(new Sdx.Html.RawText("span"));
+      span.Attr.AddClass("foo");
+      p.AddHtml(span);
+
+      Sdx.Context.Current.Debug.Log(div.Render());
+
+
     }
   }
 }

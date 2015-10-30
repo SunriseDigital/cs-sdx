@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Sdx.Html
 {
-  public class Tag : ITag
+  public class Tag : IHtml
   {
     private string tagName;
-    private List<ITag> children;
+    private List<IHtml> children;
     private Attr attribute;
 
     public Attr Attr
@@ -25,7 +26,7 @@ namespace Sdx.Html
 
     protected virtual void init()
     {
-      this.children = new List<ITag>();
+      this.children = new List<IHtml>();
     }
 
     public Tag(string tagName) : this()
@@ -33,13 +34,14 @@ namespace Sdx.Html
       this.tagName = tagName;
     }
 
-    public Tag AddTag(ITag element)
+    public Tag AddHtml(IHtml html)
     {
-      this.children.Add(element);
+      Sdx.Context.Current.Debug.Log(this.children);
+      this.children.Add(html);
       return this;
     }
 
-    public virtual string RenderStartTag(Attr attribute = null)
+    public string RenderStartTag(Attr attribute = null)
     {
       if(this.attribute.Count > 0)
       {
@@ -58,18 +60,19 @@ namespace Sdx.Html
 
     public virtual string Render(Attr attribute = null)
     {
-      string tags = RenderStartTag(attribute);
+      var builder = new StringBuilder();
+      builder.Append(RenderStartTag(attribute));
 
       if (this.children != null)
       {
-        foreach (ITag elem in children)
+        foreach (IHtml elem in children)
         {
-          tags += elem.Render();
+          builder.Append(elem.Render());
         }
       }
 
-      tags += RenderEndTag();
-      return tags;
+      builder.Append(RenderEndTag());
+      return builder.ToString();
     }
   }
 }
