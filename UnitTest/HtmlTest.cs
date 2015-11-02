@@ -1,5 +1,7 @@
 ﻿using Xunit;
 using UnitTest.DummyClasses;
+using Moq;
+using System.Collections.Specialized;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -140,12 +142,32 @@ namespace UnitTest
       loginId.Name = "login_id";
       Assert.Equal("<input type=\"text\" value=\"\">", loginId.Render());
 
-      //loginId.Value = "test_user";
-      //Assert.Equal("<input type=\"text\" value=\"test_user\">", loginId.Render());
-
       form.SetElement(loginId);
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"\"></form>", form.Render());
-      Assert.Equal("<input type=\"text\" value=\"\">", form["login_id"].Render());
+
+      loginId.Value = "test_user";
+
+      form.SetElement(loginId);
+      Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"test_user\"></form>", form.Render());
+      Assert.Equal("<input type=\"text\" value=\"test_user\">", form["login_id"].Render());
     }
+
+    //[Fact]
+    //public void TestMock()
+    //{
+    //  var mock = new Mock<System.Web.HttpRequestBase>();
+    //  mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+    //    {"name1", "post1" },
+    //  });
+
+    //  mock.SetupGet(x => x.QueryString).Returns(new NameValueCollection {
+    //    {"name1", "get1" },
+    //    {"name2", "get2" },
+    //  });
+
+    //  var request = mock.Object;
+
+    //  Sdx.Context.Current.Debug.Log(request.QueryString);
+    //}
   }
 }

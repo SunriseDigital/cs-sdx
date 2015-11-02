@@ -5,12 +5,12 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public abstract class Element : IHtml
+  public abstract class Element : ITag
   {
-    private IHtml tag;
+    private ITag tag;
     public string Name { get; set; }
 
-    protected abstract IHtml CreateTag();
+    protected abstract ITag CreateTag();
 
     public string Render(Attr attribute = null)
     {
@@ -20,6 +20,26 @@ namespace Sdx.Html
     public Element()
     {
       this.tag = this.CreateTag();
+    }
+
+    public Attr Attr
+    {
+      get
+      {
+        return this.tag.Attr;
+      }
+    }
+
+    public string Value
+    {
+      get
+      {
+        return this.tag.Attr["value"];
+      }
+      set
+      {
+        this.tag.Attr["value"] = value;
+      }
     }
   }
 }

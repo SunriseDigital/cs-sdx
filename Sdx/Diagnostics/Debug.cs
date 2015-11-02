@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Diagnostics;
 using System.IO;
+using System.Collections.Specialized;
 
 namespace Sdx.Diagnostics
 {
@@ -72,6 +73,20 @@ namespace Sdx.Diagnostics
         {
           // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
           result += indent + DumpIndent + key + " :" + Dump(dic[key], " ") + Environment.NewLine;
+        }
+
+        //改行を取り除く
+        return result.TrimEnd('\r', '\n');
+      }
+      //Request.Form/QueryStringなどのコレクション
+      else if(value is NameValueCollection)
+      {
+        var nvcol = value as NameValueCollection;
+
+        var result = GetDumpTitle(value, indent, "(" + nvcol.Count + ")");
+        foreach (var key in nvcol.Keys)
+        {
+          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ") + Environment.NewLine;
         }
 
         //改行を取り除く

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class Tag : IHtml
+  public class Tag : ITag
   {
     private string tagName;
     private List<IHtml> children;
