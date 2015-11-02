@@ -7,7 +7,6 @@ namespace Sdx.Html
   public class Tag : ITag
   {
     private string tagName;
-    private List<IHtml> children;
     private Attr attribute;
 
     public Attr Attr
@@ -18,16 +17,18 @@ namespace Sdx.Html
       }
     }
 
+    internal IList<IHtml> Children { get; private set; }
+
     public Tag(string tagName)
     {
       this.tagName = tagName;
       this.attribute = new Attr();
-      this.children = new List<IHtml>();
+      this.Children = new List<IHtml>();
     }
 
     public Tag AddHtml(IHtml html)
     {
-      this.children.Add(html);
+      this.Children.Add(html);
       return this;
     }
 
@@ -68,7 +69,7 @@ namespace Sdx.Html
       var builder = new StringBuilder();
       this.RenderStartTag(builder, attribute);
 
-      foreach (IHtml elem in children)
+      foreach (IHtml elem in Children)
       {
         builder.Append(elem.Render());
       }

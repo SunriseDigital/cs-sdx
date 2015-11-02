@@ -84,6 +84,7 @@
     <Compile Include="Html\ITag.cs" />
     <Compile Include="Html\RawText.cs" />
     <Compile Include="Html\Tag.cs" />
+    <Compile Include="Html\TextArea.cs" />
     <Compile Include="Html\VoidTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Web\Holder.cs" />

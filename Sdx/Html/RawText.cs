@@ -2,16 +2,16 @@
 {
   public class RawText : IHtml
   {
-    private string text;
+    public string Text { get; private set; }
 
     public RawText(string text)
     {
-      this.text = text;
+      this.Text = text;
     }
 
     public string Render(Attr attribute = null)
     {
-      return this.text;
+      return this.Text;
     }
   }
 }

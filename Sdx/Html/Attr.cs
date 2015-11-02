@@ -25,6 +25,11 @@ namespace Sdx.Html
     {
       get
       {
+        if(!this.attrDictionary.ContainsKey(key))
+        {
+          return null;
+        }
+
         if(key == "class")
         {
           return String.Join(" ", ((List<string>)this.attrDictionary[key]));

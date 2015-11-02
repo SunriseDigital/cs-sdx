@@ -142,17 +142,40 @@ namespace UnitTest
       var form = new Sdx.Html.Form();
       var loginId = new Sdx.Html.InputText();
 
+      Assert.Equal("", loginId.Value);
+
       loginId.Name = "login_id";
       Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Render());
 
       form.SetElement(loginId);
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"\" name=\"login_id\"></form>", form.Render());
-
       loginId.Value = "test_user";
 
       form.SetElement(loginId);
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"test_user\" name=\"login_id\"></form>", form.Render());
       Assert.Equal("<input type=\"text\" value=\"test_user\" name=\"login_id\">", form["login_id"].Render());
+    }
+
+
+    [Fact]
+    public void TestFormTextArea()
+    {
+      var form = new Sdx.Html.Form();
+      var comment = new Sdx.Html.TextArea();
+
+      comment.Name = "comment";
+      Assert.Equal("<textarea name=\"comment\"></textarea>", comment.Render());
+
+      Assert.Equal("", comment.Value);
+
+      comment.Value = @"日本語
+改行もあったりする
+English
+";
+      Assert.Equal(@"<textarea name=""comment"">日本語
+改行もあったりする
+English
+</textarea>", comment.Render());
     }
 
     //[Fact]

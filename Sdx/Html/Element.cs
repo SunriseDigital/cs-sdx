@@ -7,7 +7,7 @@ namespace Sdx.Html
 {
   public abstract class Element : ITag
   {
-    private ITag tag;
+    internal protected ITag tag;
     public string Name
     {
       get
@@ -41,7 +41,7 @@ namespace Sdx.Html
       }
     }
 
-    public string Value
+    public virtual string Value
     {
       get
       {
