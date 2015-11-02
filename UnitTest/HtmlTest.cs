@@ -2,6 +2,8 @@
 using UnitTest.DummyClasses;
 using Moq;
 using System.Collections.Specialized;
+using System.Web;
+using System.IO;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -126,11 +128,12 @@ namespace UnitTest
       form.Method = Sdx.Html.Form.MethodType.Get;
       Assert.Equal("<form method=\"get\" action=\"/foo/bar\"></form>", form.Render());
 
-
-      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-        form.SetActionToCurrent();
-      }));
-      Assert.IsType<InvalidOperationException>(ex);
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://test.cs-sdx.com/form/current", "foo=bar"),
+        new HttpResponse(new StringWriter())
+      );
+      form.SetActionToCurrent();
+      Assert.Equal("<form method=\"get\" action=\"/form/current?foo=bar\"></form>", form.Render());
     }
 
     [Fact]
