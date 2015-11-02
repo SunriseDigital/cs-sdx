@@ -8,7 +8,18 @@ namespace Sdx.Html
   public abstract class Element : ITag
   {
     private ITag tag;
-    public string Name { get; set; }
+    public string Name
+    {
+      get
+      {
+        return this.tag.Attr["name"];
+      }
+
+      set
+      {
+        this.tag.Attr["name"] = value;
+      }
+    }
 
     protected abstract ITag CreateTag();
 
