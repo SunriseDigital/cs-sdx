@@ -142,14 +142,14 @@ namespace UnitTest
       var form = new Sdx.Html.Form();
       var loginId = new Sdx.Html.InputText();
 
-      Assert.Equal("", loginId.Value);
+      Assert.Equal("", loginId.TagValue);
 
       loginId.Name = "login_id";
       Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Render());
 
       form.SetElement(loginId);
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"\" name=\"login_id\"></form>", form.Render());
-      loginId.Value = "test_user";
+      loginId.TagValue = "test_user";
 
       form.SetElement(loginId);
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"test_user\" name=\"login_id\"></form>", form.Render());
@@ -166,9 +166,9 @@ namespace UnitTest
       comment.Name = "comment";
       Assert.Equal("<textarea name=\"comment\"></textarea>", comment.Render());
 
-      Assert.Equal("", comment.Value);
+      Assert.Equal("", comment.TagValue);
 
-      comment.Value = @"日本語
+      comment.TagValue = @"日本語
 改行もあったりする
 English
 ";
@@ -176,6 +176,26 @@ English
 改行もあったりする
 English
 </textarea>", comment.Render());
+    }
+
+
+    [Fact]
+    public void TestFormCheckBox()
+    {
+      var form = new Sdx.Html.Form();
+      var checkbox = new Sdx.Html.CheckBox();
+
+      checkbox.Name = "checkbox";
+      Assert.Equal("<input type=\"checkbox\" value=\"\" name=\"checkbox\">", checkbox.Render());
+
+      Assert.Equal("", checkbox.TagValue);
+
+      checkbox.TagValue = "chx_value";
+      Assert.Equal("<input type=\"checkbox\" value=\"chx_value\" name=\"checkbox\">", checkbox.Render());
+      //checkboxはValueに正しい値が代入されて初めてValueが取得可能になる。
+      Assert.Equal("", checkbox.Value);
+      checkbox.Value = "chx_value";
+      Assert.Equal("chx_value", checkbox.Value);
     }
 
     //[Fact]

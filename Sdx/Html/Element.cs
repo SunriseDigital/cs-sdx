@@ -41,7 +41,7 @@ namespace Sdx.Html
       }
     }
 
-    public virtual string Value
+    public virtual string TagValue
     {
       get
       {
@@ -50,6 +50,19 @@ namespace Sdx.Html
       set
       {
         this.tag.Attr["value"] = value;
+      }
+    }
+
+    public virtual string Value
+    {
+      get
+      {
+        return this.TagValue;
+      }
+
+      set
+      {
+        this.TagValue = value;
       }
     }
   }

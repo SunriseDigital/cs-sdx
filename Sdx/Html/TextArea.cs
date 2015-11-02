@@ -13,7 +13,7 @@ namespace Sdx.Html
       return new Tag("textarea");
     }
 
-    public override string Value
+    public override string TagValue
     {
       get
       {
