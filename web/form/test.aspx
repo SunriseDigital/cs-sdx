@@ -14,8 +14,15 @@
             <div class="form-group">
                 <%= form["input_text"].Tag.Render(Attr.Create().AddClass("form-control")) %>
             </div>
-            <div>
+            <div class="form-group">
                 <%= form["select"].Tag.Render(Attr.Create().AddClass("form-control")) %>
+            </div>
+            <div class="form-group">
+                <% form["check_list"].Tag.ForEach( checkbox => {%>
+                <div class="checkbox">
+                    <%= checkbox.Render() %>
+                </div>
+                <%}); %>
             </div>
         <%= form.RenderEndTag() %>
     </div>

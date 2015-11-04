@@ -331,6 +331,65 @@ English
     }
 
     [Fact]
+    public void TestFormElementGroupCheckboxWithLabel()
+    {
+      var group = new Sdx.Html.ElementGroup();
+      group.Name = "checkboxies";
+
+      Sdx.Html.CheckBox checkbox;
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "1";
+      group.AddElement(checkbox, "foo");
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "2";
+      group.AddElement(checkbox, "bar");
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "3";
+      group.AddElement(checkbox, "zip");
+
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <label><input type=""checkbox"" value=""1"" name=""checkboxies"">foo</label>
+  <label><input type=""checkbox"" value=""2"" name=""checkboxies"">bar</label>
+  <label><input type=""checkbox"" value=""3"" name=""checkboxies"">zip</label>
+</span>
+"),
+  group.Tag.Render()
+      );
+
+      group = new Sdx.Html.ElementGroup();
+      group.Name = "checkboxies";
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "1";
+      checkbox.Tag.Attr["id"] = "check_foo";
+      group.AddElement(checkbox, "foo");
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "2";
+      checkbox.Tag.Attr["id"] = "check_bar";
+      group.AddElement(checkbox, "bar");
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "3";
+      checkbox.Tag.Attr["id"] = "check_zip";
+      group.AddElement(checkbox, "zip");
+
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <label for=""check_foo""><input type=""checkbox"" value=""1"" id=""check_foo"" name=""checkboxies"">foo</label>
+  <label for=""check_bar""><input type=""checkbox"" value=""2"" id=""check_bar"" name=""checkboxies"">bar</label>
+  <label for=""check_zip""><input type=""checkbox"" value=""3"" id=""check_zip"" name=""checkboxies"">zip</label>
+</span>
+"),
+  group.Tag.Render()
+      );
+    }
+
+    [Fact]
     public void TestFormSelect()
     {
       var select = new Sdx.Html.Select();

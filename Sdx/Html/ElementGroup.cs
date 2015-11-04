@@ -32,15 +32,31 @@ namespace Sdx.Html
       }
     }
 
-    public void AddElement(Element element)
+    public void AddElement(Element element, string labelString = null)
     {
       elements.Add(element);
 
       var tag = (Tag)this.tag;
-      tag.AddHtml(element.tag);
+      
       if(this.name != null)
       {
         element.Name = this.name;
+      }
+
+      if (labelString == null)
+      {
+        tag.AddHtml(element.tag);
+      }
+      else
+      {
+        var label = new Tag("label");
+        label.AddHtml(element.tag);
+        if (element.tag.Attr["id"] != null)
+        {
+          label.Attr["for"] = element.tag.Attr["id"];
+        }
+        label.AddHtml(new RawText(labelString));
+        tag.AddHtml(label);
       }
     }
 

@@ -29,6 +29,27 @@ public partial class form_test : System.Web.UI.Page
     option.Text = "bar";
     select.AddOption(option, "group2");
 
+    var checkList = new Sdx.Html.ElementGroup();
+    checkList.Name = "check_list";
+    form.SetElement(checkList);
+
+    Sdx.Html.CheckBox checkbox;
+
+    checkbox = new Sdx.Html.CheckBox();
+    checkbox.Tag.Attr["value"] = "20";
+    checkbox.Tag.Attr["id"] = "check_list_20";
+    checkList.AddElement(checkbox, "いち");
+
+    checkbox = new Sdx.Html.CheckBox();
+    checkbox.Tag.Attr["value"] = "21";
+    checkbox.Tag.Attr["id"] = "check_list_21";
+    checkList.AddElement(checkbox, "にい");
+
+    checkbox = new Sdx.Html.CheckBox();
+    checkbox.Tag.Attr["value"] = "22";
+    checkbox.Tag.Attr["id"] = "check_list_22";
+    checkList.AddElement(checkbox, "さん");
+
     Sdx.Context.Current.Debug.Log(Request.Form, "POST");
     Sdx.Context.Current.Debug.Log(Request.QueryString, "GET");
 
