@@ -330,6 +330,75 @@ English
 );
     }
 
+    [Fact]
+    public void TestFormSelect()
+    {
+      var select = new Sdx.Html.Select();
+      select.Name = "select";
+
+      Assert.Equal("<select name=\"select\"></select>", select.Render());
+
+      Sdx.Html.Option option;
+
+      option = new Sdx.Html.Option();
+      option.Attr["value"] = "1";
+      option.Text = "foo";
+      select.AddOption(option);
+
+      option = new Sdx.Html.Option();
+      option.Attr["value"] = "2";
+      option.Text = "bar";
+      select.AddOption(option);
+
+      Assert.Equal(HtmlLiner(@"
+<select name=""select"">
+  <option value=""1"">foo</option>
+  <option value=""2"">bar</option>
+</select>
+"),
+  select.Render()
+);
+
+      Assert.Equal(0, select.Value.Count);
+
+      select.Bind("1");
+      Assert.Equal(1, select.Value.Count);
+      Assert.Equal("1", select.Value.First);
+      Assert.Equal(HtmlLiner(@"
+<select name=""select"">
+  <option value=""1"" selected=""selected"">foo</option>
+  <option value=""2"">bar</option>
+</select>
+"),
+  select.Render()
+);
+
+      select.Bind("2");
+      Assert.Equal(1, select.Value.Count);
+      Assert.Equal("2", select.Value.First);
+      Assert.Equal(HtmlLiner(@"
+<select name=""select"">
+  <option value=""1"">foo</option>
+  <option value=""2"" selected=""selected"">bar</option>
+</select>
+"),
+  select.Render()
+);
+
+      select.Bind(new string[] { "1", "2" });
+      Assert.Equal(2, select.Value.Count);
+      Assert.Equal("1", select.Value.All[0]);
+      Assert.Equal("2", select.Value.All[1]);
+      Assert.Equal(HtmlLiner(@"
+<select name=""select"">
+  <option value=""1"" selected=""selected"">foo</option>
+  <option value=""2"" selected=""selected"">bar</option>
+</select>
+"),
+  select.Render()
+);
+    }
+
     //[Fact]
     //public void TestMock()
     //{

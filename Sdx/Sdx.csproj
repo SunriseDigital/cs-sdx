@@ -85,7 +85,9 @@
     <Compile Include="Html\IHtml.cs" />
     <Compile Include="Html\InputText.cs" />
     <Compile Include="Html\ITag.cs" />
+    <Compile Include="Html\Option.cs" />
     <Compile Include="Html\RawText.cs" />
+    <Compile Include="Html\Select.cs" />
     <Compile Include="Html\Tag.cs" />
     <Compile Include="Html\TextArea.cs" />
     <Compile Include="Html\VoidTag.cs" />

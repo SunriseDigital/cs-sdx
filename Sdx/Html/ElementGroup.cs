@@ -62,15 +62,9 @@ namespace Sdx.Html
 
     internal protected override void BindValue(object value)
     {
-      if(!(value is string[]))
-      {
-        throw new InvalidOperationException("Support only string only value.");
-      }
-
       base.BindValue(value);
 
-      var values = (string[])value;
-
+      var values = this.Value.All;
       this.elements.ForEach(element => {
         if (element is CheckBox)
         {
