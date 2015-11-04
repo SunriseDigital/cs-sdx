@@ -4,8 +4,6 @@ namespace Sdx.Html
 {
   public class CheckBox : Element
   {
-    private string value;
-
     public CheckBox()
     {
     }
@@ -17,24 +15,6 @@ namespace Sdx.Html
       tag.Attr["value"] = "";
 
       return tag;
-    }
-
-    public override string Value
-    {
-      get
-      {
-        if (this.TagValue == this.value)
-        {
-          return this.value;
-        }
-
-        return "";
-      }
-
-      set
-      {
-        this.value = value;
-      }
     }
   }
 }

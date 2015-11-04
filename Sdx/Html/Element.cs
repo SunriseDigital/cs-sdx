@@ -8,6 +8,9 @@ namespace Sdx.Html
   public abstract class Element : ITag
   {
     internal protected ITag tag;
+
+    private FormValue value = new FormValue();
+
     public string Name
     {
       get
@@ -41,29 +44,26 @@ namespace Sdx.Html
       }
     }
 
-    public virtual string TagValue
+    public FormValue Value
     {
       get
       {
-        return this.tag.Attr["value"];
-      }
-      set
-      {
-        this.tag.Attr["value"] = value;
+        return this.value;
       }
     }
 
-    public virtual string Value
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="value">string|string[]</param>
+    internal protected virtual void BindValue(object value)
     {
-      get
-      {
-        return this.TagValue;
-      }
+      this.value.Set(value);
+    }
 
-      set
-      {
-        this.TagValue = value;
-      }
+    public void Bind(string value)
+    {
+      this.BindValue(value);
     }
   }
 }

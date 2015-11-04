@@ -16,5 +16,11 @@ namespace Sdx.Html
 
       return tag;
     }
+
+    internal protected override void BindValue(object value)
+    {
+      base.BindValue(value);
+      this.Attr["value"] = value.ToString();
+    }
   }
 }
