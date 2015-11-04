@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
@@ -17,7 +18,7 @@ namespace Sdx.Html
       }
     }
 
-    internal IList<IHtml> Children { get; private set; }
+    internal List<IHtml> Children { get; private set; }
 
     public Tag(string tagName)
     {
@@ -76,6 +77,21 @@ namespace Sdx.Html
 
       builder.Append(RenderEndTag());
       return builder.ToString();
+    }
+
+    public void ForEach(Action<IHtml> action)
+    {
+      this.Children.ForEach(html => action(html));
+    }
+
+    public IEnumerator<IHtml> GetEnumerator()
+    {
+      return ((IEnumerable<IHtml>)this.Children).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      return ((IEnumerable<IHtml>)this.Children).GetEnumerator();
     }
   }
 }

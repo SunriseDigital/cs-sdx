@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Sdx.Html
@@ -38,6 +40,31 @@ namespace Sdx.Html
       builder.Append(">");
 
       return builder.ToString();
+    }
+
+    public void ForEach(Action<IHtml> action)
+    {
+      throw new NotImplementedException();
+    }
+
+    public IEnumerator<IHtml> GetEnumerator()
+    {
+      throw new NotImplementedException();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      throw new NotImplementedException();
+    }
+
+    public string RenderStartTag(Attr attribute = null)
+    {
+      return this.Render(attribute);
+    }
+
+    public string RenderEndTag()
+    {
+      throw new NotImplementedException();
     }
   }
 }

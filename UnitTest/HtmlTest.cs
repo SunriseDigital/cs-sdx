@@ -145,7 +145,7 @@ namespace UnitTest
       Assert.Equal("", loginId.Value.First);
 
       loginId.Name = "login_id";
-      Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Render());
+      Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Tag.Render());
 
       form.SetElement(loginId);
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"\" name=\"login_id\"></form>", form.Render());
@@ -153,11 +153,11 @@ namespace UnitTest
 
       form.SetElement(loginId);
       Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"test_user\" name=\"login_id\"></form>", form.Render());
-      Assert.Equal("<input type=\"text\" value=\"test_user\" name=\"login_id\">", form["login_id"].Render());
+      Assert.Equal("<input type=\"text\" value=\"test_user\" name=\"login_id\">", form["login_id"].Tag.Render());
 
       Assert.Equal("test_user", loginId.Value.First);
       loginId.Bind("new_value");
-      Assert.Equal("<input type=\"text\" value=\"new_value\" name=\"login_id\">", form["login_id"].Render());
+      Assert.Equal("<input type=\"text\" value=\"new_value\" name=\"login_id\">", form["login_id"].Tag.Render());
       Assert.Equal("new_value", loginId.Value.First);
     }
 
@@ -169,7 +169,7 @@ namespace UnitTest
       var comment = new Sdx.Html.TextArea();
 
       comment.Name = "comment";
-      Assert.Equal("<textarea name=\"comment\"></textarea>", comment.Render());
+      Assert.Equal("<textarea name=\"comment\"></textarea>", comment.Tag.Render());
 
       comment.Bind(@"日本語
 改行もあったりする
@@ -179,7 +179,7 @@ English
       Assert.Equal(@"<textarea name=""comment"">日本語
 改行もあったりする
 English
-</textarea>", comment.Render());
+</textarea>", comment.Tag.Render());
 
       Assert.Equal(@"日本語
 改行もあったりする
@@ -194,10 +194,10 @@ English
       var checkbox = new Sdx.Html.CheckBox();
 
       checkbox.Name = "checkbox";
-      Assert.Equal("<input type=\"checkbox\" value=\"\" name=\"checkbox\">", checkbox.Render());
+      Assert.Equal("<input type=\"checkbox\" value=\"\" name=\"checkbox\">", checkbox.Tag.Render());
 
-      checkbox.Attr["value"] = "chx_value";
-      Assert.Equal("<input type=\"checkbox\" value=\"chx_value\" name=\"checkbox\">", checkbox.Render());
+      checkbox.Tag.Attr["value"] = "chx_value";
+      Assert.Equal("<input type=\"checkbox\" value=\"chx_value\" name=\"checkbox\">", checkbox.Tag.Render());
       //checkboxはValueに正しい値が代入されて初めてValueが取得可能になる。
       Assert.Equal("", checkbox.Value.First);
       checkbox.Bind("chx_value");
@@ -213,15 +213,15 @@ English
       Sdx.Html.CheckBox checkbox;
 
       checkbox = new Sdx.Html.CheckBox();
-      checkbox.Attr["value"] = "1";
+      checkbox.Tag.Attr["value"] = "1";
       group.AddElement(checkbox);
 
       checkbox = new Sdx.Html.CheckBox();
-      checkbox.Attr["value"] = "2";
+      checkbox.Tag.Attr["value"] = "2";
       group.AddElement(checkbox);
 
       checkbox = new Sdx.Html.CheckBox();
-      checkbox.Attr["value"] = "3";
+      checkbox.Tag.Attr["value"] = "3";
       group.AddElement(checkbox);
 
       Assert.Equal(HtmlLiner(@"
@@ -231,7 +231,7 @@ English
   <input type=""checkbox"" value=""3"" name=""checkboxies"">
 </span>
 "),
-  group.Render()
+  group.Tag.Render()
       );
 
       Assert.Equal(0, group.Value.Count);
@@ -246,25 +246,25 @@ English
   <input type=""checkbox"" value=""3"" name=""checkboxies"">
 </span>
 "),
-  group.Render()
+  group.Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""1"" name=""checkboxies"" checked=""checked"">
 "),
-  group[0].Render()
+  group[0].Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""2"" name=""checkboxies"">
 "),
-  group[1].Render()
+  group[1].Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""3"" name=""checkboxies"">
 "),
-  group[2].Render()
+  group[2].Tag.Render()
 );
 
       group.Bind(new string[] { "2", "3" });
@@ -278,25 +278,25 @@ English
   <input type=""checkbox"" value=""3"" name=""checkboxies"" checked=""checked"">
 </span>
 "),
-  group.Render()
+  group.Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""1"" name=""checkboxies"">
 "),
-  group[0].Render()
+  group[0].Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""2"" name=""checkboxies"" checked=""checked"">
 "),
-  group[1].Render()
+  group[1].Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""3"" name=""checkboxies"" checked=""checked"">
 "),
-  group[2].Render()
+  group[2].Tag.Render()
 );
 
       group.Bind(new string[0]);
@@ -308,25 +308,25 @@ English
   <input type=""checkbox"" value=""3"" name=""checkboxies"">
 </span>
 "),
-  group.Render()
+  group.Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""1"" name=""checkboxies"">
 "),
-  group[0].Render()
+  group[0].Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""2"" name=""checkboxies"">
 "),
-  group[1].Render()
+  group[1].Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
 <input type=""checkbox"" value=""3"" name=""checkboxies"">
 "),
-  group[2].Render()
+  group[2].Tag.Render()
 );
     }
 
@@ -336,17 +336,17 @@ English
       var select = new Sdx.Html.Select();
       select.Name = "select";
 
-      Assert.Equal("<select name=\"select\"></select>", select.Render());
+      Assert.Equal("<select name=\"select\"></select>", select.Tag.Render());
 
       Sdx.Html.Option option;
 
       option = new Sdx.Html.Option();
-      option.Attr["value"] = "1";
+      option.Tag.Attr["value"] = "1";
       option.Text = "foo";
       select.AddOption(option);
 
       option = new Sdx.Html.Option();
-      option.Attr["value"] = "2";
+      option.Tag.Attr["value"] = "2";
       option.Text = "bar";
       select.AddOption(option);
 
@@ -356,7 +356,7 @@ English
   <option value=""2"">bar</option>
 </select>
 "),
-  select.Render()
+  select.Tag.Render()
 );
 
       Assert.Equal(0, select.Value.Count);
@@ -370,7 +370,7 @@ English
   <option value=""2"">bar</option>
 </select>
 "),
-  select.Render()
+  select.Tag.Render()
 );
 
       select.Bind("2");
@@ -382,7 +382,7 @@ English
   <option value=""2"" selected=""selected"">bar</option>
 </select>
 "),
-  select.Render()
+  select.Tag.Render()
 );
 
       select.Bind(new string[] { "1", "2" });
@@ -395,7 +395,81 @@ English
   <option value=""2"" selected=""selected"">bar</option>
 </select>
 "),
-  select.Render()
+  select.Tag.Render()
+);
+    }
+
+    [Fact]
+    public void TestFormSelectOptgroup()
+    {
+      var select = new Sdx.Html.Select();
+      select.Name = "select";
+      Sdx.Html.Option option;
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "1";
+      option.Text = "foo";
+      select.AddOption(option, "group1");
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "2";
+      option.Text = "bar";
+      select.AddOption(option, "group2");
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "3";
+      option.Text = "zip";
+      select.AddOption(option);
+
+      Assert.Equal(HtmlLiner(@"
+<select name=""select"">
+  <optgroup label=""group1"">
+    <option value=""1"">foo</option>
+  </optgroup>
+  <optgroup label=""group2"">
+    <option value=""2"">bar</option>
+  </optgroup>
+  <option value=""3"">zip</option>
+</select>
+"),
+  select.Tag.Render()
+);
+
+      Assert.Equal(0, select.Value.Count);
+
+      select.Bind("2");
+      Assert.Equal(1, select.Value.Count);
+      Assert.Equal("2", select.Value.First);
+      Assert.Equal(HtmlLiner(@"
+<select name=""select"">
+  <optgroup label=""group1"">
+    <option value=""1"">foo</option>
+  </optgroup>
+  <optgroup label=""group2"">
+    <option value=""2"" selected=""selected"">bar</option>
+  </optgroup>
+  <option value=""3"">zip</option>
+</select>
+"),
+  select.Tag.Render()
+);
+
+      select.Bind(new string[] { "2", "3" });
+      Assert.Equal(2, select.Value.Count);
+      Assert.Equal("2", select.Value.All[0]);
+      Assert.Equal("3", select.Value.All[1]);
+      Assert.Equal(HtmlLiner(@"
+<select name=""select"">
+  <optgroup label=""group1"">
+    <option value=""1"">foo</option>
+  </optgroup>
+  <optgroup label=""group2"">
+    <option value=""2"" selected=""selected"">bar</option>
+  </optgroup>
+  <option value=""3"" selected=""selected"">zip</option>
+</select>
+"),
+  select.Tag.Render()
 );
     }
 

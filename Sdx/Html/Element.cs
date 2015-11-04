@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public abstract class Element : ITag
+  public abstract class Element
   {
     internal protected ITag tag;
 
@@ -26,22 +26,17 @@ namespace Sdx.Html
 
     protected abstract ITag CreateTag();
 
-    public string Render(Attr attribute = null)
+    public ITag Tag
     {
-      return this.tag.Render(attribute);
+      get
+      {
+        return this.tag;
+      }
     }
 
     public Element()
     {
       this.tag = this.CreateTag();
-    }
-
-    public Attr Attr
-    {
-      get
-      {
-        return this.tag.Attr;
-      }
     }
 
     public FormValue Value

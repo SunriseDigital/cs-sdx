@@ -20,7 +20,7 @@ namespace Sdx.Html
     internal protected override void BindValue(object value)
     {
       base.BindValue(value);
-      this.Attr["value"] = value.ToString();
+      this.Tag.Attr["value"] = value.ToString();
     }
   }
 }

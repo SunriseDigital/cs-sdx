@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Sdx.Html
 {
-  public class Form : IHtml
+  public class Form
   {
     public enum MethodType
     {
@@ -96,13 +96,24 @@ namespace Sdx.Html
       foreach(var kv in this.elements)
       {
         var elem = kv.Value;
-        builder.Append(elem.Render());
+        builder.Append(elem.Tag.Render());
       }
 
       builder.Append(this.tag.RenderEndTag());
 
       return builder.ToString();
     }
+
+    public string RenderStartTag(Attr attribute = null)
+    {
+      return this.tag.RenderStartTag(attribute);
+    }
+
+    public string RenderEndTag()
+    {
+      return this.tag.RenderEndTag();
+    }
+
 
     public void SetElement(Element element)
     {

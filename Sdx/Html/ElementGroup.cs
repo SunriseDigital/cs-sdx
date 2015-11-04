@@ -55,7 +55,7 @@ namespace Sdx.Html
       {
         this.name = value;
         this.elements.ForEach(element => {
-          element.Attr["name"] = value;
+          element.Tag.Attr["name"] = value;
         });
       }
     }
@@ -68,13 +68,13 @@ namespace Sdx.Html
       this.elements.ForEach(element => {
         if (element is CheckBox)
         {
-          if (Array.IndexOf(values, element.Attr["value"]) > -1)
+          if (Array.IndexOf(values, element.Tag.Attr["value"]) > -1)
           {
-            element.Attr.Add("checked");
+            element.Tag.Attr.Add("checked");
           }
           else
           {
-            element.Attr.Remove("checked");
+            element.Tag.Attr.Remove("checked");
           }
         }
       });
