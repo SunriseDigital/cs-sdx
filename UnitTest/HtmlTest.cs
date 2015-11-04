@@ -191,7 +191,6 @@ English
     [Fact]
     public void TestFormCheckBox()
     {
-      var form = new Sdx.Html.Form();
       var checkbox = new Sdx.Html.CheckBox();
 
       checkbox.Name = "checkbox";
@@ -203,6 +202,132 @@ English
       Assert.Equal("", checkbox.Value.First);
       checkbox.Bind("chx_value");
       Assert.Equal("chx_value", checkbox.Value.First);
+    }
+
+    [Fact]
+    public void TestFormElementGroupCheckbox()
+    {
+      var group = new Sdx.Html.ElementGroup();
+      group.Name = "checkboxies";
+
+      Sdx.Html.CheckBox checkbox;
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Attr["value"] = "1";
+      group.AddElement(checkbox);
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Attr["value"] = "2";
+      group.AddElement(checkbox);
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Attr["value"] = "3";
+      group.AddElement(checkbox);
+
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <input type=""checkbox"" value=""1"" name=""checkboxies"">
+  <input type=""checkbox"" value=""2"" name=""checkboxies"">
+  <input type=""checkbox"" value=""3"" name=""checkboxies"">
+</span>
+"),
+  group.Render()
+      );
+
+      Assert.Equal(0, group.Value.Count);
+
+      group.Bind(new string[] { "1" });
+      Assert.Equal(1, group.Value.Count);
+      Assert.Equal("1", group.Value.First);
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <input type=""checkbox"" value=""1"" name=""checkboxies"" checked=""checked"">
+  <input type=""checkbox"" value=""2"" name=""checkboxies"">
+  <input type=""checkbox"" value=""3"" name=""checkboxies"">
+</span>
+"),
+  group.Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""1"" name=""checkboxies"" checked=""checked"">
+"),
+  group[0].Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""2"" name=""checkboxies"">
+"),
+  group[1].Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""3"" name=""checkboxies"">
+"),
+  group[2].Render()
+);
+
+      group.Bind(new string[] { "2", "3" });
+      Assert.Equal(2, group.Value.Count);
+      Assert.Equal("2", group.Value.All[0]);
+      Assert.Equal("3", group.Value.All[1]);
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <input type=""checkbox"" value=""1"" name=""checkboxies"">
+  <input type=""checkbox"" value=""2"" name=""checkboxies"" checked=""checked"">
+  <input type=""checkbox"" value=""3"" name=""checkboxies"" checked=""checked"">
+</span>
+"),
+  group.Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""1"" name=""checkboxies"">
+"),
+  group[0].Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""2"" name=""checkboxies"" checked=""checked"">
+"),
+  group[1].Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""3"" name=""checkboxies"" checked=""checked"">
+"),
+  group[2].Render()
+);
+
+      group.Bind(new string[0]);
+      Assert.Equal(0, group.Value.Count);
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <input type=""checkbox"" value=""1"" name=""checkboxies"">
+  <input type=""checkbox"" value=""2"" name=""checkboxies"">
+  <input type=""checkbox"" value=""3"" name=""checkboxies"">
+</span>
+"),
+  group.Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""1"" name=""checkboxies"">
+"),
+  group[0].Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""2"" name=""checkboxies"">
+"),
+  group[1].Render()
+);
+
+      Assert.Equal(HtmlLiner(@"
+<input type=""checkbox"" value=""3"" name=""checkboxies"">
+"),
+  group[2].Render()
+);
     }
 
     //[Fact]

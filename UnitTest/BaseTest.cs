@@ -1,6 +1,7 @@
 ﻿using System;
 
 using UnitTest.DummyClasses;
+using System.Text.RegularExpressions;
 
 #if ON_VISUAL_STUDIO
 using ClassInitialize = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;
@@ -85,6 +86,16 @@ namespace UnitTest
 #if !ON_VISUAL_STUDIO
       this.TearDown();
 #endif
+    }
+
+    protected string HtmlLiner(string html)
+    {
+      html = html.Replace(Environment.NewLine, "");
+
+      Regex re = new Regex("> +<", RegexOptions.Singleline);
+      html = re.Replace(html, "><");
+
+      return html.Trim();
     }
   }
 }

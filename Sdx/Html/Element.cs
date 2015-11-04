@@ -11,7 +11,7 @@ namespace Sdx.Html
 
     private FormValue value = new FormValue();
 
-    public string Name
+    public virtual string Name
     {
       get
       {
@@ -62,6 +62,11 @@ namespace Sdx.Html
     }
 
     public void Bind(string value)
+    {
+      this.BindValue(value);
+    }
+
+    public void Bind(string[] value)
     {
       this.BindValue(value);
     }
