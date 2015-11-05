@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Text;
 using System.Web;
 
@@ -36,6 +37,17 @@ namespace Sdx.Html
     public IEnumerator<Element> GetEnumerator()
     {
       return this.elements.Values.GetEnumerator();
+    }
+
+    public void Bind(NameValueCollection values)
+    {
+      foreach(var name in values.AllKeys)
+      {
+        if(this.elements.ContainsKey(name))
+        {
+          this.elements[name].Bind(values.GetValues(name));
+        }
+      }
     }
   }
 }

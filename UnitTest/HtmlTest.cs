@@ -527,6 +527,27 @@ English
 );
     }
 
+    [Fact]
+    public void TestFormBind()
+    {
+      var mock = new Mock<System.Web.HttpRequestBase>();
+      mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+        {"login_id", "foo@bar.com" },
+      });
+
+      var form = new Sdx.Html.Form();
+      var loginId = new Sdx.Html.InputText("login_id");
+
+      form.SetElement(loginId);
+
+      var request = mock.Object;
+
+      form.Bind(request.Form);
+
+      Assert.Equal("<input type=\"text\" value=\"foo@bar.com\" name=\"login_id\">", loginId.Tag.Render());
+      Sdx.Context.Current.Debug.Log(loginId.Tag.Render());
+    }
+
     //[Fact]
     //public void TestMock()
     //{

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Sdx.Html
 {
@@ -24,7 +25,7 @@ namespace Sdx.Html
       base.BindValue(value);
       var ta = (Tag)this.tag;
       ta.children.Clear();
-      ta.AddHtml(new RawText(value.ToString()));
+      ta.AddHtml(new RawText(this.Value.First()));
     }
   }
 }

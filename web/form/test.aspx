@@ -34,6 +34,9 @@
             <div class="form-group">
                 <%= form["textarea"].Tag.Render(Attr.Create().AddClass("form-control").Set("rows", "12")) %>
             </div>
+            <div class="form-group">
+                <input type="submit" name="submit" value="SAVE" >
+            </div>
         </form>
     </div>
 </body>

@@ -74,6 +74,11 @@ public partial class form_test : System.Web.UI.Page
     textArea.Name = "textarea";
     form.SetElement(textArea);
 
+    if(Request.Form.Count > 0)
+    {
+      form.Bind(Request.Form);
+    }
+
 
     Sdx.Context.Current.Debug.Log(Request.Form, "POST");
     Sdx.Context.Current.Debug.Log(Request.QueryString, "GET");

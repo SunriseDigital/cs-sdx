@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Sdx.Html
 {
@@ -26,7 +27,7 @@ namespace Sdx.Html
     internal protected override void BindValue(object value)
     {
       base.BindValue(value);
-      this.Tag.Attr["value"] = value.ToString();
+      this.Tag.Attr["value"] = this.Value.First();
     }
   }
 }
