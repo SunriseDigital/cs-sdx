@@ -81,6 +81,7 @@
     <Compile Include="Html\CheckBox.cs" />
     <Compile Include="Html\Element.cs" />
     <Compile Include="Html\CheckableGroup.cs" />
+    <Compile Include="Html\Errors.cs" />
     <Compile Include="Html\Form.cs" />
     <Compile Include="Html\FormValue.cs" />
     <Compile Include="Html\Html.cs" />
@@ -93,6 +94,8 @@
     <Compile Include="Html\TextArea.cs" />
     <Compile Include="Html\VoidTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Validation\NotEmpty.cs" />
+    <Compile Include="Validation\Validator.cs" />
     <Compile Include="Web\Holder.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />
@@ -104,6 +107,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

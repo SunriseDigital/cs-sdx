@@ -49,5 +49,19 @@ namespace Sdx.Html
         }
       }
     }
+
+    public bool ExecValidators()
+    {
+      var result = true;
+      foreach(var kv in elements)
+      {
+        if(!kv.Value.ExecValidators())
+        {
+          result = false;
+        }
+      }
+
+      return result;
+    }
   }
 }

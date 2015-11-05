@@ -11,6 +11,10 @@ namespace Sdx.Html
 
     private FormValue value = new FormValue();
 
+    private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
+
+    public Errors Errors { get; private set; } = new Errors();
+
     public Element(string name):this()
     {
       this.Name = name;
@@ -69,6 +73,41 @@ namespace Sdx.Html
     public void Bind(string[] value)
     {
       this.BindValue(value);
+    }
+
+    internal protected virtual object GetValueForValidator()
+    {
+      return Value.First();
+    }
+
+    public bool ExecValidators()
+    {
+      var result = true;
+      validators.ForEach(val => {
+        var validator = (Validation.Validator)val["validator"];
+        var breakChain = (bool)val["breakChain"];
+
+        validator.Errors = Errors;
+        if (!validator.IsValid(GetValueForValidator()))
+        {
+          validator.Errors = null;
+          result = false;
+          if(breakChain)
+          {
+            return;
+          }
+        }
+      });
+
+      return result;
+    }
+
+    public void AddValidator(Validation.Validator validator, bool breakChain = false)
+    {
+      validators.Add(new Dictionary<string, object> {
+        {"validator", validator},
+        {"breakChain", breakChain}
+      });
     }
   }
 }

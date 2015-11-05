@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Web;
 using System.IO;
 using System.Linq;
+using System.Globalization;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -548,22 +549,47 @@ English
       Sdx.Context.Current.Debug.Log(loginId.Tag.Render());
     }
 
-    //[Fact]
-    //public void TestMock()
-    //{
-    //  var mock = new Mock<System.Web.HttpRequestBase>();
-    //  mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
-    //    {"name1", "post1" },
-    //  });
+    [Fact]
+    public void TestFormValidation()
+    {
+      var mock = new Mock<System.Web.HttpRequestBase>();
+      mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+        {"login_id", "" },
+      });
 
-    //  mock.SetupGet(x => x.QueryString).Returns(new NameValueCollection {
-    //    {"name1", "get1" },
-    //    {"name2", "get2" },
-    //  });
+      var form = new Sdx.Html.Form();
+      var loginId = new Sdx.Html.InputText("login_id");
+      loginId.AddValidator(new Sdx.Validation.NotEmpty());
 
-    //  var request = mock.Object;
+      form.SetElement(loginId);
 
-    //  Sdx.Context.Current.Debug.Log(request.QueryString);
-    //}
-  }
+      var request = mock.Object;
+
+      form.Bind(request.Form);
+
+      Assert.False(form.ExecValidators());
+      Assert.Equal(1, loginId.Errors.Count);
+      Assert.Equal("必須項目です。", loginId.Errors[0]);
+      
+
+    }
+
+      //[Fact]
+      //public void TestMock()
+      //{
+      //  var mock = new Mock<System.Web.HttpRequestBase>();
+      //  mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+      //    {"name1", "post1" },
+      //  });
+
+      //  mock.SetupGet(x => x.QueryString).Returns(new NameValueCollection {
+      //    {"name1", "get1" },
+      //    {"name2", "get2" },
+      //  });
+
+      //  var request = mock.Object;
+
+      //  Sdx.Context.Current.Debug.Log(request.QueryString);
+      //}
+    }
 }
