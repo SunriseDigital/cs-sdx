@@ -117,26 +117,6 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestForm()
-    {
-      var form = new Sdx.Html.Form();
-      Assert.Equal("<form method=\"post\"></form>", form.Render());
-
-      form.Action = "/foo/bar";
-      Assert.Equal("<form method=\"post\" action=\"/foo/bar\"></form>", form.Render());
-
-      form.Method = Sdx.Html.Form.MethodType.Get;
-      Assert.Equal("<form method=\"get\" action=\"/foo/bar\"></form>", form.Render());
-
-      HttpContext.Current = new HttpContext(
-        new HttpRequest("", "http://test.cs-sdx.com/form/current", "foo=bar"),
-        new HttpResponse(new StringWriter())
-      );
-      form.SetActionToCurrent();
-      Assert.Equal("<form method=\"get\" action=\"/form/current?foo=bar\"></form>", form.Render());
-    }
-
-    [Fact]
     public void TestFormInputText()
     {
       var form = new Sdx.Html.Form();
@@ -147,12 +127,10 @@ namespace UnitTest
       loginId.Name = "login_id";
       Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Tag.Render());
 
-      form.SetElement(loginId);
-      Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"\" name=\"login_id\"></form>", form.Render());
+      
       loginId.Bind("test_user");
 
       form.SetElement(loginId);
-      Assert.Equal("<form method=\"post\"><input type=\"text\" value=\"test_user\" name=\"login_id\"></form>", form.Render());
       Assert.Equal("<input type=\"text\" value=\"test_user\" name=\"login_id\">", form["login_id"].Tag.Render());
 
       Assert.Equal("test_user", loginId.Value.First);

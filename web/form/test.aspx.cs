@@ -7,7 +7,6 @@ public partial class form_test : System.Web.UI.Page
   protected void Page_Load(object sender, EventArgs e)
   {
     form = new Sdx.Html.Form();
-    form.SetActionToCurrent();
 
     //Text
     var inputText = new Sdx.Html.InputText();

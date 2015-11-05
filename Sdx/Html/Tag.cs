@@ -25,12 +25,7 @@ namespace Sdx.Html
       return builder.ToString();
     }
 
-    /// <summary>
-    /// Form.Render()から使っているのでinternal
-    /// </summary>
-    /// <param name="builder"></param>
-    /// <param name="attribute"></param>
-    internal void RenderStartTag(StringBuilder builder, Attr attribute)
+    private void RenderStartTag(StringBuilder builder, Attr attribute)
     {
       builder
         .Append("<")

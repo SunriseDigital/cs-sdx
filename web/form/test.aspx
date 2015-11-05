@@ -11,7 +11,7 @@
 <body>
     <div class="container">
         <h1>Form Test</h1>
-        <%= form.RenderStartTag() %> 
+        <form action="<%= HttpContext.Current.Request.RawUrl %>" method="post">
             <div class="form-group">
                 <%= form["input_text"].Tag.Render(Attr.Create().AddClass("form-control")) %>
             </div>
@@ -34,7 +34,7 @@
             <div class="form-group">
                 <%= form["textarea"].Tag.Render(Attr.Create().AddClass("form-control").Set("rows", "12")) %>
             </div>
-        <%= form.RenderEndTag() %>
+        </form>
     </div>
 </body>
 </html>
