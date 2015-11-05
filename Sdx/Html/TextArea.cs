@@ -4,7 +4,7 @@ namespace Sdx.Html
 {
   public class TextArea: Element
   {
-    internal protected override IHtml CreateTag()
+    internal protected override Html CreateTag()
     {
       return new Tag("textarea");
     }
@@ -13,7 +13,7 @@ namespace Sdx.Html
     {
       base.BindValue(value);
       var ta = (Tag)this.tag;
-      ta.Children.Clear();
+      ta.children.Clear();
       ta.AddHtml(new RawText(value.ToString()));
     }
   }

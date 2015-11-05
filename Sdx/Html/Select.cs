@@ -7,9 +7,9 @@ namespace Sdx.Html
   {
     private List<Option> options = new List<Option>();
 
-    private Dictionary<string, Tag> optgroups = new Dictionary<string, Html.Tag>();
+    private Dictionary<string, Tag> optgroups = new Dictionary<string, Tag>();
 
-    internal protected override IHtml CreateTag()
+    internal protected override Html CreateTag()
     {
       return new Tag("select");
     }

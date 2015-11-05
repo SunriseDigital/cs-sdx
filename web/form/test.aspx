@@ -26,8 +26,9 @@
                 <%}); %>
             </div>
             <div class="form-group">
-                <% form["radios"].Tag.ForEach( radio => {%>
-                <%= radio.Render(Attr.Create().AddClass("radio-inline")) %>
+                <% form["radios"].Tag.ForEach( radioLabel => {%>
+                <% radioLabel.Children.First().Attr.AddClass("foo-bar"); %>
+                <%= radioLabel.Render(Attr.Create().AddClass("radio-inline")) %>
                 <%}); %>
             </div>
             <div class="form-group">

@@ -5,36 +5,24 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class VoidTag : IHtml
+  public class VoidTag : Html
   {
-    private string tagName;
-    private Attr attribute;
-
-    public Attr Attr
+    public VoidTag(string tagName):base(tagName)
     {
-      get
-      {
-        return this.attribute;
-      }
+      this.Attr = new Attr();
     }
 
-    public VoidTag(string tagName)
-    {
-      this.tagName = tagName;
-      this.attribute = new Attr();
-    }
-
-    public string Render(Attr attribute = null)
+    public override string Render(Attr attribute = null)
     {
       var builder = new StringBuilder();
       builder
         .Append("<")
-        .Append(this.tagName);
+        .Append(this.TagName);
 
-      if (this.attribute.Count > 0)
+      if (this.Attr.Count > 0)
       {
         builder.Append(" ");
-        this.attribute.Render(builder, attribute);
+        this.Attr.Render(builder, attribute);
       }
 
       builder.Append(">");
@@ -42,27 +30,12 @@ namespace Sdx.Html
       return builder.ToString();
     }
 
-    public void ForEach(Action<IHtml> action)
-    {
-      throw new NotImplementedException();
-    }
-
-    public IEnumerator<IHtml> GetEnumerator()
-    {
-      throw new NotImplementedException();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      throw new NotImplementedException();
-    }
-
-    public string RenderStartTag(Attr attribute = null)
+    public override string RenderStartTag(Attr attribute = null)
     {
       return this.Render(attribute);
     }
 
-    public string RenderEndTag()
+    public override string RenderEndTag()
     {
       throw new NotImplementedException();
     }

@@ -4,51 +4,28 @@ using System.Collections.Generic;
 
 namespace Sdx.Html
 {
-  public class RawText : IHtml
+  public class RawText : Html
   {
     public string Text { get; private set; }
 
-    public Attr Attr
-    {
-      get
-      {
-        throw new NotImplementedException();
-      }
-    }
-
-    public RawText(string text)
+    public RawText(string text):base(null)
     {
       this.Text = text;
     }
 
-    public string Render(Attr attribute = null)
+    public override string Render(Attr attribute = null)
     {
       return this.Text;
     }
 
-    public void ForEach(Action<IHtml> action)
+    public override string RenderStartTag(Attr attribute = null)
     {
-      throw new NotImplementedException();
+      return null;
     }
 
-    public string RenderStartTag(Attr attribute = null)
+    public override string RenderEndTag()
     {
-      throw new NotImplementedException();
-    }
-
-    public string RenderEndTag()
-    {
-      throw new NotImplementedException();
-    }
-
-    public IEnumerator<IHtml> GetEnumerator()
-    {
-      throw new NotImplementedException();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      throw new NotImplementedException();
+      return null;
     }
   }
 }
