@@ -7,7 +7,7 @@ namespace Sdx.Html
 {
   public abstract class Element
   {
-    internal protected ITag tag;
+    internal protected IHtml tag;
 
     private FormValue value = new FormValue();
 
@@ -24,9 +24,9 @@ namespace Sdx.Html
       }
     }
 
-    internal protected abstract ITag CreateTag();
+    internal protected abstract IHtml CreateTag();
 
-    public ITag Tag
+    public IHtml Tag
     {
       get
       {

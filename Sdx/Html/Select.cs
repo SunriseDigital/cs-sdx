@@ -9,7 +9,7 @@ namespace Sdx.Html
 
     private Dictionary<string, Tag> optgroups = new Dictionary<string, Html.Tag>();
 
-    internal protected override ITag CreateTag()
+    internal protected override IHtml CreateTag()
     {
       return new Tag("select");
     }

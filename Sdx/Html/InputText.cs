@@ -4,7 +4,7 @@ namespace Sdx.Html
 {
   public class InputText : Element
   {
-    internal protected override ITag CreateTag()
+    internal protected override IHtml CreateTag()
     {
       var tag = new VoidTag("input");
       tag.Attr.Set("type", "text");

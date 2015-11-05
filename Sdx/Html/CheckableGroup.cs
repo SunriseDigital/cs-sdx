@@ -14,7 +14,7 @@ namespace Sdx.Html
     {
     }
 
-    internal protected override ITag CreateTag()
+    internal protected override IHtml CreateTag()
     {
       return new Tag("span");
     }

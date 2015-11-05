@@ -85,7 +85,6 @@
     <Compile Include="Html\FormValue.cs" />
     <Compile Include="Html\IHtml.cs" />
     <Compile Include="Html\InputText.cs" />
-    <Compile Include="Html\ITag.cs" />
     <Compile Include="Html\Option.cs" />
     <Compile Include="Html\Radio.cs" />
     <Compile Include="Html\RawText.cs" />

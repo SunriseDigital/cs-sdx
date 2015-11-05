@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class VoidTag : ITag
+  public class VoidTag : IHtml
   {
     private string tagName;
     private Attr attribute;
