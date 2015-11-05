@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
 namespace Sdx.Html
 {
-  public class FormValue
+  public class FormValue: IEnumerable<string>
   {
     private string[] values;
 
@@ -34,32 +35,37 @@ namespace Sdx.Html
       }
     }
 
+    public string this[int index]
+    {
+      get
+      {
+        return this.values[index];
+      }
+    }
+
+    public IEnumerator<string> GetEnumerator()
+    {
+      return ((IEnumerable<string>)values).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+      return ((IEnumerable<string>)values).GetEnumerator();
+    }
+
+    public bool IsEmpty
+    {
+      get
+      {
+        return this.values.Length == 0;
+      } 
+    }
+
     public int Count
     {
       get
       {
         return this.values.Length;
-      }
-    }
-
-    public string First
-    {
-      get
-      {
-        if(this.values.Length == 0)
-        {
-          return "";
-        }
-
-        return this.values[0];
-      }
-    }
-
-    public string[] All
-    {
-      get
-      {
-        return (string[])this.values.Clone();
       }
     }
   }

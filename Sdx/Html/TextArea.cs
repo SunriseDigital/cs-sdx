@@ -4,6 +4,16 @@ namespace Sdx.Html
 {
   public class TextArea: Element
   {
+    public TextArea():base()
+    {
+
+    }
+
+    public TextArea(string name):base(name)
+    {
+
+    }
+
     internal protected override Html CreateTag()
     {
       return new Tag("textarea");

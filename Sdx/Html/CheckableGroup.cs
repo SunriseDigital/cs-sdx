@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sdx.Html
 {
@@ -10,8 +11,14 @@ namespace Sdx.Html
 
     private string name;
 
-    public CheckableGroup()
+    public CheckableGroup():base()
     {
+
+    }
+
+    public CheckableGroup(string name):base(name)
+    {
+
     }
 
     internal protected override Html CreateTag()
@@ -80,9 +87,8 @@ namespace Sdx.Html
     {
       base.BindValue(value);
 
-      var values = this.Value.All;
       this.elements.ForEach(element => {
-        if (Array.IndexOf(values, element.Tag.Attr["value"]) > -1)
+        if (this.Value.Contains(element.Tag.Attr["value"]))
         {
           element.Tag.Attr.Set("checked");
         }

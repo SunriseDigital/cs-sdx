@@ -11,6 +11,11 @@ namespace Sdx.Html
 
     private FormValue value = new FormValue();
 
+    public Element(string name):this()
+    {
+      this.Name = name;
+    }
+
     public virtual string Name
     {
       get

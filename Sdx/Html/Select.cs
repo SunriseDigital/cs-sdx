@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sdx.Html
 {
@@ -12,6 +13,16 @@ namespace Sdx.Html
     internal protected override Html CreateTag()
     {
       return new Tag("select");
+    }
+
+    public Select():base()
+    {
+
+    }
+
+    public Select(string name):base(name)
+    {
+
     }
 
     public void AddOption(Option option, string optgroupLabel = null)
@@ -47,9 +58,8 @@ namespace Sdx.Html
     {
       base.BindValue(value);
 
-      var values = this.Value.All;
       this.options.ForEach(element => {
-        if (Array.IndexOf(values, element.Tag.Attr["value"]) > -1)
+        if (this.Value.Contains(element.Tag.Attr["value"]))
         {
           element.Tag.Attr.Set("selected");
         }

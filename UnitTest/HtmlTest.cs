@@ -4,6 +4,7 @@ using Moq;
 using System.Collections.Specialized;
 using System.Web;
 using System.IO;
+using System.Linq;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -66,19 +67,19 @@ namespace UnitTest
 
       attr.Remove("disabled");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\"", attr.Render());
-      
+
       attr.RemoveStyle("width");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"height: 200px;\"", attr.Render());
-      
+
       attr.RemoveStyle("height");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\"", attr.Render());
-      
+
       attr.RemoveClass("foo");
       Assert.Equal("class=\"bar\" data-attr=\"datavalue\"", attr.Render());
-      
+
       attr.RemoveClass("bar");
       Assert.Equal("data-attr=\"datavalue\"", attr.Render());
-      
+
       attr.Remove("data-attr");
       Assert.Equal("", attr.Render());
     }
@@ -122,21 +123,21 @@ namespace UnitTest
       var form = new Sdx.Html.Form();
       var loginId = new Sdx.Html.InputText();
 
-      Assert.Equal("", loginId.Value.First);
+      Assert.True(loginId.Value.IsEmpty);
 
       loginId.Name = "login_id";
       Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Tag.Render());
 
-      
+
       loginId.Bind("test_user");
 
       form.SetElement(loginId);
       Assert.Equal("<input type=\"text\" value=\"test_user\" name=\"login_id\">", form["login_id"].Tag.Render());
 
-      Assert.Equal("test_user", loginId.Value.First);
+      Assert.Equal("test_user", loginId.Value.First());
       loginId.Bind("new_value");
       Assert.Equal("<input type=\"text\" value=\"new_value\" name=\"login_id\">", form["login_id"].Tag.Render());
-      Assert.Equal("new_value", loginId.Value.First);
+      Assert.Equal("new_value", loginId.Value.First());
     }
 
 
@@ -162,7 +163,7 @@ English
       Assert.Equal(@"日本語
 改行もあったりする
 English
-", comment.Value.First);
+", comment.Value.First());
     }
 
 
@@ -177,9 +178,9 @@ English
       checkbox.Tag.Attr["value"] = "chx_value";
       Assert.Equal("<input type=\"checkbox\" name=\"checkbox\" value=\"chx_value\">", checkbox.Tag.Render());
       //checkboxはValueに正しい値が代入されて初めてValueが取得可能になる。
-      Assert.Equal("", checkbox.Value.First);
+      Assert.True(checkbox.Value.IsEmpty);
       checkbox.Bind("chx_value");
-      Assert.Equal("chx_value", checkbox.Value.First);
+      Assert.Equal("chx_value", checkbox.Value.First());
     }
 
     [Fact]
@@ -193,9 +194,9 @@ English
       radio.Tag.Attr["value"] = "chx_value";
       Assert.Equal("<input type=\"radio\" name=\"radio\" value=\"chx_value\">", radio.Tag.Render());
       //radioはValueに正しい値が代入されて初めてValueが取得可能になる。
-      Assert.Equal("", radio.Value.First);
+      Assert.True(radio.Value.IsEmpty);
       radio.Bind("chx_value");
-      Assert.Equal("chx_value", radio.Value.First);
+      Assert.Equal("chx_value", radio.Value.First());
     }
 
     [Fact]
@@ -232,7 +233,7 @@ English
 
       group.Bind(new string[] { "1" });
       Assert.Equal(1, group.Value.Count);
-      Assert.Equal("1", group.Value.First);
+      Assert.Equal("1", group.Value.First());
       Assert.Equal(HtmlLiner(@"
 <span>
   <input type=""checkbox"" value=""1"" name=""checkboxies"" checked=""checked"">
@@ -263,8 +264,8 @@ English
 
       group.Bind(new string[] { "2", "3" });
       Assert.Equal(2, group.Value.Count);
-      Assert.Equal("2", group.Value.All[0]);
-      Assert.Equal("3", group.Value.All[1]);
+      Assert.Equal("2", group.Value[0]);
+      Assert.Equal("3", group.Value[1]);
       Assert.Equal(HtmlLiner(@"
 <span>
   <input type=""checkbox"" value=""1"" name=""checkboxies"">
@@ -416,7 +417,7 @@ English
 
       select.Bind("1");
       Assert.Equal(1, select.Value.Count);
-      Assert.Equal("1", select.Value.First);
+      Assert.Equal("1", select.Value.First());
       Assert.Equal(HtmlLiner(@"
 <select name=""select"">
   <option value=""1"" selected=""selected"">foo</option>
@@ -428,7 +429,7 @@ English
 
       select.Bind("2");
       Assert.Equal(1, select.Value.Count);
-      Assert.Equal("2", select.Value.First);
+      Assert.Equal("2", select.Value.First());
       Assert.Equal(HtmlLiner(@"
 <select name=""select"">
   <option value=""1"">foo</option>
@@ -440,8 +441,8 @@ English
 
       select.Bind(new string[] { "1", "2" });
       Assert.Equal(2, select.Value.Count);
-      Assert.Equal("1", select.Value.All[0]);
-      Assert.Equal("2", select.Value.All[1]);
+      Assert.Equal("1", select.Value[0]);
+      Assert.Equal("2", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
 <select name=""select"">
   <option value=""1"" selected=""selected"">foo</option>
@@ -492,7 +493,7 @@ English
 
       select.Bind("2");
       Assert.Equal(1, select.Value.Count);
-      Assert.Equal("2", select.Value.First);
+      Assert.Equal("2", select.Value.First());
       Assert.Equal(HtmlLiner(@"
 <select name=""select"">
   <optgroup label=""group1"">
@@ -509,8 +510,8 @@ English
 
       select.Bind(new string[] { "2", "3" });
       Assert.Equal(2, select.Value.Count);
-      Assert.Equal("2", select.Value.All[0]);
-      Assert.Equal("3", select.Value.All[1]);
+      Assert.Equal("2", select.Value[0]);
+      Assert.Equal("3", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
 <select name=""select"">
   <optgroup label=""group1"">

@@ -4,6 +4,16 @@ namespace Sdx.Html
 {
   public class Radio : Checkable
   {
+    public Radio():base()
+    {
+
+    }
+
+    public Radio(string name):base(name)
+    {
+
+    }
+
     internal protected override Html CreateTag()
     {
       var tag = new VoidTag("input");

@@ -7,6 +7,15 @@ namespace Sdx.Html
 {
   public abstract class Checkable : Element
   {
+    public Checkable():base()
+    {
+
+    }
+
+    public Checkable(string name):base(name)
+    {
+
+    }
 
   }
 }

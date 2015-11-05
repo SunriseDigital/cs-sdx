@@ -4,6 +4,16 @@ namespace Sdx.Html
 {
   public class InputText : Element
   {
+    public InputText():base()
+    {
+
+    }
+
+    public InputText(string name):base(name)
+    {
+
+    }
+
     internal protected override Html CreateTag()
     {
       var tag = new VoidTag("input");
