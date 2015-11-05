@@ -42,7 +42,7 @@ namespace UnitTest
       attr.SetStyle("height", "200px");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\"", attr.Render());
 
-      attr.Add("disabled");
+      attr.Set("disabled");
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", attr.Render());
 
       //temp add

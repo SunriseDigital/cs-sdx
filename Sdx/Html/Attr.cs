@@ -151,7 +151,7 @@ namespace Sdx.Html
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public Attr Add(string value)
+    public Attr Set(string value)
     {
       this.attrDictionary[value] = value;
       return this;

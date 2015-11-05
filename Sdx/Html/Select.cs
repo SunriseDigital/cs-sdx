@@ -51,7 +51,7 @@ namespace Sdx.Html
       this.options.ForEach(element => {
         if (Array.IndexOf(values, element.Tag.Attr["value"]) > -1)
         {
-          element.Tag.Attr.Add("selected");
+          element.Tag.Attr.Set("selected");
         }
         else
         {

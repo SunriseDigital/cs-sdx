@@ -84,7 +84,7 @@ namespace Sdx.Html
       this.elements.ForEach(element => {
         if (Array.IndexOf(values, element.Tag.Attr["value"]) > -1)
         {
-          element.Tag.Attr.Add("checked");
+          element.Tag.Attr.Set("checked");
         }
         else
         {
