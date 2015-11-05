@@ -2,12 +2,12 @@
 
 namespace Sdx.Html
 {
-  public class CheckBox : Checkable
+  public class Radio : Checkable
   {
     internal protected override ITag CreateTag()
     {
       var tag = new VoidTag("input");
-      tag.Attr["type"] = "checkbox";
+      tag.Attr["type"] = "radio";
 
       return tag;
     }

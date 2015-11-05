@@ -24,7 +24,7 @@ namespace Sdx.Html
       }
     }
 
-    protected abstract ITag CreateTag();
+    internal protected abstract ITag CreateTag();
 
     public ITag Tag
     {

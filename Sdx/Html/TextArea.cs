@@ -4,11 +4,7 @@ namespace Sdx.Html
 {
   public class TextArea: Element
   {
-    public TextArea()
-    {
-    }
-
-    protected override ITag CreateTag()
+    internal protected override ITag CreateTag()
     {
       return new Tag("textarea");
     }

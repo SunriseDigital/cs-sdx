@@ -194,10 +194,10 @@ English
       var checkbox = new Sdx.Html.CheckBox();
 
       checkbox.Name = "checkbox";
-      Assert.Equal("<input type=\"checkbox\" value=\"\" name=\"checkbox\">", checkbox.Tag.Render());
+      Assert.Equal("<input type=\"checkbox\" name=\"checkbox\">", checkbox.Tag.Render());
 
       checkbox.Tag.Attr["value"] = "chx_value";
-      Assert.Equal("<input type=\"checkbox\" value=\"chx_value\" name=\"checkbox\">", checkbox.Tag.Render());
+      Assert.Equal("<input type=\"checkbox\" name=\"checkbox\" value=\"chx_value\">", checkbox.Tag.Render());
       //checkboxはValueに正しい値が代入されて初めてValueが取得可能になる。
       Assert.Equal("", checkbox.Value.First);
       checkbox.Bind("chx_value");
@@ -205,24 +205,40 @@ English
     }
 
     [Fact]
-    public void TestFormElementGroupCheckbox()
+    public void TestFormRadio()
     {
-      var group = new Sdx.Html.ElementGroup();
+      var radio = new Sdx.Html.Radio();
+
+      radio.Name = "radio";
+      Assert.Equal("<input type=\"radio\" name=\"radio\">", radio.Tag.Render());
+
+      radio.Tag.Attr["value"] = "chx_value";
+      Assert.Equal("<input type=\"radio\" name=\"radio\" value=\"chx_value\">", radio.Tag.Render());
+      //radioはValueに正しい値が代入されて初めてValueが取得可能になる。
+      Assert.Equal("", radio.Value.First);
+      radio.Bind("chx_value");
+      Assert.Equal("chx_value", radio.Value.First);
+    }
+
+    [Fact]
+    public void TestFormCheckableGroupCheckbox()
+    {
+      var group = new Sdx.Html.CheckableGroup();
       group.Name = "checkboxies";
 
       Sdx.Html.CheckBox checkbox;
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "1";
-      group.AddElement(checkbox);
+      group.AddCheckable(checkbox);
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "2";
-      group.AddElement(checkbox);
+      group.AddCheckable(checkbox);
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "3";
-      group.AddElement(checkbox);
+      group.AddCheckable(checkbox);
 
       Assert.Equal(HtmlLiner(@"
 <span>
@@ -333,22 +349,22 @@ English
     [Fact]
     public void TestFormElementGroupCheckboxWithLabel()
     {
-      var group = new Sdx.Html.ElementGroup();
+      var group = new Sdx.Html.CheckableGroup();
       group.Name = "checkboxies";
 
       Sdx.Html.CheckBox checkbox;
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "1";
-      group.AddElement(checkbox, "foo");
+      group.AddCheckable(checkbox, "foo");
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "2";
-      group.AddElement(checkbox, "bar");
+      group.AddCheckable(checkbox, "bar");
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "3";
-      group.AddElement(checkbox, "zip");
+      group.AddCheckable(checkbox, "zip");
 
       Assert.Equal(HtmlLiner(@"
 <span>
@@ -360,23 +376,23 @@ English
   group.Tag.Render()
       );
 
-      group = new Sdx.Html.ElementGroup();
+      group = new Sdx.Html.CheckableGroup();
       group.Name = "checkboxies";
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "1";
       checkbox.Tag.Attr["id"] = "check_foo";
-      group.AddElement(checkbox, "foo");
+      group.AddCheckable(checkbox, "foo");
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "2";
       checkbox.Tag.Attr["id"] = "check_bar";
-      group.AddElement(checkbox, "bar");
+      group.AddCheckable(checkbox, "bar");
 
       checkbox = new Sdx.Html.CheckBox();
       checkbox.Tag.Attr["value"] = "3";
       checkbox.Tag.Attr["id"] = "check_zip";
-      group.AddElement(checkbox, "zip");
+      group.AddCheckable(checkbox, "zip");
 
       Assert.Equal(HtmlLiner(@"
 <span>

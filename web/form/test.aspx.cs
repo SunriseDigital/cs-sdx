@@ -9,10 +9,12 @@ public partial class form_test : System.Web.UI.Page
     form = new Sdx.Html.Form();
     form.SetActionToCurrent();
 
+    //Text
     var inputText = new Sdx.Html.InputText();
     inputText.Name = "input_text";
     form.SetElement(inputText);
 
+    //Select
     var select = new Sdx.Html.Select();
     select.Name = "select";
     form.SetElement(select);
@@ -29,7 +31,8 @@ public partial class form_test : System.Web.UI.Page
     option.Text = "bar";
     select.AddOption(option, "group2");
 
-    var checkList = new Sdx.Html.ElementGroup();
+    //Checkbox
+    var checkList = new Sdx.Html.CheckableGroup();
     checkList.Name = "check_list";
     form.SetElement(checkList);
 
@@ -38,17 +41,40 @@ public partial class form_test : System.Web.UI.Page
     checkbox = new Sdx.Html.CheckBox();
     checkbox.Tag.Attr["value"] = "20";
     checkbox.Tag.Attr["id"] = "check_list_20";
-    checkList.AddElement(checkbox, "いち");
+    checkList.AddCheckable(checkbox, "いち");
 
     checkbox = new Sdx.Html.CheckBox();
     checkbox.Tag.Attr["value"] = "21";
     checkbox.Tag.Attr["id"] = "check_list_21";
-    checkList.AddElement(checkbox, "にい");
+    checkList.AddCheckable(checkbox, "にい");
 
     checkbox = new Sdx.Html.CheckBox();
     checkbox.Tag.Attr["value"] = "22";
     checkbox.Tag.Attr["id"] = "check_list_22";
-    checkList.AddElement(checkbox, "さん");
+    checkList.AddCheckable(checkbox, "さん");
+
+    //Radio
+    var radios = new Sdx.Html.CheckableGroup();
+    radios.Name = "radios";
+    form.SetElement(radios);
+
+    Sdx.Html.Radio radio;
+
+    radio = new Sdx.Html.Radio();
+    radio.Tag.Attr["value"] = "30";
+    radio.Tag.Attr["id"] = "radios_30";
+    radios.AddCheckable(radio, "らじお　いち");
+
+    radio = new Sdx.Html.Radio();
+    radio.Tag.Attr["value"] = "31";
+    radio.Tag.Attr["id"] = "radios_31";
+    radios.AddCheckable(radio, "らじお　さん");
+
+    //TextArea
+    var textArea = new Sdx.Html.TextArea();
+    textArea.Name = "textarea";
+    form.SetElement(textArea);
+
 
     Sdx.Context.Current.Debug.Log(Request.Form, "POST");
     Sdx.Context.Current.Debug.Log(Request.QueryString, "GET");

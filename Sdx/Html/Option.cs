@@ -4,7 +4,7 @@ namespace Sdx.Html
 {
   public class Option : Element
   {
-    protected override ITag CreateTag()
+    internal protected override ITag CreateTag()
     {
       return new Tag("option");
     }
