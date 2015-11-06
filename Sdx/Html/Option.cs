@@ -9,6 +9,11 @@ namespace Sdx.Html
       return new Tag("option");
     }
 
+    protected internal override FormValue CreateFormValue()
+    {
+      return new FormValue(false);
+    }
+
     public string Text
     {
       get

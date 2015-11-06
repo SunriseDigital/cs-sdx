@@ -9,16 +9,23 @@ namespace Sdx.Html
   {
     internal protected Html tag;
 
-    private FormValue value = new FormValue();
-
     private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
 
-    public Errors Errors { get; private set; } = new Errors();
+    public Validation.Errors Errors { get; private set; } = new Validation.Errors();
 
     public Element(string name):this()
     {
       this.Name = name;
     }
+
+    /// <summary>
+    /// <see cref="FormValue.HasMany"/>はElement毎に違うのでそれを設定するたの抽象メソッド。
+    /// 子クラスで実装してください。
+    /// </summary>
+    /// <returns></returns>
+    internal protected abstract FormValue CreateFormValue();
+
+    internal protected abstract Html CreateTag();
 
     public virtual string Name
     {
@@ -33,8 +40,6 @@ namespace Sdx.Html
       }
     }
 
-    internal protected abstract Html CreateTag();
-
     public Html Tag
     {
       get
@@ -46,15 +51,10 @@ namespace Sdx.Html
     public Element()
     {
       this.tag = this.CreateTag();
+      this.Value = this.CreateFormValue();
     }
 
-    public FormValue Value
-    {
-      get
-      {
-        return this.value;
-      }
-    }
+    public FormValue Value { get; private set; }
 
     /// <summary>
     /// 
@@ -62,7 +62,7 @@ namespace Sdx.Html
     /// <param name="value">string|string[]</param>
     internal protected virtual void BindValue(object value)
     {
-      this.value.Set(value);
+      this.Value.Set(value);
     }
 
     public void Bind(string value)
@@ -75,11 +75,6 @@ namespace Sdx.Html
       this.BindValue(value);
     }
 
-    internal protected virtual object GetValueForValidator()
-    {
-      return Value.First();
-    }
-
     public bool ExecValidators()
     {
       var result = true;
@@ -88,7 +83,17 @@ namespace Sdx.Html
         var breakChain = (bool)val["breakChain"];
 
         validator.Errors = Errors;
-        if (!validator.IsValid(GetValueForValidator()))
+        bool isValid;
+        if (this.Value.HasMany)
+        {
+          isValid = validator.IsValid(this.Value.ToArray());
+        }
+        else
+        {
+          isValid = validator.IsValid(this.Value.First());
+        }
+
+        if (!isValid)
         {
           validator.Errors = null;
           result = false;

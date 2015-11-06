@@ -1,0 +1,4 @@
+﻿Sdx:
+  Validation:
+    NotEmpty:
+      ErrorIsEmpty: "必須項目です。"

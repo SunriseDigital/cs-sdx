@@ -6,6 +6,7 @@ using System.Web;
 using System.IO;
 using System.Linq;
 using System.Globalization;
+using System.Reflection;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -557,21 +558,19 @@ English
         {"login_id", "" },
       });
 
+      var request = mock.Object;
+
       var form = new Sdx.Html.Form();
+
       var loginId = new Sdx.Html.InputText("login_id");
       loginId.AddValidator(new Sdx.Validation.NotEmpty());
-
       form.SetElement(loginId);
-
-      var request = mock.Object;
 
       form.Bind(request.Form);
 
       Assert.False(form.ExecValidators());
       Assert.Equal(1, loginId.Errors.Count);
-      Assert.Equal("必須項目です。", loginId.Errors[0]);
-      
-
+      Assert.Equal("必須項目です。", loginId.Errors[0].Message);
     }
 
       //[Fact]

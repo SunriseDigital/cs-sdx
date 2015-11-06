@@ -25,6 +25,11 @@ namespace Sdx.Html
 
     }
 
+    protected internal override FormValue CreateFormValue()
+    {
+      return new FormValue(false);
+    }
+
     public void AddOption(Option option, string optgroupLabel = null)
     {
       this.options.Add(option);
