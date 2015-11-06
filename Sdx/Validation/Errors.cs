@@ -38,6 +38,7 @@ namespace Sdx.Validation
         else
         {
           var ul = new Html.Tag("ul");
+          ul.Attr.AddClass("sdx-has-error");
           this.errors.ForEach(error => {
             var li = new Html.Tag("li");
             li.AddHtml(new Html.RawText(error.Message));
@@ -62,6 +63,11 @@ namespace Sdx.Validation
     IEnumerator IEnumerable.GetEnumerator()
     {
       return ((IEnumerable<Error>)errors).GetEnumerator();
+    }
+
+    internal void Clear()
+    {
+      this.errors.Clear();
     }
   }
 }

@@ -78,11 +78,13 @@ namespace Sdx.Html
     public bool ExecValidators()
     {
       var result = true;
+      this.Errors.Clear();
+
       validators.ForEach(val => {
         var validator = (Validation.Validator)val["validator"];
         var breakChain = (bool)val["breakChain"];
 
-        validator.Errors = Errors;
+        validator.Errors = this.Errors;
         bool isValid;
         if (this.Value.HasMany)
         {

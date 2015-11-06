@@ -575,7 +575,19 @@ English
 
       Assert.False(form.ExecValidators());
       Assert.Equal(1, loginId.Errors.Count);
+      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li></ul>", loginId.Errors.Html.Render());
       Assert.Equal("必須項目です。", loginId.Errors[0].Message);
+      Assert.Equal("ja", loginId.Errors[0].Lang);
+
+      mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+        {"login_id", "some value" },
+      });
+
+      form.Bind(request.Form);
+
+      Assert.True(form.ExecValidators());
+      Assert.Equal(0, loginId.Errors.Count);
+      Assert.Equal("", loginId.Errors.Html.Render());
     }
 
       //[Fact]
