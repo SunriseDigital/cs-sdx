@@ -31,10 +31,11 @@ namespace Sdx.Html
         .Append("<")
         .Append(this.TagName);
 
-      if (this.Attr.Count > 0)
+      var newAttr = this.Attr.Merge(attribute);
+      if(newAttr.Count > 0)
       {
         builder.Append(" ");
-        this.Attr.Render(builder, attribute);
+        newAttr.Render(builder);
       }
 
       builder.Append(">");

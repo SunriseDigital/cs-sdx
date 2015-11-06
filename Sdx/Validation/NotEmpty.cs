@@ -9,15 +9,22 @@ namespace Sdx.Validation
   {
     private const string ErrorIsEmpty = "ErrorIsEmpty";
 
-    protected static readonly Dictionary<string, Dictionary<string, string>> DefaultMessages = new Dictionary<string, Dictionary<string, string>>
+    protected override bool ExecIsValue(IEnumerable<string> values)
     {
+      if (values == null)
       {
-        "ja", new Dictionary<string, string>
-        {
-          {"ErrorIsEmpty", "必須項目です。"}
-        }
+        this.AddError(ErrorIsEmpty);
+        return false;
       }
-    };
+
+      if(values.Count() == 0)
+      {
+        this.AddError(ErrorIsEmpty);
+        return false;
+      }
+
+      return true;
+    }
 
     protected override bool ExecIsValue(string value)
     {

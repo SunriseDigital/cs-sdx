@@ -52,17 +52,17 @@ namespace UnitTest
 
       Assert.Equal(
         "class=\"foo bar hoge\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"",
-        attr.Render(Sdx.Html.Attr.Create().AddClass("hoge", "bar"))
+        attr.Merge(Sdx.Html.Attr.Create().AddClass("hoge", "bar")).Render()
       );
 
       Assert.Equal(
         "class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 150px; height: 200px; border: 1px;\" disabled=\"disabled\"",
-        attr.Render(Sdx.Html.Attr.Create().SetStyle("border", "1px").SetStyle("width", "150px"))
+        attr.Merge(Sdx.Html.Attr.Create().SetStyle("border", "1px").SetStyle("width", "150px")).Render()
       );
 
       Assert.Equal(
         "class=\"foo bar\" data-attr=\"update\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\" data-attr2=\"datavalue2\"",
-        attr.Render(Sdx.Html.Attr.Create().Set("data-attr", "update").Set("data-attr2", "datavalue2"))
+        attr.Merge(Sdx.Html.Attr.Create().Set("data-attr", "update").Set("data-attr2", "datavalue2")).Render()
       );
 
       //Remove
@@ -92,7 +92,12 @@ namespace UnitTest
       var html = new Sdx.Html.Tag("div");
       Assert.Equal("<div></div>", html.Render());
 
+      Assert.Equal("<div class=\"foobar\"></div>", html.Render(Sdx.Html.Attr.Create().AddClass("foobar")));
+      Assert.Equal("<div></div>", html.Render());
+
       html.Attr.AddClass("foo");
+      Assert.Equal("<div class=\"foo\"></div>", html.Render());
+      Assert.Equal("<div class=\"foo bar\"></div>", html.Render(Sdx.Html.Attr.Create().AddClass("bar")));
       Assert.Equal("<div class=\"foo\"></div>", html.Render());
 
       html.AddHtml(new Sdx.Html.RawText("bar"));

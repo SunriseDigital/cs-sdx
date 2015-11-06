@@ -22,6 +22,29 @@ namespace Sdx.Html
 
     public abstract string RenderEndTag();
 
+    public string Render(params string[] classes)
+    {
+      var attr = new Attr();
+      foreach(var val in classes)
+      {
+        attr.AddClass(val);
+      }
+
+      return this.Render(attr);
+    }
+
+    public string RenderStartTag(params string[] classes)
+    {
+      var attr = new Attr();
+      foreach (var val in classes)
+      {
+        attr.AddClass(val);
+      }
+
+      return this.RenderStartTag(attr);
+    }
+
+
     public Attr Attr { get; internal protected set; }
 
     public string TagName { get; private set; }

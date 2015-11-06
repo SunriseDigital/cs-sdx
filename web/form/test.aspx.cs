@@ -11,11 +11,13 @@ public partial class form_test : System.Web.UI.Page
     //Text
     var inputText = new Sdx.Html.InputText();
     inputText.Name = "input_text";
+    inputText.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(inputText);
 
     //Select
     var select = new Sdx.Html.Select();
     select.Name = "select";
+    select.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(select);
 
     Sdx.Html.Option option;
@@ -33,6 +35,7 @@ public partial class form_test : System.Web.UI.Page
     //Checkbox
     var checkList = new Sdx.Html.CheckableGroup();
     checkList.Name = "check_list";
+    checkList.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(checkList);
 
     Sdx.Html.CheckBox checkbox;
@@ -55,6 +58,7 @@ public partial class form_test : System.Web.UI.Page
     //Radio
     var radios = new Sdx.Html.CheckableGroup();
     radios.Name = "radios";
+    radios.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(radios);
 
     Sdx.Html.Radio radio;
@@ -72,11 +76,18 @@ public partial class form_test : System.Web.UI.Page
     //TextArea
     var textArea = new Sdx.Html.TextArea();
     textArea.Name = "textarea";
+    textArea.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(textArea);
 
     if(Request.Form.Count > 0)
     {
       form.Bind(Request.Form);
+      if (form.ExecValidators())
+      {
+        Sdx.Context.Current.Debug.Log("Is Valid !!");
+      }
+
+      Sdx.Context.Current.Debug.Log("Is Not Valid !!");
     }
 
 
