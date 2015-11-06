@@ -78,5 +78,10 @@ namespace Sdx.Data
 
       this.BaseNode = yaml.Documents[0].RootNode; ;
     }
+
+    public override string ToString()
+    {
+      return BaseNode.ToString();
+    }
   }
 }
