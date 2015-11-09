@@ -7,7 +7,15 @@ namespace Sdx.Validation
 {
   public class NotEmpty : Validator
   {
-    private const string ErrorIsEmpty = "ErrorIsEmpty";
+    public const string ErrorIsEmpty = "ErrorIsEmpty";
+
+    public NotEmpty(string message = null) : base(message)
+    {
+    }
+
+    public NotEmpty(Dictionary<string, string> messages) : base(messages)
+    {
+    }
 
     protected override bool ExecIsValue(IEnumerable<string> values)
     {

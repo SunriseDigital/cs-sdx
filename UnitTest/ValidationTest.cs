@@ -1,5 +1,6 @@
 ﻿using Xunit;
 using UnitTest.DummyClasses;
+using System.Collections.Generic;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -54,6 +55,24 @@ namespace UnitTest
       Assert.False(validator.IsValid(nullArray));
       Assert.Equal(1, validator.Errors.Count);
       Assert.Equal("必須項目です。", validator.Errors[0].Message);
+    }
+
+
+    [Fact]
+    public void TestSwapMessage()
+    {
+      var validator = new Sdx.Validation.NotEmpty("SWAP MESSAGE STRING");
+      Assert.False(validator.IsValid(""));
+      Assert.Equal(1, validator.Errors.Count);
+      Assert.Equal("SWAP MESSAGE STRING", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.NotEmpty(new Dictionary<string, string> {
+        { Sdx.Validation.NotEmpty.ErrorIsEmpty, "SWAP MESSAGE DIC"}
+      });
+      Assert.False(validator.IsValid(""));
+      Assert.Equal(1, validator.Errors.Count);
+      Assert.Equal("SWAP MESSAGE DIC", validator.Errors[0].Message);
+
     }
   }
 }
