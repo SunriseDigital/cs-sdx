@@ -37,6 +37,24 @@ public partial class form_test : System.Web.UI.Page
     option.Text = "bar";
     select.AddOption(option, "group2");
 
+    //select multi
+    var multiSelect = new Sdx.Html.Select();
+    multiSelect.Name = "multi_select";
+    multiSelect.IsMultiple = true;
+    multiSelect.AddValidator(new Sdx.Validation.NotEmpty());
+    form.SetElement(multiSelect);
+
+    option = new Sdx.Html.Option();
+    option.Tag.Attr["value"] = "100";
+    option.Text = "選択肢１００";
+    multiSelect.AddOption(option);
+
+    option = new Sdx.Html.Option();
+    option.Tag.Attr["value"] = "101";
+    option.Text = "選択肢１０１";
+    multiSelect.AddOption(option);
+
+
     //Checkbox
     var checkList = new Sdx.Html.CheckableGroup();
     checkList.Name = "check_list";

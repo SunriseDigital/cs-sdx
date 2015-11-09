@@ -45,7 +45,19 @@ namespace Sdx.Html
       {
         if(this.elements.ContainsKey(name))
         {
-          this.elements[name].Bind(values.GetValues(name));
+          if (this.elements[name].Value.HasMany)
+          {
+            this.elements[name].Bind(values.GetValues(name));
+          }
+          else
+          {
+            var vals = values.GetValues(name);
+            if (vals.Length > 1)
+            {
+              throw new InvalidOperationException(name + "element must have single value.");
+            }
+            this.elements[name].Bind(vals[0]);
+          }
         }
       }
     }

@@ -9,6 +9,7 @@ namespace Sdx.Html
   {
     internal protected Html tag;
 
+
     private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
 
     public Validation.Errors Errors { get; private set; } = new Validation.Errors();
@@ -67,11 +68,19 @@ namespace Sdx.Html
 
     public void Bind(string value)
     {
+      if (this.Value.HasMany)
+      {
+        throw new InvalidOperationException("This element must have multiple value.");
+      }
       this.BindValue(value);
     }
 
     public void Bind(string[] value)
     {
+      if (!this.Value.HasMany)
+      {
+        throw new InvalidOperationException("This element must have single value.");
+      }
       this.BindValue(value);
     }
 

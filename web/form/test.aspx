@@ -21,6 +21,11 @@
         <%= form["select"].Tag.Render(Attr.Create().AddClass("form-control")) %>
         <%= form["select"].Errors.Html.Render("h5", "text-danger", "list-unstyled") %>
       </div>
+      <div class="form-group<%if (form["multi_select"].Errors.Count > 0){ %> has-error<%}; %>">
+        <% form["multi_select"].Tag.Attr["size"] = "2"; %>
+        <%= form["multi_select"].Tag.Render(Attr.Create().AddClass("form-control")) %>
+        <%= form["multi_select"].Errors.Html.Render("h5", "text-danger", "list-unstyled") %>
+      </div>
       <div class="form-group<%if (form["check_list"].Errors.Count > 0){ %> has-error<%}; %>">
         <% form["check_list"].Tag.ForEach( checkbox => {%>
         <div class="checkbox">

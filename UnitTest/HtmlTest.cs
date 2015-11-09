@@ -446,12 +446,13 @@ English
   select.Tag.Render()
 );
 
+      select.IsMultiple = true;
       select.Bind(new string[] { "1", "2" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("1", select.Value[0]);
       Assert.Equal("2", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
-<select name=""select"">
+<select name=""select"" multiple=""multiple"">
   <option value=""1"" selected=""selected"">foo</option>
   <option value=""2"" selected=""selected"">bar</option>
 </select>
@@ -514,13 +515,13 @@ English
 "),
   select.Tag.Render()
 );
-
+      select.IsMultiple = true;
       select.Bind(new string[] { "2", "3" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("2", select.Value[0]);
       Assert.Equal("3", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
-<select name=""select"">
+<select name=""select"" multiple=""multiple"">
   <optgroup label=""group1"">
     <option value=""1"">foo</option>
   </optgroup>
@@ -590,22 +591,72 @@ English
       Assert.Equal("", loginId.Errors.Html.Render());
     }
 
-      //[Fact]
-      //public void TestMock()
-      //{
-      //  var mock = new Mock<System.Web.HttpRequestBase>();
-      //  mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
-      //    {"name1", "post1" },
-      //  });
+    [Fact]
+    public void TestFormSelectValidation()
+    {
 
-      //  mock.SetupGet(x => x.QueryString).Returns(new NameValueCollection {
-      //    {"name1", "get1" },
-      //    {"name2", "get2" },
-      //  });
+      Sdx.Html.Option option;
 
-      //  var request = mock.Object;
+      var select = new Sdx.Html.Select("single_select");
 
-      //  Sdx.Context.Current.Debug.Log(request.QueryString);
-      //}
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "10";
+      option.Text = "sigle10";
+      select.AddOption(option);
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "11";
+      option.Text = "sigle11";
+      select.AddOption(option);
+
+      select.Bind("10");
+
+      Assert.Equal(HtmlLiner(@"
+<select name=""single_select"">
+  <option value=""10"" selected=""selected"">sigle10</option>
+  <option value=""11"">sigle11</option>
+</select>"), select.Tag.Render());
+
+      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        select.Bind(new string[] { "10", "11" });
+      }));
+      Assert.IsType<InvalidOperationException>(ex);
+
+      select.IsMultiple = true;
+      select.Bind(new string[] { "10", "11" });
+
+      Assert.Equal(HtmlLiner(@"
+<select name=""single_select"" multiple=""multiple"">
+  <option value=""10"" selected=""selected"">sigle10</option>
+  <option value=""11"" selected=""selected"">sigle11</option>
+</select>"), select.Tag.Render());
+
+      ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        select.Bind("10");
+      }));
+      Assert.IsType<InvalidOperationException>(ex);
+      
+
+
+      Sdx.Context.Current.Debug.Log(select.Tag.Render());
     }
+
+    //[Fact]
+    //public void TestMock()
+    //{
+    //  var mock = new Mock<System.Web.HttpRequestBase>();
+    //  mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+    //    {"name1", "post1" },
+    //  });
+
+    //  mock.SetupGet(x => x.QueryString).Returns(new NameValueCollection {
+    //    {"name1", "get1" },
+    //    {"name2", "get2" },
+    //  });
+
+    //  var request = mock.Object;
+
+    //  Sdx.Context.Current.Debug.Log(request.QueryString);
+    //}
+  }
 }

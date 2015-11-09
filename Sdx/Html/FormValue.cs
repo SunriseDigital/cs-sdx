@@ -27,10 +27,7 @@ namespace Sdx.Html
       else if (value is string)
       {
         var strVal = value.ToString();
-        if (strVal != "")
-        {
-          this.values = new string[] { strVal };
-        }
+        this.values = new string[] { strVal };
       }
       else
       {
@@ -54,6 +51,11 @@ namespace Sdx.Html
     IEnumerator IEnumerable.GetEnumerator()
     {
       return ((IEnumerable<string>)values).GetEnumerator();
+    }
+
+    public override string ToString()
+    {
+      return String.Join(",", this.values);
     }
 
     public bool IsEmpty

@@ -53,6 +53,11 @@ namespace Sdx.Html
       }
     }
 
+    public bool Exists(string key)
+    {
+      return this.attrDictionary.ContainsKey(key);
+    }
+
     public Attr AddClass(string value, bool add)
     {
       Sdx.Context.Current.Debug.Log(add);
