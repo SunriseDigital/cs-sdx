@@ -592,7 +592,7 @@ English
     }
 
     [Fact]
-    public void TestFormSelectValidation()
+    public void TestFormSelectMultiple()
     {
 
       Sdx.Html.Option option;
@@ -635,8 +635,6 @@ English
         select.Bind("10");
       }));
       Assert.IsType<InvalidOperationException>(ex);
-      
-
 
       Sdx.Context.Current.Debug.Log(select.Tag.Render());
     }
