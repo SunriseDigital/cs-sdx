@@ -17,6 +17,7 @@
         <%= form["input_text"].Errors.Html.Render("h5", "text-danger", "list-unstyled") %>
       </div>
       <div class="form-group<%if (form["select"].Errors.Count > 0){ %> has-error<%}; %>">
+        <% form.As<Sdx.Html.Select>("select").Options.First().Text = "選択してください"; %>
         <%= form["select"].Tag.Render(Attr.Create().AddClass("form-control")) %>
         <%= form["select"].Errors.Html.Render("h5", "text-danger", "list-unstyled") %>
       </div>

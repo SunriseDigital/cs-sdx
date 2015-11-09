@@ -133,17 +133,17 @@ namespace UnitTest
       Assert.True(loginId.Value.IsEmpty);
 
       loginId.Name = "login_id";
-      Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\">", loginId.Tag.Render());
 
 
       loginId.Bind("test_user");
 
       form.SetElement(loginId);
-      Assert.Equal("<input type=\"text\" value=\"test_user\" name=\"login_id\">", form["login_id"].Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\" value=\"test_user\">", form["login_id"].Tag.Render());
 
       Assert.Equal("test_user", loginId.Value.First());
       loginId.Bind("new_value");
-      Assert.Equal("<input type=\"text\" value=\"new_value\" name=\"login_id\">", form["login_id"].Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\" value=\"new_value\">", form["login_id"].Tag.Render());
       Assert.Equal("new_value", loginId.Value.First());
     }
 
@@ -551,7 +551,7 @@ English
 
       form.Bind(request.Form);
 
-      Assert.Equal("<input type=\"text\" value=\"foo@bar.com\" name=\"login_id\">", loginId.Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\" value=\"foo@bar.com\">", loginId.Tag.Render());
       Sdx.Context.Current.Debug.Log(loginId.Tag.Render());
     }
 

@@ -24,7 +24,6 @@ namespace Sdx.Html
     {
       var tag = new VoidTag("input");
       tag.Attr.Set("type", "text");
-      tag.Attr.Set("value", "");
 
       return tag;
     }

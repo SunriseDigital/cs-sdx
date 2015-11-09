@@ -23,6 +23,11 @@ public partial class form_test : System.Web.UI.Page
     Sdx.Html.Option option;
 
     option = new Sdx.Html.Option();
+    option.Text = "Select this !!";
+    option.Tag.Attr["value"] = "";
+    select.AddOption(option);
+
+    option = new Sdx.Html.Option();
     option.Tag.Attr["value"] = "10";
     option.Text = "foo";
     select.AddOption(option, "group1");

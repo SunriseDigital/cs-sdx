@@ -63,5 +63,11 @@ namespace Sdx.Html
 
       return result;
     }
+
+    public T As<T>(string name) where T : Element
+    {
+      return (T)this[name];
+    }
+
   }
 }
