@@ -559,6 +559,8 @@ English
     [Fact]
     public void TestFormValidation()
     {
+      Sdx.Context.Current.Lang = "ja";
+
       var mock = new Mock<System.Web.HttpRequestBase>();
       mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
         {"login_id", "" },

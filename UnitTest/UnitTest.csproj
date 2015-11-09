@@ -101,6 +101,7 @@
     <Compile Include="Test\Orm\Shop.cs" />
     <Compile Include="Test\Config\Dir.cs" />
     <Compile Include="Test\Config\Dir2.cs" />
+    <Compile Include="ValidationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

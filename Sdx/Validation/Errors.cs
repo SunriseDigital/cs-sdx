@@ -65,7 +65,7 @@ namespace Sdx.Validation
       return ((IEnumerable<Error>)errors).GetEnumerator();
     }
 
-    internal void Clear()
+    public void Clear()
     {
       this.errors.Clear();
     }
