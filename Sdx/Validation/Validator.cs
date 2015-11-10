@@ -20,6 +20,34 @@ namespace Sdx.Validation
 
     private Dictionary<string, string> placeholders = new Dictionary<string, string>();
 
+    public IDictionary<string, string> Messages
+    {
+      get
+      {
+        return this.messages;
+      }
+    }
+
+    public string Message
+    {
+      get
+      {
+        if (this.messages.ContainsKey(ErrorAll))
+        {
+          return this.messages[ErrorAll];
+        }
+        else
+        {
+          return null;
+        }
+      }
+
+      set
+      {
+        this.messages[ErrorAll] = value;
+      }
+    }
+
     public Validator(string message = null)
     {
       if (message != null)

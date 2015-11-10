@@ -5,7 +5,7 @@ namespace Sdx.Validation
   public class LessThan : Validator
   {
     public const string ErrorInvalid = "ErrorInvalid";
-    public const string ErrorLessEqual = "ErrorLessEqual";
+    public const string ErrorLessThanInclusive = "ErrorLessThanInclusive";
     public const string ErrorLessThan = "ErrorLessThan";
 
     private long max;
@@ -64,7 +64,7 @@ namespace Sdx.Validation
           return true;
         }
 
-        this.AddError(ErrorLessEqual);
+        this.AddError(ErrorLessThanInclusive);
       }
       else
       {

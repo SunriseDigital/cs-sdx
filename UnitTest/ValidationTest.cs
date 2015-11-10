@@ -115,5 +115,33 @@ namespace UnitTest
       validator = new Sdx.Validation.LessThan(max);
       Assert.False(validator.IsValid((max + 1).ToString()));
     }
+
+
+    [Fact]
+    public void TestGreaterThan()
+    {
+      Sdx.Context.Current.Lang = "ja";
+
+      var validator = new Sdx.Validation.GreaterThan(10);
+      Assert.Equal(10, validator.Min);
+      Assert.False(validator.Inclusive);
+      Assert.True(validator.IsValid("11"));
+      Assert.False(validator.IsValid("10"));
+      Assert.Equal("10より大きな数字を入力してください。", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.GreaterThan(10, true);
+      Assert.Equal(10, validator.Min);
+      Assert.True(validator.IsValid("10"));
+      Assert.False(validator.IsValid("9"));
+      Assert.Equal("10以上の数字を入力してください。", validator.Errors[0].Message);
+      validator.Errors.Clear();
+      Assert.False(validator.IsValid("９"));//全角はだめ
+      Assert.Equal("数字を入力してください。", validator.Errors[0].Message);
+
+
+      validator = new Sdx.Validation.GreaterThan(10, true, "%min% and %min%");
+      Assert.False(validator.IsValid("9"));
+      Assert.Equal("10 and 10", validator.Errors[0].Message);
+    }
   }
 }

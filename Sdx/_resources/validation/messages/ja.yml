@@ -4,6 +4,11 @@
       ErrorIsEmpty: "必須項目です。"
     
     LessThan:
-      ErrorInvalid:   "数字を入力してください。"
-      ErrorLessThan:  "%max%未満の数字を入力してください。"
-      ErrorLessEqual: "%max%以下の数字を入力してください。"
+      ErrorInvalid:           "数字を入力してください。"
+      ErrorLessThan:          "%max%未満の数字を入力してください。"
+      ErrorLessThanInclusive: "%max%以下の数字を入力してください。"
+
+    GreaterThan:
+      ErrorInvalid:              "数字を入力してください。"
+      ErrorGreaterThan:          "%min%より大きな数字を入力してください。"
+      ErrorGreaterThanInclusive: "%min%以上の数字を入力してください。"
