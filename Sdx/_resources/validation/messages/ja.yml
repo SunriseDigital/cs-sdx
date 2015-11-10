@@ -19,3 +19,6 @@
 
     Numeric:
       ErrorNotNumeric: "数字を入力してください。"
+
+    Email:
+      ErrorInvalidFormat: "メールアドレスの形式が正しくありません。"

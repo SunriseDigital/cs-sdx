@@ -191,5 +191,38 @@ namespace UnitTest
       validator.IsValid("aaa");
       Assert.Equal("Ahe ahe uhiha", validator.Errors[0].Message);
     }
+
+    [Fact]
+    public void TestEmail()
+    {
+      Sdx.Context.Current.Lang = "ja";
+      var validator = new Sdx.Validation.Email();
+
+      Assert.True(validator.IsValid("foo@bar.com"));
+      Assert.True(validator.IsValid("foo@bar.co.jp"));
+      Assert.True(validator.IsValid("foo+bar@bar.hoge"));
+      Assert.True(validator.IsValid("foo@hoge.hoge.bar.hoge"));
+
+      //本来許されないけどガラケーで結構見かける
+      Assert.True(validator.IsValid("foo?@bar.hoge"));
+      Assert.True(validator.IsValid("foo...aa@bar.hoge"));
+      Assert.True(validator.IsValid("+foo@foo.bar"));
+      Assert.True(validator.IsValid("foo.@foo.bar"));
+
+      Assert.False(validator.IsValid("foo"));
+      Assert.False(validator.IsValid("foo@"));
+      Assert.False(validator.IsValid("foo@bar"));
+      Assert.False(validator.IsValid("foo@bar."));
+      Assert.False(validator.IsValid("foo@foo@bar"));
+
+      //http://suzuki.tdiary.net/20130124.html
+      //http://it.srad.jp/story/14/08/06/0852210/
+      //日本語のメールアドレスは使用可能になったが、普及率と入力ミスによる機会損失をを天秤にかけ今のところ通らないようにしておきます。
+      Assert.False(validator.IsValid("日本語@hoge.hoge.bar.hoge"));
+      Assert.False(validator.IsValid("aaa@ドメインも日本語.bar.hoge"));
+
+      Assert.Equal("メールアドレスの形式が正しくありません。", validator.Errors[0].Message);
+
+    }
   }
 }
