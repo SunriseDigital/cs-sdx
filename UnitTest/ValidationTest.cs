@@ -74,5 +74,37 @@ namespace UnitTest
       Assert.Equal("SWAP MESSAGE DIC", validator.Errors[0].Message);
 
     }
+
+    [Fact]
+    public void TestLessThanAndMessagePlaceholder()
+    {
+      Sdx.Context.Current.Lang = "ja";
+
+      var validator = new Sdx.Validation.LessThan(10);
+
+      Assert.Equal(10, validator.Max);
+      Assert.True(validator.IsValid("9"));
+      Assert.False(validator.IsValid("10"));
+      Assert.Equal("10未満の数字を入力してください。", validator.Errors[0].Message);
+
+      validator.Errors.Clear();
+      validator.Inclusive = true;
+      Assert.True(validator.IsValid("10"));
+      Assert.False(validator.IsValid("11"));
+      Assert.Equal("10以下の数字を入力してください。", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.LessThan(10, true);
+      Assert.True(validator.Inclusive);
+
+
+      validator = new Sdx.Validation.LessThan(10, "<SDX>max</SDX> and <SDX>max</SDX>");
+      Assert.False(validator.IsValid("10"));
+      Assert.Equal("10 and 10", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.LessThan(10, true, "<SDX>max</SDX> and <SDX>max</SDX>");
+      Assert.True(validator.IsValid("10"));
+      Assert.False(validator.IsValid("11"));
+      Assert.Equal("10 and 10", validator.Errors[0].Message);
+    }
   }
 }

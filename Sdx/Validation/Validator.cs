@@ -18,6 +18,8 @@ namespace Sdx.Validation
 
     private Dictionary<string, string> messages = new Dictionary<string, string>();
 
+    private Dictionary<string, string> placeholders = new Dictionary<string, string>();
+
     public Validator(string message = null)
     {
       if (message != null)
@@ -51,23 +53,28 @@ namespace Sdx.Validation
       return result;
     }
 
+    protected void SetPlaceholder(string key, string value)
+    {
+      placeholders[key] = value;
+    }
+
     private Stream GetMessagesStream(string lang)
     {
       var assembly = Assembly.GetExecutingAssembly();
       return assembly.GetManifestResourceStream("Sdx._resources.validation.messages." + lang + ".yml");
     }
 
-    private void DetectMessage(Error error)
+    private string DetectMessage(Error error)
     {
       if (this.messages.ContainsKey(ErrorAll))
       {
-        error.Message = this.messages[ErrorAll];
         error.Lang = null;
+        return this.messages[ErrorAll];
       }
       else if (this.messages.ContainsKey(error.ErrorType))
       {
-        error.Message = this.messages[error.ErrorType];
         error.Lang = null;
+        return this.messages[error.ErrorType];
       }
       else //設定ファイルから読む
       {
@@ -95,7 +102,7 @@ namespace Sdx.Validation
         }
 
         var messages = messageMemoryCache[error.Lang];
-        error.Message = messages.Get(error.ClassName).Get(error.ErrorType).Value;
+        return messages.Get(error.ClassName).Get(error.ErrorType).Value;
       }
     }
 
@@ -107,8 +114,13 @@ namespace Sdx.Validation
       error.ErrorType = errorType;
       error.Lang = Sdx.Context.Current.Lang;
 
-      this.DetectMessage(error);
-
+      var message = this.DetectMessage(error);
+      //placeholder
+      foreach (var kv in this.placeholders)
+      {
+        message = message.Replace("<SDX>"+kv.Key+"</SDX>", kv.Value);
+      }
+      error.Message = message;
 
       Errors.Add(error);
     }
