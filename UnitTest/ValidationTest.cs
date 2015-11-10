@@ -81,13 +81,13 @@ namespace UnitTest
       Sdx.Context.Current.Lang = "ja";
 
       var validator = new Sdx.Validation.LessThan(10);
-
       Assert.Equal(10, validator.Max);
+      Assert.False(validator.Inclusive);
       Assert.True(validator.IsValid("9"));
       Assert.False(validator.IsValid("10"));
       Assert.Equal("10未満の数字を入力してください。", validator.Errors[0].Message);
 
-      validator.Errors.Clear();
+      validator = new Sdx.Validation.LessThan(10);
       validator.Inclusive = true;
       Assert.True(validator.IsValid("10"));
       Assert.False(validator.IsValid("11"));
@@ -95,6 +95,10 @@ namespace UnitTest
 
       validator = new Sdx.Validation.LessThan(10, true);
       Assert.True(validator.Inclusive);
+
+      validator = new Sdx.Validation.LessThan(10);
+      Assert.False(validator.IsValid("aaa"));
+      Assert.Equal("数字を入力してください。", validator.Errors[0].Message);
 
 
       validator = new Sdx.Validation.LessThan(10, "%max% and %max%");
