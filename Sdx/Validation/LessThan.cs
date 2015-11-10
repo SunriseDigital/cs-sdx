@@ -8,9 +8,9 @@ namespace Sdx.Validation
     public const string ErrorLessEqual = "ErrorLessEqual";
     public const string ErrorLessThan = "ErrorLessThan";
 
-    private int max;
+    private long max;
 
-    public int Max
+    public long Max
     {
       get
       {
@@ -26,23 +26,23 @@ namespace Sdx.Validation
 
     public bool Inclusive { get; set; } = false;
 
-    public LessThan(int max):base()
+    public LessThan(long max):base()
     {
       this.Max = max;
     }
 
-    public LessThan(int max, bool inclusive):base()
+    public LessThan(long max, bool inclusive):base()
     {
       this.Max = max;
       this.Inclusive = inclusive;
     }
 
-    public LessThan(int max, string message) : base(message)
+    public LessThan(long max, string message) : base(message)
     {
       this.Max = max;
     }
 
-    public LessThan(int max, bool inclusive, string message) : base(message)
+    public LessThan(long max, bool inclusive, string message) : base(message)
     {
       this.Max = max;
       this.Inclusive = inclusive;
@@ -50,8 +50,8 @@ namespace Sdx.Validation
 
     protected override bool ExecIsValue(string value)
     {
-      int intValue = 0;
-      if (!Int32.TryParse(value, out intValue))
+      long intValue = 0;
+      if (!Int64.TryParse(value, out intValue))
       {
         this.AddError(ErrorInvalid);
         return false;
@@ -75,7 +75,6 @@ namespace Sdx.Validation
 
         this.AddError(ErrorLessThan);
       }
-
 
       return false;
     }

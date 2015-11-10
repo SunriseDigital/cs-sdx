@@ -109,6 +109,11 @@ namespace UnitTest
       Assert.True(validator.IsValid("10"));
       Assert.False(validator.IsValid("11"));
       Assert.Equal("10 and 10", validator.Errors[0].Message);
+
+      long max = Int32.MaxValue;
+      ++max;
+      validator = new Sdx.Validation.LessThan(max);
+      Assert.False(validator.IsValid((max + 1).ToString()));
     }
   }
 }
