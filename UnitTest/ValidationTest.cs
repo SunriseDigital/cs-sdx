@@ -167,5 +167,16 @@ namespace UnitTest
       Assert.Equal(4, validator.Min);
       Assert.Equal(6, validator.Max);
     }
+
+    [Fact]
+    public void TestNumeric()
+    {
+      Sdx.Context.Current.Lang = "ja";
+
+      var validator = new Sdx.Validation.Numeric();
+      Assert.True(validator.IsValid("1234567"));
+      Assert.False(validator.IsValid("１２３"));//全角はだめ
+      Assert.Equal("数字を入力してください。", validator.Errors[0].Message);
+    }
   }
 }
