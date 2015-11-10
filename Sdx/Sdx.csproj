@@ -100,6 +100,7 @@
     <Compile Include="Validation\LessThan.cs" />
     <Compile Include="Validation\NotEmpty.cs" />
     <Compile Include="Validation\Numeric.cs" />
+    <Compile Include="Validation\Regex.cs" />
     <Compile Include="Validation\StringLength.cs" />
     <Compile Include="Validation\Validator.cs" />
     <Compile Include="Web\Holder.cs" />

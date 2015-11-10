@@ -21,4 +21,7 @@
       ErrorNotNumeric: "数字を入力してください。"
 
     Email:
-      ErrorInvalidFormat: "メールアドレスの形式が正しくありません。"
+      ErrorInvalidFormat: "メールアドレスの書式が正しくありません。"
+
+    Regex:
+      ErrorNotMatch: "書式が正しくありません。"
