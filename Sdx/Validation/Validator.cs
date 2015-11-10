@@ -118,7 +118,7 @@ namespace Sdx.Validation
       //placeholder
       foreach (var kv in this.placeholders)
       {
-        message = message.Replace("<SDX>"+kv.Key+"</SDX>", kv.Value);
+        message = message.Replace("%"+kv.Key+"%", kv.Value);
       }
       error.Message = message;
 

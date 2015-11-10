@@ -97,11 +97,11 @@ namespace UnitTest
       Assert.True(validator.Inclusive);
 
 
-      validator = new Sdx.Validation.LessThan(10, "<SDX>max</SDX> and <SDX>max</SDX>");
+      validator = new Sdx.Validation.LessThan(10, "%max% and %max%");
       Assert.False(validator.IsValid("10"));
       Assert.Equal("10 and 10", validator.Errors[0].Message);
 
-      validator = new Sdx.Validation.LessThan(10, true, "<SDX>max</SDX> and <SDX>max</SDX>");
+      validator = new Sdx.Validation.LessThan(10, true, "%max% and %max%");
       Assert.True(validator.IsValid("10"));
       Assert.False(validator.IsValid("11"));
       Assert.Equal("10 and 10", validator.Errors[0].Message);

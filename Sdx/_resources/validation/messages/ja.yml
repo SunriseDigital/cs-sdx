@@ -5,5 +5,5 @@
     
     LessThan:
       ErrorInvalid:   "数字を入力してください。"
-      ErrorLessThan:  "<SDX>max</SDX>未満の数字を入力してください。"
-      ErrorLessEqual: "<SDX>max</SDX>以下の数字を入力してください。"
+      ErrorLessThan:  "%max%未満の数字を入力してください。"
+      ErrorLessEqual: "%max%以下の数字を入力してください。"
