@@ -86,49 +86,68 @@ namespace Sdx.Validation
 
     private string DetectMessage(Error error)
     {
+      //インスタンスメッセージ（簡易）
       if (this.messages.ContainsKey(ErrorAll))
       {
         error.Lang = null;
         return this.messages[ErrorAll];
       }
-      else if (this.messages.ContainsKey(error.ErrorType))
+
+      //インスタンスメッセージ
+      if (this.messages.ContainsKey(error.ErrorType))
       {
         error.Lang = null;
         return this.messages[error.ErrorType];
       }
-      else //設定ファイルから読む
+
+      //クラスメッセージ
+      //public static Dictionary<string, Dictionary<string, string>> MessageTemplates { get; private set; }
+      //クラスに上記プロパティを作って設定する
+      var prop = this.GetType().GetProperty("MessageTemplates");
+      if (prop != null)
       {
-        if (!messageMemoryCache.ContainsKey(error.Lang))
+        var templates = (Dictionary<string, Dictionary<string, string>>)prop.GetValue(null, null);
+        if (templates.ContainsKey(error.Lang))
         {
-          var tree = new Data.TreeYaml();
-
-          var stream = this.GetMessagesStream(error.Lang);
-          if (stream == null)
+          var msgs = templates[error.Lang];
+          if (msgs.ContainsKey(error.ErrorType))
           {
-            error.Lang = "ja";
-            stream = this.GetMessagesStream(error.Lang);
+            return msgs[error.ErrorType];
           }
-
-          using (stream)
-          {
-            StreamReader sr = new StreamReader(
-                stream,
-                Encoding.GetEncoding("utf-8")
-            );
-            tree.Load(sr);
-          }
-
-          messageMemoryCache[error.Lang] = tree;
         }
-
-        var messages = messageMemoryCache[error.Lang];
-        var path = error.ClassName + "." + error.ErrorType;
-        if (messages.Exsits(path))
-        {
-          return messages.Get(path).Value;
-        }
-        return "";
       }
+
+      //設定ファイルから読む
+      if (!messageMemoryCache.ContainsKey(error.Lang))
+      {
+        var tree = new Data.TreeYaml();
+
+        var stream = this.GetMessagesStream(error.Lang);
+        if (stream == null)
+        {
+          error.Lang = "ja";
+          stream = this.GetMessagesStream(error.Lang);
+        }
+
+        using (stream)
+        {
+          StreamReader sr = new StreamReader(
+              stream,
+              Encoding.GetEncoding("utf-8")
+          );
+          tree.Load(sr);
+        }
+
+        messageMemoryCache[error.Lang] = tree;
+      }
+
+      var messages = messageMemoryCache[error.Lang];
+      var path = error.ClassName + "." + error.ErrorType;
+      if (messages.Exsits(path))
+      {
+        return messages.Get(path).Value;
+      }
+      return "";
     }
 
     protected void AddError(string errorType)

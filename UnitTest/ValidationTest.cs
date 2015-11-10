@@ -177,5 +177,19 @@ namespace UnitTest
       Assert.False(validator.IsValid("１２３"));//全角はだめ
       Assert.Equal("数字を入力してください。", validator.Errors[0].Message);
     }
+
+    [Fact]
+    public void TestClassMessages()
+    {
+      Sdx.Context.Current.Lang = "ja";
+      var validator = new Test.Validation.Numeric();
+      validator.IsValid("aaa");
+      Assert.Equal("あへあへうひは", validator.Errors[0].Message);
+
+      Sdx.Context.Current.Lang = "en";
+      validator = new Test.Validation.Numeric();
+      validator.IsValid("aaa");
+      Assert.Equal("Ahe ahe uhiha", validator.Errors[0].Message);
+    }
   }
 }
