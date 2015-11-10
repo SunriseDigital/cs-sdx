@@ -235,5 +235,16 @@ namespace UnitTest
       Assert.False(validator.IsValid("aaaa"));
       Assert.Equal("書式が正しくありません。", validator.Errors[0].Message);
     }
+
+    [Fact]
+    public void TestRegex()
+    {
+      Sdx.Context.Current.Lang = "ja";
+      var validator = new Sdx.Validation.Regex("[0-9]+");
+      Assert.Equal("[0-9]+", validator.Pattern.ToString());
+      Assert.True(validator.IsValid("0123"));
+      Assert.False(validator.IsValid("aaaa"));
+      Assert.Equal("書式が正しくありません。", validator.Errors[0].Message);
+    }
   }
 }
