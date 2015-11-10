@@ -11,10 +11,6 @@ namespace Sdx.Validation
     {
     }
 
-    public Numeric(Dictionary<string, string> messages) : base(messages)
-    {
-    }
-
     protected override bool ExecIsValue(string value)
     {
       long result;

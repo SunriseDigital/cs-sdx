@@ -66,9 +66,8 @@ namespace UnitTest
       Assert.Equal(1, validator.Errors.Count);
       Assert.Equal("SWAP MESSAGE STRING", validator.Errors[0].Message);
 
-      validator = new Sdx.Validation.NotEmpty(new Dictionary<string, string> {
-        { Sdx.Validation.NotEmpty.ErrorIsEmpty, "SWAP MESSAGE DIC"}
-      });
+      validator = new Sdx.Validation.NotEmpty();
+      validator.Messages[Sdx.Validation.NotEmpty.ErrorIsEmpty] = "SWAP MESSAGE DIC";
       Assert.False(validator.IsValid(""));
       Assert.Equal(1, validator.Errors.Count);
       Assert.Equal("SWAP MESSAGE DIC", validator.Errors[0].Message);

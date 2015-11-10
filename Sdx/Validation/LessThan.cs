@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sdx.Validation
 {
@@ -26,23 +27,12 @@ namespace Sdx.Validation
 
     public bool Inclusive { get; set; } = false;
 
-    public LessThan(long max):base()
+    public LessThan(long max, string message = null) : base(message)
     {
       this.Max = max;
     }
 
-    public LessThan(long max, bool inclusive):base()
-    {
-      this.Max = max;
-      this.Inclusive = inclusive;
-    }
-
-    public LessThan(long max, string message) : base(message)
-    {
-      this.Max = max;
-    }
-
-    public LessThan(long max, bool inclusive, string message) : base(message)
+    public LessThan(long max, bool inclusive, string message = null) : base(message)
     {
       this.Max = max;
       this.Inclusive = inclusive;

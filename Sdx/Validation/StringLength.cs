@@ -41,17 +41,12 @@ namespace Sdx.Validation
       }
     }
 
-    public StringLength(int? min = null, int? max = null) : base()
+    public StringLength(int? min = null, int? max = null, string message = null) : base(message)
     {
       this.Min = min;
       this.Max = max;
     }
 
-    public StringLength(int min, int max, string message) : base(message)
-    {
-      this.Min = min;
-      this.Max = max;
-    }
 
     protected override bool ExecIsValue(string value)
     {

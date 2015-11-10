@@ -56,14 +56,6 @@ namespace Sdx.Validation
       }
     }
 
-    public Validator(Dictionary<string, string> messages)
-    {
-      foreach (var kv in messages)
-      {
-        this.messages[kv.Key] = kv.Value;
-      }
-    }
-
     protected abstract bool ExecIsValue(string value);
 
     protected virtual bool ExecIsValue(IEnumerable<string> values)
@@ -148,14 +140,21 @@ namespace Sdx.Validation
       error.Lang = Sdx.Context.Current.Lang;
 
       var message = this.DetectMessage(error);
+      
+      error.Message = this.ReplacePlaceholder(message);
+
+      Errors.Add(error);
+    }
+
+    public string ReplacePlaceholder(string message)
+    {
       //placeholder
       foreach (var kv in this.placeholders)
       {
-        message = message.Replace("%"+kv.Key+"%", kv.Value);
+        message = message.Replace("%" + kv.Key + "%", kv.Value);
       }
-      error.Message = message;
 
-      Errors.Add(error);
+      return message;
     }
 
     protected Dictionary<string, string> MessagePlaceholder = new Dictionary<string, string>();

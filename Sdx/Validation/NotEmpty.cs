@@ -13,10 +13,6 @@ namespace Sdx.Validation
     {
     }
 
-    public NotEmpty(Dictionary<string, string> messages) : base(messages)
-    {
-    }
-
     protected override bool ExecIsValue(IEnumerable<string> values)
     {
       if (values == null)
