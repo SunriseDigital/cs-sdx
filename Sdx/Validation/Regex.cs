@@ -8,12 +8,12 @@ namespace Sdx.Validation
 
     public System.Text.RegularExpressions.Regex Pattern { get; set; }
 
-    public Regex(string pattern)
+    public Regex(string pattern, string message = null):base(message)
     {
       this.Pattern = new System.Text.RegularExpressions.Regex(pattern);
     }
 
-    protected override bool ExecIsValue(string value)
+    protected override bool ExecIsValid(string value)
     {
       if (!this.Pattern.IsMatch(value))
       {

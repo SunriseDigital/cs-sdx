@@ -103,6 +103,7 @@
     <Compile Include="Validation\Regex.cs" />
     <Compile Include="Validation\StringLength.cs" />
     <Compile Include="Validation\Validator.cs" />
+    <Compile Include="Validation\Whitelist.cs" />
     <Compile Include="Web\Holder.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />

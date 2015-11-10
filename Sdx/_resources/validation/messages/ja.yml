@@ -25,3 +25,6 @@
 
     Regex:
       ErrorNotMatch: "書式が正しくありません。"
+
+    Whitelist:
+      ErrorNotIn:    "不正な値です。"

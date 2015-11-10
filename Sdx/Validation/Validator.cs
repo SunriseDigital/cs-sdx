@@ -56,22 +56,8 @@ namespace Sdx.Validation
       }
     }
 
-    protected abstract bool ExecIsValue(string value);
+    protected abstract bool ExecIsValid(string value);
 
-    protected virtual bool ExecIsValue(IEnumerable<string> values)
-    {
-      var result = true;
-      foreach (var value in values)
-      {
-        if (!ExecIsValue(value))
-        {
-          result = false;
-          break;
-        }
-      }
-
-      return result;
-    }
 
     protected void SetPlaceholder(string key, string value)
     {
@@ -179,13 +165,19 @@ namespace Sdx.Validation
     protected Dictionary<string, string> MessagePlaceholder = new Dictionary<string, string>();
 
 
-    public bool IsValid(IEnumerable<string> values)
+    public virtual bool IsValid(IEnumerable<string> values)
     {
-      if (this.Errors == null)
+      var result = true;
+      foreach (var value in values)
       {
-        this.Errors = new Errors();
+        if (!IsValid(value))
+        {
+          result = false;
+          break;
+        }
       }
-      return ExecIsValue(values);
+
+      return result;
     }
 
     public bool IsValid(string value)
@@ -194,7 +186,9 @@ namespace Sdx.Validation
       {
         this.Errors = new Errors();
       }
-      return ExecIsValue(value);
+
+      this.SetPlaceholder("value", value);
+      return ExecIsValid(value);
     }
   }
 }

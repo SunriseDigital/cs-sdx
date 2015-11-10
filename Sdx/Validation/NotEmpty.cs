@@ -13,7 +13,7 @@ namespace Sdx.Validation
     {
     }
 
-    protected override bool ExecIsValue(IEnumerable<string> values)
+    public override bool IsValid(IEnumerable<string> values)
     {
       if (values == null)
       {
@@ -30,7 +30,7 @@ namespace Sdx.Validation
       return true;
     }
 
-    protected override bool ExecIsValue(string value)
+    protected override bool ExecIsValid(string value)
     {
       if (value == null)
       {

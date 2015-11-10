@@ -38,7 +38,7 @@ namespace Sdx.Validation
       this.Inclusive = inclusive;
     }
 
-    protected override bool ExecIsValue(string value)
+    protected override bool ExecIsValid(string value)
     {
       long intValue = 0;
       if (!Int64.TryParse(value, out intValue))

@@ -237,14 +237,15 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestRegex()
+    public void TestWhitelist()
     {
       Sdx.Context.Current.Lang = "ja";
-      var validator = new Sdx.Validation.Regex("[0-9]+");
-      Assert.Equal("[0-9]+", validator.Pattern.ToString());
-      Assert.True(validator.IsValid("0123"));
-      Assert.False(validator.IsValid("aaaa"));
-      Assert.Equal("書式が正しくありません。", validator.Errors[0].Message);
+      var validator = new Sdx.Validation.Whitelist(new string[] {"10", "20"});
+
+      Assert.True(validator.IsValid("10"));
+      Assert.True(validator.IsValid("20"));
+      Assert.False(validator.IsValid("11"));
+      Assert.Equal("不正な値です。", validator.Errors[0].Message);
     }
   }
 }

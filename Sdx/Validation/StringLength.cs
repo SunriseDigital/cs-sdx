@@ -48,7 +48,7 @@ namespace Sdx.Validation
     }
 
 
-    protected override bool ExecIsValue(string value)
+    protected override bool ExecIsValid(string value)
     {
       int length = value.Length;
       if (this.Min != null && length < this.Min)
