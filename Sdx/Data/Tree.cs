@@ -31,6 +31,13 @@ namespace Sdx.Data
     /// <returns></returns>
     protected abstract Tree BuildTree(List<string> paths);
 
+    /// <summary>
+    /// 対象のパスが存在するかどうかを返す。
+    /// </summary>
+    /// <param name="paths"></param>
+    /// <returns></returns>
+    protected abstract bool Exsits(List<string> paths);
+
     public string Value
     {
       get
@@ -63,6 +70,10 @@ namespace Sdx.Data
       return this.treeCache[path];
     }
 
+    public bool Exsits(string path)
+    {
+      return this.Exsits(this.SplitPath(path));
+    }
 
     private List<string> SplitPath(string path)
     {

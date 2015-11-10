@@ -12,3 +12,7 @@
       ErrorInvalid:              "数字を入力してください。"
       ErrorGreaterThan:          "%min%より大きな数字を入力してください。"
       ErrorGreaterThanInclusive: "%min%以上の数字を入力してください。"
+
+    StringLength:
+      ErrorTooShort:  "%min%文字以上入力してください。"
+      ErrorTooLong:   "%max%文字以下で入力お願いします。"

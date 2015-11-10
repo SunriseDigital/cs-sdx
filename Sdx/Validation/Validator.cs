@@ -130,7 +130,12 @@ namespace Sdx.Validation
         }
 
         var messages = messageMemoryCache[error.Lang];
-        return messages.Get(error.ClassName).Get(error.ErrorType).Value;
+        var path = error.ClassName + "." + error.ErrorType;
+        if (messages.Exsits(path))
+        {
+          return messages.Get(path).Value;
+        }
+        return "";
       }
     }
 

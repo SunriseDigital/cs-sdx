@@ -143,5 +143,29 @@ namespace UnitTest
       Assert.False(validator.IsValid("9"));
       Assert.Equal("10 and 10", validator.Errors[0].Message);
     }
+
+    [Fact]
+    public void TestStringLength()
+    {
+      Sdx.Context.Current.Lang = "ja";
+
+      var validator = new Sdx.Validation.StringLength(3);
+      Assert.Equal(3, validator.Min);
+      Assert.Null(validator.Max);
+      Assert.True(validator.IsValid("aaa"));
+      Assert.False(validator.IsValid("aa"));
+      Assert.Equal("3文字以上入力してください。", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.StringLength(max: 9);
+      Assert.Null(validator.Min);
+      Assert.Equal(9, validator.Max);
+      Assert.True(validator.IsValid("123456789"));
+      Assert.False(validator.IsValid("12345678910"));
+      Assert.Equal("9文字以下で入力お願いします。", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.StringLength(4, 6);
+      Assert.Equal(4, validator.Min);
+      Assert.Equal(6, validator.Max);
+    }
   }
 }
