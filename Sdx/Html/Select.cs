@@ -89,18 +89,17 @@ namespace Sdx.Html
       }
     }
 
-    internal protected override void BindValue(object value)
+    internal protected override void BindValueToTag()
     {
-      base.BindValue(value);
-
-      this.options.ForEach(element => {
-        if (this.Value.Contains(element.Tag.Attr["value"]))
+      this.options.ForEach(option => {
+        var tagValue = option.Tag.Attr["value"];
+        if (this.Value.Any(v => v == tagValue))
         {
-          element.Tag.Attr.Set("selected");
+          option.Bind(tagValue);
         }
         else
         {
-          element.Tag.Attr.Remove("selected");
+          option.Tag.Attr.Remove("selected");
         }
       });
     }

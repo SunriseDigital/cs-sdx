@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class InputText : Element
+  public class InputHidden : Element
   {
-    public InputText():base()
+    public InputHidden():base()
     {
 
     }
 
-    public InputText(string name):base(name)
+    public InputHidden(string name):base(name)
     {
 
     }
@@ -20,11 +20,10 @@ namespace Sdx.Html
       return new FormValue(false);
     }
 
-    internal protected override Tag CreateTag()
+    protected internal override Tag CreateTag()
     {
-      var tag = new VoidTag("input");
-      tag.Attr.Set("type", "text");
-
+      var tag =  new VoidTag("input");
+      tag.Attr["type"] = "hidden";
       return tag;
     }
 

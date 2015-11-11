@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Sdx.Html
 {
@@ -27,6 +28,14 @@ namespace Sdx.Html
         var op = this.tag;
         op.children.Clear();
         op.AddHtml(new RawText(value));
+      }
+    }
+
+    protected internal override void BindValueToTag()
+    {
+      if (this.Value.First() == this.tag.Attr["value"])
+      {
+        this.tag.Attr.Set("selected");
       }
     }
   }

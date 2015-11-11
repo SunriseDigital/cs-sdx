@@ -17,5 +17,13 @@ namespace Sdx.Html
 
     }
 
+    protected internal override void BindValueToTag()
+    {
+      if (this.Value.First() == this.tag.Attr["value"])
+      {
+        this.tag.Attr.Set("checked");
+      }
+    }
+
   }
 }

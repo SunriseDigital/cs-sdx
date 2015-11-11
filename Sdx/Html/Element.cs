@@ -61,10 +61,7 @@ namespace Sdx.Html
     /// 
     /// </summary>
     /// <param name="value">string|string[]</param>
-    internal protected virtual void BindValue(object value)
-    {
-      this.Value.Set(value);
-    }
+    internal protected abstract void BindValueToTag();
 
     public void Bind(string value)
     {
@@ -72,7 +69,8 @@ namespace Sdx.Html
       {
         throw new InvalidOperationException("This element must have multiple value.");
       }
-      this.BindValue(value);
+      this.Value.Set(value);
+      this.BindValueToTag();
     }
 
     public void Bind(string[] value)
@@ -81,7 +79,8 @@ namespace Sdx.Html
       {
         throw new InvalidOperationException("This element must have single value.");
       }
-      this.BindValue(value);
+      this.Value.Set(value);
+      this.BindValueToTag();
     }
 
     public bool ExecValidators()

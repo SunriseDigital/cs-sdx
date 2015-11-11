@@ -675,6 +675,18 @@ English
       Sdx.Context.Current.Debug.Log(select.Tag.Render());
     }
 
+    [Fact]
+    public void TestFormInputHidden()
+    {
+      var radio = new Sdx.Html.InputHidden();
+
+      radio.Name = "hidden";
+      Assert.Equal("<input type=\"hidden\" name=\"hidden\">", radio.Tag.Render());
+      radio.Bind("hidden_value");
+      Assert.Equal("hidden_value", radio.Value.First());
+      Assert.Equal("<input type=\"hidden\" name=\"hidden\" value=\"hidden_value\">", radio.Tag.Render());
+    }
+
     //[Fact]
     //public void TestMock()
     //{

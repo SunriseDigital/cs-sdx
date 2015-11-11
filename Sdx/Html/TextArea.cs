@@ -25,9 +25,8 @@ namespace Sdx.Html
       return new Tag("textarea");
     }
 
-    internal protected override void BindValue(object value)
+    internal protected override void BindValueToTag()
     {
-      base.BindValue(value);
       var ta = this.tag;
       ta.children.Clear();
       ta.AddHtml(new RawText(this.Value.First()));

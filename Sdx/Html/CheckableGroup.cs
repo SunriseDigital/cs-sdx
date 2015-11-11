@@ -96,14 +96,13 @@ namespace Sdx.Html
       }
     }
 
-    internal protected override void BindValue(object value)
+    internal protected override void BindValueToTag()
     {
-      base.BindValue(value);
-
       this.elements.ForEach(element => {
-        if (this.Value.Contains(element.Tag.Attr["value"]))
+        var tagValue = element.Tag.Attr["value"];
+        if (this.Value.Any(v => v == tagValue))
         {
-          element.Tag.Attr.Set("checked");
+          element.Bind(tagValue);
         }
         else
         {
