@@ -11,14 +11,31 @@ public partial class form_test : System.Web.UI.Page
     //Text
     var inputText = new Sdx.Html.InputText();
     inputText.Name = "input_text";
+    inputText
+      .AddValidator(new Sdx.Validation.NotEmpty(), true)
+      .AddValidator(new Sdx.Validation.Email());
     form.SetElement(inputText);
+
+    var inputNumber = new Sdx.Html.InputText();
+    inputNumber.Name = "input_number";
+    inputNumber
+      .AddValidator(new Sdx.Validation.NotEmpty(), true)
+      .AddValidator(new Sdx.Validation.GreaterThan(100))
+      .AddValidator(new Sdx.Validation.LessThan(200));
+    form.SetElement(inputNumber);
 
     //Select
     var select = new Sdx.Html.Select();
     select.Name = "select";
+    select.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(select);
 
     Sdx.Html.Option option;
+
+    option = new Sdx.Html.Option();
+    option.Text = "Select this !!";
+    option.Tag.Attr["value"] = "";
+    select.AddOption(option);
 
     option = new Sdx.Html.Option();
     option.Tag.Attr["value"] = "10";
@@ -30,9 +47,28 @@ public partial class form_test : System.Web.UI.Page
     option.Text = "bar";
     select.AddOption(option, "group2");
 
+    //select multi
+    var multiSelect = new Sdx.Html.Select();
+    multiSelect.Name = "multi_select";
+    multiSelect.IsMultiple = true;
+    multiSelect.AddValidator(new Sdx.Validation.NotEmpty());
+    form.SetElement(multiSelect);
+
+    option = new Sdx.Html.Option();
+    option.Tag.Attr["value"] = "100";
+    option.Text = "選択肢１００";
+    multiSelect.AddOption(option);
+
+    option = new Sdx.Html.Option();
+    option.Tag.Attr["value"] = "101";
+    option.Text = "選択肢１０１";
+    multiSelect.AddOption(option);
+
+
     //Checkbox
     var checkList = new Sdx.Html.CheckableGroup();
     checkList.Name = "check_list";
+    checkList.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(checkList);
 
     Sdx.Html.CheckBox checkbox;
@@ -55,6 +91,7 @@ public partial class form_test : System.Web.UI.Page
     //Radio
     var radios = new Sdx.Html.CheckableGroup();
     radios.Name = "radios";
+    radios.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(radios);
 
     Sdx.Html.Radio radio;
@@ -72,11 +109,20 @@ public partial class form_test : System.Web.UI.Page
     //TextArea
     var textArea = new Sdx.Html.TextArea();
     textArea.Name = "textarea";
+    textArea
+      .AddValidator(new Sdx.Validation.NotEmpty())
+      .AddValidator(new Sdx.Validation.StringLength(10, 30));
     form.SetElement(textArea);
 
     if(Request.Form.Count > 0)
     {
       form.Bind(Request.Form);
+      if (form.ExecValidators())
+      {
+        Sdx.Context.Current.Debug.Log("Is Valid !!");
+      }
+
+      Sdx.Context.Current.Debug.Log("Is Not Valid !!");
     }
 
 

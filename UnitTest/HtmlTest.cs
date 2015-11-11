@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.Web;
 using System.IO;
 using System.Linq;
+using System.Globalization;
+using System.Reflection;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -50,17 +52,17 @@ namespace UnitTest
 
       Assert.Equal(
         "class=\"foo bar hoge\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"",
-        attr.Render(Sdx.Html.Attr.Create().AddClass("hoge", "bar"))
+        attr.Merge(Sdx.Html.Attr.Create().AddClass("hoge", "bar")).Render()
       );
 
       Assert.Equal(
         "class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 150px; height: 200px; border: 1px;\" disabled=\"disabled\"",
-        attr.Render(Sdx.Html.Attr.Create().SetStyle("border", "1px").SetStyle("width", "150px"))
+        attr.Merge(Sdx.Html.Attr.Create().SetStyle("border", "1px").SetStyle("width", "150px")).Render()
       );
 
       Assert.Equal(
         "class=\"foo bar\" data-attr=\"update\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\" data-attr2=\"datavalue2\"",
-        attr.Render(Sdx.Html.Attr.Create().Set("data-attr", "update").Set("data-attr2", "datavalue2"))
+        attr.Merge(Sdx.Html.Attr.Create().Set("data-attr", "update").Set("data-attr2", "datavalue2")).Render()
       );
 
       //Remove
@@ -90,7 +92,12 @@ namespace UnitTest
       var html = new Sdx.Html.Tag("div");
       Assert.Equal("<div></div>", html.Render());
 
+      Assert.Equal("<div class=\"foobar\"></div>", html.Render(Sdx.Html.Attr.Create().AddClass("foobar")));
+      Assert.Equal("<div></div>", html.Render());
+
       html.Attr.AddClass("foo");
+      Assert.Equal("<div class=\"foo\"></div>", html.Render());
+      Assert.Equal("<div class=\"foo bar\"></div>", html.Render(Sdx.Html.Attr.Create().AddClass("bar")));
       Assert.Equal("<div class=\"foo\"></div>", html.Render());
 
       html.AddHtml(new Sdx.Html.RawText("bar"));
@@ -126,17 +133,17 @@ namespace UnitTest
       Assert.True(loginId.Value.IsEmpty);
 
       loginId.Name = "login_id";
-      Assert.Equal("<input type=\"text\" value=\"\" name=\"login_id\">", loginId.Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\">", loginId.Tag.Render());
 
 
       loginId.Bind("test_user");
 
       form.SetElement(loginId);
-      Assert.Equal("<input type=\"text\" value=\"test_user\" name=\"login_id\">", form["login_id"].Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\" value=\"test_user\">", form["login_id"].Tag.Render());
 
       Assert.Equal("test_user", loginId.Value.First());
       loginId.Bind("new_value");
-      Assert.Equal("<input type=\"text\" value=\"new_value\" name=\"login_id\">", form["login_id"].Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\" value=\"new_value\">", form["login_id"].Tag.Render());
       Assert.Equal("new_value", loginId.Value.First());
     }
 
@@ -439,12 +446,13 @@ English
   select.Tag.Render()
 );
 
+      select.IsMultiple = true;
       select.Bind(new string[] { "1", "2" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("1", select.Value[0]);
       Assert.Equal("2", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
-<select name=""select"">
+<select name=""select"" multiple=""multiple"">
   <option value=""1"" selected=""selected"">foo</option>
   <option value=""2"" selected=""selected"">bar</option>
 </select>
@@ -507,13 +515,13 @@ English
 "),
   select.Tag.Render()
 );
-
+      select.IsMultiple = true;
       select.Bind(new string[] { "2", "3" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("2", select.Value[0]);
       Assert.Equal("3", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
-<select name=""select"">
+<select name=""select"" multiple=""multiple"">
   <optgroup label=""group1"">
     <option value=""1"">foo</option>
   </optgroup>
@@ -544,8 +552,110 @@ English
 
       form.Bind(request.Form);
 
-      Assert.Equal("<input type=\"text\" value=\"foo@bar.com\" name=\"login_id\">", loginId.Tag.Render());
+      Assert.Equal("<input type=\"text\" name=\"login_id\" value=\"foo@bar.com\">", loginId.Tag.Render());
       Sdx.Context.Current.Debug.Log(loginId.Tag.Render());
+    }
+
+    [Fact]
+    public void TestFormValidation()
+    {
+      Sdx.Context.Current.Lang = "ja";
+
+      var mock = new Mock<System.Web.HttpRequestBase>();
+      mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+        {"login_id", "" },
+      });
+
+      var request = mock.Object;
+
+      var form = new Sdx.Html.Form();
+
+      var loginId = new Sdx.Html.InputText("login_id");
+      loginId
+        .AddValidator(new Sdx.Validation.NotEmpty())
+        .AddValidator(new Sdx.Validation.Email());
+      form.SetElement(loginId);
+
+      form.Bind(request.Form);
+
+      Assert.False(form.ExecValidators());
+      Assert.Equal(2, loginId.Errors.Count);
+      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li><li>メールアドレスの書式が正しくありません。</li></ul>", loginId.Errors.Html.Render());
+      Assert.Equal("必須項目です。", loginId.Errors[0].Message);
+      Assert.Equal("ja", loginId.Errors[0].Lang);
+
+      //BreakChain
+      form = new Sdx.Html.Form();
+
+      loginId = new Sdx.Html.InputText("login_id");
+      loginId
+        .AddValidator(new Sdx.Validation.NotEmpty(), true)
+        .AddValidator(new Sdx.Validation.Email());
+      form.SetElement(loginId);
+
+      form.Bind(request.Form);
+
+      Assert.False(form.ExecValidators());
+      Assert.Equal(1, loginId.Errors.Count);
+      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li></ul>", loginId.Errors.Html.Render());
+
+      mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
+        {"login_id", "some@mail.com" },
+      });
+
+      form.Bind(request.Form);
+
+      Assert.True(form.ExecValidators());
+      Assert.Equal(0, loginId.Errors.Count);
+      Assert.Equal("", loginId.Errors.Html.Render());
+    }
+
+    [Fact]
+    public void TestFormSelectMultiple()
+    {
+
+      Sdx.Html.Option option;
+
+      var select = new Sdx.Html.Select("single_select");
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "10";
+      option.Text = "sigle10";
+      select.AddOption(option);
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "11";
+      option.Text = "sigle11";
+      select.AddOption(option);
+
+      select.Bind("10");
+
+      Assert.Equal(HtmlLiner(@"
+<select name=""single_select"">
+  <option value=""10"" selected=""selected"">sigle10</option>
+  <option value=""11"">sigle11</option>
+</select>"), select.Tag.Render());
+
+      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        select.Bind(new string[] { "10", "11" });
+      }));
+      Assert.IsType<InvalidOperationException>(ex);
+
+      select.IsMultiple = true;
+      select.Bind(new string[] { "10", "11" });
+
+      Assert.Equal(HtmlLiner(@"
+<select name=""single_select"" multiple=""multiple"">
+  <option value=""10"" selected=""selected"">sigle10</option>
+  <option value=""11"" selected=""selected"">sigle11</option>
+</select>"), select.Tag.Render());
+
+      ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        select.Bind("10");
+      }));
+      Assert.IsType<InvalidOperationException>(ex);
+
+      Sdx.Context.Current.Debug.Log(select.Tag.Render());
     }
 
     //[Fact]

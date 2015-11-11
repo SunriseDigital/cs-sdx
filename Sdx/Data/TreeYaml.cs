@@ -78,5 +78,30 @@ namespace Sdx.Data
 
       this.BaseNode = yaml.Documents[0].RootNode; ;
     }
+
+    public override string ToString()
+    {
+      return BaseNode.ToString();
+    }
+
+    protected override bool Exsits(List<string> paths)
+    {
+      YamlNode target = this.BaseNode;
+
+      foreach (var key in paths)
+      {
+        var keyNode = new YamlScalarNode(key);
+        if (((YamlMappingNode)target).Children.ContainsKey(keyNode))
+        {
+          target = ((YamlMappingNode)target).Children[new YamlScalarNode(key)];
+        }
+        else
+        {
+          return false;
+        }
+      }
+
+      return true;
+    }
   }
 }

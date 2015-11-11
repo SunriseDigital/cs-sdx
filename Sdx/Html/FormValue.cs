@@ -10,10 +10,13 @@ namespace Sdx.Html
   {
     private string[] values;
 
-    internal FormValue()
+    internal FormValue(bool hasMany)
     {
       this.values = new string[0];
+      this.HasMany = hasMany;
     }
+
+    public bool HasMany { get; internal set; }
 
     internal void Set(object value)
     {
@@ -24,10 +27,7 @@ namespace Sdx.Html
       else if (value is string)
       {
         var strVal = value.ToString();
-        if (strVal != "")
-        {
-          this.values = new string[] { strVal };
-        }
+        this.values = new string[] { strVal };
       }
       else
       {
@@ -51,6 +51,11 @@ namespace Sdx.Html
     IEnumerator IEnumerable.GetEnumerator()
     {
       return ((IEnumerable<string>)values).GetEnumerator();
+    }
+
+    public override string ToString()
+    {
+      return String.Join(",", this.values);
     }
 
     public bool IsEmpty

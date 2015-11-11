@@ -15,6 +15,11 @@ namespace Sdx.Html
 
     }
 
+    protected internal override FormValue CreateFormValue()
+    {
+      return new FormValue(false);
+    }
+
     internal protected override Html CreateTag()
     {
       return new Tag("textarea");

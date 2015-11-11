@@ -53,6 +53,22 @@ namespace Sdx.Html
       }
     }
 
+    public bool Exists(string key)
+    {
+      return this.attrDictionary.ContainsKey(key);
+    }
+
+    public Attr AddClass(string value, bool add)
+    {
+      Sdx.Context.Current.Debug.Log(add);
+      if (add)
+      {
+        this.AddClass(value);
+      }
+
+      return this;
+    }
+
     /// <summary>
     /// クラス属性を追加します。
     /// </summary>
@@ -179,53 +195,62 @@ namespace Sdx.Html
       return this;
     }
 
-    internal void Render(StringBuilder builder, Attr attribute)
+    public Attr Merge(Attr attribute)
     {
-      if (attribute == null)
+      var newAttr = new Attr();
+
+      newAttr.attrDictionary = this.CloneAttrDictionary();
+      if (attribute != null)
       {
-        this.RenderWithDictionary(builder, this.attrDictionary);
-      }
-      else
-      {
-        var tmpAttrDic = this.CloneAttrDictionary();
-        attribute.attrDictionary.ForEach((key, value) => {
-          if (key == "class" && tmpAttrDic.ContainsKey(key))
+        attribute.attrDictionary.ForEach((key, value) =>
+        {
+          //merge
+          if (key == "class" && newAttr.attrDictionary.ContainsKey(key))
           {
-            var tmpClasses = (List<string>)tmpAttrDic["class"];
+            var tmpClasses = (List<string>)newAttr.attrDictionary["class"];
             var argClasses = (List<string>)value;
-            argClasses.ForEach(val => {
+            argClasses.ForEach(val =>
+            {
               if (!tmpClasses.Contains(val))
               {
                 tmpClasses.Add(val);
               }
             });
           }
-          else if (key == "style" && tmpAttrDic.ContainsKey(key))
+          //merge
+          else if (key == "style" && newAttr.attrDictionary.ContainsKey(key))
           {
-            var tmpStyles = (Collection.OrderedDictionary<string, string>)tmpAttrDic["style"];
+            var tmpStyles = (Collection.OrderedDictionary<string, string>)newAttr.attrDictionary["style"];
             var argStyles = (Collection.OrderedDictionary<string, string>)value;
-            argStyles.ForEach((k, v) => {
+            argStyles.ForEach((k, v) =>
+            {
               tmpStyles[k] = v;
             });
           }
           else
           {
-            tmpAttrDic[key] = value;
+            newAttr.attrDictionary[key] = value;
           }
         });
-
-        this.RenderWithDictionary(builder, tmpAttrDic);
       }
+
+      return newAttr;
+    }
+
+
+    internal void Render(StringBuilder builder)
+    {
+      this.RenderWithDictionary(builder, this.attrDictionary);
     }
 
     /// <summary>
     /// 属性文字列を組み立てます。
     /// </summary>
     /// <returns></returns>
-    public string Render(Attr attribute = null)
+    public string Render()
     {
       var builder = new StringBuilder();
-      this.Render(builder, attribute);
+      this.Render(builder);
       return builder.ToString();
     }
 

@@ -21,6 +21,11 @@ namespace Sdx.Html
 
     }
 
+    protected internal override FormValue CreateFormValue()
+    {
+      return new FormValue(true);
+    }
+
     internal protected override Html CreateTag()
     {
       return new Tag("span");

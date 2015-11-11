@@ -14,6 +14,11 @@ namespace Sdx.Html
 
     }
 
+    protected internal override FormValue CreateFormValue()
+    {
+      return new FormValue(false);
+    }
+
     internal protected override Html CreateTag()
     {
       var tag = new VoidTag("input");
