@@ -50,7 +50,7 @@ public partial class form_test : System.Web.UI.Page
     //select multi
     var multiSelect = new Sdx.Html.Select();
     multiSelect.Name = "multi_select";
-    multiSelect.IsMultiple = true;
+    multiSelect.Multiple = true;
     multiSelect.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(multiSelect);
 

@@ -20,7 +20,7 @@ namespace Sdx.Html
     }
 
     /// <summary>
-    /// <see cref="FormValue.HasMany"/>はElement毎に違うのでそれを設定するたの抽象メソッド。
+    /// <see cref="FormValue.Multiple"/>はElement毎に違うのでそれを設定するたの抽象メソッド。
     /// 子クラスで実装してください。
     /// </summary>
     /// <returns></returns>
@@ -68,7 +68,7 @@ namespace Sdx.Html
 
     public void Bind(string value)
     {
-      if (this.Value.HasMany)
+      if (this.Value.Multiple)
       {
         throw new InvalidOperationException("This element must have multiple value.");
       }
@@ -77,7 +77,7 @@ namespace Sdx.Html
 
     public void Bind(string[] value)
     {
-      if (!this.Value.HasMany)
+      if (!this.Value.Multiple)
       {
         throw new InvalidOperationException("This element must have single value.");
       }
@@ -96,7 +96,7 @@ namespace Sdx.Html
 
         validator.Errors = this.Errors;
         bool isValid;
-        if (this.Value.HasMany)
+        if (this.Value.Multiple)
         {
           isValid = validator.IsValid(this.Value.ToArray());
         }

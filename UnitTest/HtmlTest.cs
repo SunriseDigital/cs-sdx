@@ -446,7 +446,7 @@ English
   select.Tag.Render()
 );
 
-      select.IsMultiple = true;
+      select.Multiple = true;
       select.Bind(new string[] { "1", "2" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("1", select.Value[0]);
@@ -515,7 +515,7 @@ English
 "),
   select.Tag.Render()
 );
-      select.IsMultiple = true;
+      select.Multiple = true;
       select.Bind(new string[] { "2", "3" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("2", select.Value[0]);
@@ -641,7 +641,7 @@ English
       }));
       Assert.IsType<InvalidOperationException>(ex);
 
-      select.IsMultiple = true;
+      select.Multiple = true;
       select.Bind(new string[] { "10", "11" });
 
       Assert.Equal(HtmlLiner(@"

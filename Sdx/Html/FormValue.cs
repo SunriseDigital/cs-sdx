@@ -10,13 +10,13 @@ namespace Sdx.Html
   {
     private string[] values;
 
-    internal FormValue(bool hasMany)
+    internal FormValue(bool isMultiple)
     {
       this.values = new string[0];
-      this.HasMany = hasMany;
+      this.Multiple = isMultiple;
     }
 
-    public bool HasMany { get; internal set; }
+    public bool Multiple { get; internal set; }
 
     internal void Set(object value)
     {

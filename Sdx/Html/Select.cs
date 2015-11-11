@@ -23,7 +23,7 @@ namespace Sdx.Html
       }
     }
 
-    public bool IsMultiple
+    public bool Multiple
     {
       get
       {
@@ -34,12 +34,12 @@ namespace Sdx.Html
       {
         if (value)
         {
-          this.Value.HasMany = true;
+          this.Value.Multiple = true;
           this.Tag.Attr.Set("multiple");
         }
         else
         {
-          this.Value.HasMany = false;
+          this.Value.Multiple = false;
           this.Tag.Attr.Remove("multiple");
         }
       }
