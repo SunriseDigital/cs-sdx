@@ -46,22 +46,22 @@ namespace UnitTest
       Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\"", attr.Render());
 
       attr.Set("disabled");
-      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"", attr.Render());
+      Assert.Equal("class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled", attr.Render());
 
       //temp add
 
       Assert.Equal(
-        "class=\"foo bar hoge\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\"",
+        "class=\"foo bar hoge\" data-attr=\"datavalue\" style=\"width: 100px; height: 200px;\" disabled",
         attr.Merge(Sdx.Html.Attr.Create().AddClass("hoge", "bar")).Render()
       );
 
       Assert.Equal(
-        "class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 150px; height: 200px; border: 1px;\" disabled=\"disabled\"",
+        "class=\"foo bar\" data-attr=\"datavalue\" style=\"width: 150px; height: 200px; border: 1px;\" disabled",
         attr.Merge(Sdx.Html.Attr.Create().SetStyle("border", "1px").SetStyle("width", "150px")).Render()
       );
 
       Assert.Equal(
-        "class=\"foo bar\" data-attr=\"update\" style=\"width: 100px; height: 200px;\" disabled=\"disabled\" data-attr2=\"datavalue2\"",
+        "class=\"foo bar\" data-attr=\"update\" style=\"width: 100px; height: 200px;\" disabled data-attr2=\"datavalue2\"",
         attr.Merge(Sdx.Html.Attr.Create().Set("data-attr", "update").Set("data-attr2", "datavalue2")).Render()
       );
 
@@ -260,7 +260,7 @@ English
       Assert.Equal("1", group.Value.First());
       Assert.Equal(HtmlLiner(@"
 <span>
-  <input type=""checkbox"" value=""1"" name=""checkboxies"" checked=""checked"">
+  <input type=""checkbox"" value=""1"" name=""checkboxies"" checked>
   <input type=""checkbox"" value=""2"" name=""checkboxies"">
   <input type=""checkbox"" value=""3"" name=""checkboxies"">
 </span>
@@ -269,7 +269,7 @@ English
 );
 
       Assert.Equal(HtmlLiner(@"
-<input type=""checkbox"" value=""1"" name=""checkboxies"" checked=""checked"">
+<input type=""checkbox"" value=""1"" name=""checkboxies"" checked>
 "),
   group[0].Tag.Render()
 );
@@ -293,8 +293,8 @@ English
       Assert.Equal(HtmlLiner(@"
 <span>
   <input type=""checkbox"" value=""1"" name=""checkboxies"">
-  <input type=""checkbox"" value=""2"" name=""checkboxies"" checked=""checked"">
-  <input type=""checkbox"" value=""3"" name=""checkboxies"" checked=""checked"">
+  <input type=""checkbox"" value=""2"" name=""checkboxies"" checked>
+  <input type=""checkbox"" value=""3"" name=""checkboxies"" checked>
 </span>
 "),
   group.Tag.Render()
@@ -307,13 +307,13 @@ English
 );
 
       Assert.Equal(HtmlLiner(@"
-<input type=""checkbox"" value=""2"" name=""checkboxies"" checked=""checked"">
+<input type=""checkbox"" value=""2"" name=""checkboxies"" checked>
 "),
   group[1].Tag.Render()
 );
 
       Assert.Equal(HtmlLiner(@"
-<input type=""checkbox"" value=""3"" name=""checkboxies"" checked=""checked"">
+<input type=""checkbox"" value=""3"" name=""checkboxies"" checked>
 "),
   group[2].Tag.Render()
 );
@@ -444,7 +444,7 @@ English
       Assert.Equal("1", select.Value.First());
       Assert.Equal(HtmlLiner(@"
 <select name=""select"">
-  <option value=""1"" selected=""selected"">foo</option>
+  <option value=""1"" selected>foo</option>
   <option value=""2"">bar</option>
 </select>
 "),
@@ -457,7 +457,7 @@ English
       Assert.Equal(HtmlLiner(@"
 <select name=""select"">
   <option value=""1"">foo</option>
-  <option value=""2"" selected=""selected"">bar</option>
+  <option value=""2"" selected>bar</option>
 </select>
 "),
   select.Tag.Render()
@@ -469,9 +469,9 @@ English
       Assert.Equal("1", select.Value[0]);
       Assert.Equal("2", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
-<select name=""select"" multiple=""multiple"">
-  <option value=""1"" selected=""selected"">foo</option>
-  <option value=""2"" selected=""selected"">bar</option>
+<select name=""select"" multiple>
+  <option value=""1"" selected>foo</option>
+  <option value=""2"" selected>bar</option>
 </select>
 "),
   select.Tag.Render()
@@ -525,7 +525,7 @@ English
     <option value=""1"">foo</option>
   </optgroup>
   <optgroup label=""group2"">
-    <option value=""2"" selected=""selected"">bar</option>
+    <option value=""2"" selected>bar</option>
   </optgroup>
   <option value=""3"">zip</option>
 </select>
@@ -538,14 +538,14 @@ English
       Assert.Equal("2", select.Value[0]);
       Assert.Equal("3", select.Value[1]);
       Assert.Equal(HtmlLiner(@"
-<select name=""select"" multiple=""multiple"">
+<select name=""select"" multiple>
   <optgroup label=""group1"">
     <option value=""1"">foo</option>
   </optgroup>
   <optgroup label=""group2"">
-    <option value=""2"" selected=""selected"">bar</option>
+    <option value=""2"" selected>bar</option>
   </optgroup>
-  <option value=""3"" selected=""selected"">zip</option>
+  <option value=""3"" selected>zip</option>
 </select>
 "),
   select.Tag.Render()
@@ -649,7 +649,7 @@ English
 
       Assert.Equal(HtmlLiner(@"
 <select name=""single_select"">
-  <option value=""10"" selected=""selected"">sigle10</option>
+  <option value=""10"" selected>sigle10</option>
   <option value=""11"">sigle11</option>
 </select>"), select.Tag.Render());
 
@@ -662,9 +662,9 @@ English
       select.Bind(new string[] { "10", "11" });
 
       Assert.Equal(HtmlLiner(@"
-<select name=""single_select"" multiple=""multiple"">
-  <option value=""10"" selected=""selected"">sigle10</option>
-  <option value=""11"" selected=""selected"">sigle11</option>
+<select name=""single_select"" multiple>
+  <option value=""10"" selected>sigle10</option>
+  <option value=""11"" selected>sigle11</option>
 </select>"), select.Tag.Render());
 
       ex = Record.Exception(new Assert.ThrowsDelegate(() => {

@@ -296,11 +296,16 @@ namespace Sdx.Html
         }
         else
         {
-          builder
-            .Append(key)
-            .Append("=\"")
-            .Append(value)
-            .Append("\" ");
+          builder.Append(key);
+          if (key != value.ToString())
+          {
+            builder
+              .Append("=\"")
+              .Append(value)
+              .Append("\"");
+          }
+
+          builder.Append(" ");
         }
 
       });
