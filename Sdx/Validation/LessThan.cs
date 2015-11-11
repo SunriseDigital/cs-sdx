@@ -25,11 +25,12 @@ namespace Sdx.Validation
       }
     }
 
-    public bool Inclusive { get; set; } = false;
+    public bool Inclusive { get; set; }
 
     public LessThan(long max, string message = null) : base(message)
     {
       this.Max = max;
+      this.Inclusive = false;
     }
 
     public LessThan(long max, bool inclusive, string message = null) : base(message)

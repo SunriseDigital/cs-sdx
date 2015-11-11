@@ -12,11 +12,12 @@ namespace Sdx.Html
 
     private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
 
-    public Validation.Errors Errors { get; private set; } = new Validation.Errors();
+    public Validation.Errors Errors { get; private set; }
 
     public Element(string name):this()
     {
       this.Name = name;
+      this.Errors = new Validation.Errors();
     }
 
     /// <summary>

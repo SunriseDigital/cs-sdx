@@ -8,8 +8,6 @@ namespace Sdx.Html
 {
   public abstract class HtmlBase
   {
-    private string tagName;
-
     internal protected List<HtmlBase> children = new List<HtmlBase>();
     /// <summary>
     /// HTMLのタグとして正当な文字列を返す
