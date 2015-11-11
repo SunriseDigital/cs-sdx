@@ -7,7 +7,7 @@ namespace Sdx.Html
 {
   public abstract class Element
   {
-    internal protected HtmlBase tag;
+    internal protected Tag tag;
 
 
     private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
@@ -26,7 +26,7 @@ namespace Sdx.Html
     /// <returns></returns>
     internal protected abstract FormValue CreateFormValue();
 
-    internal protected abstract HtmlBase CreateTag();
+    internal protected abstract Tag CreateTag();
 
     public virtual string Name
     {
@@ -41,7 +41,7 @@ namespace Sdx.Html
       }
     }
 
-    public HtmlBase Tag
+    public Tag Tag
     {
       get
       {

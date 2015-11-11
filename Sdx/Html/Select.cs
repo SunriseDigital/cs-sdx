@@ -10,7 +10,7 @@ namespace Sdx.Html
 
     private Dictionary<string, Tag> optgroups = new Dictionary<string, Tag>();
 
-    internal protected override HtmlBase CreateTag()
+    internal protected override Tag CreateTag()
     {
       return new Tag("select");
     }
@@ -64,7 +64,7 @@ namespace Sdx.Html
     {
       this.options.Add(option);
 
-      var tag = (Tag)this.tag;
+      var tag = this.tag;
 
       if (optgroupLabel == null)
       {

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class VoidTag : HtmlBase
+  public class VoidTag : Tag
   {
     public VoidTag(string tagName):base(tagName)
     {

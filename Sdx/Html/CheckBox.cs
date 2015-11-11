@@ -19,7 +19,7 @@ namespace Sdx.Html
       return new FormValue(false);
     }
 
-    internal protected override HtmlBase CreateTag()
+    internal protected override Tag CreateTag()
     {
       var tag = new VoidTag("input");
       tag.Attr["type"] = "checkbox";

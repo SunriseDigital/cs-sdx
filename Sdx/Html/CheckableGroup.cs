@@ -34,7 +34,7 @@ namespace Sdx.Html
       return new FormValue(true);
     }
 
-    internal protected override HtmlBase CreateTag()
+    internal protected override Tag CreateTag()
     {
       return new Tag("span");
     }
@@ -56,7 +56,7 @@ namespace Sdx.Html
     {
       elements.Add(checkable);
 
-      var tag = (Tag)this.tag;
+      var tag = this.tag;
       
       if(this.name != null)
       {

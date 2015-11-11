@@ -20,7 +20,7 @@ namespace Sdx.Html
       return new FormValue(false);
     }
 
-    internal protected override HtmlBase CreateTag()
+    internal protected override Tag CreateTag()
     {
       return new Tag("textarea");
     }
@@ -28,7 +28,7 @@ namespace Sdx.Html
     internal protected override void BindValue(object value)
     {
       base.BindValue(value);
-      var ta = (Tag)this.tag;
+      var ta = this.tag;
       ta.children.Clear();
       ta.AddHtml(new RawText(this.Value.First()));
     }
