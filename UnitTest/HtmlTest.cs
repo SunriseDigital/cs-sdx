@@ -571,7 +571,26 @@ English
       var form = new Sdx.Html.Form();
 
       var loginId = new Sdx.Html.InputText("login_id");
-      loginId.AddValidator(new Sdx.Validation.NotEmpty());
+      loginId
+        .AddValidator(new Sdx.Validation.NotEmpty())
+        .AddValidator(new Sdx.Validation.Email());
+      form.SetElement(loginId);
+
+      form.Bind(request.Form);
+
+      Assert.False(form.ExecValidators());
+      Assert.Equal(2, loginId.Errors.Count);
+      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li><li>メールアドレスの書式が正しくありません。</li></ul>", loginId.Errors.Html.Render());
+      Assert.Equal("必須項目です。", loginId.Errors[0].Message);
+      Assert.Equal("ja", loginId.Errors[0].Lang);
+
+      //BreakChain
+      form = new Sdx.Html.Form();
+
+      loginId = new Sdx.Html.InputText("login_id");
+      loginId
+        .AddValidator(new Sdx.Validation.NotEmpty(), true)
+        .AddValidator(new Sdx.Validation.Email());
       form.SetElement(loginId);
 
       form.Bind(request.Form);
@@ -579,11 +598,9 @@ English
       Assert.False(form.ExecValidators());
       Assert.Equal(1, loginId.Errors.Count);
       Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li></ul>", loginId.Errors.Html.Render());
-      Assert.Equal("必須項目です。", loginId.Errors[0].Message);
-      Assert.Equal("ja", loginId.Errors[0].Lang);
 
       mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
-        {"login_id", "some value" },
+        {"login_id", "some@mail.com" },
       });
 
       form.Bind(request.Form);

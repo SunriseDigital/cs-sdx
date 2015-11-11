@@ -89,7 +89,8 @@ namespace Sdx.Html
       var result = true;
       this.Errors.Clear();
 
-      validators.ForEach(val => {
+      foreach (var val in validators)
+      {
         var validator = (Validation.Validator)val["validator"];
         var breakChain = (bool)val["breakChain"];
 
@@ -108,22 +109,24 @@ namespace Sdx.Html
         {
           validator.Errors = null;
           result = false;
-          if(breakChain)
+          if (breakChain)
           {
-            return;
+            break;
           }
         }
-      });
+      }
 
       return result;
     }
 
-    public void AddValidator(Validation.Validator validator, bool breakChain = false)
+    public Element AddValidator(Validation.Validator validator, bool breakChain = false)
     {
       validators.Add(new Dictionary<string, object> {
         {"validator", validator},
         {"breakChain", breakChain}
       });
+
+      return this;
     }
   }
 }
