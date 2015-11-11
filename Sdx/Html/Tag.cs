@@ -18,6 +18,12 @@ namespace Sdx.Html
       return this;
     }
 
+    public Tag AddText(string text)
+    {
+      this.AddHtml(new RawText(text));
+      return this;
+    }
+
     public override string RenderStartTag(Attr attribute = null)
     {
       var builder = new StringBuilder();

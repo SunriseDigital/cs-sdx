@@ -122,6 +122,16 @@ namespace UnitTest
         "<div><p>日本語<br>English<span class=\"foo\">span</span></p></div>",
         div.Render()
       );
+
+      span = new Sdx.Html.Tag("span");
+      span
+        .AddText("foobar")
+        .AddText("日本語");
+
+      Assert.Equal(
+        "<span>foobar日本語</span>",
+        span.Render()
+      );
     }
 
     [Fact]
