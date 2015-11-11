@@ -8,11 +8,12 @@ namespace Sdx.Db.Sql
   {
     public Adapter Adapter { get; private set; }
     public string From { get; set; }
-    public Condition Where { get; private set; } = new Condition();
+    public Condition Where { get; private set; }
 
     internal Delete(Adapter adapter)
     {
       this.Adapter = adapter;
+      this.Where = new Condition();
     }
 
     public Delete SetFrom(string table)
