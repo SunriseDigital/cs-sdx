@@ -51,6 +51,8 @@ namespace Sdx.Validation
     protected override bool ExecIsValid(string value)
     {
       int length = value.Length;
+      this.SetPlaceholder("actual_length", length.ToString());
+
       if (this.Min != null && length < this.Min)
       {
         this.AddError(ErrorTooShort);

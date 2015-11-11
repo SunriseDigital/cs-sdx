@@ -153,18 +153,23 @@ namespace UnitTest
       Assert.Null(validator.Max);
       Assert.True(validator.IsValid("aaa"));
       Assert.False(validator.IsValid("aa"));
-      Assert.Equal("3文字以上入力してください。", validator.Errors[0].Message);
+      Assert.Equal("3文字以上入力してください（現在2文字）。", validator.Errors[0].Message);
 
       validator = new Sdx.Validation.StringLength(max: 9);
       Assert.Null(validator.Min);
       Assert.Equal(9, validator.Max);
       Assert.True(validator.IsValid("123456789"));
       Assert.False(validator.IsValid("12345678910"));
-      Assert.Equal("9文字以下で入力お願いします。", validator.Errors[0].Message);
+      Assert.Equal("9文字までしか入力できません（現在11文字）。", validator.Errors[0].Message);
 
       validator = new Sdx.Validation.StringLength(4, 6);
       Assert.Equal(4, validator.Min);
       Assert.Equal(6, validator.Max);
+
+      //\r\nが2文字になる件ですが、DBでも2にカウントされるので通してしまうとエラーになってしまう可能性がある。
+      //本来フィルターして統一すべき案件なので、Vaildatorでは対応しない方針にします。
+      validator = new Sdx.Validation.StringLength(max: 4);
+      Assert.False(validator.IsValid("日本語\r\n"));
     }
 
     [Fact]

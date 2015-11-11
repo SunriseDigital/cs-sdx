@@ -14,8 +14,8 @@
       ErrorGreaterThanInclusive: "%min%以上の数字を入力してください。"
 
     StringLength:
-      ErrorTooShort:  "%min%文字以上入力してください。"
-      ErrorTooLong:   "%max%文字以下で入力お願いします。"
+      ErrorTooShort:  "%min%文字以上入力してください（現在%actual_length%文字）。"
+      ErrorTooLong:   "%max%文字までしか入力できません（現在%actual_length%文字）。"
 
     Numeric:
       ErrorNotNumeric: "数字を入力してください。"
