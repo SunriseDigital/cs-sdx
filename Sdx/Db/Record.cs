@@ -13,9 +13,15 @@ namespace Sdx.Db
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
     internal string ContextName { get; set; }
-    internal Dictionary<string, object> UpdatedValues { get; } = new Dictionary<string, object>();
-    internal List<Dictionary<string, object>> ValuesList { get; } = new List<Dictionary<string, object>>();
+    internal Dictionary<string, object> UpdatedValues { get; private set; }
+    internal List<Dictionary<string, object>> ValuesList { get; private set; }
     internal Select Select { get; set; }
+
+    public Record()
+    {
+      this.UpdatedValues = new Dictionary<string, object>();
+      this.ValuesList = new List<Dictionary<string, object>>();
+    }
 
     public TableMeta OwnMeta
     {
