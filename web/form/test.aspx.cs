@@ -11,8 +11,18 @@ public partial class form_test : System.Web.UI.Page
     //Text
     var inputText = new Sdx.Html.InputText();
     inputText.Name = "input_text";
-    inputText.AddValidator(new Sdx.Validation.NotEmpty());
+    inputText
+      .AddValidator(new Sdx.Validation.NotEmpty(), true)
+      .AddValidator(new Sdx.Validation.Email());
     form.SetElement(inputText);
+
+    var inputNumber = new Sdx.Html.InputText();
+    inputNumber.Name = "input_number";
+    inputNumber
+      .AddValidator(new Sdx.Validation.NotEmpty(), true)
+      .AddValidator(new Sdx.Validation.GreaterThan(100))
+      .AddValidator(new Sdx.Validation.LessThan(200));
+    form.SetElement(inputNumber);
 
     //Select
     var select = new Sdx.Html.Select();
@@ -99,7 +109,9 @@ public partial class form_test : System.Web.UI.Page
     //TextArea
     var textArea = new Sdx.Html.TextArea();
     textArea.Name = "textarea";
-    textArea.AddValidator(new Sdx.Validation.NotEmpty());
+    textArea
+      .AddValidator(new Sdx.Validation.NotEmpty())
+      .AddValidator(new Sdx.Validation.StringLength(10, 30));
     form.SetElement(textArea);
 
     if(Request.Form.Count > 0)
