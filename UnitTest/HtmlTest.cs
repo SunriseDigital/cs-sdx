@@ -132,6 +132,13 @@ namespace UnitTest
         "<span>foobar日本語</span>",
         span.Render()
       );
+
+      span = new Sdx.Html.Tag("span");
+      span.AddText("\"&<>");
+      Assert.Equal(
+        "<span>&quot;&amp;&lt;&gt;</span>",
+        span.Render()
+      );
     }
 
     [Fact]

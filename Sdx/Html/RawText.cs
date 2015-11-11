@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Web;
 
 namespace Sdx.Html
 {
@@ -10,7 +8,7 @@ namespace Sdx.Html
 
     public RawText(string text):base(null)
     {
-      this.Text = text;
+      this.Text = HttpUtility.HtmlEncode(text);
     }
 
     public override string Render(Attr attribute = null)
