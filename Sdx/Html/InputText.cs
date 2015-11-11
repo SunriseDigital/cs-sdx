@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class InputText : Element
+  public class InputText : Input
   {
     public InputText():base()
     {
@@ -15,22 +15,9 @@ namespace Sdx.Html
 
     }
 
-    protected internal override FormValue CreateFormValue()
+    protected internal override string GetInputType()
     {
-      return new FormValue(false);
-    }
-
-    internal protected override Tag CreateTag()
-    {
-      var tag = new VoidTag("input");
-      tag.Attr.Set("type", "text");
-
-      return tag;
-    }
-
-    internal protected override void BindValueToTag()
-    {
-      this.Tag.Attr["value"] = this.Value.First();
+      return "text";
     }
   }
 }

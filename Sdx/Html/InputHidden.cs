@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class InputHidden : Element
+  public class InputHidden : Input
   {
     public InputHidden():base()
     {
@@ -15,21 +15,9 @@ namespace Sdx.Html
 
     }
 
-    protected internal override FormValue CreateFormValue()
+    protected internal override string GetInputType()
     {
-      return new FormValue(false);
-    }
-
-    protected internal override Tag CreateTag()
-    {
-      var tag =  new VoidTag("input");
-      tag.Attr["type"] = "hidden";
-      return tag;
-    }
-
-    internal protected override void BindValueToTag()
-    {
-      this.Tag.Attr["value"] = this.Value.First();
+      return "hidden";
     }
   }
 }
