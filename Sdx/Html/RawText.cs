@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Sdx.Html
 {
-  public class RawText : Html
+  public class RawText : HtmlBase
   {
     public string Text { get; private set; }
 

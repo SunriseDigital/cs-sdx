@@ -85,7 +85,7 @@
     <Compile Include="Validation\Errors.cs" />
     <Compile Include="Html\Form.cs" />
     <Compile Include="Html\FormValue.cs" />
-    <Compile Include="Html\Html.cs" />
+    <Compile Include="Html\HtmlBase.cs" />
     <Compile Include="Html\InputText.cs" />
     <Compile Include="Html\Option.cs" />
     <Compile Include="Html\Radio.cs" />

@@ -20,7 +20,7 @@ namespace Sdx.Html
       return new FormValue(false);
     }
 
-    internal protected override Html CreateTag()
+    internal protected override HtmlBase CreateTag()
     {
       return new Tag("textarea");
     }

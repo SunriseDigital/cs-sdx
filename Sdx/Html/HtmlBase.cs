@@ -6,11 +6,11 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public abstract class Html
+  public abstract class HtmlBase
   {
     private string tagName;
 
-    internal protected List<Html> children = new List<Html>();
+    internal protected List<HtmlBase> children = new List<HtmlBase>();
     /// <summary>
     /// HTMLのタグとして正当な文字列を返す
     /// </summary>
@@ -49,17 +49,17 @@ namespace Sdx.Html
 
     public string TagName { get; private set; }
 
-    public Html(string tagName)
+    public HtmlBase(string tagName)
     {
       this.TagName = tagName;
     }
 
-    public void ForEach(Action<Html> action)
+    public void ForEach(Action<HtmlBase> action)
     {
       this.children.ForEach(action);
     }
 
-    public IEnumerable<Html> Children
+    public IEnumerable<HtmlBase> Children
     {
       get
       {

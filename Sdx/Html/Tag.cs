@@ -5,14 +5,14 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class Tag : Html
+  public class Tag : HtmlBase
   {
     public Tag(string tagName):base(tagName)
     {
       this.Attr = new Attr();
     }
 
-    public Tag AddHtml(Html html)
+    public Tag AddHtml(HtmlBase html)
     {
       this.children.Add(html);
       return this;
@@ -51,7 +51,7 @@ namespace Sdx.Html
       var builder = new StringBuilder();
       this.RenderStartTag(builder, attribute);
 
-      foreach (Html child in children)
+      foreach (HtmlBase child in children)
       {
         builder.Append(child.Render());
       }

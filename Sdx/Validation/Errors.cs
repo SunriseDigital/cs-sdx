@@ -27,7 +27,7 @@ namespace Sdx.Validation
       }
     }
 
-    public Html.Html Html
+    public Html.HtmlBase Html
     {
       get
       {
