@@ -5,11 +5,19 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class CheckableGroup: Element, IEnumerable<Checkable>
+  public class CheckableGroup: Element
   {
     private List<Checkable> elements = new List<Checkable>();
 
     private string name;
+
+    public IEnumerable<Checkable> Checkables
+    {
+      get
+      {
+        return this.elements;
+      }
+    }
 
     public CheckableGroup():base()
     {
@@ -102,16 +110,6 @@ namespace Sdx.Html
           element.Tag.Attr.Remove("checked");
         }
       });
-    }
-
-    public IEnumerator<Checkable> GetEnumerator()
-    {
-      return ((IEnumerable<Checkable>)elements).GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-      return ((IEnumerable<Checkable>)elements).GetEnumerator();
     }
   }
 }
