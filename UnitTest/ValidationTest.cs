@@ -83,19 +83,19 @@ namespace UnitTest
 
       var validator = new Sdx.Validation.LessThan(10);
       Assert.Equal(10, validator.Max);
-      Assert.False(validator.Inclusive);
+      Assert.False(validator.IsInclusive);
       Assert.True(validator.IsValid("9"));
       Assert.False(validator.IsValid("10"));
       Assert.Equal("10未満の数字を入力してください。", validator.Errors[0].Message);
 
       validator = new Sdx.Validation.LessThan(10);
-      validator.Inclusive = true;
+      validator.IsInclusive = true;
       Assert.True(validator.IsValid("10"));
       Assert.False(validator.IsValid("11"));
       Assert.Equal("10以下の数字を入力してください。", validator.Errors[0].Message);
 
       validator = new Sdx.Validation.LessThan(10, true);
-      Assert.True(validator.Inclusive);
+      Assert.True(validator.IsInclusive);
 
       validator = new Sdx.Validation.LessThan(10);
       Assert.False(validator.IsValid("aaa"));
@@ -125,7 +125,7 @@ namespace UnitTest
 
       var validator = new Sdx.Validation.GreaterThan(10);
       Assert.Equal(10, validator.Min);
-      Assert.False(validator.Inclusive);
+      Assert.False(validator.IsInclusive);
       Assert.True(validator.IsValid("11"));
       Assert.False(validator.IsValid("10"));
       Assert.Equal("10より大きな数字を入力してください。", validator.Errors[0].Message);

@@ -11,7 +11,7 @@ namespace Sdx.Validation
     {
     }
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       long result;
       if (!Int64.TryParse(value, out result))

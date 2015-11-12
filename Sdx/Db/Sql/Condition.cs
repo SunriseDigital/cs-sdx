@@ -32,7 +32,7 @@ namespace Sdx.Db.Sql
       get { return wheres.Count; }
     }
 
-    internal bool EnableBracket { get; set; }
+    internal bool NeedsBracket { get; set; }
 
     internal string ContextName { private get; set; }
 
@@ -118,7 +118,7 @@ namespace Sdx.Db.Sql
 
     private void AddWithCondition(Condition condition, Logical logical, Type type)
     {
-      condition.EnableBracket = true;
+      condition.NeedsBracket = true;
       this.childConditions.Add(condition);
       if (this.ContextName != null)
       {
@@ -173,7 +173,7 @@ namespace Sdx.Db.Sql
 
     internal void Build(StringBuilder builder, Adapter adapter, DbParameterCollection parameters, Counter condCount)
     {
-      if (this.EnableBracket)
+      if (this.NeedsBracket)
       {
         builder.Append("(");
       }
@@ -198,7 +198,7 @@ namespace Sdx.Db.Sql
         }
       });
 
-      if (this.EnableBracket)
+      if (this.NeedsBracket)
       {
         builder.Append(")");
       }

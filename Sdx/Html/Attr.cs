@@ -58,10 +58,9 @@ namespace Sdx.Html
       return this.attrDictionary.ContainsKey(key);
     }
 
-    public Attr AddClass(string value, bool add)
+    public Attr AddClass(string value, bool needsAdd)
     {
-      Sdx.Context.Current.Debug.Log(add);
-      if (add)
+      if (needsAdd)
       {
         this.AddClass(value);
       }

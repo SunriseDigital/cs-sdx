@@ -15,7 +15,7 @@ namespace Sdx.Validation
       this.List = whitelist;
     }
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       if (!this.List.Any(val => val == value))
       {

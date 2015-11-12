@@ -45,7 +45,7 @@ namespace Sdx.Html
       {
         if(this.elements.ContainsKey(name))
         {
-          if (this.elements[name].Value.Multiple)
+          if (this.elements[name].Value.IsMultiple)
           {
             this.elements[name].Bind(values.GetValues(name));
           }

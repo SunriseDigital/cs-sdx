@@ -13,7 +13,7 @@ namespace Sdx.Validation
       this.Pattern = new System.Text.RegularExpressions.Regex(pattern);
     }
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       if (!this.Pattern.IsMatch(value))
       {

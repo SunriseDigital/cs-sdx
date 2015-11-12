@@ -30,7 +30,7 @@ namespace Sdx.Validation
       return true;
     }
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       if (value == null)
       {

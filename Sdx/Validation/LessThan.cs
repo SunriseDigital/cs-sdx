@@ -25,21 +25,21 @@ namespace Sdx.Validation
       }
     }
 
-    public bool Inclusive { get; set; }
+    public bool IsInclusive { get; set; }
 
     public LessThan(long max, string message = null) : base(message)
     {
       this.Max = max;
-      this.Inclusive = false;
+      this.IsInclusive = false;
     }
 
-    public LessThan(long max, bool inclusive, string message = null) : base(message)
+    public LessThan(long max, bool isInclusive, string message = null) : base(message)
     {
       this.Max = max;
-      this.Inclusive = inclusive;
+      this.IsInclusive = isInclusive;
     }
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       long intValue = 0;
       if (!Int64.TryParse(value, out intValue))
@@ -48,7 +48,7 @@ namespace Sdx.Validation
         return false;
       }
 
-      if (this.Inclusive)
+      if (this.IsInclusive)
       {
         if (intValue <= this.Max)
         {

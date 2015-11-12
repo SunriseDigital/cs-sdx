@@ -463,7 +463,7 @@ English
   select.Tag.Render()
 );
 
-      select.Multiple = true;
+      select.IsMultiple = true;
       select.Bind(new string[] { "1", "2" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("1", select.Value[0]);
@@ -532,7 +532,7 @@ English
 "),
   select.Tag.Render()
 );
-      select.Multiple = true;
+      select.IsMultiple = true;
       select.Bind(new string[] { "2", "3" });
       Assert.Equal(2, select.Value.Count);
       Assert.Equal("2", select.Value[0]);
@@ -660,7 +660,7 @@ English
       }));
       Assert.IsType<InvalidOperationException>(ex);
 
-      select.Multiple = true;
+      select.IsMultiple = true;
       select.Bind(new string[] { "10", "11" });
 
       Assert.Equal(HtmlLiner(@"
@@ -695,12 +695,12 @@ English
       var input = new Sdx.Html.InputText("test");
 
       input.AddValidator(new Sdx.Validation.Numeric());
-      input.AllowEmpty = true;
+      input.IsAllowEmpty = true;
       input.Bind("");
       input.ExecValidators();
       Assert.Equal(0, input.Errors.Count);
 
-      input.AllowEmpty = false;
+      input.IsAllowEmpty = false;
       input.ExecValidators();
       Assert.Equal(1, input.Errors.Count);
     }

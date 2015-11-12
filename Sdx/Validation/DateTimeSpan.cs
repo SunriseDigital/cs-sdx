@@ -28,7 +28,7 @@ namespace Sdx.Validation
       this.DateFormat = dateFormat;
     }
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       DateTime targetDate;
       if (!DateTime.TryParse(value, out targetDate))

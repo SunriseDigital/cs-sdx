@@ -19,7 +19,7 @@ namespace Sdx.Html
     }
 
     /// <summary>
-    /// <see cref="FormValue.Multiple"/>はElement毎に違うのでそれを設定するたの抽象メソッド。
+    /// <see cref="FormValue.IsMultiple"/>はElement毎に違うのでそれを設定するたの抽象メソッド。
     /// 子クラスで実装してください。
     /// </summary>
     /// <returns></returns>
@@ -48,14 +48,14 @@ namespace Sdx.Html
       }
     }
 
-    public bool AllowEmpty { get; set; }
+    public bool IsAllowEmpty { get; set; }
 
     public Element()
     {
       this.tag = this.CreateTag();
       this.Value = this.CreateFormValue();
       this.Errors = new Validation.Errors();
-      this.AllowEmpty = false;
+      this.IsAllowEmpty = false;
     }
 
     public FormValue Value { get; private set; }
@@ -68,7 +68,7 @@ namespace Sdx.Html
 
     public void Bind(string value)
     {
-      if (this.Value.Multiple)
+      if (this.Value.IsMultiple)
       {
         throw new InvalidOperationException("This element must have multiple value.");
       }
@@ -78,7 +78,7 @@ namespace Sdx.Html
 
     public void Bind(string[] value)
     {
-      if (!this.Value.Multiple)
+      if (!this.Value.IsMultiple)
       {
         throw new InvalidOperationException("This element must have single value.");
       }
@@ -91,7 +91,7 @@ namespace Sdx.Html
       var result = true;
       this.Errors.Clear();
 
-      if(this.AllowEmpty && this.Value.IsEmpty)
+      if(this.IsAllowEmpty && this.Value.IsEmpty)
       {
         return true;
       }
@@ -103,7 +103,7 @@ namespace Sdx.Html
 
         validator.Errors = this.Errors;
         bool isValid;
-        if (this.Value.Multiple)
+        if (this.Value.IsMultiple)
         {
           isValid = validator.IsValid(this.Value.ToArray());
         }

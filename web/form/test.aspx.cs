@@ -50,7 +50,7 @@ public partial class form_test : System.Web.UI.Page
     //select multi
     var multiSelect = new Sdx.Html.Select();
     multiSelect.Name = "multi_select";
-    multiSelect.Multiple = true;
+    multiSelect.IsMultiple = true;
     multiSelect.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(multiSelect);
 
@@ -116,7 +116,7 @@ public partial class form_test : System.Web.UI.Page
 
     //date
     var startDate = new Sdx.Html.InputDate("start_date");
-    startDate.AllowEmpty = true;
+    startDate.IsAllowEmpty = true;
     startDate
       .AddValidator(new Sdx.Validation.DateSpan(new DateTime(2015, 10, 1), new DateTime(2015, 10, 31), "yyyy年M月d日"))
       ;

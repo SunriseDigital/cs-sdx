@@ -52,7 +52,7 @@ namespace Sdx.Validation
     }
 
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       int length = value.Length;
       this.SetPlaceholder("actual_length", length.ToString());

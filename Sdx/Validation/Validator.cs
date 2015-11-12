@@ -56,7 +56,7 @@ namespace Sdx.Validation
       }
     }
 
-    protected abstract bool ExecIsValid(string value);
+    protected abstract bool IsValidString(string value);
 
 
     protected void SetPlaceholder(string key, string value)
@@ -188,7 +188,7 @@ namespace Sdx.Validation
       }
 
       this.SetPlaceholder("value", value);
-      return ExecIsValid(value);
+      return IsValidString(value);
     }
   }
 }

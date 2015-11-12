@@ -13,10 +13,10 @@ namespace Sdx.Html
     internal FormValue(bool isMultiple)
     {
       this.values = new string[0];
-      this.Multiple = isMultiple;
+      this.IsMultiple = isMultiple;
     }
 
-    public bool Multiple { get; internal set; }
+    public bool IsMultiple { get; internal set; }
 
     internal void Set(object value)
     {
@@ -62,7 +62,7 @@ namespace Sdx.Html
     {
       get
       {
-        if(this.Multiple)
+        if(this.IsMultiple)
         {
           return this.Count == 0;
         }

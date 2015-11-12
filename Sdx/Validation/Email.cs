@@ -15,7 +15,7 @@ namespace Sdx.Validation
     {
     }
 
-    protected override bool ExecIsValid(string value)
+    protected override bool IsValidString(string value)
     {
       var parts = value.Split('@');
       if (parts.Length != 2)
