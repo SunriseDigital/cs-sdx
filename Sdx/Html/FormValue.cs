@@ -62,7 +62,18 @@ namespace Sdx.Html
     {
       get
       {
-        return this.values.Length == 0;
+        if(this.Multiple)
+        {
+          return this.Count == 0;
+        }
+        else if (this.Count == 0)
+        {
+          return true;
+        }
+        else
+        {
+          return this.First() == "";
+        }
       } 
     }
 

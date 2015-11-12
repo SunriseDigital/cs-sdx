@@ -5,7 +5,21 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  class InputDate
+  public class InputDate : Input
   {
+    public InputDate():base()
+    {
+
+    }
+
+    public InputDate(string name):base(name)
+    {
+
+    }
+
+    protected internal override string GetInputType()
+    {
+      return "date";
+    }
   }
 }

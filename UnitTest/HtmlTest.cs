@@ -610,6 +610,8 @@ English
         .AddValidator(new Sdx.Validation.Email());
       form.SetElement(loginId);
 
+      Assert.Equal(0, loginId.Errors.Count);
+
       form.Bind(request.Form);
 
       Assert.False(form.ExecValidators());
@@ -685,6 +687,22 @@ English
       radio.Bind("hidden_value");
       Assert.Equal("hidden_value", radio.Value.First());
       Assert.Equal("<input type=\"hidden\" name=\"hidden\" value=\"hidden_value\">", radio.Tag.Render());
+    }
+
+    [Fact]
+    public void TestFormRequireValidate()
+    {
+      var input = new Sdx.Html.InputText("test");
+
+      input.AddValidator(new Sdx.Validation.Numeric());
+      input.AllowEmpty = true;
+      input.Bind("");
+      input.ExecValidators();
+      Assert.Equal(0, input.Errors.Count);
+
+      input.AllowEmpty = false;
+      input.ExecValidators();
+      Assert.Equal(1, input.Errors.Count);
     }
 
     //[Fact]

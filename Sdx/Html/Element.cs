@@ -9,7 +9,6 @@ namespace Sdx.Html
   {
     internal protected Tag tag;
 
-
     private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
 
     public Validation.Errors Errors { get; private set; }
@@ -17,7 +16,6 @@ namespace Sdx.Html
     public Element(string name):this()
     {
       this.Name = name;
-      this.Errors = new Validation.Errors();
     }
 
     /// <summary>
@@ -50,10 +48,14 @@ namespace Sdx.Html
       }
     }
 
+    public bool AllowEmpty { get; set; }
+
     public Element()
     {
       this.tag = this.CreateTag();
       this.Value = this.CreateFormValue();
+      this.Errors = new Validation.Errors();
+      this.AllowEmpty = false;
     }
 
     public FormValue Value { get; private set; }
@@ -88,6 +90,11 @@ namespace Sdx.Html
     {
       var result = true;
       this.Errors.Clear();
+
+      if(this.AllowEmpty && this.Value.IsEmpty)
+      {
+        return true;
+      }
 
       foreach (var val in validators)
       {

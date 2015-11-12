@@ -114,6 +114,14 @@ public partial class form_test : System.Web.UI.Page
       .AddValidator(new Sdx.Validation.StringLength(10, 30));
     form.SetElement(textArea);
 
+    //date
+    var startDate = new Sdx.Html.InputDate("start_date");
+    startDate.AllowEmpty = true;
+    startDate
+      .AddValidator(new Sdx.Validation.DateSpan(new DateTime(2015, 10, 1), new DateTime(2015, 10, 31), "yyyy年M月d日"))
+      ;
+    form.SetElement(startDate);
+
     if(Request.Form.Count > 0)
     {
       form.Bind(Request.Form);
@@ -125,6 +133,7 @@ public partial class form_test : System.Web.UI.Page
       Sdx.Context.Current.Debug.Log("Is Not Valid !!");
     }
 
+    
 
     Sdx.Context.Current.Debug.Log(Request.Form, "POST");
     Sdx.Context.Current.Debug.Log(Request.QueryString, "GET");

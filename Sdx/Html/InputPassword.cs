@@ -5,7 +5,22 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  class InputPassword
+  public class InputPassword : Input
   {
+
+    public InputPassword():base()
+    {
+
+    }
+
+    public InputPassword(string name):base(name)
+    {
+
+    }
+    
+    protected internal override string GetInputType()
+    {
+      return "password";
+    }
   }
 }
