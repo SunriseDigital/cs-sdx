@@ -43,6 +43,10 @@ namespace Sdx.Validation
 
     public StringLength(int? min = null, int? max = null, string message = null) : base(message)
     {
+      if(min == null && max == null)
+      {
+        throw new ArgumentNullException("min and max are both null.");
+      }
       this.Min = min;
       this.Max = max;
     }

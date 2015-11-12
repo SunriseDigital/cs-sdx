@@ -11,6 +11,8 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 #endif
 
 using System;
+using System.Threading;
+using System.Globalization;
 
 namespace UnitTest
 {
@@ -251,6 +253,31 @@ namespace UnitTest
       Assert.True(validator.IsValid("20"));
       Assert.False(validator.IsValid("11"));
       Assert.Equal("不正な値です。", validator.Errors[0].Message);
+    }
+
+    [Fact]
+    public void TestDateTimeSpan()
+    {
+      Sdx.Context.Current.Lang = "ja";
+
+      var validator = new Sdx.Validation.DateSpan(min:new DateTime(2015, 10, 12), dateFormat:"yyyy年M月d日");
+      Assert.Equal("yyyy年M月d日", validator.DateFormat);
+      Assert.True(validator.IsValid("2015/10/12"));
+      Assert.True(validator.IsValid("2015-10-12"));
+      Assert.False(validator.IsValid("123"));
+      Assert.Equal("日付を入力してください。", validator.Errors[0].Message);
+      validator.Errors.Clear();
+      Assert.False(validator.IsValid("2015/10/11"));
+      Assert.Equal("2015年10月12日以降の日付を入力してください。", validator.Errors[0].Message);
+
+      var maxDate = new DateTime(2015, 10, 12);
+      validator = new Sdx.Validation.DateSpan(max: maxDate);
+      Assert.Equal("d", validator.DateFormat);
+      Assert.True(validator.IsValid("2015/10/12"));
+      Assert.True(validator.IsValid("2015-10-12"));
+      Assert.False(validator.IsValid("2015/10/13"));
+      Assert.Equal(maxDate.ToString("d") + "以前の日付を入力してください。", validator.Errors[0].Message);
+
     }
   }
 }
