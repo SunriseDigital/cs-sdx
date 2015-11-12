@@ -256,7 +256,7 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestDateTimeSpan()
+    public void TestDateSpan()
     {
       Sdx.Context.Current.Lang = "ja";
 
@@ -277,6 +277,31 @@ namespace UnitTest
       Assert.True(validator.IsValid("2015-10-12"));
       Assert.False(validator.IsValid("2015/10/13"));
       Assert.Equal(maxDate.ToString("d") + "以前の日付を入力してください。", validator.Errors[0].Message);
+
+    }
+
+    [Fact]
+    public void TestDateTimeSpan()
+    {
+      Sdx.Context.Current.Lang = "ja";
+
+      var validator = new Sdx.Validation.DateTimeSpan(min: new DateTime(2015, 10, 12, 16, 30, 0), dateFormat: "yyyy年M月d日 H時m分");
+      Assert.Equal("yyyy年M月d日 H時m分", validator.DateFormat);
+      Assert.True(validator.IsValid("2015/10/12 16:30"));
+      Assert.True(validator.IsValid("2015-10-12 16:30"));
+      Assert.False(validator.IsValid("123"));
+      Assert.Equal("日時を入力してください。", validator.Errors[0].Message);
+      validator.Errors.Clear();
+      Assert.False(validator.IsValid("2015/10/11 16:29"));
+      Assert.Equal("2015年10月12日 16時30分以降の日時を入力してください。", validator.Errors[0].Message);
+
+      var maxDate = new DateTime(2015, 10, 12, 17, 45, 0);
+      validator = new Sdx.Validation.DateTimeSpan(max: maxDate);
+      Assert.Null(validator.DateFormat);
+      Assert.True(validator.IsValid("2015/10/12 17:45"));
+      Assert.True(validator.IsValid("2015-10-12 17:45"));
+      Assert.False(validator.IsValid("2015/10/12  17:46"));
+      Assert.Equal(maxDate.ToString() + "以前の日時を入力してください。", validator.Errors[0].Message);
 
     }
   }

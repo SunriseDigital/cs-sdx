@@ -33,3 +33,8 @@
       ErrorInvalid:   "日付を入力してください。"
       ErrorIsEarlier: "%min%以降の日付を入力してください。"
       ErrorIsLater:   "%max%以前の日付を入力してください。"
+
+    DateTimeSpan:
+      ErrorInvalid:   "日時を入力してください。"
+      ErrorIsEarlier: "%min%以降の日時を入力してください。"
+      ErrorIsLater:   "%max%以前の日時を入力してください。"

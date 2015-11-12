@@ -85,6 +85,7 @@
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
     <Compile Include="Html\InputPassword.cs" />
+    <Compile Include="Validation\DateTimeSpan.cs" />
     <Compile Include="Validation\DateSpan.cs" />
     <Compile Include="Validation\Email.cs" />
     <Compile Include="Validation\Errors.cs" />
