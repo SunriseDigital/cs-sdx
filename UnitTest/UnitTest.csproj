@@ -46,6 +46,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualStudio.QualityTools.UnitTestFramework, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Moq, Version=4.2.1510.2205, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="MySql.Data, Version=6.9.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\MySql.Data.6.9.6\lib\net40\MySql.Data.dll</HintPath>
@@ -53,6 +57,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -75,9 +80,11 @@
     <Compile Include="DbUpdateTest.cs" />
     <Compile Include="DiagnosticsTest.cs" />
     <Compile Include="DummyClasses.cs" />
+    <Compile Include="HtmlTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="Test\Validation\Numeric.cs" />
     <Compile Include="UrlTest.cs" />
     <Compile Include="Test\Orm\LargeArea.cs" />
     <Compile Include="Test\Orm\Category.cs" />
@@ -95,6 +102,7 @@
     <Compile Include="Test\Orm\Shop.cs" />
     <Compile Include="Test\Config\Dir.cs" />
     <Compile Include="Test\Config\Dir2.cs" />
+    <Compile Include="ValidationTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

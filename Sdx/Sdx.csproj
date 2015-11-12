@@ -76,7 +76,40 @@
     <Compile Include="Diagnostics\Debug.cs" />
     <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
     <Compile Include="Diagnostics\DebugHttpModule.cs" />
+    <Compile Include="Html\Attr.cs" />
+    <Compile Include="Html\Checkable.cs" />
+    <Compile Include="Html\CheckBox.cs" />
+    <Compile Include="Html\Element.cs" />
+    <Compile Include="Html\CheckableGroup.cs" />
+    <Compile Include="Html\Input.cs" />
+    <Compile Include="Html\InputDate.cs" />
+    <Compile Include="Html\InputHidden.cs" />
+    <Compile Include="Html\InputPassword.cs" />
+    <Compile Include="Validation\DateTimeSpan.cs" />
+    <Compile Include="Validation\DateSpan.cs" />
+    <Compile Include="Validation\Email.cs" />
+    <Compile Include="Validation\Errors.cs" />
+    <Compile Include="Html\Form.cs" />
+    <Compile Include="Html\FormValue.cs" />
+    <Compile Include="Html\HtmlBase.cs" />
+    <Compile Include="Html\InputText.cs" />
+    <Compile Include="Html\Option.cs" />
+    <Compile Include="Html\Radio.cs" />
+    <Compile Include="Html\RawText.cs" />
+    <Compile Include="Html\Select.cs" />
+    <Compile Include="Html\Tag.cs" />
+    <Compile Include="Html\TextArea.cs" />
+    <Compile Include="Html\VoidTag.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Validation\Error.cs" />
+    <Compile Include="Validation\GreaterThan.cs" />
+    <Compile Include="Validation\LessThan.cs" />
+    <Compile Include="Validation\NotEmpty.cs" />
+    <Compile Include="Validation\Numeric.cs" />
+    <Compile Include="Validation\Regex.cs" />
+    <Compile Include="Validation\StringLength.cs" />
+    <Compile Include="Validation\Validator.cs" />
+    <Compile Include="Validation\Whitelist.cs" />
     <Compile Include="Web\Holder.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />
@@ -87,6 +120,7 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+    <EmbeddedResource Include="_resources\validation\messages\ja.yml" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

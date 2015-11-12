@@ -74,13 +74,21 @@ namespace Sdx.Collection
 
     public OrderedDictionary(int capacity):this(capacity, null)
     {
-      
+
     }
 
     public OrderedDictionary(int capacity, IEqualityComparer<TKey> comparer)
     {
       this.list = new List<TKey>(capacity);
       this.dictionary = new Dictionary<TKey, TValue>(capacity, comparer);
+    }
+
+    public OrderedDictionary(IDictionary<TKey, TValue> dictionary):this()
+    {
+      foreach(var keyValue in dictionary)
+      {
+        this[keyValue.Key] = keyValue.Value; 
+      }
     }
 
     /// <summary>
