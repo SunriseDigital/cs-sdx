@@ -1,0 +1,3 @@
+[submodule "web/lib"]
+	path = web/lib
+	url = git@github.com:SunriseDigital/cs-sdx-web.git

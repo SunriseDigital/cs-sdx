@@ -13,6 +13,7 @@ CREATE TABLE area (
   name varchar(50),
   large_area_id int,
   code varchar(50) NOT NULL,
+  sequence int NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   UNIQUE INDEX large_area_code (code ASC)
 );

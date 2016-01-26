@@ -13,6 +13,7 @@ CREATE TABLE area (
   name nvarchar(50),
   large_area_id int,
   code nvarchar(50) NOT NULL,
+  sequence int NOT NULL DEFAULT 0,
   CONSTRAINT pk_area PRIMARY KEY CLUSTERED (id),
   CONSTRAINT key_area_code UNIQUE NONCLUSTERED (code)
 );
