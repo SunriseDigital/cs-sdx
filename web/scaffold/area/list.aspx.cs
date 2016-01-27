@@ -9,9 +9,6 @@ public partial class scaffold_area_list : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-      var scaffold = new Sdx.Web.Scaffold("area");
-
-      scaffold.Db = Test.Db.CreateSqlServer();
-      scaffold.Model = Test.Orm.Area.Meta;
+      var scaffold = new Sdx.Web.Scaffold<Test.Orm.Area>(Test.Db.CreateSqlServer(), "area");
     }
 }

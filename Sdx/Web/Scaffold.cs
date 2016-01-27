@@ -5,28 +5,23 @@ using System.Text;
 
 namespace Sdx.Web
 {
-  public class Scaffold
+  public class Scaffold<T> where T: Sdx.Db.Record, new()
   {
-    private const string CONTEXT_KEY = "SDX.WEB.SCAFFOLD.INSTANCES";
+    public const string CONTEXT_KEY = "SDX.WEB.SCAFFOLD.INSTANCES";
     public String Name { get; private set; }
 
-    public static Scaffold Instance(string name)
-    {
-      return Context.Current.Vars.As<Dictionary<string, Scaffold>>(Scaffold.CONTEXT_KEY)[name];
-    }
-
-    public Scaffold(string name)
+    public Scaffold(Sdx.Db.Adapter db, string name)
     {
       this.Name = name;
-      Dictionary<string, Scaffold> instances = null;
-      if (!Context.Current.Vars.ContainsKey(Scaffold.CONTEXT_KEY))
+      Dictionary<string, Scaffold<T>> instances = null;
+      if (!Context.Current.Vars.ContainsKey(Scaffold<T>.CONTEXT_KEY))
       {
-        instances = new Dictionary<string, Scaffold>();
-        Context.Current.Vars[Scaffold.CONTEXT_KEY] = instances;
+        instances = new Dictionary<string, Scaffold<T>>();
+        Context.Current.Vars[Scaffold<T>.CONTEXT_KEY] = instances;
       }
       else
       {
-        instances = Context.Current.Vars.As<Dictionary<string, Scaffold>>(Scaffold.CONTEXT_KEY);
+        instances = Context.Current.Vars.As<Dictionary<string, Scaffold<T>>>(Scaffold<T>.CONTEXT_KEY);
       }
 
       if (instances.ContainsKey(name))
@@ -34,26 +29,40 @@ namespace Sdx.Web
         throw new InvalidOperationException("Already exists `area` Scaffold");
       }
 
+      var prop = typeof(T).GetProperty("Meta");
+      if (prop == null)
+      {
+        throw new NotImplementedException("Missing Meta property in " + typeof(T));
+      }
+
+      this.TableMeta = prop.GetValue(null, null) as Db.TableMeta;
+      if (this.TableMeta == null)
+      {
+        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
+      }
+
       instances[name] = this;
+
+      Db = db;
     }
 
 
-    public Db.TableMeta Model { get; set; }
+    private Db.TableMeta TableMeta { get; set; }
 
-    public Db.Adapter Db { get; set; }
+    private Db.Adapter Db { get; set; }
 
-    public Db.RecordSet<Db.Record> List
+    public Db.RecordSet<T> List
     {
       get
       {
         var select = Db.CreateSelect();
-        select.AddFrom(Model.CreateTable<Db.Table>());
+        select.AddFrom(TableMeta.CreateTable<Db.Table>());
 
-        Db.RecordSet<Db.Record> records;
+        Db.RecordSet<T> records;
         using (var conn = Db.CreateConnection())
         {
           conn.Open();
-          records = conn.FetchRecordSet<Db.Record>(select);
+          records = conn.FetchRecordSet<T>(select);
         }
 
         return records;
