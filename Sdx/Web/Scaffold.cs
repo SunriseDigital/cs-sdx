@@ -68,5 +68,9 @@ namespace Sdx.Web
         return records;
       }
     }
+
+    public List<Dictionary<string, string>> ListColumns { get; set; }
+
+    public string Title { get; set; }
   }
 }

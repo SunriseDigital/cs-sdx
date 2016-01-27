@@ -10,5 +10,14 @@ public partial class scaffold_area_list : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
       var scaffold = new Sdx.Web.Scaffold<Test.Orm.Area>(Test.Db.CreateSqlServer(), "area");
+      scaffold.Title = "エリア";
+      scaffold.ListColumns = new List<Dictionary<string, string>>() { 
+        new Dictionary<string, string>{
+          {"column",  "name"}
+        },
+        new Dictionary<string, string>{
+          {"column",  "code"}
+        }
+      };
     }
 }
