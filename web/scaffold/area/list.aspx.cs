@@ -11,8 +11,7 @@ public partial class scaffold_area_list : System.Web.UI.Page
     {
       var scaffold = new Sdx.Web.Scaffold("area");
 
+      scaffold.Db = Test.Db.CreateSqlServer();
       scaffold.Model = Test.Orm.Area.Meta;
-
-      scaffold.RunList();
     }
 }

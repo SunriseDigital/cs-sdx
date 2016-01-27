@@ -63,7 +63,7 @@ namespace UnitTest
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.SqlServerAdapter();
-      testDb.Adapter.ConnectionString = DbSelectTest.SqlServerConnectionString;
+      testDb.Adapter.ConnectionString = Test.Db.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
@@ -71,7 +71,7 @@ namespace UnitTest
 
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.MySqlAdapter();
-      testDb.Adapter.ConnectionString = DbSelectTest.MySqlConnectionString;
+      testDb.Adapter.ConnectionString = Test.Db.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);
@@ -88,16 +88,6 @@ namespace UnitTest
     public override void FixtureSetUp()
     {
       BaseDbTest.InitilizeClass(null);
-    }
-
-    protected static String MySqlConnectionString
-    {
-      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963;"; }
-    }
-
-    protected static String SqlServerConnectionString
-    {
-      get { return "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;"; }
     }
 
     private static void ResetMySqlDatabase()
@@ -132,7 +122,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         }
       }
 
-      factory.ConnectionString = BaseDbTest.MySqlConnectionString;
+      factory.ConnectionString = Test.Db.MySqlConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {
@@ -199,7 +189,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         createUserSql.ExecuteNonQuery();
       }
 
-      factory.ConnectionString = BaseDbTest.SqlServerConnectionString;
+      factory.ConnectionString = Test.Db.SqlServerConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {

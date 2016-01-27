@@ -48,6 +48,16 @@ namespace Sdx.Db
 
     private Dictionary<string, Table.Column> columnsCache = new Dictionary<string, Table.Column>();
 
+    public T CreateTable<T>() where T:Table
+    {
+      return (T)this.TableType.GetConstructor(Type.EmptyTypes).Invoke(null);
+    }
+
+    public T CreateRecord<T>() where T : Record
+    {
+      return (T)this.RecordType.GetConstructor(Type.EmptyTypes).Invoke(null);
+    }
+
     public bool HasColumn(string columnName)
     {
       return this.columnsCache.ContainsKey(columnName);

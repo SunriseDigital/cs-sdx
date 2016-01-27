@@ -1,5 +1,5 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="list.aspx.cs" Inherits="scaffold_area_list" %>
-<%@ Register TagPrefix="Scaffold" TagName="list" Src="~\_sdx\control\scaffold\list.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="list" Src="~\lib\_private\control\scaffold\list.ascx" %>
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -7,6 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title></title>
 </head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <body>
     <div>
       <Scaffold:list ID="list" runat="server" Name="area" />

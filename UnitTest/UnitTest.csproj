@@ -84,6 +84,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
     <Compile Include="TestTemplate.cs" />
+    <Compile Include="Test\Db.cs" />
     <Compile Include="Test\Validation\Numeric.cs" />
     <Compile Include="UrlTest.cs" />
     <Compile Include="Test\Orm\LargeArea.cs" />
