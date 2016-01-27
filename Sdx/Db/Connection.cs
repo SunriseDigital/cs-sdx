@@ -437,6 +437,7 @@ namespace Sdx.Db
     /// SQLを実行しRecordSetを生成して返します。
     /// </summary>
     /// <typeparam name="T">Recordのクラスを指定</typeparam>
+    /// TODO ↓このコメントは古い？ただ、このオプションが無いと同じテーブルを二つJOINした時にまとめられないのでは？調査する。
     /// <param name="contextName">
     /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
