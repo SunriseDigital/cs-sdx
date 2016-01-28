@@ -69,7 +69,7 @@ namespace Sdx.Scaffold
       }
     }
 
-    public Sdx.Collection.HolderList ListColumns { get; set; }
+    public Sdx.Scaffold.ParamList ListColumns { get; set; }
 
     public string Title { get; set; }
   }

@@ -11,21 +11,11 @@ public partial class scaffold_area_list : System.Web.UI.Page
   {
     var scaffold = new Sdx.Scaffold.Manager<Test.Orm.Area>(Test.Db.CreateSqlServer(), "area");
     scaffold.Title = "エリア";
-    scaffold.ListColumns = Sdx.Collection.HolderList.Create()
-      .Add(Sdx.Collection.Holder.Create()
+    scaffold.ListColumns = Sdx.Scaffold.ParamList.Create()
+      .Add(Sdx.Scaffold.Param.Create()
         .Set("column", "name")
-        .Set("foo", "var")
-      ).Add(Sdx.Collection.Holder.Create()
+      ).Add(Sdx.Scaffold.Param.Create()
         .Set("column", "code")
-        .Set("foo", "var")
       );
-    //scaffold.ListColumns = new List<Dictionary<string, string>>() { 
-    //    new Dictionary<string, string>{
-    //      {"column",  "name"}
-    //    },
-    //    new Dictionary<string, string>{
-    //      {"column",  "code"}
-    //    }
-    //  };
   }
 }
