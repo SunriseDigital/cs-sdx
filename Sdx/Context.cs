@@ -9,70 +9,6 @@ namespace Sdx
 {
   public class Context
   {
-    public class ContextVarCollection : IEnumerable<KeyValuePair<string, object>>
-    {
-      private Dictionary<string, object> items = new Dictionary<string, object>();
-
-      public object this[string key]
-      {
-        set
-        {
-          this.items[key] = value;
-        }
-
-        get
-        {
-          return this.items[key];
-        }
-      }
-
-      public ContextVarCollection Add(string key, object value)
-      {
-        this.items.Add(key, value);
-        return this;
-      }
-
-
-      public bool ContainsKey(string key)
-      {
-        return this.items.ContainsKey(key);
-      }
-
-      public T As<T>(string key)
-      {
-        return (T)this[key];
-      }
-
-      /// <summary>
-      /// 既にそのキーが存在していればそのインスタンスを返し、なければ`creator()`を呼んで、キーにセットします。
-      /// IF文と余計な代入を省略できる省略できるショートカットです。
-      /// </summary>
-      /// <typeparam name="T"></typeparam>
-      /// <param name="key"></param>
-      /// <param name="factory">T型のインスタンスを返す引数なしの関数</param>
-      /// <returns></returns>
-      public T As<T>(string key, Func<T> factory)
-      {
-        if (!this.ContainsKey(key))
-        {
-          //同じキーだと例外。インデクサーとAddほどハッキリしないので安全のため例外にしてあります。
-          this.Add(key, factory());
-        }
-
-        return As<T>(key);
-      }
-
-      public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
-      {
-        return ((IEnumerable<KeyValuePair<string, object>>)items).GetEnumerator();
-      }
-
-      IEnumerator IEnumerable.GetEnumerator()
-      {
-        return ((IEnumerable<KeyValuePair<string, object>>)items).GetEnumerator();
-      }
-    }
-
     private const string SDX_CONTEXT_KEY = "SDX.CONTEXT.INSTANCE_KEY";
 
     private static Context nonWebInstance;
@@ -111,11 +47,9 @@ namespace Sdx
 
     public Stopwatch Timer { get; private set; }
 
-    private ContextVarCollection vars = new ContextVarCollection();
+    private Collection.Holder vars = new Collection.Holder();
 
-
-
-    public ContextVarCollection Vars
+    public Collection.Holder Vars
     {
       get
       {

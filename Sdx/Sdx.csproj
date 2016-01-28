@@ -46,6 +46,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collection\Holder.cs" />
     <Compile Include="Collection\OrderedDictionary.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Data\Tree.cs" />
@@ -110,7 +111,6 @@
     <Compile Include="Validation\StringLength.cs" />
     <Compile Include="Validation\Validator.cs" />
     <Compile Include="Validation\Whitelist.cs" />
-    <Compile Include="Web\Holder.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />
     <Compile Include="Util\Datetime.cs" />
