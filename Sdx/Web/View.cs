@@ -7,16 +7,18 @@ namespace Sdx.Web
   public class View
   {
     private static String varsKey = "SDX.WEB.VIEW.VARS";
-    public static Holder Vars
+    public static Sdx.Collection.Holder Vars
     {
       get
       {
         if(!HttpContext.Current.Items.Contains(varsKey))
         {
-          HttpContext.Current.Items[varsKey] = new Holder();
+          var holder = new Sdx.Collection.Holder();
+          holder.StrictCheck = false;
+          HttpContext.Current.Items[varsKey] = holder;
         }
 
-        return (Holder)HttpContext.Current.Items[varsKey];
+        return (Sdx.Collection.Holder)HttpContext.Current.Items[varsKey];
       }
     }
   }
