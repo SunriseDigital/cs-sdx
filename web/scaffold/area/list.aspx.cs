@@ -11,7 +11,7 @@ public partial class scaffold_area_list : System.Web.UI.Page
   {
     var scaffold = new Sdx.Scaffold.Manager<Test.Orm.Area>(Test.Db.CreateSqlServer(), "area");
     scaffold.Title = "エリア";
-    scaffold.ListColumns = Sdx.Scaffold.ParamList.Create()
+    scaffold.DisplayList
       .Add(Sdx.Scaffold.Param.Create()
         .Set("column", "name")
       ).Add(Sdx.Scaffold.Param.Create()

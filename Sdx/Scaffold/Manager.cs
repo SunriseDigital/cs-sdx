@@ -44,6 +44,9 @@ namespace Sdx.Scaffold
       instances[name] = this;
 
       Db = db;
+
+      DisplayList = new ParamList();
+      FormList = new ParamList();
     }
 
 
@@ -69,8 +72,20 @@ namespace Sdx.Scaffold
       }
     }
 
-    public Sdx.Scaffold.ParamList ListColumns { get; set; }
-
     public string Title { get; set; }
+
+    public ParamList FormList { get; private set; }
+
+    public ParamList DisplayList { get; private set; }
+
+    public IEnumerable<FormItem> BuildFormItems()
+    {
+      foreach(var param in FormList)
+      {
+        yield return new FormItem(param, TableMeta);
+      }
+    }
+
+    public Web.Url ReturnUrl { get; set; }
   }
 }

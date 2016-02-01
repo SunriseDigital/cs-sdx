@@ -86,6 +86,7 @@
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
     <Compile Include="Html\InputPassword.cs" />
+    <Compile Include="Scaffold\FormItem.cs" />
     <Compile Include="Scaffold\Param.cs" />
     <Compile Include="Scaffold\ParamList.cs" />
     <Compile Include="Validation\DateTimeSpan.cs" />
