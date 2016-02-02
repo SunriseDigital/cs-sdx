@@ -38,7 +38,7 @@ namespace Test.Orm.Table
       );
     }
 
-    public static Sdx.Html.Element CreateIdElement()
+    public static Sdx.Html.FormElement CreateIdElement()
     {
       var elem = new Sdx.Html.InputHidden();
       elem.Name = "id";

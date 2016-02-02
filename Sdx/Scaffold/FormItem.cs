@@ -24,13 +24,13 @@ namespace Sdx.Scaffold
       }
     }
 
-    public Sdx.Html.Element CreateElement()
+    public Sdx.Html.FormElement CreateElement()
     {
       var methodName = "Create" + Sdx.Util.String.ToCamelCase(this.param["column"]) + "Element";
       var method = tableMeta.TableType.GetMethod(methodName);
       if (method!= null)
       {
-        return (Sdx.Html.Element)method.Invoke(null, null);
+        return (Sdx.Html.FormElement)method.Invoke(null, null);
       }
       else
       {
