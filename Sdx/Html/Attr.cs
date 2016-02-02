@@ -168,7 +168,7 @@ namespace Sdx.Html
     /// <returns></returns>
     public Attr Set(string value)
     {
-      this.attrDictionary[value] = value;
+      this.attrDictionary[value] = null;
       return this;
     }
 
@@ -296,7 +296,7 @@ namespace Sdx.Html
         else
         {
           builder.Append(key);
-          if (key != value.ToString())
+          if (value != null)
           {
             builder
               .Append("=\"")
