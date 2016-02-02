@@ -438,5 +438,22 @@ namespace UnitTest
       Assert.False(url.HasParam("unknown"));
       Assert.False(url.HasParam("あんのうん"));
     }
+
+    [Fact]
+    public void TestNoDomain()
+    {
+      var url = new Sdx.Web.Url("/path/to/no-domain?foo=var");
+
+      Assert.Null(url.Scheme);
+      Assert.Null(url.Domain);
+      Assert.Equal("/path/to/no-domain", url.LocalPath);
+      Assert.Equal("var", url.GetParam("foo"));
+      Assert.Equal("/path/to/no-domain?foo=var", url.Build());
+
+      url.AddParam("foo", "hoge");
+      Assert.Equal("/path/to/no-domain?foo=var&foo=hoge", url.Build());
+      Assert.Equal("/path/to/no-domain", url.Build(new List<string>() { "foo" }));
+      Assert.Equal("/path/to/no-domain?foo=var&foo=hoge&hoge=fuga", url.Build(new Dictionary<string, string>() { { "hoge", "fuga" } }));
+    }
   }
 }
