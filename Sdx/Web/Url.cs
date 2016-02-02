@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sdx.Web
 {
@@ -10,13 +11,21 @@ namespace Sdx.Web
     //コンストラクタ
     public Url(string urlStr)
     {
-      //@var System.Uri
-      var uri = new Uri(urlStr);
+      Uri uri;
+      if(!urlStr.StartsWith("http"))
+      {
+        uri = new Uri("http://sdx.com" + urlStr);
+      }
+      else
+      {
+        uri = new Uri(urlStr);
+        this.Scheme = uri.Scheme;
+        this.Domain = uri.Host;
+      }
+      
       this.ParamList = new List<Tuple<string,string>>();
       this.ParamCount = new Dictionary<string, int>();
 
-      this.Scheme = uri.Scheme;
-      this.Domain = uri.Host;
       this.LocalPath = uri.LocalPath;
 
       //クエリーを分解して保存
@@ -47,10 +56,16 @@ namespace Sdx.Web
 
     private string BuildPath()
     {
-      string path = string.Format(
-        "{0}://{1}{2}", Uri.EscapeUriString(this.Scheme), Uri.EscapeUriString(this.Domain), Uri.EscapeUriString(this.LocalPath)
-      );
-      return path;
+      if(this.Scheme != null && this.Domain != null)
+      {
+        return string.Format(
+          "{0}://{1}{2}", Uri.EscapeUriString(this.Scheme), Uri.EscapeUriString(this.Domain), Uri.EscapeUriString(this.LocalPath)
+        );
+      }
+      else
+      {
+        return Uri.EscapeUriString(this.LocalPath);
+      }
     }
 
     public string Build()
