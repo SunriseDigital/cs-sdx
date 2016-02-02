@@ -80,7 +80,7 @@
     <Compile Include="Html\Attr.cs" />
     <Compile Include="Html\Checkable.cs" />
     <Compile Include="Html\CheckBox.cs" />
-    <Compile Include="Html\Element.cs" />
+    <Compile Include="Html\FormElement.cs" />
     <Compile Include="Html\CheckableGroup.cs" />
     <Compile Include="Html\Input.cs" />
     <Compile Include="Html\InputDate.cs" />

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public abstract class Element
+  public abstract class FormElement
   {
     internal protected Tag tag;
 
@@ -13,7 +13,7 @@ namespace Sdx.Html
 
     public Validation.Errors Errors { get; private set; }
 
-    public Element(string name):this()
+    public FormElement(string name):this()
     {
       this.Name = name;
     }
@@ -50,7 +50,7 @@ namespace Sdx.Html
 
     public bool IsAllowEmpty { get; set; }
 
-    public Element()
+    public FormElement()
     {
       this.tag = this.CreateTag();
       this.Value = this.CreateFormValue();
@@ -126,7 +126,7 @@ namespace Sdx.Html
       return result;
     }
 
-    public Element AddValidator(Validation.Validator validator, bool breakChain = false)
+    public FormElement AddValidator(Validation.Validator validator, bool breakChain = false)
     {
       validators.Add(new Dictionary<string, object> {
         {"validator", validator},

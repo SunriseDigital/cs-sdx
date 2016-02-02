@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class Option : Element
+  public class Option : FormElement
   {
     internal protected override Tag CreateTag()
     {

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class CheckableGroup: Element
+  public class CheckableGroup: FormElement
   {
     private List<Checkable> elements = new List<Checkable>();
 
@@ -44,7 +44,7 @@ namespace Sdx.Html
       this.elements.ForEach(elem => action(elem));
     }
 
-    public Element this[int index]
+    public FormElement this[int index]
     {
       get
       {

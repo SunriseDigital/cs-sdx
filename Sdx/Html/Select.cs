@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class Select:Element
+  public class Select:FormElement
   {
     private List<Option> options = new List<Option>();
 

@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public abstract class Input : Element
+  public abstract class Input : FormElement
   {
     protected internal abstract string GetInputType();
 
