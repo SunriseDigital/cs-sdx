@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public abstract class Checkable : Element
+  public abstract class Checkable : FormElement
   {
     public Checkable():base()
     {

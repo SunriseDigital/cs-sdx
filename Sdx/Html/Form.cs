@@ -7,11 +7,11 @@ using System.Web;
 
 namespace Sdx.Html
 {
-  public class Form : IEnumerable<Element>
+  public class Form : IEnumerable<FormElement>
   {
-    private Dictionary<string, Element> elements = new Dictionary<string, Element>();
+    private Dictionary<string, FormElement> elements = new Dictionary<string, FormElement>();
 
-    public Element this[string name]
+    public FormElement this[string name]
     {
       get
       {
@@ -19,7 +19,7 @@ namespace Sdx.Html
       }
     }
 
-    public void SetElement(Element element)
+    public void SetElement(FormElement element)
     {
       if(element.Name == null)
       {
@@ -34,7 +34,7 @@ namespace Sdx.Html
       return this.elements.Values.GetEnumerator();
     }
 
-    public IEnumerator<Element> GetEnumerator()
+    public IEnumerator<FormElement> GetEnumerator()
     {
       return this.elements.Values.GetEnumerator();
     }
@@ -76,7 +76,7 @@ namespace Sdx.Html
       return result;
     }
 
-    public T As<T>(string name) where T : Element
+    public T As<T>(string name) where T : FormElement
     {
       return (T)this[name];
     }

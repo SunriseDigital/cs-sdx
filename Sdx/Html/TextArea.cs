@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class TextArea: Element
+  public class TextArea: FormElement
   {
     public TextArea():base()
     {
