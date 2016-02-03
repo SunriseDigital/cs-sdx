@@ -135,5 +135,7 @@ namespace Sdx.Html
 
       return this;
     }
+
+    public string Label { get; set; }
   }
 }

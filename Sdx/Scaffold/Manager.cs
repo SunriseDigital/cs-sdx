@@ -78,14 +78,35 @@ namespace Sdx.Scaffold
 
     public ParamList DisplayList { get; private set; }
 
-    public IEnumerable<FormItem> BuildFormItems()
+    public Html.Form BuildForm()
     {
-      foreach(var param in FormList)
+      Form = new Html.Form();
+
+      foreach (var param in FormList)
       {
-        yield return new FormItem(param, TableMeta);
+        Html.FormElement elem;
+        var methodName = "Create" + Sdx.Util.String.ToCamelCase(param["column"]) + "Element";
+        var method = TableMeta.TableType.GetMethod(methodName);
+        if (method != null)
+        {
+          elem = (Sdx.Html.FormElement)method.Invoke(null, null);
+        }
+        else
+        {
+          elem = new Sdx.Html.InputText();
+          elem.Name = param["column"];
+        }
+
+        elem.Label = param["label"];
+
+        Form.SetElement(elem);
       }
+
+      return Form;
     }
 
     public Web.Url ReturnUrl { get; set; }
+
+    public Html.Form Form { get; private set; }
   }
 }
