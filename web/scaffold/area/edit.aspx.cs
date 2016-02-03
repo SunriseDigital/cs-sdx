@@ -9,7 +9,7 @@ public partial class scaffold_area_edit : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-      var scaffold = new Sdx.Scaffold.Manager<Test.Orm.Area>(Test.Db.CreateSqlServer(), "area");
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Area.Meta, Test.Db.CreateSqlServer(), "area");
       scaffold.Title = "エリア";
       scaffold.ReturnUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
       scaffold.FormList

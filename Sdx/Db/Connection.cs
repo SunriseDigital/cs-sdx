@@ -433,6 +433,11 @@ namespace Sdx.Db
       return resultSet[0];
     }
 
+    //public RecordSet<Record> FetchRecordSel(Sql.Select select, Type type)
+    //{
+
+    //}
+
     /// <summary>
     /// SQLを実行しRecordSetを生成して返します。
     /// </summary>
