@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 
@@ -42,24 +43,34 @@ namespace Sdx.Scaffold
 
     private Db.TableMeta TableMeta { get; set; }
 
-    private Db.Adapter Db { get; set; }
+    public Db.Adapter Db { get; private set; }
+
+    private dynamic FetchRecordSet(Db.Sql.Select select)
+    {
+      dynamic records;
+      using (var conn = Db.CreateConnection())
+      {
+        conn.Open();
+        var method = conn.GetType().GetMethod("FetchRecordSet").MakeGenericMethod(TableMeta.RecordType);
+        records = method.Invoke(conn, new object[] { select });
+      }
+
+      return records;
+    }
+
+    private Db.Sql.Select CreateSelect()
+    {
+      var select = Db.CreateSelect();
+      select.AddFrom(TableMeta.CreateTable<Db.Table>());
+      return select;
+    }
 
     public dynamic RecordSet
     {
       get
       {
-        var select = Db.CreateSelect();
-        select.AddFrom(TableMeta.CreateTable<Db.Table>());
-
-        dynamic records;
-        using (var conn = Db.CreateConnection())
-        {
-          conn.Open();
-          var method = conn.GetType().GetMethod("FetchRecordSet").MakeGenericMethod(TableMeta.RecordType);
-          records = method.Invoke(conn, new object[] { select });
-        }
-
-        return records;
+        var select = CreateSelect();
+        return FetchRecordSet(select);
       }
     }
 
@@ -71,7 +82,7 @@ namespace Sdx.Scaffold
 
     public Html.Form BuildForm()
     {
-      Form = new Html.Form();
+      var form = new Html.Form();
 
       foreach (var param in FormList)
       {
@@ -84,26 +95,62 @@ namespace Sdx.Scaffold
         }
         else
         {
-          elem = new Sdx.Html.InputText();
+          //主キーはhidden
+          if (TableMeta.Pkeys.Exists((column) => column == param["column"]))
+          {
+            elem = new Sdx.Html.InputHidden();
+          }
+          else
+          {
+            elem = new Sdx.Html.InputText();
+          }
+          
           elem.Name = param["column"];
         }
 
         elem.Label = param["label"];
 
-        Form.SetElement(elem);
+        form.SetElement(elem);
       }
 
-      return Form;
+      return form;
     }
 
     public Web.Url ReturnUrl { get; set; }
-
-    public Html.Form Form { get; private set; }
 
     public static Manager CurrentInstance(string key)
     {
       var instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
       return instances[key];
+    }
+
+    public Sdx.Db.Record LoadRecord(NameValueCollection parameters)
+    {
+      var select = CreateSelect();
+
+      var exists = false;
+      TableMeta.Pkeys.ForEach((column) => {
+        var values = parameters.GetValues(column);
+        if (values != null && values.Length > 0 && values[0].Length > 0)
+        {
+          exists = true;
+          select.Where.Add(column, values[0]);
+        }
+      });
+
+      if (!exists)
+      {
+        return TableMeta.CreateRecord<Sdx.Db.Record>();
+      }
+
+      var records = FetchRecordSet(select);
+
+      if (records.Count == 0)
+      {
+        return TableMeta.CreateRecord<Sdx.Db.Record>();
+      }
+
+      return records[0];
     }
   }
 }

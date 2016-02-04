@@ -5,6 +5,7 @@ using System.Text;
 using System.Data;
 
 using Sdx.Db.Sql;
+using System.Collections.Specialized;
 
 namespace Sdx.Db
 {
@@ -284,6 +285,17 @@ namespace Sdx.Db
         .Append("}");
 
       return builder.ToString();
+    }
+
+    public void Bind(NameValueCollection collection)
+    {
+      this.OwnMeta.Columns.ForEach((column) => {
+        var values = collection.GetValues(column.Name);
+        if (values != null && values.Length > 0 && values[0].Length > 0)
+        {
+          this.SetValue(column.Name, values[0]);
+        }
+      });
     }
   }
 }

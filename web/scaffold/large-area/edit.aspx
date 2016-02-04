@@ -10,7 +10,7 @@
 </head>
 <body>
   <div class="container">
-    <Scaffold:list ID="list" runat="server" Name="area" />
+    <Scaffold:list ID="list" runat="server" Name="large_area" />
   </div>
 </body>
 </html>

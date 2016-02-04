@@ -37,12 +37,5 @@ namespace Test.Orm.Table
         typeof(Test.Orm.Table.Area)
       );
     }
-
-    public static Sdx.Html.FormElement CreateIdElement()
-    {
-      var elem = new Sdx.Html.InputHidden();
-      elem.Name = "id";
-      return elem;
-    }
   }
 }
