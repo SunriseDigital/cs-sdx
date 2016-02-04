@@ -290,10 +290,16 @@ namespace Sdx.Db
     public void Bind(NameValueCollection collection)
     {
       this.OwnMeta.Columns.ForEach((column) => {
-        var values = collection.GetValues(column.Name);
-        if (values != null && values.Length > 0 && values[0].Length > 0)
+        var value = collection[column.Name];
+        if (value != null)
         {
-          this.SetValue(column.Name, values[0]);
+          //Autoincrement時主キーは空で来るのでう
+          if (value.Length == 0 && column.IsPkey)
+          {
+            return;
+          }
+
+          this.SetValue(column.Name, value);
         }
       });
     }

@@ -37,18 +37,27 @@ namespace Sdx.Db
 
     public class Column
     {
-      public Column(string name)
+      //TODO TypeはValidationの自動設定に使う予定。独自Typeに変更したほうがいいと思われる。
+      public Column(string name, Type type = null, bool isNotNull = true)
       {
         this.Name = name;
-      }
-
-      public Column(string name, Type type) : this(name)
-      {
         this.Type = type;
+        this.IsNotNull = isNotNull;
       }
 
       public string Name { get; private set; }
       public Type Type { get; private set; }
+      public bool IsNotNull {get; private set;}
+
+      public TableMeta Meta { get; internal set; }
+
+      public bool IsPkey
+      {
+        get
+        {
+          return Meta.Pkeys.Exists((column) => this.Name == column);
+        }
+      }
     }
 
     public Adapter Adapter { get; set; }

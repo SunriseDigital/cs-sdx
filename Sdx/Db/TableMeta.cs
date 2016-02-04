@@ -36,6 +36,7 @@ namespace Sdx.Db
 
       this.Columns.ForEach(column => {
         this.columnsCache[column.Name] = column;
+        column.Meta = this;
       });
     }
 

@@ -22,7 +22,7 @@ namespace Test.Orm.Table
           new Column("area_id"),
           new Column("main_image_id"),
           new Column("sub_image_id"),
-          new Column("created_at", typeof(DateTime)),
+          new Column("created_at"),
         },
         new Dictionary<string, Relation>()
         {
