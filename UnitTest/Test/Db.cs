@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Test
 {
@@ -29,6 +30,21 @@ namespace Test
       var db = new Sdx.Db.SqlServerAdapter();
       db.ConnectionString = SqlServerConnectionString;
       return db;
+    }
+
+    public static Sdx.Db.Adapter CreateDb()
+    {
+      var useMysql = false;
+      if(HttpContext.Current != null)
+      {
+        var cookie = HttpContext.Current.Request.Cookies["sdx_test_use_mysql"];
+        if(cookie != null && cookie.Value == "1")
+        {
+          useMysql = true;
+        }
+      }
+
+      return useMysql ? CreateMySql() : CreateSqlServer();
     }
   }
 }
