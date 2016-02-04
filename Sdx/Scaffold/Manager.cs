@@ -9,9 +9,10 @@ namespace Sdx.Scaffold
   public class Manager
   {
     private const string CONTEXT_KEY = "SDX.SCAFFOLD.MANAGER.INSTANCES";
+    private const string DEFAULT_NAME = "SDX.SCAFFOLD.MANAGER.DEFAULT_NAME";
     public String Name { get; private set; }
 
-    public Manager(Db.TableMeta tableMeta, Sdx.Db.Adapter db, string name)
+    public Manager(Db.TableMeta tableMeta, Sdx.Db.Adapter db, string name = Manager.DEFAULT_NAME)
     {
       this.Name = name;
       Dictionary<string, Manager> instances = null;
@@ -27,7 +28,7 @@ namespace Sdx.Scaffold
 
       if (instances.ContainsKey(name))
       {
-        throw new InvalidOperationException("Already exists `area` Manager");
+        throw new InvalidOperationException("Already exists " + this.Name + " Manager");
       }
 
       this.TableMeta = tableMeta;
@@ -120,6 +121,10 @@ namespace Sdx.Scaffold
 
     public static Manager CurrentInstance(string key)
     {
+      if(key == null)
+      {
+        key = Manager.DEFAULT_NAME;
+      }
       var instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
       return instances[key];
     }

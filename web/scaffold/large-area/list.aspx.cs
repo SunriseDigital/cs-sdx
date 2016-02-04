@@ -9,7 +9,7 @@ public partial class scaffold_area_list : System.Web.UI.Page
 {
   protected void Page_Load(object sender, EventArgs e)
   {
-    var scaffold = new Sdx.Scaffold.Manager(Test.Orm.LargeArea.Meta, Test.Db.CreateSqlServer(), "large_area");
+    var scaffold = new Sdx.Scaffold.Manager(Test.Orm.LargeArea.Meta, Test.Db.CreateSqlServer());
     scaffold.Title = "エリア";
     scaffold.DisplayList
       .Add(Sdx.Scaffold.Param.Create()

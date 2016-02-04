@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
 <body>
     <div>
-      <Scaffold:list ID="list" runat="server" Name="large_area" />
+      <Scaffold:list ID="list" runat="server" />
     </div>
 </body>
 </html>
