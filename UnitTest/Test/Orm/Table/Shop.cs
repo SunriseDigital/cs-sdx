@@ -17,7 +17,7 @@ namespace Test.Orm.Table
         },
         new List<Column>()
         {
-          new Column("id"),
+          new Column("id", isAutoIncrement: true),
           new Column("name"),
           new Column("area_id"),
           new Column("main_image_id"),

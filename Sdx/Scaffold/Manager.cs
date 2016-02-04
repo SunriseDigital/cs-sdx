@@ -117,7 +117,9 @@ namespace Sdx.Scaffold
       return form;
     }
 
-    public Web.Url ReturnUrl { get; set; }
+
+    public Web.Url ListPage { get; set; }
+    public Web.Url EditPage { get; set; }
 
     public static Manager CurrentInstance(string key)
     {

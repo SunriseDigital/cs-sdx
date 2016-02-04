@@ -11,7 +11,7 @@ public partial class scaffold_area_edit : System.Web.UI.Page
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.LargeArea.Meta, Test.Db.CreateSqlServer());
       scaffold.Title = "エリア";
-      scaffold.ReturnUrl = new Sdx.Web.Url("/scaffold/large-area/list.aspx");
+      scaffold.ListPage = new Sdx.Web.Url("/scaffold/large-area/list.aspx");
       scaffold.FormList
         .Add(Sdx.Scaffold.Param.Create()
           .Set("column", "id")

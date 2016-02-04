@@ -38,16 +38,18 @@ namespace Sdx.Db
     public class Column
     {
       //TODO TypeはValidationの自動設定に使う予定。独自Typeに変更したほうがいいと思われる。
-      public Column(string name, Type type = null, bool isNotNull = true)
+      public Column(string name, Type type = null, bool isNotNull = true, bool isAutoIncrement = false)
       {
         this.Name = name;
         this.Type = type;
         this.IsNotNull = isNotNull;
+        this.IsAutoIncrement = isAutoIncrement;
       }
 
       public string Name { get; private set; }
       public Type Type { get; private set; }
       public bool IsNotNull {get; private set;}
+      public bool IsAutoIncrement { get; private set; }
 
       public TableMeta Meta { get; internal set; }
 

@@ -17,7 +17,7 @@ namespace Test.Orm.Table
         },
         new List<Column>()
         {
-          new Column("id"),
+          new Column("id", isAutoIncrement: true),
           new Column("path"),
         },
         new Dictionary<string, Relation>()
