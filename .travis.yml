@@ -8,3 +8,8 @@ script:
   - cp UnitTest/user.config.tpl UnitTest/user.config
   - xbuild /p:Configuration=TravisCI cs-sdx.sln
   - mono ./testrunner/xunit.runners.1.9.2/tools/xunit.console.clr4.exe ./UnitTest/bin/TravisCI/UnitTest.dll
+git:
+    submodules: false
+before_install:
+    - sed -i 's/git@github.com:/https:\/\/github.com\//' .gitmodules
+    - git submodule update --init --recursive
