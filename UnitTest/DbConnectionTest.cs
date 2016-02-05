@@ -491,7 +491,8 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         string id = null;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           id = con.FetchOne<string>(select);
         }));
         //connectionを開いてないので例外になるはず
@@ -508,7 +509,8 @@ namespace UnitTest
         var command = select.Build();
 
         string id = null;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           id = con.FetchOne<string>(command);
         }));
         //connectionを開いてないので例外になるはず
@@ -546,7 +548,8 @@ namespace UnitTest
       {
         var command = sel.Build();
 
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           list = con.FetchList<string>(command);
         }));
         //connectionを開いてないので例外になるはず
@@ -573,7 +576,8 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           list = con.FetchList<string>(sel);
         }));
         //connectionを開いてないので例外になるはず
@@ -612,7 +616,8 @@ namespace UnitTest
       {
         Dictionary<string, string> strDic = null;
         var command = sel.Build();
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           strDic = con.FetchDictionary<string>(command);
         }));
         //connectionを開いてないので例外になるはず
@@ -640,7 +645,8 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Dictionary<string, object> objDic;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           objDic = con.FetchDictionary<object>(sel);
         }));
         //connectionを開いてないので例外になるはず
@@ -679,7 +685,8 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           list = con.FetchDictionaryList<string>(command);
         }));
         //connectionを開いてないので例外になるはず
@@ -706,7 +713,8 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           list = con.FetchDictionaryList<string>(sel);
         }));
         //connectionを開いてないので例外になるはず
@@ -745,7 +753,8 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           list = con.FetchKeyValuePairList<int, string>(command);
         }));
         //connectionを開いてないので例外になるはず
@@ -773,7 +782,8 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           list = con.FetchKeyValuePairList<int, string>(sel);
         }));
         //connectionを開いてないので例外になるはず
@@ -809,7 +819,8 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Test.Orm.Shop shop;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           shop = con.FetchRecord<Test.Orm.Shop>(sel);
         }));
         //connectionを開いてないので例外になるはず
@@ -823,15 +834,15 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestFetchRecordListWithConnection()
+    public void TestFetchRecordSetWithConnection()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunFetchRecordListWithConnection(db);
+        RunFetchRecordSetWithConnection(db);
       }
     }
 
-    private void RunFetchRecordListWithConnection(TestDb db)
+    private void RunFetchRecordSetWithConnection(TestDb db)
     {
       var sel = db.Adapter.CreateSelect();
       sel
@@ -844,7 +855,8 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Sdx.Db.RecordSet<Test.Orm.Shop> set;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           set = con.FetchRecordSet<Test.Orm.Shop>(sel);
         }));
         //connectionを開いてないので例外になるはず
@@ -908,5 +920,63 @@ namespace UnitTest
 
       context.DbProfiler = prevProfiler;
     }
+
+    [Fact]
+    public void TestFetchRecordSetNonGeneric()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchRecordSetNonGeneric(db);
+      }
+    }
+
+    private void RunFetchRecordSetNonGeneric(TestDb db)
+    {
+      var sel = db.Adapter.CreateSelect();
+      sel
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddOrder("id", Sdx.Db.Sql.Order.DESC)
+        .Where
+          .Add("id", new string[] { "2", "3" })
+        ;
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        Sdx.Db.RecordSet<Sdx.Db.Record> set;
+        con.Open();
+        set = con.FetchRecordSet(sel);
+        Assert.Equal(2, set.Count);
+        Assert.Equal(3, set[0].GetInt32("id"));
+        Assert.Equal("天府舫", set[0].GetString("name"));
+        Assert.Equal(2, set[1].GetInt32("id"));
+        Assert.Equal("エスペリア", set[1].GetString("name"));
+      }
+    }
+
+    [Fact]
+    public void TestFetchRecordNonGeneric()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchRecordNonGeneric(db);
+      }
+    }
+
+    private void RunFetchRecordNonGeneric(TestDb db)
+    {
+      var sel = db.Adapter.CreateSelect();
+      sel
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", 1);
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        con.Open();
+        Sdx.Db.Record shop = con.FetchRecord(sel);
+        Assert.Equal(1, shop.GetInt32("id"));
+        Assert.Equal("天祥", shop.GetString("name"));
+      }
+    }
+
   }
 }
