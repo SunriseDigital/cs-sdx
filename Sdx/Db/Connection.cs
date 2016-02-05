@@ -471,6 +471,11 @@ namespace Sdx.Db
       return recordSet;
     }
 
+    /// <summary>
+    /// RecordSetの基点となるテーブルは最初にAddFromされた<see cref="Context" />です。
+    /// </summary>
+    /// <param name="select"></param>
+    /// <returns></returns>
     public RecordSet<Record> FetchRecordSet(Select select)
     {
       var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
