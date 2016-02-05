@@ -952,5 +952,31 @@ namespace UnitTest
         Assert.Equal("エスペリア", set[1].GetString("name"));
       }
     }
+
+    [Fact]
+    public void TestFetchRecordNonGeneric()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchRecordNonGeneric(db);
+      }
+    }
+
+    private void RunFetchRecordNonGeneric(TestDb db)
+    {
+      var sel = db.Adapter.CreateSelect();
+      sel
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", 1);
+
+      using (var con = db.Adapter.CreateConnection())
+      {
+        con.Open();
+        Sdx.Db.Record shop = con.FetchRecord(sel);
+        Assert.Equal(1, shop.GetInt32("id"));
+        Assert.Equal("天祥", shop.GetString("name"));
+      }
+    }
+
   }
 }

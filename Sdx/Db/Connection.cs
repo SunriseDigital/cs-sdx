@@ -434,6 +434,18 @@ namespace Sdx.Db
       return resultSet[0];
     }
 
+    public Record FetchRecord(Sql.Select select)
+    {
+      var resultSet = this.FetchRecordSet(select);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
     /// <summary>
     /// SQLを実行しRecordSetを生成して返します。
     /// </summary>
