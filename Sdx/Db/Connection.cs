@@ -421,6 +421,19 @@ namespace Sdx.Db
       return result;
     }
 
+    public T FetchRecordByPkey<T>(Db.Table table, string pkeyValue) where T : Record, new()
+    {
+      if (table.OwnMeta.Pkeys.Count > 1)
+      {
+        throw new InvalidOperationException("This table has multiple pkeys.");
+      }
+      var select = this.Adapter.CreateSelect();
+      select.AddFrom(table);
+      select.Where.Add(table.OwnMeta.Pkeys[0], pkeyValue);
+
+      return this.FetchRecord<T>(select);
+    }
+
     public T FetchRecord<T>(Sql.Select select) where T : Record, new()
     {
       var resultSet = this.FetchRecordSet<T>(select);
@@ -431,6 +444,12 @@ namespace Sdx.Db
       }
 
       return resultSet[0];
+    }
+
+    public dynamic Exec(string methodName, Type reocrdType, params object[] args)
+    {
+      var method = this.GetType().GetMethod(methodName).MakeGenericMethod(reocrdType);
+      return (dynamic)method.Invoke(this, args);
     }
 
     /// <summary>

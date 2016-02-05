@@ -148,18 +148,5 @@ namespace Sdx.Db
     {
       return this.MemberwiseClone();
     }
-
-    public T FindByPkey<T>(string pkeyValue, Db.Connection conn) where T: Sdx.Db.Record, new()
-    {
-      if(OwnMeta.Pkeys.Count > 1)
-      {
-        throw new InvalidOperationException("This table has multiple pkeys.");
-      }
-      var select = conn.Adapter.CreateSelect();
-      select.AddFrom(this);
-      select.Where.Add(OwnMeta.Pkeys[0], pkeyValue);
-
-      return conn.FetchRecord<T>(select);
-    }
   }
 }

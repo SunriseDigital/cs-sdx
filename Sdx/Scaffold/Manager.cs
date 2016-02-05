@@ -168,8 +168,7 @@ namespace Sdx.Scaffold
         using (var conn = Db.CreateConnection())
         {
           conn.Open();
-          var method = conn.GetType().GetMethod("FetchRecordSet").MakeGenericMethod(TableMeta.RecordType);
-          records = method.Invoke(conn, new object[] { select });
+          records = conn.Exec("FetchRecordSet", TableMeta.RecordType, select);
         }
       }
 

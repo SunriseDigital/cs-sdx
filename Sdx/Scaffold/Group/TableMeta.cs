@@ -25,9 +25,7 @@ namespace Sdx.Scaffold.Group
       {
         conn.Open();
         var table = tableMeta.CreateTable<Db.Table>();
-        var method = table.GetType().GetMethod("FindByPkey").MakeGenericMethod(tableMeta.RecordType);
-        var record = (Db.Record)method.Invoke(table, new object[] { TargetValue, conn });
-        Sdx.Context.Current.Debug.Log(record);
+        var record = (Db.Record)conn.Exec("FetchRecordByPkey", tableMeta.RecordType, table, TargetValue);
         name = record.GetString(display);
       }
 
