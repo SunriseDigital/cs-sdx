@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
@@ -343,6 +344,13 @@ namespace Sdx.Db.Sql
       return this.contextList.ContainsKey(contextName);
     }
 
+    public IEnumerable<KeyValuePair<string, Context>> ContextList
+    {
+      get
+      {
+        return contextList;
+      }
+    }
 
     /// <summary>
     /// From及びJoinしたテーブルの中からcontextNameのテーブルを探し返す

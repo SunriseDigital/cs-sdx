@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Text;
 using Sdx.Db.Sql;
+using System.Linq;
 
 namespace Sdx.Db
 {
@@ -446,10 +447,28 @@ namespace Sdx.Db
       return resultSet[0];
     }
 
-    public dynamic Exec(string methodName, Type reocrdType, params object[] args)
+    public Record FetchRecord(Sql.Select select)
     {
-      var method = this.GetType().GetMethod(methodName).MakeGenericMethod(reocrdType);
-      return (dynamic)method.Invoke(this, args);
+      var resultSet = this.FetchRecordSet(select);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
+    public Record FetchRecord(Sql.Select select, string contextName)
+    {
+      var resultSet = this.FetchRecordSet(select, contextName);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
     }
 
     /// <summary>
@@ -476,13 +495,41 @@ namespace Sdx.Db
         throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
       }
 
+      return FetchRecordSet<T>(select, meta.Name);
+    }
+
+    /// <summary>
+    /// RecordSetの基点となるテーブルは最初にAddFromされた<see cref="Context"/>です。
+    /// </summary>
+    /// <param name="select"></param>
+    /// <returns></returns>
+    public RecordSet<Record> FetchRecordSet(Select select)
+    {
+      var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
+
+      return FetchRecordSet<Record>(select, firstFrom.Name);
+    }
+
+    public RecordSet<Record> FetchRecordSet(Select select, string contextName)
+    {
+      return FetchRecordSet<Record>(select, contextName);
+    }
+
+    public dynamic Exec(string methodName, Type reocrdType, params object[] args)
+    {
+      var method = this.GetType().GetMethod(methodName).MakeGenericMethod(reocrdType);
+      return (dynamic)method.Invoke(this, args);
+    }
+
+    private RecordSet<T> FetchRecordSet<T>(Select select, string contextName) where T : Record, new()
+    {
       RecordSet<T> recordSet = null;
       using (var command = select.Build())
       {
         recordSet = this.Fetch<RecordSet<T>>(command, (reader) =>
         {
           var resultSet = new RecordSet<T>();
-          resultSet.Build(reader, select, meta.Name);
+          resultSet.Build(reader, select, contextName);
           return resultSet;
         });
       }
