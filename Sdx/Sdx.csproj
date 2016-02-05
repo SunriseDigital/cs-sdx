@@ -90,6 +90,9 @@
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
     <Compile Include="Html\InputPassword.cs" />
+    <Compile Include="Scaffold\Group\Base.cs" />
+    <Compile Include="Scaffold\Group\StaticClass.cs" />
+    <Compile Include="Scaffold\Group\TableMeta.cs" />
     <Compile Include="Scaffold\Param.cs" />
     <Compile Include="Scaffold\ParamList.cs" />
     <Compile Include="Validation\DateTimeSpan.cs" />

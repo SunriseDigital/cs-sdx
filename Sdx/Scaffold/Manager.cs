@@ -41,38 +41,15 @@ namespace Sdx.Scaffold
       FormList = new ParamList();
     }
 
-
-    private Db.TableMeta TableMeta { get; set; }
+    internal Db.TableMeta TableMeta { get; set; }
 
     public Db.Adapter Db { get; private set; }
-
-    private dynamic FetchRecordSet(Db.Sql.Select select)
-    {
-      dynamic records;
-      using (var conn = Db.CreateConnection())
-      {
-        conn.Open();
-        var method = conn.GetType().GetMethod("FetchRecordSet").MakeGenericMethod(TableMeta.RecordType);
-        records = method.Invoke(conn, new object[] { select });
-      }
-
-      return records;
-    }
 
     private Db.Sql.Select CreateSelect()
     {
       var select = Db.CreateSelect();
       select.AddFrom(TableMeta.CreateTable<Db.Table>());
       return select;
-    }
-
-    public dynamic RecordSet
-    {
-      get
-      {
-        var select = CreateSelect();
-        return FetchRecordSet(select);
-      }
     }
 
     public string Title { get; set; }
@@ -133,31 +110,70 @@ namespace Sdx.Scaffold
 
     public Sdx.Db.Record LoadRecord(NameValueCollection parameters)
     {
-      var select = CreateSelect();
-
-      var exists = false;
-      TableMeta.Pkeys.ForEach((column) => {
-        var values = parameters.GetValues(column);
-        if (values != null && values.Length > 0 && values[0].Length > 0)
+      var recordSet = FetchRecordSet((select) => {
+        var exists = false;
+        TableMeta.Pkeys.ForEach((column) =>
         {
-          exists = true;
-          select.Where.Add(column, values[0]);
+          var values = parameters.GetValues(column);
+          if (values != null && values.Length > 0 && values[0].Length > 0)
+          {
+            exists = true;
+            select.Where.Add(column, values[0]);
+          }
+        });
+
+        if (!exists)
+        {
+          return false;
         }
+
+        return true;  
+      
       });
-
-      if (!exists)
+      
+      if(recordSet == null)
       {
         return TableMeta.CreateRecord<Sdx.Db.Record>();
       }
 
-      var records = FetchRecordSet(select);
-
-      if (records.Count == 0)
+      if (recordSet.Count == 0)
       {
         return TableMeta.CreateRecord<Sdx.Db.Record>();
       }
 
-      return records[0];
+      return recordSet[0];
+    }
+
+    private Group.Base group;
+
+    public Group.Base Group
+    {
+      get { return group; }
+      set
+      {
+        group = value;
+        group.Manager = this;
+      }
+    }
+
+    public dynamic FetchRecordSet(Func<Db.Sql.Select, bool> filter)
+    {
+      var select = CreateSelect();
+      var ret = filter(select);
+
+      dynamic records = null;
+
+      if(ret)
+      {
+        using (var conn = Db.CreateConnection())
+        {
+          conn.Open();
+          var method = conn.GetType().GetMethod("FetchRecordSet").MakeGenericMethod(TableMeta.RecordType);
+          records = method.Invoke(conn, new object[] { select });
+        }
+      }
+
+      return records;
     }
   }
 }
