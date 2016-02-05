@@ -4,6 +4,7 @@ using System.Data;
 using System.Data.Common;
 using System.Text;
 using Sdx.Db.Sql;
+using System.Linq;
 
 namespace Sdx.Db
 {
@@ -462,6 +463,25 @@ namespace Sdx.Db
         recordSet = this.Fetch<RecordSet<T>>(command, (reader) =>
         {
           var resultSet = new RecordSet<T>();
+          resultSet.Build(reader, select, meta.Name);
+          return resultSet;
+        });
+      }
+
+      return recordSet;
+    }
+
+    public RecordSet<Record> FetchRecordSet(Select select)
+    {
+      var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
+      var meta = firstFrom.Table.OwnMeta;
+
+      RecordSet<Record> recordSet = null;
+      using (var command = select.Build())
+      {
+        recordSet = this.Fetch<RecordSet<Record>>(command, (reader) =>
+        {
+          var resultSet = new RecordSet<Record>();
           resultSet.Build(reader, select, meta.Name);
           return resultSet;
         });
