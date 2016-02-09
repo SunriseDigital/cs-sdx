@@ -137,7 +137,7 @@ namespace Sdx.Scaffold
       if(recordSet == null || recordSet.Count == 0)
       {
         record = TableMeta.CreateRecord<Sdx.Db.Record>();
-        if (Group != null)
+        if (Group != null && Group.TargetValue != null)
         {
           record.SetValue(Group.TargetColumnName, Group.TargetValue);
         }
