@@ -39,24 +39,27 @@ namespace Sdx.Html
       return this.elements.Values.GetEnumerator();
     }
 
-    public void Bind(NameValueCollection values)
+    public void Bind(params NameValueCollection[] collections)
     {
-      foreach(var name in values.AllKeys)
+      foreach (var values in collections)
       {
-        if(this.elements.ContainsKey(name))
+        foreach (var name in values.AllKeys)
         {
-          if (this.elements[name].Value.IsMultiple)
+          if (this.elements.ContainsKey(name))
           {
-            this.elements[name].Bind(values.GetValues(name));
-          }
-          else
-          {
-            var vals = values.GetValues(name);
-            if (vals.Length > 1)
+            if (this.elements[name].Value.IsMultiple)
             {
-              throw new InvalidOperationException(name + "element must have single value.");
+              this.elements[name].Bind(values.GetValues(name));
             }
-            this.elements[name].Bind(vals[0]);
+            else
+            {
+              var vals = values.GetValues(name);
+              if (vals.Length > 1)
+              {
+                throw new InvalidOperationException(name + "element must have single value.");
+              }
+              this.elements[name].Bind(vals[0]);
+            }
           }
         }
       }
@@ -80,6 +83,5 @@ namespace Sdx.Html
     {
       return (T)this[name];
     }
-
   }
 }

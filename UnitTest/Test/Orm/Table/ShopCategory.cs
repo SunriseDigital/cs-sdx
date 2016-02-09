@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class ShopCategory : Sdx.Db.Table
+  class ShopCategory : Test.Db.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 

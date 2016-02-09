@@ -109,7 +109,7 @@ namespace Sdx.Scaffold
       return instances[key];
     }
 
-    public Sdx.Db.Record LoadRecord(NameValueCollection parameters)
+    public Db.Record LoadRecord(NameValueCollection parameters)
     {
       var recordSet = FetchRecordSet((select) => {
         var exists = false;
@@ -131,18 +131,23 @@ namespace Sdx.Scaffold
         return true;  
       
       });
+
+      Db.Record record;
       
-      if(recordSet == null)
+      if(recordSet == null || recordSet.Count == 0)
       {
-        return TableMeta.CreateRecord<Sdx.Db.Record>();
+        record = TableMeta.CreateRecord<Sdx.Db.Record>();
+        if (Group != null)
+        {
+          record.SetValue(Group.TargetColumnName, Group.TargetValue);
+        }
+      }
+      else
+      {
+        record = recordSet[0];
       }
 
-      if (recordSet.Count == 0)
-      {
-        return TableMeta.CreateRecord<Sdx.Db.Record>();
-      }
-
-      return recordSet[0];
+      return record;
     }
 
     private Group.Base group;

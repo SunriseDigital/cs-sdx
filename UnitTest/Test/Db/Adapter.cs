@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Web;
 
-namespace Test
+namespace Test.Db
 {
-  public class Db
+  public class Adapter
   {
     public static String MySqlConnectionString
     {

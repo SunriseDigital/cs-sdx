@@ -148,5 +148,10 @@ namespace Sdx.Db
     {
       return this.MemberwiseClone();
     }
+
+    public virtual Table SelectDefaultOrder(Sql.Select select)
+    {
+      return this;
+    }
   }
 }

@@ -9,7 +9,7 @@ namespace Test.Scaffold
   {
     public static Sdx.Scaffold.Manager Create()
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Area.Meta, Test.Db.CreateDb());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Area.Meta, Test.Db.Adapter.CreateDb());
       scaffold.Title = "エリア";
 
       scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
@@ -29,6 +29,9 @@ namespace Test.Scaffold
         .Add(Sdx.Scaffold.Param.Create()
           .Set("column", "id")
           .Set("label", "ID")
+        ).Add(Sdx.Scaffold.Param.Create()
+          .Set("column", "large_area_id")
+          .Set("label", "大エリア")
         ).Add(Sdx.Scaffold.Param.Create()
           .Set("column", "name")
           .Set("label", "名称")

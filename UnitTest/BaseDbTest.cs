@@ -63,7 +63,7 @@ namespace UnitTest
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.SqlServerAdapter();
-      testDb.Adapter.ConnectionString = Test.Db.SqlServerConnectionString;
+      testDb.Adapter.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
@@ -71,7 +71,7 @@ namespace UnitTest
 
       testDb = new TestDb();
       testDb.Adapter = new Sdx.Db.MySqlAdapter();
-      testDb.Adapter.ConnectionString = Test.Db.MySqlConnectionString;
+      testDb.Adapter.ConnectionString = Test.Db.Adapter.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);
@@ -122,7 +122,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         }
       }
 
-      factory.ConnectionString = Test.Db.MySqlConnectionString;
+      factory.ConnectionString = Test.Db.Adapter.MySqlConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {
@@ -189,7 +189,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         createUserSql.ExecuteNonQuery();
       }
 
-      factory.ConnectionString = Test.Db.SqlServerConnectionString;
+      factory.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {

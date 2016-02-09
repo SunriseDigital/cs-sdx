@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Image : Sdx.Db.Table
+  class Image : Test.Db.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 

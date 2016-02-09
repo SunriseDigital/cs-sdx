@@ -10,6 +10,5 @@ public partial class scaffold_area_edit : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
       Test.Scaffold.Area.Create();
-      
     }
 }

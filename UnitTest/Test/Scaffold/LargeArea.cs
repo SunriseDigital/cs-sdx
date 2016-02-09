@@ -9,7 +9,7 @@ namespace Test.Scaffold
   {
     public static Sdx.Scaffold.Manager Create()
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.LargeArea.Meta, Test.Db.CreateDb());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.LargeArea.Meta, Test.Db.Adapter.CreateDb());
       scaffold.Title = "大エリア";
 
       scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/large-area/edit.aspx");
