@@ -234,7 +234,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         Assert.Equal("SimpleLiteralSub", shop.GetValue("name"));
         Assert.Equal(4, shop.GetValue("area_id"));
@@ -288,7 +288,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         Assert.Equal("SimpleSelectSub", shop.GetValue("name"));
         Assert.Equal(5, shop.GetValue("area_id"));
@@ -347,7 +347,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         Assert.Equal("UpdateTest", shop.GetValue("name"));
         Assert.Equal(3, shop.GetValue("area_id"));
@@ -402,7 +402,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         Assert.Equal(5, shop.GetValue("area_id"));
       }
@@ -451,7 +451,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         Assert.Equal(4, shop.GetValue("area_id"));
       }
@@ -498,7 +498,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         Assert.Equal("Delete", shop.GetValue("name"));
       }
@@ -534,7 +534,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         Assert.Null(shop);
       }
@@ -562,7 +562,7 @@ namespace UnitTest
       {
         conn.Open();
 
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
         Assert.False(shop.IsUpdated);
 
         var newName = Sdx.Util.String.GenRandom(10);
@@ -589,7 +589,7 @@ namespace UnitTest
         Assert.Equal(1, shop.GetInt32("main_image_id"));
         Assert.Equal(dateTime, shop.GetDateTime("created_at"));
 
-        var updatedShop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var updatedShop = conn.FetchRecord(select);
         Assert.Equal(newName, updatedShop.GetString("name"));
         Assert.Equal(2, updatedShop.GetInt32("area_id"));
         Assert.Equal(1, updatedShop.GetInt32("main_image_id"));
@@ -648,7 +648,7 @@ namespace UnitTest
             .AddFrom(new Test.Orm.Table.Shop())
             .Where.Add("id", id);
 
-        var newShop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var newShop = conn.FetchRecord(select);
 
         Assert.Equal(newName, newShop.GetString("name"));
         Assert.Equal(3, newShop.GetInt32("area_id"));
@@ -664,7 +664,7 @@ namespace UnitTest
         Assert.True(newShop.IsDeleted);
 
         //確認
-        var deletedShop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var deletedShop = conn.FetchRecord(select);
         Assert.Null(deletedShop);
       }
     }

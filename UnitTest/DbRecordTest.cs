@@ -47,7 +47,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
         shops.ForEach(shop =>
         {
@@ -86,7 +86,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(2, shops.Count);
@@ -146,7 +146,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, shops.Count);
@@ -191,7 +191,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(2, shops.Count);
@@ -236,7 +236,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area", conn);
@@ -277,7 +277,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         var menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
           "menu",
@@ -331,7 +331,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         var shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
           "shop_category",
@@ -385,7 +385,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, shops.Count);
@@ -421,7 +421,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
 
         Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image"));
@@ -454,7 +454,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, shops.Count);
@@ -489,7 +489,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
 
         Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image", conn));
@@ -522,7 +522,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
         Assert.True(shop is Test.Orm.Shop);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
@@ -579,7 +579,7 @@ namespace UnitTest
         conn.Open();
         //Tableを使ってないと、MetaDataが取れないので主キーがわからず組み立てられない。
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+          var shop = conn.FetchRecord(select);
         }));
 
         Assert.IsType<InvalidOperationException>(ex);
@@ -611,7 +611,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+        var shops = conn.FetchRecordSet(select);
 
         Assert.Equal("天祥", shops[0].GetString("name"));
         Assert.Equal("エスペリア", shops[1].GetString("name"));
@@ -645,7 +645,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord<Test.Orm.Shop>(select);
+        var shop = conn.FetchRecord(select);
 
         var datetime = shop.GetDateTime("created_at");
         Assert.IsType<DateTime>(datetime);

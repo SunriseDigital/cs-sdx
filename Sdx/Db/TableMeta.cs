@@ -49,24 +49,14 @@ namespace Sdx.Db
 
     private Dictionary<string, Table.Column> columnsCache = new Dictionary<string, Table.Column>();
 
-    public dynamic CreateTable()
+    public Table CreateTable()
     {
-      return (dynamic)this.TableType.GetConstructor(Type.EmptyTypes).Invoke(null);
+      return (Table)this.TableType.GetConstructor(Type.EmptyTypes).Invoke(null);
     }
 
-    public T CreateTable<T>() where T:Table
+    public Record CreateRecord()
     {
-      return (T)this.TableType.GetConstructor(Type.EmptyTypes).Invoke(null);
-    }
-
-    public dynamic CreateRecord()
-    {
-      return (dynamic)this.RecordType.GetConstructor(Type.EmptyTypes).Invoke(null);
-    }
-
-    public T CreateRecord<T>() where T : Record
-    {
-      return (T)this.RecordType.GetConstructor(Type.EmptyTypes).Invoke(null);
+      return (Record)this.RecordType.GetConstructor(Type.EmptyTypes).Invoke(null);
     }
 
     public bool HasColumn(string columnName)

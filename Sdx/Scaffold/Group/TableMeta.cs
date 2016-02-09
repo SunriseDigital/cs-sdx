@@ -24,8 +24,8 @@ namespace Sdx.Scaffold.Group
       using(var conn = Manager.Db.CreateConnection())
       {
         conn.Open();
-        var table = tableMeta.CreateTable<Db.Table>();
-        var record = (Db.Record)conn.Exec("FetchRecordByPkey", tableMeta.RecordType, table, TargetValue);
+        var table = tableMeta.CreateTable();
+        var record = conn.FetchRecordByPkey(table, TargetValue);
         name = record.GetString(display);
       }
 

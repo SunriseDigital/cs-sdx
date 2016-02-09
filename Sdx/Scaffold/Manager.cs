@@ -49,7 +49,7 @@ namespace Sdx.Scaffold
     private Db.Sql.Select CreateSelect()
     {
       var select = Db.CreateSelect();
-      select.AddFrom(TableMeta.CreateTable<Db.Table>());
+      select.AddFrom(TableMeta.CreateTable());
       return select;
     }
 
@@ -136,7 +136,7 @@ namespace Sdx.Scaffold
       
       if(recordSet == null || recordSet.Count == 0)
       {
-        record = TableMeta.CreateRecord<Sdx.Db.Record>();
+        record = TableMeta.CreateRecord();
         if (Group != null && Group.TargetValue != null)
         {
           record.SetValue(Group.TargetColumnName, Group.TargetValue);

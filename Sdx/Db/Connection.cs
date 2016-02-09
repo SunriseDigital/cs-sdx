@@ -422,7 +422,7 @@ namespace Sdx.Db
       return result;
     }
 
-    public T FetchRecordByPkey<T>(Db.Table table, string pkeyValue) where T : Record, new()
+    public Record FetchRecordByPkey(Db.Table table, string pkeyValue)
     {
       if (table.OwnMeta.Pkeys.Count > 1)
       {
@@ -432,19 +432,7 @@ namespace Sdx.Db
       select.AddFrom(table);
       select.Where.Add(table.OwnMeta.Pkeys[0], pkeyValue);
 
-      return this.FetchRecord<T>(select);
-    }
-
-    public T FetchRecord<T>(Sql.Select select) where T : Record, new()
-    {
-      var resultSet = this.FetchRecordSet<T>(select);
-
-      if (resultSet.Count == 0)
-      {
-        return null;
-      }
-
-      return (T)resultSet[0];
+      return this.FetchRecord(select);
     }
 
     public Record FetchRecord(Sql.Select select)
@@ -481,68 +469,14 @@ namespace Sdx.Db
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet FetchRecordSet<T>(Sql.Select select) where T : Record, new()
+    public RecordSet FetchRecordSet(Sql.Select select)
     {
-      var prop = typeof(T).GetProperty("Meta");
-      if (prop == null)
-      {
-        throw new NotImplementedException("Missing Meta property in " + typeof(T));
-      }
 
-      var meta = prop.GetValue(null, null) as TableMeta;
-      if (meta == null)
-      {
-        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
-      }
-
-      return FetchRecordSet<T>(select, meta.Name);
-    }
-
-    /// <summary>
-    /// RecordSetの基点となるテーブルは最初にAddFromされた<see cref="Context"/>です。
-    /// </summary>
-    /// <param name="select"></param>
-    /// <returns></returns>
-    public dynamic FetchRecordSet(Select select)
-    {
       var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
-      return Exec("FetchRecordSet", firstFrom.Table.OwnMeta.RecordType, new object[]{select});
+      return FetchRecordSet(select, firstFrom.Name);
     }
 
-    public dynamic FetchRecordSet(Select select, string contextName)
-    {
-      var target = select.Context(contextName);
-      return Exec("FetchRecordSet", target.Table.OwnMeta.RecordType, new object[] { select });
-    }
-
-    /// <summary>
-    /// 型指定がGenericタイプのメソッドを探し最初に見つかったメソッドを
-    /// </summary>
-    /// <param name="methodName"></param>
-    /// <param name="reocrdType"></param>
-    /// <param name="args"></param>
-    /// <returns></returns>
-    public dynamic Exec(string methodName, Type reocrdType, params object[] args)
-    {
-      var method = this.GetType().GetMethods()
-        .Where(m => m.Name == methodName)
-        .Where(m => m.IsGenericMethodDefinition)
-        .Where(m =>
-        {
-          var types = m.GetGenericArguments();
-          if (types.Length > 1)
-          {
-            return false;
-          }
-
-          return true;
-        })
-        .First().MakeGenericMethod(reocrdType);
-
-      return (dynamic)method.Invoke(this, args);
-    }
-
-    private RecordSet FetchRecordSet<T>(Select select, string contextName) where T : Record, new()
+    public RecordSet FetchRecordSet(Select select, string contextName)
     {
       RecordSet recordSet = null;
       using (var command = select.Build())

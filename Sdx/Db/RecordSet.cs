@@ -78,7 +78,7 @@ namespace Sdx.Db
       Record result;
       if (!this.resultDic.ContainsKey(key))
       {
-        result = select.Context(contextName).Table.OwnMeta.CreateRecord<Record>();
+        result = select.Context(contextName).Table.OwnMeta.CreateRecord();
         result.ContextName = contextName;
         result.Select = select;
         this.results.Add(result);
