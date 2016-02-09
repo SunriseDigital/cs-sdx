@@ -174,7 +174,7 @@ namespace Sdx.Scaffold
         using (var conn = Db.CreateConnection())
         {
           conn.Open();
-          records = conn.Exec("FetchRecordSet", TableMeta.RecordType, select);
+          records = conn.FetchRecordSet(select);
         }
       }
 

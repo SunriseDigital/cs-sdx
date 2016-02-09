@@ -503,16 +503,16 @@ namespace Sdx.Db
     /// </summary>
     /// <param name="select"></param>
     /// <returns></returns>
-    public RecordSet<Record> FetchRecordSet(Select select)
+    public dynamic FetchRecordSet(Select select)
     {
       var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
-
-      return FetchRecordSet<Record>(select, firstFrom.Name);
+      return Exec("FetchRecordSet", firstFrom.Table.OwnMeta.RecordType, new object[]{select});
     }
 
-    public RecordSet<Record> FetchRecordSet(Select select, string contextName)
+    public dynamic FetchRecordSet(Select select, string contextName)
     {
-      return FetchRecordSet<Record>(select, contextName);
+      var target = select.Context(contextName);
+      return Exec("FetchRecordSet", target.Table.OwnMeta.RecordType, new object[] { select });
     }
 
     /// <summary>

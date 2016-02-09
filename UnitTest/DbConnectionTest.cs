@@ -942,7 +942,7 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Sdx.Db.RecordSet<Sdx.Db.Record> set;
+        dynamic set;
         con.Open();
         set = con.FetchRecordSet(sel);
         Assert.Equal(2, set.Count);

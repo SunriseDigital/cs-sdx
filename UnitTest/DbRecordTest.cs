@@ -571,7 +571,7 @@ namespace UnitTest
 
       select.Context("shop").InnerJoin(
         "menu",
-        Test.Orm.Shop.Meta.CreateJoinCondition("menu")
+        Test.Orm.Table.Shop.Meta.CreateJoinCondition("menu")
       );
 
       using (var conn = db.Adapter.CreateConnection())

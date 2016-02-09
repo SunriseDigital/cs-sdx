@@ -9,7 +9,7 @@ using System.Collections.Specialized;
 
 namespace Sdx.Db
 {
-  public class Record
+  public abstract class Record
   {
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
