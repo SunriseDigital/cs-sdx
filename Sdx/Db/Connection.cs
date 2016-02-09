@@ -444,7 +444,7 @@ namespace Sdx.Db
         return null;
       }
 
-      return resultSet[0];
+      return (T)resultSet[0];
     }
 
     public Record FetchRecord(Sql.Select select)
@@ -481,7 +481,7 @@ namespace Sdx.Db
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(Sql.Select select) where T : Record, new()
+    public RecordSet FetchRecordSet<T>(Sql.Select select) where T : Record, new()
     {
       var prop = typeof(T).GetProperty("Meta");
       if (prop == null)
@@ -542,14 +542,14 @@ namespace Sdx.Db
       return (dynamic)method.Invoke(this, args);
     }
 
-    private RecordSet<T> FetchRecordSet<T>(Select select, string contextName) where T : Record, new()
+    private RecordSet FetchRecordSet<T>(Select select, string contextName) where T : Record, new()
     {
-      RecordSet<T> recordSet = null;
+      RecordSet recordSet = null;
       using (var command = select.Build())
       {
-        recordSet = this.Fetch<RecordSet<T>>(command, (reader) =>
+        recordSet = this.Fetch<RecordSet>(command, (reader) =>
         {
-          var resultSet = new RecordSet<T>();
+          var resultSet = new RecordSet();
           resultSet.Build(reader, select, contextName);
           return resultSet;
         });

@@ -854,7 +854,7 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Sdx.Db.RecordSet<Test.Orm.Shop> set;
+        Sdx.Db.RecordSet set;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
           set = con.FetchRecordSet<Test.Orm.Shop>(sel);

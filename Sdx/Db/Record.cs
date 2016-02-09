@@ -128,12 +128,12 @@ namespace Sdx.Db
       return this;
     }
 
-    public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    public Record GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
     {
       return this.GetRecord<T>(contextName, null, selectHook);
     }
 
-    public T GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    public Record GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
     {
       var records = this.GetRecordSet<T>(contextName, connection, selectHook);
       if (records.Count == 0)
@@ -144,12 +144,12 @@ namespace Sdx.Db
       return records[0];
     }
 
-    public RecordSet<T> GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    public RecordSet GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
     {
       return this.GetRecordSet<T>(contextName, null, selectHook);
     }
 
-    public RecordSet<T> GetRecordSet<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    public RecordSet GetRecordSet<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
     {
       if (this.recordCache.ContainsKey(contextName))
       {
@@ -158,7 +158,7 @@ namespace Sdx.Db
           throw new ArgumentException("You must clear record cache, before use selectHook.");
         }
 
-        return (RecordSet<T>)this.recordCache[contextName];
+        return (RecordSet)this.recordCache[contextName];
       }
 
       if (this.Select.HasContext(contextName)) //already joined
@@ -168,7 +168,7 @@ namespace Sdx.Db
           throw new ArgumentException("You can't use selectHook, because already joined " + contextName + " context.");
         }
 
-        var resultSet = new RecordSet<T>();
+        var resultSet = new RecordSet();
         resultSet.Build(this.ValuesList, this.Select, contextName);
         //キャッシュする
         this.recordCache[contextName] = resultSet;
@@ -196,7 +196,7 @@ namespace Sdx.Db
             selectHook.Invoke(sel);
           }
 
-          RecordSet<T> resultSet = connection.FetchRecordSet<T>(sel);
+          RecordSet resultSet = connection.FetchRecordSet<T>(sel);
 
           //キャッシュする
           this.recordCache[contextName] = resultSet;
