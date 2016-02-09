@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Sdx.Scaffold
 {
@@ -95,8 +96,8 @@ namespace Sdx.Scaffold
     }
 
 
-    public Web.Url ListPage { get; set; }
-    public Web.Url EditPage { get; set; }
+    public Web.Url ListPageUrl { get; set; }
+    public Web.Url EditPageUrl { get; set; }
 
     public static Manager CurrentInstance(string key)
     {
@@ -156,7 +157,7 @@ namespace Sdx.Scaffold
       }
     }
 
-    public dynamic FetchRecordSet(Func<Db.Sql.Select, bool> filter)
+    private dynamic FetchRecordSet(Func<Db.Sql.Select, bool> filter)
     {
       var select = CreateSelect();
       var ret = filter(select);
@@ -173,6 +174,45 @@ namespace Sdx.Scaffold
       }
 
       return records;
+    }
+
+    private bool initializedGroup  = false;
+    public void InitGroup()
+    {
+      if(this.Group == null)
+      {
+        return;
+      }
+
+      if (initializedGroup)
+      {
+        return;
+      }
+
+      initializedGroup = true;
+
+      Group.TargetValue = HttpContext.Current.Request.QueryString[Group.TargetColumnName];
+      if(Group.TargetValue != null)
+      {
+        ListPageUrl.AddParam(Group.TargetColumnName, Group.TargetValue);
+        EditPageUrl.AddParam(Group.TargetColumnName, Group.TargetValue);
+      }
+    }
+
+    public dynamic FetchRecordSet()
+    {
+      return FetchRecordSet((select) =>
+      {
+        if (Group != null)
+        {
+          if (Group.TargetValue != null)
+          {
+            select.Where.Add(Group.TargetColumnName, Group.TargetValue);
+          }
+        }
+
+        return true;
+      });
     }
   }
 }
