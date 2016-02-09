@@ -320,13 +320,14 @@ namespace Sdx.Db
       });
     }
 
-    public List<T> FetchList<T>(DbCommand command)
+    public List<object> FetchList(DbCommand command)
     {
-      return this.Fetch<List<T>>(command, (reader) => {
-        var list = new List<T>();
+      return this.Fetch<List<object>>(command, (reader) =>
+      {
+        var list = new List<object>();
         while (reader.Read())
         {
-          list.Add(this.castDbValue<T>(reader.GetValue(0)));
+          list.Add(reader.GetValue(0));
         }
         return list;
       });
@@ -389,12 +390,12 @@ namespace Sdx.Db
       return result;
     }
 
-    public List<T> FetchList<T>(Sql.Select select)
+    public List<object> FetchList(Sql.Select select)
     {
-      List<T> result = null;
+      List<object> result = null;
       using (var command = select.Build())
       {
-        result = this.FetchList<T>(command);
+        result = this.FetchList(command);
       }
 
       return result;

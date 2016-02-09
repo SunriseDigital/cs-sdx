@@ -69,7 +69,7 @@ namespace UnitTest
         conn.Open();
         conn.BeginTransaction();
         var command = select.Build();
-        var result = conn.FetchList<string>(command);
+        var result = conn.FetchList(command);
         Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
@@ -278,8 +278,8 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var list = conn.FetchList<string>(sel.Build());
-        Assert.IsType<List<string>>(list);
+        var list = conn.FetchList(sel.Build());
+        Assert.IsType<List<object>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天祥", list[0]);
         Assert.Equal("エスペリア", list[1]);
@@ -299,8 +299,8 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var list = conn.FetchList<string>(sel);
-        Assert.IsType<List<string>>(list);
+        var list = conn.FetchList(sel);
+        Assert.IsType<List<object>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]);
         Assert.Equal("Freeve", list[1]);
@@ -320,8 +320,8 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var intList = conn.FetchList<int>(sel);
-        Assert.IsType<List<int>>(intList);
+        var intList = conn.FetchList(sel);
+        Assert.IsType<List<object>>(intList);
         Assert.Equal(2, intList.Count);
         Assert.Equal(5, intList[0]);
         Assert.Equal(6, intList[1]);
@@ -341,11 +341,11 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var datetimes = conn.FetchList<DateTime>(sel);
-        Assert.IsType<List<DateTime>>(datetimes);
+        var datetimes = conn.FetchList(sel);
+        Assert.IsType<List<object>>(datetimes);
         Assert.Equal(2, datetimes.Count);
-        Assert.Equal("2015-01-01 12:30:00", datetimes[0].ToString("yyyy-MM-dd HH:mm:ss"));
-        Assert.Equal("2015-01-02 12:30:00", datetimes[1].ToString("yyyy-MM-dd HH:mm:ss"));
+        Assert.Equal("2015-01-01 12:30:00", ((DateTime)datetimes[0]).ToString("yyyy-MM-dd HH:mm:ss"));
+        Assert.Equal("2015-01-02 12:30:00", ((DateTime)datetimes[1]).ToString("yyyy-MM-dd HH:mm:ss"));
       }
     }
 
@@ -542,7 +542,7 @@ namespace UnitTest
         .SetLimit(2)
         ;
 
-      List<string> list = null;
+      List<object> list = null;
 
       using (var con = db.Adapter.CreateConnection())
       {
@@ -550,14 +550,14 @@ namespace UnitTest
 
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          list = con.FetchList<string>(command);
+          list = con.FetchList(command);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = con.FetchList<string>(command);
-        Assert.IsType<List<string>>(list);
+        list = con.FetchList(command);
+        Assert.IsType<List<object>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天祥", list[0]);
         Assert.Equal("エスペリア", list[1]);
@@ -578,14 +578,14 @@ namespace UnitTest
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          list = con.FetchList<string>(sel);
+          list = con.FetchList(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = con.FetchList<string>(sel);
-        Assert.IsType<List<string>>(list);
+        list = con.FetchList(sel);
+        Assert.IsType<List<object>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]);
         Assert.Equal("Freeve", list[1]);
