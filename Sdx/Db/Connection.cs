@@ -515,9 +515,30 @@ namespace Sdx.Db
       return FetchRecordSet<Record>(select, contextName);
     }
 
+    /// <summary>
+    /// 型指定がGenericタイプのメソッドを探し最初に見つかったメソッドを
+    /// </summary>
+    /// <param name="methodName"></param>
+    /// <param name="reocrdType"></param>
+    /// <param name="args"></param>
+    /// <returns></returns>
     public dynamic Exec(string methodName, Type reocrdType, params object[] args)
     {
-      var method = this.GetType().GetMethod(methodName).MakeGenericMethod(reocrdType);
+      var method = this.GetType().GetMethods()
+        .Where(m => m.Name == methodName)
+        .Where(m => m.IsGenericMethodDefinition)
+        .Where(m =>
+        {
+          var types = m.GetGenericArguments();
+          if (types.Length > 1)
+          {
+            return false;
+          }
+
+          return true;
+        })
+        .First().MakeGenericMethod(reocrdType);
+
       return (dynamic)method.Invoke(this, args);
     }
 
