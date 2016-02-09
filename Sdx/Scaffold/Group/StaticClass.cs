@@ -7,8 +7,8 @@ namespace Sdx.Scaffold.Group
 {
   public class StaticClass : Base
   {
-    public StaticClass(string columnName, string className, string methodFordisplay, string methodForList)
-      : base(columnName)
+    public StaticClass(string columnName, string className, string methodFordisplay, string methodForList = null)
+      : base(columnName, methodForList != null)
     {
 
     }
@@ -16,6 +16,11 @@ namespace Sdx.Scaffold.Group
     protected override string FetchName()
     {
       return "StaticClass";
+    }
+
+    protected internal override List<KeyValuePair<string, string>> GetKeyValuePairList()
+    {
+      return null;
     }
   }
 }

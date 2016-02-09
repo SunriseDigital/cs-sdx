@@ -16,7 +16,7 @@ namespace Test.Scaffold
       scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
       //scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", "GetName", "GetList");
-      scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.LargeArea.Meta, "name", "FetchAllDefaultOrdered");
+      scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.LargeArea.Meta, "name", "SelectDefaultOrder");
 
       scaffold.DisplayList
         .Add(Sdx.Scaffold.Param.Create()
