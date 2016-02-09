@@ -59,7 +59,7 @@ namespace UnitTest
         conn.Open();
         conn.BeginTransaction();
         var command = select.Build();
-        var id = conn.FetchOne<string>(command);
+        var id = conn.FetchOne(command);
         Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
@@ -373,7 +373,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var intValue = conn.FetchOne<int>(sel.Build());
+        var intValue = conn.FetchOne(sel.Build());
         Assert.IsType<int>(intValue);
         Assert.Equal(1, intValue);
       }
@@ -393,7 +393,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var strValue = conn.FetchOne<string>(sel);
+        var strValue = conn.FetchOne(sel);
         Assert.IsType<string>(strValue);
         Assert.Equal("天府舫", strValue);
       }
@@ -414,9 +414,9 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var dtValue = conn.FetchOne<DateTime>(sel);
+        var dtValue = conn.FetchOne(sel);
         Assert.IsType<DateTime>(dtValue);
-        Assert.Equal("2015-01-04 12:30:00", dtValue.ToString("yyyy-MM-dd HH:mm:ss"));
+        Assert.Equal("2015-01-04 12:30:00", ((DateTime)dtValue).ToString("yyyy-MM-dd HH:mm:ss"));
       }
     }
 
@@ -490,17 +490,17 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        string id = null;
+        object id = null;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          id = con.FetchOne<string>(select);
+          id = con.FetchOne(select);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        id = con.FetchOne<string>(select);
-        Assert.Equal("1", id);
+        id = con.FetchOne(select);
+        Assert.Equal(1, id);
         Assert.Equal(System.Data.ConnectionState.Open, con.State);
       }
 
@@ -508,17 +508,17 @@ namespace UnitTest
       {
         var command = select.Build();
 
-        string id = null;
+        object id = null;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          id = con.FetchOne<string>(command);
+          id = con.FetchOne(command);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        id = con.FetchOne<string>(command);
-        Assert.Equal("1", id);
+        id = con.FetchOne(command);
+        Assert.Equal(1, id);
       }
     }
 

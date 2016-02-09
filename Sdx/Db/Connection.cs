@@ -333,15 +333,15 @@ namespace Sdx.Db
       });
     }
 
-    public T FetchOne<T>(DbCommand command)
+    public object FetchOne(DbCommand command)
     {
-      return this.Fetch<T>(command, (reader) => {
+      return this.Fetch<object>(command, (reader) => {
         while (reader.Read())
         {
-          return this.castDbValue<T>(reader.GetValue(0));
+          return reader.GetValue(0);
         }
 
-        return default(T);
+        return null;
       });
     }
 
@@ -379,12 +379,12 @@ namespace Sdx.Db
       return result;
     }
 
-    public T FetchOne<T>(Sql.Select select)
+    public object FetchOne(Sql.Select select)
     {
-      T result = default(T);
+      object result;
       using (var command = select.Build())
       {
-        result = this.FetchOne<T>(command);
+        result = this.FetchOne(command);
       }
 
       return result;
