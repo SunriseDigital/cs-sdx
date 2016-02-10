@@ -162,12 +162,12 @@ namespace Sdx.Scaffold
       }
     }
 
-    private dynamic FetchRecordSet(Func<Db.Sql.Select, bool> filter)
+    private Db.RecordSet FetchRecordSet(Func<Db.Sql.Select, bool> filter)
     {
       var select = CreateSelect();
       var ret = filter(select);
 
-      dynamic records = null;
+      Db.RecordSet records = null;
 
       if(ret)
       {
@@ -204,7 +204,7 @@ namespace Sdx.Scaffold
       }
     }
 
-    public dynamic FetchRecordSet()
+    public Db.RecordSet FetchRecordSet()
     {
       return FetchRecordSet((select) =>
       {

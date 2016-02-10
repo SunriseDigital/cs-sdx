@@ -44,6 +44,11 @@ namespace Sdx.Scaffold.Group
         select.AddOption(Html.Option.Create(pair));
       });
 
+      if(TargetValue != null)
+      {
+        select.Bind(TargetValue);
+      }
+
       return select;
     }
   }
