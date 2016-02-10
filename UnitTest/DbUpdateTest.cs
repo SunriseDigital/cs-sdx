@@ -80,11 +80,11 @@ namespace UnitTest
         conn.Open();
         var command = CreateFooBarCommand(conn, "FooBar");
 
-        var shop = conn.FetchDictionary<string>(command);
-        Assert.Equal(id.ToString(), shop["id"]);
-        Assert.Equal("1", shop["area_id"]);
+        var shop = conn.FetchDictionary(command);
+        Assert.Equal(Convert.ToInt32(id), shop["id"]);
+        Assert.Equal(1, shop["area_id"]);
 
-        Assert.Equal(now.ToString(), shop["created_at"]);
+        Assert.Equal(now, shop["created_at"]);
       }
 
       //ExecuteInsert
@@ -189,9 +189,9 @@ namespace UnitTest
         {
           conn.Open();
 
-          var shop = conn.FetchDictionary<string>(CreateFooBarCommand(conn, "FooBarSubquery"));
-          Assert.Equal(id.ToString(), shop["id"]);
-          Assert.Equal("2", shop["area_id"]);
+          var shop = conn.FetchDictionary(CreateFooBarCommand(conn, "FooBarSubquery"));
+          Assert.Equal(Convert.ToInt32(id), shop["id"]);
+          Assert.Equal(2, shop["area_id"]);
         }
       }
 

@@ -48,7 +48,7 @@ namespace UnitTest
         conn.Open();
         conn.BeginTransaction();
         var command = select.Build();
-        var shop = conn.FetchDictionary<object>(command);
+        var shop = conn.FetchDictionary(command);
         Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
@@ -443,11 +443,11 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var strDic = conn.FetchDictionary<string>(sel.Build());
-        Assert.IsType<Dictionary<string, string>>(strDic);
-        Assert.Equal("1", strDic["id"]);
+        var strDic = conn.FetchDictionary(sel.Build());
+        Assert.IsType<Dictionary<string, object>>(strDic);
+        Assert.Equal(1, strDic["id"]);
         Assert.Equal("天祥", strDic["name"]);
-        Assert.Equal("", strDic["main_image_id"]);
+        Assert.Equal(DBNull.Value, strDic["main_image_id"]);
       }
 
       sel = db.Adapter.CreateSelect();
@@ -463,7 +463,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var objDic = conn.FetchDictionary<object>(sel);
+        var objDic = conn.FetchDictionary(sel);
         Assert.IsType<Dictionary<string, object>>(objDic);
         Assert.Equal(3, objDic["id"]);
         Assert.Equal("天府舫", objDic["name"]);
@@ -614,21 +614,21 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Dictionary<string, string> strDic = null;
+        Dictionary<string, object> strDic = null;
         var command = sel.Build();
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          strDic = con.FetchDictionary<string>(command);
+          strDic = con.FetchDictionary(command);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        strDic = con.FetchDictionary<string>(sel.Build());
-        Assert.IsType<Dictionary<string, string>>(strDic);
-        Assert.Equal("1", strDic["id"]);
+        strDic = con.FetchDictionary(sel.Build());
+        Assert.IsType<Dictionary<string, object>>(strDic);
+        Assert.Equal(1, strDic["id"]);
         Assert.Equal("天祥", strDic["name"]);
-        Assert.Equal("", strDic["main_image_id"]);
+        Assert.Equal(DBNull.Value, strDic["main_image_id"]);
       }
 
 
@@ -647,13 +647,13 @@ namespace UnitTest
         Dictionary<string, object> objDic;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          objDic = con.FetchDictionary<object>(sel);
+          objDic = con.FetchDictionary(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        objDic = con.FetchDictionary<object>(sel);
+        objDic = con.FetchDictionary(sel);
         Assert.IsType<Dictionary<string, object>>(objDic);
         Assert.Equal(3, objDic["id"]);
         Assert.Equal("天府舫", objDic["name"]);

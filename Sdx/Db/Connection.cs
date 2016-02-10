@@ -345,15 +345,15 @@ namespace Sdx.Db
       });
     }
 
-    public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
+    public Dictionary<string, object> FetchDictionary(DbCommand command)
     {
-      return this.Fetch<Dictionary<string, T>>(command, (reader) => {
-        var dic = new Dictionary<string, T>();
+      return this.Fetch<Dictionary<string, object>>(command, (reader) => {
+        var dic = new Dictionary<string, object>();
         while (reader.Read())
         {
           for (var i = 0; i < reader.FieldCount; i++)
           {
-            dic[reader.GetName(i)] = this.castDbValue<T>(reader.GetValue(i));
+            dic[reader.GetName(i)] = reader.GetValue(i);
           }
 
           break;
@@ -368,12 +368,12 @@ namespace Sdx.Db
       return command.Connection == this.DbConnection && command.Transaction == this.DbTransaction;
     }
 
-    public Dictionary<string, T> FetchDictionary<T>(Sql.Select select)
+    public Dictionary<string, object> FetchDictionary(Sql.Select select)
     {
-      Dictionary<string, T> result;
+      Dictionary<string, object> result;
       using (var command = select.Build())
       {
-        result = this.FetchDictionary<T>(command);
+        result = this.FetchDictionary(command);
       }
 
       return result;
