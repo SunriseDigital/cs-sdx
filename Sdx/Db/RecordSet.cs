@@ -6,10 +6,10 @@ using Sdx.Db.Sql;
 
 namespace Sdx.Db
 {
-  public class RecordSet<T> : IEnumerable<T> where T : Record, new()
+  public class RecordSet : IEnumerable<Record>
   {
-    private List<T> results = new List<T>();
-    private Dictionary<string, T> resultDic = new Dictionary<string, T>();
+    private List<Record> results = new List<Record>();
+    private Dictionary<string, Record> resultDic = new Dictionary<string, Record>();
 
     internal void Build(DbDataReader reader, Select select, string contextName)
     {
@@ -75,10 +75,10 @@ namespace Sdx.Db
       }
 
       var key = this.BuildUniqueKey(row, pkeys, contextName);
-      T result;
+      Record result;
       if (!this.resultDic.ContainsKey(key))
       {
-        result = new T();
+        result = select.Context(contextName).Table.OwnMeta.CreateRecord();
         result.ContextName = contextName;
         result.Select = select;
         this.results.Add(result);
@@ -117,7 +117,7 @@ namespace Sdx.Db
       }
     }
 
-    public T First
+    public Record First
     {
       get
       {
@@ -125,7 +125,7 @@ namespace Sdx.Db
       }
     }
 
-    public T this[int key]
+    public Record this[int key]
     {
       get
       {
@@ -134,12 +134,12 @@ namespace Sdx.Db
     }
 
 
-    public void ForEach(Action<T> action)
+    public void ForEach(Action<Record> action)
     {
       this.results.ForEach(action);
     }
 
-    public IEnumerator<T> GetEnumerator()
+    public IEnumerator<Record> GetEnumerator()
     {
       return this.results.GetEnumerator();
     }
