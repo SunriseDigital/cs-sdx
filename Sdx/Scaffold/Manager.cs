@@ -182,16 +182,16 @@ namespace Sdx.Scaffold
     }
 
     private bool initializedGroup  = false;
-    public void InitGroup()
+    public Html.Select InitGroup()
     {
       if(this.Group == null)
       {
-        return;
+        return null;
       }
 
       if (initializedGroup)
       {
-        return;
+        return null;
       }
 
       initializedGroup = true;
@@ -202,6 +202,13 @@ namespace Sdx.Scaffold
         ListPageUrl.AddParam(Group.TargetColumnName, Group.TargetValue);
         EditPageUrl.AddParam(Group.TargetColumnName, Group.TargetValue);
       }
+
+      if(!Group.HasSelector)
+      {
+        return null;
+      }
+
+      return Group.BuildSelector();
     }
 
     public Db.RecordSet FetchRecordSet()
