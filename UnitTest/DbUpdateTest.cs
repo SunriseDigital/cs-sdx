@@ -106,7 +106,7 @@ namespace UnitTest
         param.Value = "FooBar";
         command.Parameters.Add(param);
 
-        var shops = conn.FetchDictionaryList<string>(command);
+        var shops = conn.FetchDictionaryList(command);
         Assert.Equal(2, shops.Count);
       }
     }

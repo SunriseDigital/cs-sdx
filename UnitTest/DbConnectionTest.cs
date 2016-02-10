@@ -89,7 +89,7 @@ namespace UnitTest
         conn.Open();
         conn.BeginTransaction();
         var command = select.Build();
-        var result = conn.FetchDictionaryList<string>(command);
+        var result = conn.FetchDictionaryList(command);
         Assert.True(conn.IsAttachedTo(command));
         conn.Commit();
       }
@@ -167,11 +167,11 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var list = conn.FetchDictionaryList<string>(sel.Build());
-        Assert.IsType<List<Dictionary<string, string>>>(list);
+        var list = conn.FetchDictionaryList(sel.Build());
+        Assert.IsType<List<Dictionary<string, object>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天祥", list[0]["name"]);
-        Assert.Equal("", list[0]["main_image_id"]);
+        Assert.Equal(DBNull.Value, list[0]["main_image_id"]);
         Assert.Equal("エスペリア", list[1]["name"]);
       }
 
@@ -191,8 +191,8 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var list = conn.FetchDictionaryList<string>(sel);
-        Assert.IsType<List<Dictionary<string, string>>>(list);
+        var list = conn.FetchDictionaryList(sel);
+        Assert.IsType<List<Dictionary<string, object>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]["name"]);
         Assert.Equal("Freeve", list[1]["name"]);
@@ -680,24 +680,24 @@ namespace UnitTest
         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
         .SetLimit(2)
         ;
-      List<Dictionary<string, string>> list = null;
+      List<Dictionary<string, object>> list = null;
 
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          list = con.FetchDictionaryList<string>(command);
+          list = con.FetchDictionaryList(command);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         command.Connection.Open();
-        list = con.FetchDictionaryList<string>(command);
-        Assert.IsType<List<Dictionary<string, string>>>(list);
+        list = con.FetchDictionaryList(command);
+        Assert.IsType<List<Dictionary<string, object>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天祥", list[0]["name"]);
-        Assert.Equal("", list[0]["main_image_id"]);
+        Assert.Equal(DBNull.Value, list[0]["main_image_id"]);
         Assert.Equal("エスペリア", list[1]["name"]);
       }
 
@@ -715,14 +715,14 @@ namespace UnitTest
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          list = con.FetchDictionaryList<string>(sel);
+          list = con.FetchDictionaryList(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = con.FetchDictionaryList<string>(sel);
-        Assert.IsType<List<Dictionary<string, string>>>(list);
+        list = con.FetchDictionaryList(sel);
+        Assert.IsType<List<Dictionary<string, object>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]["name"]);
         Assert.Equal("Freeve", list[1]["name"]);
