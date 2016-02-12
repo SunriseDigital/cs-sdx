@@ -22,6 +22,11 @@ namespace UnitTest
       BaseDbTest.InitilizeClass(context);
     }
 
+    protected override void TearDown()
+    {
+      Sdx.Scaffold.Manager.ClearContextCache();
+    }
+
     [Fact]
     public void TestSimpleList()
     {
@@ -67,7 +72,46 @@ namespace UnitTest
           }
         }
       }
+    }
 
+
+    [Fact]
+    public void TestSimpleForm()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSimpleForm(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSimpleForm(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Param.Create()
+          .Set("column", "id")
+          .Set("label", "ID")
+        ).Add(Sdx.Scaffold.Param.Create()
+          .Set("column", "name")
+          .Set("label", "名称")
+        ).Add(Sdx.Scaffold.Param.Create()
+          .Set("column", "code")
+          .Set("label", "コード")
+        );
+
+      var form = scaffold.BuildForm();
+      Assert.IsType<Sdx.Html.InputHidden>(form["id"]);
+      Assert.Equal("ID", form["id"].Label);
+      Assert.Equal("id", form["id"].Tag.Attr["name"]);
+
+      Assert.IsType<Sdx.Html.InputText>(form["name"]);
+      Assert.Equal("名称", form["name"].Label);
+      Assert.Equal("name", form["name"].Tag.Attr["name"]);
+
+      Assert.IsType<Sdx.Html.InputText>(form["code"]);
+      Assert.Equal("コード", form["code"].Label);
+      Assert.Equal("code", form["code"].Tag.Attr["name"]);
     }
   }
 }

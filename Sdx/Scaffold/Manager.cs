@@ -13,6 +13,12 @@ namespace Sdx.Scaffold
     private const string DEFAULT_NAME = "SDX.SCAFFOLD.MANAGER.DEFAULT_NAME";
     public String Name { get; private set; }
 
+    public static void ClearContextCache()
+    {
+      Dictionary<string, Manager> instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
+      instances.Clear();
+    }
+
     public Manager(Db.TableMeta tableMeta, Sdx.Db.Adapter db, string name = Manager.DEFAULT_NAME)
     {
       this.Name = name;
@@ -27,7 +33,7 @@ namespace Sdx.Scaffold
         instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
       }
 
-      if (instances.ContainsKey(name))
+      if (instances.ContainsKey(this.Name))
       {
         throw new InvalidOperationException("Already exists " + this.Name + " Manager");
       }
