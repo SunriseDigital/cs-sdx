@@ -83,6 +83,7 @@
     <Compile Include="HtmlTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
+    <Compile Include="ScaffoldTest.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
     <Compile Include="Test\Db\Table.cs" />

@@ -41,7 +41,7 @@ namespace Sdx.Scaffold
       return this;
     }
 
-    public object Get(string key)
+    public string Get(string key)
     {
       return this.vars[key];
     }
