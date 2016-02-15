@@ -18,7 +18,7 @@ namespace Sdx.Scaffold.Group
       return "StaticClass";
     }
 
-    protected internal override List<KeyValuePair<string, string>> GetKeyValuePairList()
+    protected internal override List<KeyValuePair<string, string>> GetPairListForSelector()
     {
       return null;
     }

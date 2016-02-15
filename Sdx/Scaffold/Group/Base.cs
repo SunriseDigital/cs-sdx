@@ -31,7 +31,7 @@ namespace Sdx.Scaffold.Group
 
     internal Manager Manager { get; set; }
 
-    internal protected abstract List<KeyValuePair<string, string>> GetKeyValuePairList();
+    internal protected abstract List<KeyValuePair<string, string>> GetPairListForSelector();
 
     public Html.Select BuildSelector()
     {
@@ -39,7 +39,7 @@ namespace Sdx.Scaffold.Group
       //TODO I18n
       select.AddOption(Html.Option.Create("", "全て"));
       select.Name = TargetColumnName;
-      GetKeyValuePairList().ForEach((pair) =>
+      GetPairListForSelector().ForEach((pair) =>
       {
         select.AddOption(Html.Option.Create(pair));
       });

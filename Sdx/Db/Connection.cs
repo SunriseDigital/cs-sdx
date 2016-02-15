@@ -590,5 +590,18 @@ namespace Sdx.Db
 
       record.IsDeleted = true;
     }
+
+    public RecordSet FetchRecordSet(TableMeta tableMeta, Action<Select> action = null)
+    {
+      var select = Adapter.CreateSelect();
+      select.AddFrom(tableMeta.CreateTable());
+
+      if (action != null)
+      {
+        action.Invoke(select);
+      }
+
+      return FetchRecordSet(select);
+    }
   }
 }

@@ -14,6 +14,7 @@ using Moq;
 using System.Collections.Specialized;
 using System.Web;
 using System.IO;
+using System.Collections.Generic;
 
 namespace UnitTest
 {
@@ -179,6 +180,47 @@ namespace UnitTest
         {
           Assert.Equal("2", rec.GetString("large_area_id"));
         });
+
+        Assert.False(scaffold.Group.HasSelector);
+
+      }))();
+
+      //GroupSelector
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", "large_area_id=1"),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name", "SelectDefaultOrder");
+
+        scaffold.InitGroup();
+
+        Assert.True(scaffold.Group.HasSelector);
+
+        var select = scaffold.Group.BuildSelector();
+        Assert.IsType<Sdx.Html.Select>(select);
+        Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
+
+        List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
+        Assert.Equal("", options[0].Value.ToString());//最初は空
+
+        using(var conn = db.Adapter.CreateConnection())
+        {
+          conn.Open();
+          var actual = conn.FetchRecordSet(Test.Orm.Table.LargeArea.Meta, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
+          var key = 1;
+          actual.ForEach((rec) => {
+            Assert.Equal(rec.GetString("id"), options[key].Tag.Attr["value"]);
+            ++key;
+          });
+        }
+
       }))();
 
     }

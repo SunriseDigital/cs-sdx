@@ -32,7 +32,7 @@ namespace Sdx.Scaffold.Group
       return name;
     }
 
-    protected internal override List<KeyValuePair<string, string>> GetKeyValuePairList()
+    protected internal override List<KeyValuePair<string, string>> GetPairListForSelector()
     {
       List<KeyValuePair<string, string>> result = null;
       using (var conn = Manager.Db.CreateConnection())
