@@ -121,6 +121,7 @@
     <Compile Include="Validation\Validator.cs" />
     <Compile Include="Validation\Whitelist.cs" />
     <Compile Include="Scaffold\Manager.cs" />
+    <Compile Include="Web\HttpErrorHandler.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />
     <Compile Include="Util\Datetime.cs" />

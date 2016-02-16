@@ -15,26 +15,26 @@ public class Global : System.Web.HttpApplication
 
   protected void Application_BeginRequest(Object sender, EventArgs e)
   {
-
+    Sdx.Context.Current.HttpErrorHandler.SetHandler(404, () => 
+    {
+      HttpContext.Current.Response.TrySkipIisCustomErrors = true;
+      HttpContext.Current.Response.StatusCode = 404;
+      HttpContext.Current.Server.Transfer("/_error/404.aspx");
+    });
   }
 
-  protected void Application_Error(object sender, EventArgs e)
-  {
-    var serverError = Server.GetLastError() as HttpException;
-    Sdx.Context.Current.Debug.Log(serverError);
-    //Console.WriteLine(serverError);
-    // An error has occured on a .Net page.
-    //var serverError = Server.GetLastError() as HttpException;
+  //protected void Application_Error(object sender, EventArgs e)
+  //{
+  //  var serverError = Server.GetLastError() as HttpException;
 
-    //if (null != serverError)
-    //{
-    //  int errorCode = serverError.GetHttpCode();
-
-    //  if (404 == errorCode)
-    //  {
-    //    Server.ClearError();
-    //    Server.Transfer("/Errors/404.aspx");
-    //  }
-    //}
-  }
+  //  if (null != serverError)
+  //  {
+  //    int errorCode = serverError.GetHttpCode();
+  //    if (404 == errorCode)
+  //    {
+  //      Server.ClearError();
+  //      Server.Transfer("/_error/404.aspx");
+  //    }
+  //  }
+  //}
 }

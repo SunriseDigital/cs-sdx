@@ -208,6 +208,17 @@ namespace Sdx.Scaffold
         ListPageUrl.AddParam(Group.TargetColumnName, Group.TargetValue);
         EditPageUrl.AddParam(Group.TargetColumnName, Group.TargetValue);
       }
+      else if(Group.Strict)
+      {
+        if(Sdx.Context.Current.HttpErrorHandler.HasHandler(404))
+        {
+          Sdx.Context.Current.HttpErrorHandler.Invoke(404);
+        }
+        else
+        {
+          throw  new HttpException(404, "Missing " + Group.TargetColumnName + " parameter");
+        }
+      }
 
       if(!Group.HasSelector)
       {

@@ -11,6 +11,7 @@ namespace Sdx.Scaffold.Group
     {
       this.TargetColumnName = columnName;
       this.HasSelector = hasSelector;
+      this.Strict = false;
     }
 
     public string TargetColumnName { get; private set; }
@@ -51,5 +52,7 @@ namespace Sdx.Scaffold.Group
 
       return select;
     }
+
+    public bool Strict { get; set; }
   }
 }

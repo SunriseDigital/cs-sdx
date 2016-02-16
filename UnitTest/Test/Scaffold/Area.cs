@@ -17,6 +17,7 @@ namespace Test.Scaffold
 
       //scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", "GetName", "GetList");
       scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name");
+      scaffold.Group.Strict = true;
 
       scaffold.DisplayList
         .Add(Sdx.Scaffold.Param.Create()

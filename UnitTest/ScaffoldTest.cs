@@ -223,6 +223,51 @@ namespace UnitTest
 
       }))();
 
+      //Group strict without handler
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", ""),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name");
+        scaffold.Group.Strict = true;
+
+        //Handlerが無ければ例外
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          scaffold.InitGroup();
+        }));
+
+        Assert.IsType<HttpException>(ex);
+      }))();
+
+      //Group strict with handler
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", ""),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name");
+        scaffold.Group.Strict = true;
+
+        var handlerCalled = false;
+        Sdx.Context.Current.HttpErrorHandler.SetHandler(404, () => handlerCalled = true);
+        scaffold.InitGroup();
+        Assert.True(handlerCalled);
+      }))();
+
     }
   }
 }
