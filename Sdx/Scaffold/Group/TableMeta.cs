@@ -41,11 +41,7 @@ namespace Sdx.Scaffold.Group
         var table = tableMeta.CreateTable();
         var select = Manager.Db.CreateSelect();
         select.AddFrom(table);
-        var method = table.GetType().GetMethod(this.methodForList);
-        if (method == null)
-        {
-          throw new InvalidOperationException("Missing Select Method " + this.methodForList + " in " + table);
-        }
+        var method = table.GetType().GetMethods().First(m => m.Name == methodForList && !m.IsStatic && m.GetParameters()[0].ParameterType == typeof(Db.Sql.Select));
 
         method.Invoke(table, new object[] { select });
         result = conn.FetchKeyValuePairList<string, string>(select);

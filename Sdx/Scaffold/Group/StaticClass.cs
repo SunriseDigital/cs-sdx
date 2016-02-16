@@ -23,56 +23,13 @@ namespace Sdx.Scaffold.Group
 
     protected override string FetchName()
     {
-      //staticで名前がmethodForDisplay、引数が一つのStringであるメソッドを探す。
-      var method = type.GetMethods().First(m => {
-        if(m.Name != methodForDisplay)
-        {
-          return false;
-        }
-
-        if (!m.IsStatic)
-        {
-          return false;
-        }
-
-        var parameters = m.GetParameters();
-        if (parameters.Count() != 1)
-        {
-          return false;
-        }
-
-        if (parameters[0].ParameterType != typeof(String))
-        {
-          return false;
-        }
-
-        return true;
-      });
+      var method = type.GetMethods().First(m => m.Name == methodForDisplay && m.IsStatic && m.GetParameters()[0].ParameterType == typeof(String));
       return (string)method.Invoke(null, new object[] { TargetValue });
     }
 
     protected internal override List<KeyValuePair<string, string>> GetPairListForSelector()
     {
-      var method = type.GetMethods().First(m =>
-      {
-        if(m.Name != methodForList)
-        {
-          return false;
-        }
-
-        if(!m.IsStatic)
-        {
-          return false;
-        }
-
-        if(m.GetParameters().Count() != 0)
-        {
-          return false;
-        }
-        
-        return true;
-      });
-
+      var method = type.GetMethods().First(m => m.Name == methodForList && m.IsStatic);
       return (List<KeyValuePair<string, string>>)method.Invoke(null, null);
     }
   }
