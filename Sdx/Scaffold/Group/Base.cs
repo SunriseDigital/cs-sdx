@@ -61,5 +61,7 @@ namespace Sdx.Scaffold.Group
     public bool Strict { get; set; }
 
     public string DefaultValue { get; set; }
+
+    public string FixedValue { get; set; }
   }
 }

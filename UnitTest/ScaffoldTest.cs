@@ -397,5 +397,115 @@ namespace UnitTest
 
       }))();
     }
+
+    [Fact]
+    public void TestGroupingFixedValue()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGroupingFixedValue(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGroupingFixedValue(TestDb db)
+    {
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", ""),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group.FixedValue = "1";
+        scaffold.InitGroup();
+
+        Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
+        Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
+        Assert.Equal("東京", scaffold.Group.Name);
+
+        var actualSet = scaffold.FetchRecordSet();
+        actualSet.ForEach((rec) =>
+        {
+          Assert.Equal("1", rec.GetString("large_area_id"));
+        });
+      }))();
+
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", ""),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group.FixedValue = "2";
+        scaffold.InitGroup();
+
+        Assert.Equal("/scaffold/area/edit.aspx?large_area_id=2", scaffold.EditPageUrl.Build());
+        Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
+        Assert.Equal("愛知", scaffold.Group.Name);
+
+        var actualSet = scaffold.FetchRecordSet();
+        actualSet.ForEach((rec) =>
+        {
+          Assert.Equal("2", rec.GetString("large_area_id"));
+        });
+      }))();
+
+      //例外1
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", ""),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName", "GetList");
+        scaffold.Group.FixedValue = "1";
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          scaffold.InitGroup();
+        }));
+
+        Assert.IsType<InvalidOperationException>(ex);
+      }))();
+
+      //例外2
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", ""),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group.FixedValue = "1";
+        scaffold.Group.DefaultValue = "2";
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          scaffold.InitGroup();
+        }));
+
+        Assert.IsType<InvalidOperationException>(ex);
+      }))();
+    }
   }
 }

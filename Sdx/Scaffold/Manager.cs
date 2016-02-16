@@ -202,8 +202,26 @@ namespace Sdx.Scaffold
 
       initializedGroup = true;
 
+      if(Group.FixedValue != null)
+      {
+        if(Group.HasSelector)
+        {
+          throw new InvalidOperationException("You can't use FixedValue and Selector at the same time.");
+        }
 
-      Group.TargetValue = HttpContext.Current.Request.QueryString[Group.TargetColumnName];
+        if(Group.DefaultValue != null)
+        {
+          throw new InvalidOperationException("You can't use FixedValue and DefaultValue at the same time.");
+        }
+
+        Group.TargetValue = Group.FixedValue;
+      }
+      else
+      {
+        Group.TargetValue = HttpContext.Current.Request.QueryString[Group.TargetColumnName];
+      }
+
+      
       Html.Select selector = null ;
       if(Group.HasSelector)
       {
