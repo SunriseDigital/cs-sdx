@@ -37,9 +37,14 @@ namespace Sdx.Scaffold.Group
     public Html.Select BuildSelector()
     {
       var select = new Html.Select();
-      //TODO I18n
-      select.AddOption(Html.Option.Create("", "全て"));
       select.Name = TargetColumnName;
+
+      if(!Strict)
+      {
+        //TODO I18n
+        select.AddOption(Html.Option.Create("", "全て"));
+      }
+      
       GetPairListForSelector().ForEach((pair) =>
       {
         select.AddOption(Html.Option.Create(pair));
@@ -54,5 +59,7 @@ namespace Sdx.Scaffold.Group
     }
 
     public bool Strict { get; set; }
+
+    public string DefaultValue { get; set; }
   }
 }

@@ -202,7 +202,14 @@ namespace Sdx.Scaffold
 
       initializedGroup = true;
 
+
       Group.TargetValue = HttpContext.Current.Request.QueryString[Group.TargetColumnName];
+      Html.Select selector = null ;
+      if(Group.HasSelector)
+      {
+        selector = Group.BuildSelector();
+      }
+      
       if(Group.TargetValue != null)
       {
         ListPageUrl.AddParam(Group.TargetColumnName, Group.TargetValue);
@@ -210,6 +217,23 @@ namespace Sdx.Scaffold
       }
       else if(Group.Strict)
       {
+        if(Group.DefaultValue != null || selector != null)
+        {
+          string value = null;
+          if(Group.DefaultValue != null)
+          {
+            value = Group.DefaultValue;
+          }
+          else if (selector != null)
+          {
+            value = selector.Options.First().Tag.Attr["value"];
+          }
+
+          ListPageUrl.AddParam(Group.TargetColumnName, value);
+          HttpContext.Current.Response.Redirect(ListPageUrl.Build(), true);
+        }
+
+
         if(Sdx.Context.Current.HttpErrorHandler.HasHandler(404))
         {
           Sdx.Context.Current.HttpErrorHandler.Invoke(404);
@@ -220,12 +244,7 @@ namespace Sdx.Scaffold
         }
       }
 
-      if(!Group.HasSelector)
-      {
-        return null;
-      }
-
-      return Group.BuildSelector();
+      return selector;
     }
 
     public Db.RecordSet FetchRecordSet()
