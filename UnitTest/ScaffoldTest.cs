@@ -120,23 +120,23 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestGrouping()
+    public void TestGroupingTableMeta()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunGrouping(db);
+        RunGroupingTableMeta(db);
         ExecSql(db);
       }
     }
 
-    private void RunGrouping(TestDb db)
+    private void RunGroupingTableMeta(TestDb db)
     {
       HttpContext.Current = new HttpContext(
         new HttpRequest("", "http://wwww.example.com", "large_area_id=1"),
         new HttpResponse(new StringWriter())
       );
 
-      ((Action)(() => 
+      ((Action)(() =>
       {
         var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
@@ -148,12 +148,13 @@ namespace UnitTest
 
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
+        Assert.Equal("東京", scaffold.Group.Name);
 
         var actualSet = scaffold.FetchRecordSet();
         actualSet.ForEach((rec) =>
         {
           Assert.Equal("1", rec.GetString("large_area_id"));
-        });      
+        });
       }))();
 
 
@@ -174,6 +175,7 @@ namespace UnitTest
 
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=2", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
+        Assert.Equal("愛知", scaffold.Group.Name);
 
         var actualSet = scaffold.FetchRecordSet();
         actualSet.ForEach((rec) =>
@@ -210,12 +212,13 @@ namespace UnitTest
         List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
         Assert.Equal("", options[0].Value.ToString());//最初は空
 
-        using(var conn = db.Adapter.CreateConnection())
+        using (var conn = db.Adapter.CreateConnection())
         {
           conn.Open();
           var actual = conn.FetchRecordSet(Test.Orm.Table.LargeArea.Meta, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
           var key = 1;
-          actual.ForEach((rec) => {
+          actual.ForEach((rec) =>
+          {
             Assert.Equal(rec.GetString("id"), options[key].Tag.Attr["value"]);
             ++key;
           });
@@ -267,7 +270,111 @@ namespace UnitTest
         scaffold.InitGroup();
         Assert.True(handlerCalled);
       }))();
+    }
 
+    [Fact]
+    public void TestGroupingStaticClass()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGroupingStaticClass(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGroupingStaticClass(TestDb db)
+    {
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", "large_area_id=1"),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+
+        scaffold.InitGroup();
+
+        Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
+        Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
+        Assert.Equal("東京", scaffold.Group.Name);
+
+        var actualSet = scaffold.FetchRecordSet();
+        actualSet.ForEach((rec) =>
+        {
+          Assert.Equal("1", rec.GetString("large_area_id"));
+        });
+      }))();
+
+
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", "large_area_id=2"),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+
+        scaffold.InitGroup();
+
+        Assert.Equal("/scaffold/area/edit.aspx?large_area_id=2", scaffold.EditPageUrl.Build());
+        Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
+        Assert.Equal("愛知", scaffold.Group.Name);
+
+        var actualSet = scaffold.FetchRecordSet();
+        actualSet.ForEach((rec) =>
+        {
+          Assert.Equal("2", rec.GetString("large_area_id"));
+        });
+      }))();
+
+      //GroupSelector
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", "large_area_id=1"),
+        new HttpResponse(new StringWriter())
+      );
+
+      ((Action)(() =>
+      {
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
+        scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
+
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName", "GetList");
+
+        scaffold.InitGroup();
+
+        Assert.True(scaffold.Group.HasSelector);
+
+        var select = scaffold.Group.BuildSelector();
+        Assert.IsType<Sdx.Html.Select>(select);
+        Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
+
+        List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
+        Assert.Equal("", options[0].Value.ToString());//最初は空
+
+        using (var conn = db.Adapter.CreateConnection())
+        {
+          conn.Open();
+          var actual = conn.FetchRecordSet(Test.Orm.Table.LargeArea.Meta, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
+          var key = 1;
+          actual.ForEach((rec) =>
+          {
+            Assert.Equal(rec.GetString("id"), options[key].Tag.Attr["value"]);
+            ++key;
+          });
+        }
+
+      }))();
     }
   }
 }
