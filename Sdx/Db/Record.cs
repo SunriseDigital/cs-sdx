@@ -128,14 +128,14 @@ namespace Sdx.Db
       return this;
     }
 
-    public Record GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    public Record GetRecord(string contextName, Action<Select> selectHook = null)
     {
-      return this.GetRecord<T>(contextName, null, selectHook);
+      return this.GetRecord(contextName, null, selectHook);
     }
 
-    public Record GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    public Record GetRecord(string contextName, Connection connection, Action<Select> selectHook = null)
     {
-      var records = this.GetRecordSet<T>(contextName, connection, selectHook);
+      var records = this.GetRecordSet(contextName, connection, selectHook);
       if (records.Count == 0)
       {
         return null;
@@ -144,12 +144,12 @@ namespace Sdx.Db
       return records[0];
     }
 
-    public RecordSet GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    public RecordSet GetRecordSet(string contextName, Action<Select> selectHook = null)
     {
-      return this.GetRecordSet<T>(contextName, null, selectHook);
+      return this.GetRecordSet(contextName, null, selectHook);
     }
 
-    public RecordSet GetRecordSet<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    public RecordSet GetRecordSet(string contextName, Connection connection, Action<Select> selectHook = null)
     {
       if (this.recordCache.ContainsKey(contextName))
       {
@@ -310,6 +310,25 @@ namespace Sdx.Db
       });
 
       return col;
+    }
+
+    public dynamic GetDynamic(string path, Connection conn = null)
+    {
+      dynamic result = this;
+      var chunk = path.Split('.');
+      foreach(var key in chunk)
+      {
+        //record
+        if (OwnMeta.Relations.ContainsKey(key))
+        {
+          result = result.GetRecord(key, conn);
+        }
+        else
+        {
+          result = result.GetValue(key);
+        }
+      }
+      return result;
     }
   }
 }

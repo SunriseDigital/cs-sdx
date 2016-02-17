@@ -15,6 +15,14 @@ namespace Sdx.Scaffold
 
     private List<Param> list = new List<Param>();
 
+    public Param this[int index]
+    {
+      get
+      {
+        return list[index];
+      }
+    }
+
     public ParamList Add(Param param)
     {
       this.list.Add(param);

@@ -511,5 +511,34 @@ namespace UnitTest
         Assert.IsType<InvalidOperationException>(ex);
       }))();
     }
+
+    [Fact]
+    public void TestDynamicGetter()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunDynamicGetter(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunDynamicGetter(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+      scaffold.DisplayList
+        .Add(Sdx.Scaffold.Param.Create()
+          .Set("label", "大エリア名")
+          .Set("dynamic", "large_area.name")
+          .Set("style", "width: 100px;")
+        );
+
+      using(var conn = db.Adapter.CreateConnection())
+      {
+        conn.Open();
+        var records = scaffold.FetchRecordSet();
+        Assert.Equal("東京", scaffold.DisplayList[0].Build(records[0], conn));
+      }
+
+    }
   }
 }

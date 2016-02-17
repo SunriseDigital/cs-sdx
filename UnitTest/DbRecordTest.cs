@@ -97,7 +97,7 @@ namespace UnitTest
         Assert.Equal("", shops[0].GetString("main_image_id"));
         Assert.Equal("", shops[0].GetString("sub_image_id"));
 
-        var area = shops[0].GetRecordSet<Test.Orm.Area>("area")[0];
+        var area = shops[0].GetRecordSet("area")[0];
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal("新中野", area.GetString("name"));
@@ -108,7 +108,7 @@ namespace UnitTest
         Assert.Equal("", shops[1].GetString("main_image_id"));
         Assert.Equal("", shops[1].GetString("sub_image_id"));
 
-        area = shops[1].GetRecordSet<Test.Orm.Area>("area").First;
+        area = shops[1].GetRecordSet("area").First;
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal("西麻布", area.GetString("name"));
@@ -152,7 +152,7 @@ namespace UnitTest
         Assert.Equal(1, shops.Count);
         Assert.Equal("天府舫", shops[0].GetString("name"));
 
-        var menuList = shops[0].GetRecordSet<Test.Orm.Menu>("menu");
+        var menuList = shops[0].GetRecordSet("menu");
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.Equal(3, menuList.Count);
         Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
@@ -197,16 +197,16 @@ namespace UnitTest
         Assert.Equal(2, shops.Count);
 
         Assert.Equal("Freeve", shops[0].GetString("name"));
-        Assert.Equal(3, shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category").Count);
-        Assert.Equal("美容室", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[0].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
-        Assert.Equal("ネイルサロン", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
-        Assert.Equal("まつげエクステ", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+        Assert.Equal(3, shops[0].GetRecordSet("shop_category").Count);
+        Assert.Equal("美容室", shops[0].GetRecordSet("shop_category")[0].GetRecordSet("category").First.GetString("name"));
+        Assert.Equal("ネイルサロン", shops[0].GetRecordSet("shop_category")[1].GetRecordSet("category").First.GetString("name"));
+        Assert.Equal("まつげエクステ", shops[0].GetRecordSet("shop_category")[2].GetRecordSet("category").First.GetString("name"));
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal("ビーナスラッシュ", shops[1].GetString("name"));
-        Assert.Equal(2, shops[1].GetRecordSet<Test.Orm.ShopCategory>("shop_category").Count);
-        Assert.Equal("ネイルサロン", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[1].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
-        Assert.Equal("まつげエクステ", shops[0].GetRecordSet<Test.Orm.ShopCategory>("shop_category")[2].GetRecordSet<Test.Orm.Category>("category").First.GetString("name"));
+        Assert.Equal(2, shops[1].GetRecordSet("shop_category").Count);
+        Assert.Equal("ネイルサロン", shops[0].GetRecordSet("shop_category")[1].GetRecordSet("category").First.GetString("name"));
+        Assert.Equal("まつげエクステ", shops[0].GetRecordSet("shop_category")[2].GetRecordSet("category").First.GetString("name"));
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
       }
     }
@@ -239,13 +239,13 @@ namespace UnitTest
         var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
-        var areaSet = shops[0].GetRecordSet<Test.Orm.Area>("area", conn);
+        var areaSet = shops[0].GetRecordSet("area", conn);
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, areaSet.Count);
         Assert.Equal("新中野", areaSet[0].GetString("name"));
 
-        var largeAreaSet = areaSet[0].GetRecordSet<Test.Orm.LargeArea>("large_area", conn);
+        var largeAreaSet = areaSet[0].GetRecordSet("large_area", conn);
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, largeAreaSet.Count);
@@ -279,7 +279,7 @@ namespace UnitTest
         conn.Open();
         var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
-        var menuSet = shops[0].GetRecordSet<Test.Orm.Menu>(
+        var menuSet = shops[0].GetRecordSet(
           "menu",
           conn,
           sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Sql.Order.ASC); }
@@ -292,7 +292,7 @@ namespace UnitTest
         Assert.Equal("牛肉の激辛水煮", menuSet[2].GetString("name"));
 
         //ORDERをひっくり返す
-        menuSet = shops[0].ClearRecordCache("menu").GetRecordSet<Test.Orm.Menu>(
+        menuSet = shops[0].ClearRecordCache("menu").GetRecordSet(
           "menu",
           conn,
           sel => { sel.Context("menu").AddOrder("id", Sdx.Db.Sql.Order.DESC); }
@@ -333,7 +333,7 @@ namespace UnitTest
         conn.Open();
         var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
-        var shopCategorySet = shops[0].GetRecordSet<Test.Orm.ShopCategory>(
+        var shopCategorySet = shops[0].GetRecordSet(
           "shop_category",
           conn,
           sel => { sel.AddOrder("category_id", Sdx.Db.Sql.Order.ASC); }
@@ -341,12 +341,12 @@ namespace UnitTest
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(3, shopCategorySet.Count);
-        Assert.Equal("美容室", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
-        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
-        Assert.Equal("まつげエクステ", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
+        Assert.Equal("美容室", shopCategorySet[0].GetRecordSet("category", conn).First.GetString("name"));
+        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet("category", conn).First.GetString("name"));
+        Assert.Equal("まつげエクステ", shopCategorySet[2].GetRecordSet("category", conn).First.GetString("name"));
         Assert.Equal(5, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
-        shopCategorySet = shops[0].ClearRecordCache("shop_category").GetRecordSet<Test.Orm.ShopCategory>(
+        shopCategorySet = shops[0].ClearRecordCache("shop_category").GetRecordSet(
           "shop_category",
           conn,
           sel => { sel.AddOrder("category_id", Sdx.Db.Sql.Order.DESC); }
@@ -355,9 +355,9 @@ namespace UnitTest
 
 
         Assert.Equal(3, shopCategorySet.Count);
-        Assert.Equal("まつげエクステ", shopCategorySet[0].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
-        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
-        Assert.Equal("美容室", shopCategorySet[2].GetRecordSet<Test.Orm.Category>("category", conn).First.GetString("name"));
+        Assert.Equal("まつげエクステ", shopCategorySet[0].GetRecordSet("category", conn).First.GetString("name"));
+        Assert.Equal("ネイルサロン", shopCategorySet[1].GetRecordSet("category", conn).First.GetString("name"));
+        Assert.Equal("美容室", shopCategorySet[2].GetRecordSet("category", conn).First.GetString("name"));
         Assert.Equal(9, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
       }
     }
@@ -390,10 +390,10 @@ namespace UnitTest
 
         Assert.Equal(1, shops.Count);
 
-        Assert.Equal("/freeve/main.jpq", shops[0].GetRecord<Test.Orm.Image>("main_image").GetString("path"));
+        Assert.Equal("/freeve/main.jpq", shops[0].GetRecord("main_image").GetString("path"));
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
-        Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord<Test.Orm.Image>("sub_image").GetString("path"));
+        Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord("sub_image").GetString("path"));
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
       }
     }
@@ -424,10 +424,10 @@ namespace UnitTest
         var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
 
-        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image"));
+        Assert.Null(shops[0].GetRecord("main_image"));
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
-        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("sub_image"));
+        Assert.Null(shops[0].GetRecord("sub_image"));
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
       }
     }
@@ -459,10 +459,10 @@ namespace UnitTest
 
         Assert.Equal(1, shops.Count);
 
-        Assert.Equal("/freeve/main.jpq", shops[0].GetRecord<Test.Orm.Image>("main_image", conn).GetString("path"));
+        Assert.Equal("/freeve/main.jpq", shops[0].GetRecord("main_image", conn).GetString("path"));
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
-        Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord<Test.Orm.Image>("sub_image", conn).GetString("path"));
+        Assert.Equal("/freeve/sub.jpq", shops[0].GetRecord("sub_image", conn).GetString("path"));
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
       }
     }
@@ -492,10 +492,10 @@ namespace UnitTest
         var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
 
-        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("main_image", conn));
+        Assert.Null(shops[0].GetRecord("main_image", conn));
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
-        Assert.Null(shops[0].GetRecord<Test.Orm.Image>("sub_image", conn));
+        Assert.Null(shops[0].GetRecord("sub_image", conn));
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
       }
     }
@@ -526,25 +526,26 @@ namespace UnitTest
         Assert.True(shop is Test.Orm.Shop);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
-        var area = shop.GetRecord<Test.Orm.Area>("area", conn);
+        var area = shop.GetRecord("area", conn);
         Assert.True(area is Test.Orm.Area);
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         //キャッシュされている（Connection必要なし）
-        var area2 = shop.GetRecord<Test.Orm.Area>("area");
+        var area2 = shop.GetRecord("area");
         Assert.Equal(2, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.Equal(area, area2);
 
         shop.ClearRecordCache();
 
         //キャッシュがクリアされたのでConnectionなしだと例外に
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
-          var areaEx = shop.GetRecord<Test.Orm.Area>("area");
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          var areaEx = shop.GetRecord("area");
         }));
 
         Assert.IsType<ArgumentNullException>(ex);
 
-        var area3 = shop.GetRecord<Test.Orm.Area>("area", conn);
+        var area3 = shop.GetRecord("area", conn);
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.NotEqual(area2, area3);
       }
@@ -578,7 +579,8 @@ namespace UnitTest
       {
         conn.Open();
         //Tableを使ってないと、MetaDataが取れないので主キーがわからず組み立てられない。
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
           var shop = conn.FetchRecord(select);
         }));
 
