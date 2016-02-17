@@ -6,16 +6,16 @@ using System.Text;
 
 namespace Sdx.Scaffold
 {
-  public class ParamList : IEnumerable<Param>
+  public class ParamsList : IEnumerable<Params>
   {
-    public static ParamList Create()
+    public static ParamsList Create()
     {
-      return new ParamList();
+      return new ParamsList();
     }
 
-    private List<Param> list = new List<Param>();
+    private List<Params> list = new List<Params>();
 
-    public Param this[int index]
+    public Params this[int index]
     {
       get
       {
@@ -23,13 +23,13 @@ namespace Sdx.Scaffold
       }
     }
 
-    public ParamList Add(Param param)
+    public ParamsList Add(Params param)
     {
       this.list.Add(param);
       return this;
     }
 
-    public IEnumerator<Param> GetEnumerator()
+    public IEnumerator<Params> GetEnumerator()
     {
       return this.list.GetEnumerator();
     }

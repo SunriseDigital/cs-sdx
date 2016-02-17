@@ -44,8 +44,8 @@ namespace Sdx.Scaffold
 
       Db = db;
 
-      DisplayList = new ParamList();
-      FormList = new ParamList();
+      DisplayList = new ParamsList();
+      FormList = new ParamsList();
     }
 
     internal Db.TableMeta TableMeta { get; set; }
@@ -61,9 +61,9 @@ namespace Sdx.Scaffold
 
     public string Title { get; set; }
 
-    public ParamList FormList { get; private set; }
+    public ParamsList FormList { get; private set; }
 
-    public ParamList DisplayList { get; private set; }
+    public ParamsList DisplayList { get; private set; }
 
     public Html.Form BuildForm()
     {

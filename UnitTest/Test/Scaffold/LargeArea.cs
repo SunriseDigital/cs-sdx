@@ -16,21 +16,21 @@ namespace Test.Scaffold
       scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/large-area/list.aspx");
 
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Param.Create()
+        .Add(Sdx.Scaffold.Params.Create()
           .Set("column", "name")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "code")
         );
 
       
       scaffold.FormList
-        .Add(Sdx.Scaffold.Param.Create()
+        .Add(Sdx.Scaffold.Params.Create()
           .Set("column", "id")
           .Set("label", "ID")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "name")
           .Set("label", "名称")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "code")
           .Set("label", "コード")
         );

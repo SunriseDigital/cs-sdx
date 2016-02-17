@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Sdx.Scaffold
 {
-  public class Param : IEnumerable<KeyValuePair<string, string>>
+  public class Params : IEnumerable<KeyValuePair<string, string>>
   {
     public enum Type
     {
@@ -17,9 +17,9 @@ namespace Sdx.Scaffold
 
     private Type? type;
     
-    public static Param Create()
+    public static Params Create()
     {
-      return new Param();
+      return new Params();
     }
 
     private Dictionary<string, string> vars = new Dictionary<string, string>();
@@ -57,7 +57,7 @@ namespace Sdx.Scaffold
       return this.vars.ContainsKey(key);
     }
 
-    public Param Set(string key, string value)
+    public Params Set(string key, string value)
     {
       this[key] = value;
       return this;

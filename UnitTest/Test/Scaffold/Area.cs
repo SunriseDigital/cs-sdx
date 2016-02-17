@@ -21,23 +21,23 @@ namespace Test.Scaffold
       scaffold.Group.DefaultValue = "1";
 
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Param.Create()
+        .Add(Sdx.Scaffold.Params.Create()
           .Set("column", "name")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "code")
         );
 
       scaffold.FormList
-        .Add(Sdx.Scaffold.Param.Create()
+        .Add(Sdx.Scaffold.Params.Create()
           .Set("column", "id")
           .Set("label", "ID")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "large_area_id")
           .Set("label", "大エリア")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "name")
           .Set("label", "名称")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "code")
           .Set("label", "コード")
         );

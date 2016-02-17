@@ -46,9 +46,9 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Param.Create()
+        .Add(Sdx.Scaffold.Params.Create()
           .Set("column", "name")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "code")
         );
 
@@ -94,13 +94,13 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.Param.Create()
+        .Add(Sdx.Scaffold.Params.Create()
           .Set("column", "id")
           .Set("label", "ID")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "name")
           .Set("label", "名称")
-        ).Add(Sdx.Scaffold.Param.Create()
+        ).Add(Sdx.Scaffold.Params.Create()
           .Set("column", "code")
           .Set("label", "コード")
         );
@@ -526,7 +526,7 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Param.Create()
+        .Add(Sdx.Scaffold.Params.Create()
           .Set("label", "大エリア名")
           .Set("dynamic", "large_area.name")
           .Set("style", "width: 100px;")
