@@ -15,6 +15,7 @@ using System.Collections.Specialized;
 using System.Web;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnitTest
 {
@@ -532,11 +533,47 @@ namespace UnitTest
           .Set("style", "width: 100px;")
         );
 
+      var records = scaffold.FetchRecordSet();
       using(var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var records = scaffold.FetchRecordSet();
         Assert.Equal("東京", scaffold.DisplayList[0].Build(records[0], conn));
+        Assert.Equal("愛知", scaffold.DisplayList[0].Build(records.First(r => r.Get("large_area_id") == 2), conn));
+      }
+    }
+
+    [Fact]
+    public void TestHtmlParams()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunHtmlParams(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunHtmlParams(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
+      scaffold.DisplayList
+        .Add(Sdx.Scaffold.Params.Create()
+          .Set("label", "エリア編集")
+          .Set("html", "<a href=\"/path/to/area/list?large_area_id={id}\">{name}</a>")
+          .Set("style", "width: 100px;")
+        );
+
+      var records = scaffold.FetchRecordSet();
+      using (var conn = db.Adapter.CreateConnection())
+      {
+        conn.Open();
+        Assert.Equal(
+          "<a href=\"/path/to/area/list?large_area_id=1\">東京</a>",
+          scaffold.DisplayList[0].Build(records[0], conn)
+        );
+        Assert.Equal(
+          "<a href=\"/path/to/area/list?large_area_id=2\">愛知</a>",
+          scaffold.DisplayList[0].Build(records[1], conn)
+        );
       }
 
     }

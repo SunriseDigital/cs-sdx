@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sdx.Scaffold
 {
@@ -23,6 +24,8 @@ namespace Sdx.Scaffold
     }
 
     private Dictionary<string, string> vars = new Dictionary<string, string>();
+
+    private static Regex htmlRegex = new Regex(@"\{([^}]+)\}");
 
     public bool StrictCheck = true;
 
@@ -101,7 +104,26 @@ namespace Sdx.Scaffold
 
     private string BuildHtml(Db.Record record)
     {
-      throw new NotImplementedException();
+      var replaced = new Dictionary<string, bool>();
+
+      var html = Get("html");
+      var match = htmlRegex.Match(html);
+
+      while(match.Success)
+      {
+        var search = match.Groups[0].Value;
+        var path = match.Groups[1].Value;
+        if (!replaced.ContainsKey(search))
+        {
+          replaced[search] = true;
+          html = html.Replace(search, record.Get(path).ToString());
+        }
+        
+        match = match.NextMatch();
+      }
+
+
+      return html;
     }
 
     private string BuildDynamic(Db.Record record, Db.Connection conn)
