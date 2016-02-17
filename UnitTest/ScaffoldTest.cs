@@ -528,7 +528,7 @@ namespace UnitTest
       scaffold.DisplayList
         .Add(Sdx.Scaffold.Params.Create()
           .Set("label", "大エリア名")
-          .Set("dynamic", "large_area.name")
+          .Set("dynamic", "@large_area.name")
           .Set("style", "width: 100px;")
         );
 

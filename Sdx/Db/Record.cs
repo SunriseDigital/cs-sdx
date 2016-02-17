@@ -312,16 +312,42 @@ namespace Sdx.Db
       return col;
     }
 
-    public dynamic GetDynamic(string path, Connection conn = null)
+    public T Get<T>(string path, Connection conn = null)
+    {
+      return (T)Get(path, conn);
+    }
+
+
+    /// <summary>
+    /// `.`で区切って深い階層のデータを取得可能。`@`はGetRecord、`#`はメソッドを検索、それ以外はカラムの取得を実行します。
+    /// メソッドに引数は渡せません。
+    /// e.g.
+    /// record.GetDynamic("@some_record.#GetSomeMethod.name"); = record.GetRecord("some_record").GetSomeMethod().GetValue("name");
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="conn"></param>
+    /// <returns></returns>
+    public dynamic Get(string path, Connection conn = null)
     {
       dynamic result = this;
       var chunk = path.Split('.');
       foreach(var key in chunk)
       {
-        //record
-        if (OwnMeta.Relations.ContainsKey(key))
+        if (result == null)
         {
-          result = result.GetRecord(key, conn);
+          throw new InvalidOperationException("Before " + key + " owner " + " is NULL in " + path);
+        }
+
+        //record
+        if (key.StartsWith("@"))
+        {
+          result = result.GetRecord(key.Substring(1), conn);
+        }
+        else if(key.StartsWith("#"))
+        {
+          var method = key.Substring(1);
+          System.Type type = result.GetType();
+          result = type.GetMethods().First(m => m.Name == method && !m.IsStatic && m.GetParameters().Count() == 0).Invoke(result, null);
         }
         else
         {

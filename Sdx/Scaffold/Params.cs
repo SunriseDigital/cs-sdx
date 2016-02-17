@@ -106,7 +106,7 @@ namespace Sdx.Scaffold
 
     private string BuildDynamic(Db.Record record, Db.Connection conn)
     {
-      return record.GetDynamic(Get("dynamic"), conn);
+      return record.Get<string>(Get("dynamic"), conn);
     }
 
     private string BuildColumn(Db.Record record)
