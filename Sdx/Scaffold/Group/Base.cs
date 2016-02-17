@@ -33,12 +33,28 @@ namespace Sdx.Scaffold.Group
 
     internal Manager Manager { get; set; }
 
-    internal protected abstract List<KeyValuePair<string, string>> GetPairListForSelector();
+    private List<KeyValuePair<string, string>> pairListForSelector;
+
+    internal protected abstract List<KeyValuePair<string, string>> BuildPairListForSelector();
+
+    private List<KeyValuePair<string, string>> GetPairListForSelector()
+    {
+      if (pairListForSelector == null)
+      {
+        pairListForSelector = BuildPairListForSelector();
+        if(pairListForSelector == null)
+        {
+          pairListForSelector = new List<KeyValuePair<string, string>>();
+        }
+      }
+
+      return pairListForSelector;
+    }
 
     public Html.Select BuildSelector()
     {
       var pairList = GetPairListForSelector();
-      if(pairList == null)
+      if(pairList.Count == 0)
       {
         return null;
       }
@@ -103,13 +119,6 @@ namespace Sdx.Scaffold.Group
         TargetValue = HttpContext.Current.Request.QueryString[TargetColumnName];
       }
 
-
-      Html.Select selector = null;
-      if (HasSelector)
-      {
-        selector = BuildSelector();
-      }
-
       if (TargetValue != null)
       {
         Manager.ListPageUrl.AddParam(TargetColumnName, TargetValue);
@@ -117,23 +126,24 @@ namespace Sdx.Scaffold.Group
       }
       else if (Strict)
       {
-        if (DefaultValue != null || selector != null)
+        //リダイレクト
+        if (DefaultValue != null || HasSelector)
         {
           string value = null;
           if (DefaultValue != null)
           {
             value = DefaultValue;
           }
-          else if (selector != null)
+          else if (HasSelector)
           {
-            value = selector.Options.First().Tag.Attr["value"];
+            value = GetPairListForSelector().First().Key;
           }
 
           Manager.ListPageUrl.AddParam(TargetColumnName, value);
           HttpContext.Current.Response.Redirect(Manager.ListPageUrl.Build(), true);
         }
 
-
+        //404
         if (Sdx.Context.Current.HttpErrorHandler.HasHandler(404))
         {
           Sdx.Context.Current.HttpErrorHandler.Invoke(404);

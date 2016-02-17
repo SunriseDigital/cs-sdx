@@ -32,7 +32,7 @@ namespace Sdx.Scaffold.Group
       return name;
     }
 
-    protected internal override List<KeyValuePair<string, string>> GetPairListForSelector()
+    protected internal override List<KeyValuePair<string, string>> BuildPairListForSelector()
     {
       if(!HasSelector)
       {

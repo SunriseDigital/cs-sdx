@@ -27,7 +27,7 @@ namespace Sdx.Scaffold.Group
       return (string)method.Invoke(null, new object[] { TargetValue });
     }
 
-    protected internal override List<KeyValuePair<string, string>> GetPairListForSelector()
+    protected internal override List<KeyValuePair<string, string>> BuildPairListForSelector()
     {
       if (!HasSelector)
       {
