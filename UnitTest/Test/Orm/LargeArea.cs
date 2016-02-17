@@ -13,5 +13,14 @@ namespace Test.Orm
     {
       Meta = Test.Orm.Table.LargeArea.Meta;
     }
+
+    /// <summary>
+    /// scaffoldでメソッドを動的に呼び出す機能のテスト用
+    /// </summary>
+    /// <returns></returns>
+    public string GetCode()
+    {
+      return GetString("code");
+    }
   }
 }

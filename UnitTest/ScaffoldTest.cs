@@ -531,6 +531,9 @@ namespace UnitTest
           .Set("label", "大エリア名")
           .Set("dynamic", "@large_area.name")
           .Set("style", "width: 100px;")
+        )
+        .Add(Sdx.Scaffold.Params.Create()
+          .Set("dynamic", "@large_area.#GetCode")
         );
 
       var records = scaffold.FetchRecordSet();
@@ -538,7 +541,9 @@ namespace UnitTest
       {
         conn.Open();
         Assert.Equal("東京", scaffold.DisplayList[0].Build(records[0], conn));
+        Assert.Equal("tokyo", scaffold.DisplayList[1].Build(records[0], conn));
         Assert.Equal("愛知", scaffold.DisplayList[0].Build(records.First(r => r.Get("large_area_id") == 2), conn));
+        Assert.Equal("aichi", scaffold.DisplayList[1].Build(records.First(r => r.Get("large_area_id") == 2), conn));
       }
     }
 
