@@ -29,6 +29,10 @@ namespace Sdx.Scaffold.Group
 
     protected internal override List<KeyValuePair<string, string>> GetPairListForSelector()
     {
+      if (!HasSelector)
+      {
+        return null;
+      }
       var method = type.GetMethods().First(m => m.Name == methodForList && m.IsStatic);
       return (List<KeyValuePair<string, string>>)method.Invoke(null, null);
     }

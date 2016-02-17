@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 
 namespace Sdx.Scaffold.Group
 {
@@ -36,6 +37,12 @@ namespace Sdx.Scaffold.Group
 
     public Html.Select BuildSelector()
     {
+      var pairList = GetPairListForSelector();
+      if(pairList == null)
+      {
+        return null;
+      }
+
       var select = new Html.Select();
       select.Name = TargetColumnName;
 
@@ -44,8 +51,8 @@ namespace Sdx.Scaffold.Group
         //TODO I18n
         select.AddOption(Html.Option.Create("", "全て"));
       }
-      
-      GetPairListForSelector().ForEach((pair) =>
+
+      pairList.ForEach((pair) =>
       {
         select.AddOption(Html.Option.Create(pair));
       });
@@ -58,10 +65,84 @@ namespace Sdx.Scaffold.Group
       return select;
     }
 
+
+
     public bool Strict { get; set; }
 
     public string DefaultValue { get; set; }
 
     public string FixedValue { get; set; }
+
+    private bool initialized = false;
+
+    public void Init()
+    {
+      if (initialized)
+      {
+        return;
+      }
+
+      initialized = true;
+
+      if (FixedValue != null)
+      {
+        if (HasSelector)
+        {
+          throw new InvalidOperationException("You can't use FixedValue and Selector at the same time.");
+        }
+
+        if (DefaultValue != null)
+        {
+          throw new InvalidOperationException("You can't use FixedValue and DefaultValue at the same time.");
+        }
+
+        TargetValue = FixedValue;
+      }
+      else
+      {
+        TargetValue = HttpContext.Current.Request.QueryString[TargetColumnName];
+      }
+
+
+      Html.Select selector = null;
+      if (HasSelector)
+      {
+        selector = BuildSelector();
+      }
+
+      if (TargetValue != null)
+      {
+        Manager.ListPageUrl.AddParam(TargetColumnName, TargetValue);
+        Manager.EditPageUrl.AddParam(TargetColumnName, TargetValue);
+      }
+      else if (Strict)
+      {
+        if (DefaultValue != null || selector != null)
+        {
+          string value = null;
+          if (DefaultValue != null)
+          {
+            value = DefaultValue;
+          }
+          else if (selector != null)
+          {
+            value = selector.Options.First().Tag.Attr["value"];
+          }
+
+          Manager.ListPageUrl.AddParam(TargetColumnName, value);
+          HttpContext.Current.Response.Redirect(Manager.ListPageUrl.Build(), true);
+        }
+
+
+        if (Sdx.Context.Current.HttpErrorHandler.HasHandler(404))
+        {
+          Sdx.Context.Current.HttpErrorHandler.Invoke(404);
+        }
+        else
+        {
+          throw new HttpException(404, "Missing " + TargetColumnName + " parameter");
+        }
+      }
+    }
   }
 }

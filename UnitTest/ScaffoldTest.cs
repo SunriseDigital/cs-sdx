@@ -57,18 +57,18 @@ namespace UnitTest
       // build expected record set
       var select = db.Adapter.CreateSelect();
       select.AddFrom(new Test.Orm.Table.LargeArea()).Table.SelectDefaultOrder(select);
-      using(var conn = db.Adapter.CreateConnection())
+      using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
         var expectedSet = conn.FetchRecordSet(select);
 
         Assert.Equal(expectedSet.Count, actualSet.Count);
 
-        for(var i = 0; i < actualSet.Count; i++)
+        for (var i = 0; i < actualSet.Count; i++)
         {
           var aRecord = actualSet[i];
           var eRecord = expectedSet[i];
-          foreach(var param in scaffold.DisplayList)
+          foreach (var param in scaffold.DisplayList)
           {
             Assert.Equal(
               eRecord.GetString(param.Get("column")),
@@ -144,8 +144,10 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name");
 
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
+
+        Assert.Null(scaffold.Group.BuildSelector());
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
         Assert.Equal("東京", scaffold.Group.Name);
@@ -171,7 +173,7 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name");
 
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=2", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
@@ -201,7 +203,7 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name", "SelectDefaultOrder");
 
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
         Assert.True(scaffold.Group.HasSelector);
 
@@ -244,7 +246,7 @@ namespace UnitTest
         //Handlerが無ければ例外
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          scaffold.InitGroup();
+          scaffold.Group.Init();
         }));
 
         Assert.IsType<HttpException>(ex);
@@ -267,7 +269,7 @@ namespace UnitTest
 
         var handlerCalled = false;
         Sdx.Context.Current.HttpErrorHandler.SetHandler(404, () => handlerCalled = true);
-        scaffold.InitGroup();
+        scaffold.Group.Init();
         Assert.True(handlerCalled);
 
       }))();
@@ -287,7 +289,8 @@ namespace UnitTest
         scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name", "SelectDefaultOrder");
         scaffold.Group.Strict = true;
 
-        var select = scaffold.InitGroup();
+        scaffold.Group.Init();
+        var select = scaffold.Group.BuildSelector();
         Assert.Equal("<select name=\"large_area_id\"><option value=\"1\">東京</option><option value=\"2\" selected>愛知</option></select>", select.Tag.Render());
 
       }))();
@@ -318,8 +321,9 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
 
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
+        Assert.Null(scaffold.Group.BuildSelector());
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
         Assert.Equal("東京", scaffold.Group.Name);
@@ -345,7 +349,7 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
 
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=2", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
@@ -372,7 +376,7 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName", "GetList");
 
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
         Assert.True(scaffold.Group.HasSelector);
 
@@ -423,7 +427,7 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
         scaffold.Group.FixedValue = "1";
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
@@ -449,7 +453,7 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
         scaffold.Group.FixedValue = "2";
-        scaffold.InitGroup();
+        scaffold.Group.Init();
 
         Assert.Equal("/scaffold/area/edit.aspx?large_area_id=2", scaffold.EditPageUrl.Build());
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
@@ -478,7 +482,7 @@ namespace UnitTest
         scaffold.Group.FixedValue = "1";
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          scaffold.InitGroup();
+          scaffold.Group.Init();
         }));
 
         Assert.IsType<InvalidOperationException>(ex);
@@ -501,7 +505,7 @@ namespace UnitTest
         scaffold.Group.DefaultValue = "2";
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          scaffold.InitGroup();
+          scaffold.Group.Init();
         }));
 
         Assert.IsType<InvalidOperationException>(ex);

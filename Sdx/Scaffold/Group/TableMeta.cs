@@ -34,6 +34,11 @@ namespace Sdx.Scaffold.Group
 
     protected internal override List<KeyValuePair<string, string>> GetPairListForSelector()
     {
+      if(!HasSelector)
+      {
+        return null;
+      }
+
       List<KeyValuePair<string, string>> result = null;
       using (var conn = Manager.Db.CreateConnection())
       {
