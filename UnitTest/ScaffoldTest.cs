@@ -53,14 +53,13 @@ namespace UnitTest
           .Set("column", "code")
         );
 
-      var actualSet = scaffold.FetchRecordSet();
-
       // build expected record set
       var select = db.Adapter.CreateSelect();
       select.AddFrom(new Test.Orm.Table.LargeArea()).Table.SelectDefaultOrder(select);
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
+        var actualSet = scaffold.FetchRecordSet(conn);
         var expectedSet = conn.FetchRecordSet(select);
 
         Assert.Equal(expectedSet.Count, actualSet.Count);
@@ -153,11 +152,16 @@ namespace UnitTest
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
         Assert.Equal("東京", scaffold.Group.Name);
 
-        var actualSet = scaffold.FetchRecordSet();
-        actualSet.ForEach((rec) =>
+        using (var conn = db.Adapter.CreateConnection())
         {
-          Assert.Equal("1", rec.GetString("large_area_id"));
-        });
+          conn.Open();
+          var actualSet = scaffold.FetchRecordSet(conn);
+          actualSet.ForEach((rec) =>
+          {
+            Assert.Equal("1", rec.GetString("large_area_id"));
+          });
+        }
+
       }))();
 
 
@@ -180,11 +184,16 @@ namespace UnitTest
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
         Assert.Equal("愛知", scaffold.Group.Name);
 
-        var actualSet = scaffold.FetchRecordSet();
-        actualSet.ForEach((rec) =>
+        using (var conn = db.Adapter.CreateConnection())
         {
-          Assert.Equal("2", rec.GetString("large_area_id"));
-        });
+          conn.Open();
+          var actualSet = scaffold.FetchRecordSet(conn);
+          actualSet.ForEach((rec) =>
+          {
+            Assert.Equal("2", rec.GetString("large_area_id"));
+          });
+        }
+
 
         Assert.False(scaffold.Group.HasSelector);
 
@@ -329,11 +338,16 @@ namespace UnitTest
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
         Assert.Equal("東京", scaffold.Group.Name);
 
-        var actualSet = scaffold.FetchRecordSet();
-        actualSet.ForEach((rec) =>
+        using (var conn = db.Adapter.CreateConnection())
         {
-          Assert.Equal("1", rec.GetString("large_area_id"));
-        });
+          conn.Open();
+          var actualSet = scaffold.FetchRecordSet(conn);
+          actualSet.ForEach((rec) =>
+          {
+            Assert.Equal("1", rec.GetString("large_area_id"));
+          });
+        }
+
       }))();
 
 
@@ -356,11 +370,16 @@ namespace UnitTest
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
         Assert.Equal("愛知", scaffold.Group.Name);
 
-        var actualSet = scaffold.FetchRecordSet();
-        actualSet.ForEach((rec) =>
+        using (var conn = db.Adapter.CreateConnection())
         {
-          Assert.Equal("2", rec.GetString("large_area_id"));
-        });
+          conn.Open();
+          var actualSet = scaffold.FetchRecordSet(conn);
+          actualSet.ForEach((rec) =>
+          {
+            Assert.Equal("2", rec.GetString("large_area_id"));
+          });
+        }
+
       }))();
 
       //GroupSelector
@@ -434,11 +453,16 @@ namespace UnitTest
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
         Assert.Equal("東京", scaffold.Group.Name);
 
-        var actualSet = scaffold.FetchRecordSet();
-        actualSet.ForEach((rec) =>
+        using (var conn = db.Adapter.CreateConnection())
         {
-          Assert.Equal("1", rec.GetString("large_area_id"));
-        });
+          conn.Open();
+          var actualSet = scaffold.FetchRecordSet(conn);
+          actualSet.ForEach((rec) =>
+          {
+            Assert.Equal("1", rec.GetString("large_area_id"));
+          });
+        }
+
       }))();
 
       HttpContext.Current = new HttpContext(
@@ -460,11 +484,15 @@ namespace UnitTest
         Assert.Equal("/scaffold/area/list.aspx?large_area_id=2", scaffold.ListPageUrl.Build());
         Assert.Equal("愛知", scaffold.Group.Name);
 
-        var actualSet = scaffold.FetchRecordSet();
-        actualSet.ForEach((rec) =>
+        using (var conn = db.Adapter.CreateConnection())
         {
-          Assert.Equal("2", rec.GetString("large_area_id"));
-        });
+          conn.Open();
+          var actualSet = scaffold.FetchRecordSet(conn);
+          actualSet.ForEach((rec) =>
+          {
+            Assert.Equal("2", rec.GetString("large_area_id"));
+          });
+        }
       }))();
 
       //例外1
@@ -536,10 +564,10 @@ namespace UnitTest
           .Set("dynamic", "@large_area.#GetCode")
         );
 
-      var records = scaffold.FetchRecordSet();
-      using(var conn = db.Adapter.CreateConnection())
+      using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
+        var records = scaffold.FetchRecordSet(conn);
         Assert.Equal("東京", scaffold.DisplayList[0].Build(records[0], conn));
         Assert.Equal("tokyo", scaffold.DisplayList[1].Build(records[0], conn));
         Assert.Equal("愛知", scaffold.DisplayList[0].Build(records.First(r => r.Get("large_area_id") == 2), conn));
@@ -567,10 +595,10 @@ namespace UnitTest
           .Set("style", "width: 100px;")
         );
 
-      var records = scaffold.FetchRecordSet();
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
+        var records = scaffold.FetchRecordSet(conn);
         Assert.Equal(
           "<a href=\"/path/to/area/list?large_area_id=1\">東京</a>",
           scaffold.DisplayList[0].Build(records[0], conn)
@@ -580,6 +608,71 @@ namespace UnitTest
           scaffold.DisplayList[0].Build(records[1], conn)
         );
       }
+
+    }
+
+    [Fact]
+    public void TestManyManySave()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunManyManySave(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunManyManySave(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db.Adapter, db.Adapter.ToString());
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Params.Create()
+          .Set("label", "名前")
+          .Set("column", "name")
+        )
+        .Add(Sdx.Scaffold.Params.Create()
+          .Set("label", "場所")
+          .Set("column", "area_id")
+        )
+        .Add(Sdx.Scaffold.Params.Create()
+          .Set("label", "業種")
+          .Set("relation", "shop_category")
+          .Set("column", "category_id")
+        );
+
+      var query = new NameValueCollection();
+
+      var post = new NameValueCollection();
+      post.Set("name", "foobar");
+      post.Set("area_id", "1");
+      post.Add("category_id", "1");
+      post.Add("category_id", "2");
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        Assert.True(record.IsNew);
+
+        var form = scaffold.BuildForm();
+        Assert.IsType<Sdx.Html.CheckableGroup>(form["category_id"]);
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, post, conn);
+          conn.Commit();
+        }
+        catch(Exception e)
+        {
+          conn.Rollback();
+          throw e;
+        }
+      }
+
+
+
+
 
     }
   }

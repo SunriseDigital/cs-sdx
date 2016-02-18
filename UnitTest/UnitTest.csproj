@@ -90,6 +90,7 @@
     <Compile Include="Test\Db\Table.cs" />
     <Compile Include="Test\Scaffold\Area.cs" />
     <Compile Include="Test\Scaffold\LargeArea.cs" />
+    <Compile Include="Test\Scaffold\Shop.cs" />
     <Compile Include="Test\Validation\Numeric.cs" />
     <Compile Include="UrlTest.cs" />
     <Compile Include="Test\Orm\LargeArea.cs" />

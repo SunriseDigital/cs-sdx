@@ -93,6 +93,11 @@ namespace Sdx.Scaffold
           elem.Name = param["column"];
         }
 
+        if(!param.ContainsKey("label"))
+        {
+          throw new InvalidOperationException("Missing label param");
+        }
+
         elem.Label = param["label"];
 
         form.SetElement(elem);
@@ -115,9 +120,9 @@ namespace Sdx.Scaffold
       return instances[key];
     }
 
-    public Db.Record LoadRecord(NameValueCollection parameters)
+    public Db.Record LoadRecord(NameValueCollection parameters, Sdx.Db.Connection conn)
     {
-      var recordSet = FetchRecordSet((select) => {
+      var recordSet = FetchRecordSet(conn, (select) => {
         var exists = false;
         TableMeta.Pkeys.ForEach((column) =>
         {
@@ -134,8 +139,8 @@ namespace Sdx.Scaffold
           return false;
         }
 
-        return true;  
-      
+        return true;
+
       });
 
       Db.Record record;
@@ -168,7 +173,7 @@ namespace Sdx.Scaffold
       }
     }
 
-    private Db.RecordSet FetchRecordSet(Func<Db.Sql.Select, bool> filter)
+    private Db.RecordSet FetchRecordSet(Sdx.Db.Connection conn, Func<Db.Sql.Select, bool> filter)
     {
       var select = CreateSelect();
       var ret = filter(select);
@@ -177,19 +182,15 @@ namespace Sdx.Scaffold
 
       if(ret)
       {
-        using (var conn = Db.CreateConnection())
-        {
-          conn.Open();
-          records = conn.FetchRecordSet(select);
-        }
+        records = conn.FetchRecordSet(select);
       }
 
       return records;
     }
 
-    public Db.RecordSet FetchRecordSet()
+    public Db.RecordSet FetchRecordSet(Sdx.Db.Connection conn)
     {
-      return FetchRecordSet((select) =>
+      return FetchRecordSet(conn, (select) =>
       {
         if (Group != null)
         {
@@ -201,6 +202,34 @@ namespace Sdx.Scaffold
 
         return true;
       });
+    }
+
+    public void Save(Sdx.Db.Record record, NameValueCollection form, Sdx.Db.Connection conn)
+    {
+      var relationList = new ParamsList();
+      var ownValues = new NameValueCollection();
+      foreach (var param in FormList)
+      {
+        if(param.ContainsKey("relation"))
+        {
+          relationList.Add(param);
+        }
+        else
+        {
+          var columnName = param["column"];
+          ownValues.Set(columnName, form[columnName]);
+        }
+      }
+
+      record.Bind(ownValues);
+      conn.Save(record);
+
+      foreach(var param in relationList)
+      {
+        var rel = TableMeta.Relations[param["relation"]];
+        Sdx.Diagnostics.Debug.Console();
+      }
+      
     }
   }
 }

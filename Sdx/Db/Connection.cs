@@ -10,6 +10,15 @@ namespace Sdx.Db
 {
   public class Connection : IDisposable
   {
+    public static string AutoCreateDateColumn { get; set; }
+    public static string AutoUpdateDateColumn { get; set; }
+
+    static Connection()
+    {
+      AutoCreateDateColumn = "created_at";
+      AutoUpdateDateColumn = "updated_at";
+    }
+
     private bool disposed = false;
 
     public Adapter Adapter { get; private set; }
@@ -521,6 +530,30 @@ namespace Sdx.Db
         var insert = this.Adapter.CreateInsert();
         insert.SetInto(record.OwnMeta.Name);
 
+        //自動登録日時更新
+        if (
+          AutoCreateDateColumn != null
+          &&
+          record.OwnMeta.HasColumn(AutoCreateDateColumn)
+          &&
+          !record.UpdatedValues.Any(kv => kv.Key == AutoCreateDateColumn)
+        )
+        {
+          record.SetValue(AutoCreateDateColumn, DateTime.Now);
+        }
+
+        //自動更新日時更新
+        if (
+          AutoUpdateDateColumn != null
+          &&
+          record.OwnMeta.HasColumn(AutoUpdateDateColumn)
+          &&
+          !record.UpdatedValues.Any(kv => kv.Key == AutoUpdateDateColumn)
+        )
+        {
+          record.SetValue(AutoUpdateDateColumn, DateTime.Now);
+        }
+
         foreach (var columnValue in record.UpdatedValues)
         {
           insert.AddColumnValue(columnValue.Key, columnValue.Value);
@@ -558,6 +591,20 @@ namespace Sdx.Db
         }
 
         record.AppendPkeyWhere(update.Where);
+
+        //自動更新日時更新
+        if (
+          record.UpdatedValues.Count > 0 
+          &&
+          AutoUpdateDateColumn != null 
+          &&
+          record.OwnMeta.HasColumn(AutoUpdateDateColumn)
+          &&
+          !record.UpdatedValues.Any(kv => kv.Key == AutoUpdateDateColumn)
+        )
+        {
+          record.SetValue(AutoUpdateDateColumn, DateTime.Now);
+        }
 
         this.Execute(update);
 

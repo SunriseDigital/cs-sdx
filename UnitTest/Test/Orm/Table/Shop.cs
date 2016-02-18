@@ -68,8 +68,31 @@ namespace Test.Orm.Table
           }
         },
         typeof(Test.Orm.Shop),
-        typeof(Test.Orm.Table.Category)
+        typeof(Test.Orm.Table.Shop)
       );
+    }
+
+    public static Sdx.Html.FormElement CreateCategoryIdElement()
+    {
+      var elem = new Sdx.Html.CheckableGroup();
+      elem.Name = "category_id";
+
+      var db = Test.Db.Adapter.CreateDb();
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var select = db.CreateSelect();
+        select.AddFrom(new Test.Orm.Table.Category()).Table.SelectDefaultOrder(select);
+
+        conn.FetchRecordSet(select).ForEach(rec =>
+        {
+          var checkbox = new Sdx.Html.CheckBox();
+          checkbox.Tag.Attr["value"] = rec.GetString("id");
+          elem.AddCheckable(checkbox);
+        });
+      }
+
+      return elem;
     }
   }
 }
