@@ -10,13 +10,13 @@ namespace Sdx.Db.Sql
   {
     private List<Column> columns = new List<Column>();
 
-    public Adapter Adapter { get; private set; }
+    public Adapter.Base Adapter { get; private set; }
 
     public string Into { get; set; }
 
     public Select Subquery { get; set; }
 
-    internal Insert(Adapter adapter)
+    internal Insert(Adapter.Base adapter)
     {
       this.Adapter = adapter;
     }

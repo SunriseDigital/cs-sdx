@@ -56,11 +56,11 @@
     <Compile Include="Data\Tree.cs" />
     <Compile Include="Data\TreeYaml.cs" />
     <Compile Include="Context.cs" />
-    <Compile Include="Db\Adapter.cs" />
+    <Compile Include="Db\Adapter\Base.cs" />
     <Compile Include="Db\Connection.cs" />
     <Compile Include="Db\DbException.cs" />
     <Compile Include="Db\Sql\INonQueryBuilder.cs" />
-    <Compile Include="Db\MySqlAdapter.cs" />
+    <Compile Include="Db\Adapter\MySql.cs" />
     <Compile Include="Db\Sql\Column.cs" />
     <Compile Include="Db\Sql\Condition.cs" />
     <Compile Include="Db\Sql\Context.cs" />
@@ -74,7 +74,7 @@
     <Compile Include="Db\Sql\Select.cs" />
     <Compile Include="Db\Record.cs" />
     <Compile Include="Db\RecordSet.cs" />
-    <Compile Include="Db\SqlServerAdapter.cs" />
+    <Compile Include="Db\Adapter\SqlServer.cs" />
     <Compile Include="Db\Sql\Update.cs" />
     <Compile Include="Db\Table.cs" />
     <Compile Include="Db\TableMeta.cs" />

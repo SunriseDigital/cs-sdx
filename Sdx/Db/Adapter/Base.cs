@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Sdx.Db.Sql;
 
-namespace Sdx.Db
+namespace Sdx.Db.Adapter
 {
-  public abstract class Adapter
+  public abstract class Base
   {
     internal DbProviderFactory Factory { get; private set; }
     private DbCommandBuilder builder;
@@ -22,7 +22,7 @@ namespace Sdx.Db
 
     public string ConnectionString { get; set; }
 
-    public Adapter()
+    public Base()
     {
       this.Factory = this.GetFactory();
       this.builder = this.Factory.CreateCommandBuilder();

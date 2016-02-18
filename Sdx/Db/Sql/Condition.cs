@@ -171,7 +171,7 @@ namespace Sdx.Db.Sql
       this.wheres.Add(holder);
     }
 
-    internal void Build(StringBuilder builder, Adapter adapter, DbParameterCollection parameters, Counter condCount)
+    internal void Build(StringBuilder builder, Adapter.Base adapter, DbParameterCollection parameters, Counter condCount)
     {
       if (this.NeedsBracket)
       {
@@ -204,7 +204,7 @@ namespace Sdx.Db.Sql
       }
     }
 
-    private string BuildPlaceholderAndParameters(Adapter adapter, DbParameterCollection parameters, Holder cond, Counter condCount)
+    private string BuildPlaceholderAndParameters(Adapter.Base adapter, DbParameterCollection parameters, Holder cond, Counter condCount)
     {
       string rightHand;
 
@@ -256,7 +256,7 @@ namespace Sdx.Db.Sql
       return rightHand;
     }
 
-    private string BuildConditionString(Adapter adapter, DbParameterCollection parameters, Holder cond, Counter condCount)
+    private string BuildConditionString(Adapter.Base adapter, DbParameterCollection parameters, Holder cond, Counter condCount)
     {
       if (cond.Type == Type.Comparison)
       {

@@ -6,11 +6,11 @@ namespace Sdx.Db.Sql
 {
   public class Delete : INonQueryBuilder
   {
-    public Adapter Adapter { get; private set; }
+    public Adapter.Base Adapter { get; private set; }
     public string From { get; set; }
     public Condition Where { get; private set; }
 
-    internal Delete(Adapter adapter)
+    internal Delete(Adapter.Base adapter)
     {
       this.Adapter = adapter;
       this.Where = new Condition();

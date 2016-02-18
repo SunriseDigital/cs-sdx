@@ -2,9 +2,9 @@
 using System.Data.Common;
 using System.Text.RegularExpressions;
 
-namespace Sdx.Db
+namespace Sdx.Db.Adapter
 {
-  public class MySqlAdapter : Adapter
+  public class MySql : Base
   {
     override protected DbProviderFactory GetFactory()
     {

@@ -16,11 +16,11 @@ namespace Sdx.Db.Sql
   {
     private List<Column> columns = new List<Column>();
 
-    public Adapter Adapter { get; private set; }
+    public Adapter.Base Adapter { get; private set; }
     public string Table { get; set; }
     public Condition Where { get; private set; }
 
-    internal Update(Adapter adapter)
+    internal Update(Adapter.Base adapter)
     {
       this.Adapter = adapter;
       this.Where = new Condition();

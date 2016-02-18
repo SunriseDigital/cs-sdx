@@ -18,21 +18,21 @@ namespace Test.Db
       get { return "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;"; }
     }
 
-    public static Sdx.Db.Adapter CreateMySql()
+    public static Sdx.Db.Adapter.Base CreateMySql()
     {
-      var db = new Sdx.Db.MySqlAdapter();
+      var db = new Sdx.Db.Adapter.MySql();
       db.ConnectionString = MySqlConnectionString;
       return db;
     }
 
-    public static Sdx.Db.Adapter CreateSqlServer()
+    public static Sdx.Db.Adapter.Base CreateSqlServer()
     {
-      var db = new Sdx.Db.SqlServerAdapter();
+      var db = new Sdx.Db.Adapter.SqlServer();
       db.ConnectionString = SqlServerConnectionString;
       return db;
     }
 
-    public static Sdx.Db.Adapter CreateDb()
+    public static Sdx.Db.Adapter.Base CreateDb()
     {
       var useMysql = false;
       if(HttpContext.Current != null)

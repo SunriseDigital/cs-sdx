@@ -1037,13 +1037,13 @@ namespace UnitTest
       db.Command = select.Build();
 
       this.AssertCommandText(
-        typeof(Sdx.Db.SqlServerAdapter),
+        typeof(Sdx.Db.Adapter.SqlServer),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC OFFSET 0 ROWS FETCH NEXT 100 ROWS ONLY"),
         db
       );
 
       this.AssertCommandText(
-        typeof(Sdx.Db.MySqlAdapter),
+        typeof(Sdx.Db.Adapter.MySql),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100"),
         db
       );
@@ -1052,13 +1052,13 @@ namespace UnitTest
       db.Command = select.Build();
 
       this.AssertCommandText(
-        typeof(Sdx.Db.SqlServerAdapter),
+        typeof(Sdx.Db.Adapter.SqlServer),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC OFFSET 10 ROWS FETCH NEXT 100 ROWS ONLY"),
         db
       );
 
       this.AssertCommandText(
-        typeof(Sdx.Db.MySqlAdapter),
+        typeof(Sdx.Db.Adapter.MySql),
         db.Sql("SELECT {0}shop{1}.* FROM {0}shop{1} ORDER BY {0}id{1} DESC LIMIT 100 OFFSET 10"),
         db
       );
@@ -1717,14 +1717,14 @@ namespace UnitTest
 
       using (var command = select.Build())
       {
-        if (db.Adapter is Sdx.Db.SqlServerAdapter)
+        if (db.Adapter is Sdx.Db.Adapter.SqlServer)
         {
           Assert.Equal(db.Sql(@"
 SELECT [shop].[id] AS [id@shop] FROM [shop] 
   WITH (UPDLOCK,ROWLOCK) 
   WHERE [shop].[id] = @0"), command.CommandText);
         }
-        else if (db.Adapter is Sdx.Db.MySqlAdapter)
+        else if (db.Adapter is Sdx.Db.Adapter.MySql)
         {
           Assert.Equal(db.Sql(@"
 SELECT `shop`.`id` AS `id@shop` FROM `shop` 

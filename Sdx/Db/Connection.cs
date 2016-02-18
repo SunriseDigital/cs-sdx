@@ -21,7 +21,7 @@ namespace Sdx.Db
 
     private bool disposed = false;
 
-    public Adapter Adapter { get; private set; }
+    public Adapter.Base Adapter { get; private set; }
 
     private DbConnection DbConnection { get; set; }
 
@@ -48,7 +48,7 @@ namespace Sdx.Db
       }
     }
 
-    public Connection(Adapter adapter)
+    public Connection(Adapter.Base adapter)
     {
       this.Adapter = adapter;
       this.DbConnection = this.Adapter.Factory.CreateConnection();

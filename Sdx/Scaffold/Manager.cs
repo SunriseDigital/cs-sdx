@@ -19,7 +19,7 @@ namespace Sdx.Scaffold
       instances.Clear();
     }
 
-    public Manager(Db.TableMeta tableMeta, Sdx.Db.Adapter db, string name = Manager.DEFAULT_NAME)
+    public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db, string name = Manager.DEFAULT_NAME)
     {
       this.Name = name;
       Dictionary<string, Manager> instances = null;
@@ -50,7 +50,7 @@ namespace Sdx.Scaffold
 
     internal Db.TableMeta TableMeta { get; set; }
 
-    public Db.Adapter Db { get; private set; }
+    public Db.Adapter.Base Db { get; private set; }
 
     private Db.Sql.Select CreateSelect()
     {

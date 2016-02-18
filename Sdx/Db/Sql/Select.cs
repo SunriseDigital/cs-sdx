@@ -47,7 +47,7 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    internal Select(Adapter adapter)
+    internal Select(Adapter.Base adapter)
     {
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Condition();
@@ -59,9 +59,9 @@ namespace Sdx.Db.Sql
       this.Adapter = adapter;
     }
 
-    private Adapter adapter;
+    private Adapter.Base adapter;
 
-    public Adapter Adapter
+    public Adapter.Base Adapter
     {
       get
       {

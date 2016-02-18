@@ -81,7 +81,7 @@ namespace Sdx.Db
       }
     }
 
-    public Adapter Adapter { get; set; }
+    public Adapter.Base Adapter { get; set; }
 
     public TableMeta OwnMeta
     {

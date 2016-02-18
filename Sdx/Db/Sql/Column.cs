@@ -69,7 +69,7 @@ namespace Sdx.Db.Sql
       }
     }
 
-    private string QuotedName(Adapter db, DbParameterCollection parameters, Counter condCount)
+    private string QuotedName(Adapter.Base db, DbParameterCollection parameters, Counter condCount)
     {
       if(this.target is Expr)
       {
@@ -86,7 +86,7 @@ namespace Sdx.Db.Sql
       }
     }
 
-    internal string Build(Adapter db, DbParameterCollection parameters, Counter condCount)
+    internal string Build(Adapter.Base db, DbParameterCollection parameters, Counter condCount)
     {
       var sql = "";
       if(this.ContextName != null)

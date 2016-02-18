@@ -2,9 +2,9 @@
 using System.Data.Common;
 using System.Text.RegularExpressions;
 
-namespace Sdx.Db
+namespace Sdx.Db.Adapter
 {
-  public class SqlServerAdapter : Adapter
+  public class SqlServer : Base
   {
     override protected DbProviderFactory GetFactory()
     {
