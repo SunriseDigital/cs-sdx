@@ -65,7 +65,7 @@ namespace Sdx.Scaffold
 
     public ParamsList DisplayList { get; private set; }
 
-    public Html.Form BuildForm()
+    public Html.Form BuildForm(Db.Record record)
     {
       var form = new Html.Form();
 

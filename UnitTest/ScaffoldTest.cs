@@ -105,18 +105,23 @@ namespace UnitTest
           .Set("label", "コード")
         );
 
-      var form = scaffold.BuildForm();
-      Assert.IsType<Sdx.Html.InputHidden>(form["id"]);
-      Assert.Equal("ID", form["id"].Label);
-      Assert.Equal("id", form["id"].Tag.Attr["name"]);
+      //formの生成にレコードが必要なので接続を生成します。
+      using(var conn = scaffold.Db.CreateConnection())
+      {
+        var record = scaffold.LoadRecord(new NameValueCollection(), conn);
+        var form = scaffold.BuildForm(record);
+        Assert.IsType<Sdx.Html.InputHidden>(form["id"]);
+        Assert.Equal("ID", form["id"].Label);
+        Assert.Equal("id", form["id"].Tag.Attr["name"]);
 
-      Assert.IsType<Sdx.Html.InputText>(form["name"]);
-      Assert.Equal("名称", form["name"].Label);
-      Assert.Equal("name", form["name"].Tag.Attr["name"]);
+        Assert.IsType<Sdx.Html.InputText>(form["name"]);
+        Assert.Equal("名称", form["name"].Label);
+        Assert.Equal("name", form["name"].Tag.Attr["name"]);
 
-      Assert.IsType<Sdx.Html.InputText>(form["code"]);
-      Assert.Equal("コード", form["code"].Label);
-      Assert.Equal("code", form["code"].Tag.Attr["name"]);
+        Assert.IsType<Sdx.Html.InputText>(form["code"]);
+        Assert.Equal("コード", form["code"].Label);
+        Assert.Equal("code", form["code"].Tag.Attr["name"]);
+      }
     }
 
     [Fact]
@@ -655,7 +660,7 @@ namespace UnitTest
         var record = scaffold.LoadRecord(query, conn);
         Assert.True(record.IsNew);
 
-        var form = scaffold.BuildForm();
+        var form = scaffold.BuildForm(record);
         Assert.IsType<Sdx.Html.CheckableGroup>(form["category_id"]);
 
         conn.BeginTransaction();

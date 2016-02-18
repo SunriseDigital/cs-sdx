@@ -15,10 +15,8 @@ namespace Test.Scaffold
       scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
       scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-      scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
-      //scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name");
-      scaffold.Group.Strict = true;
-      scaffold.Group.DefaultValue = "1";
+      //scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+      scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name", "SelectDefaultOrder");
 
       scaffold.DisplayList
         .Add(Sdx.Scaffold.Params.Create()
