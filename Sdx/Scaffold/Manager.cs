@@ -227,13 +227,20 @@ namespace Sdx.Scaffold
       foreach (var param in relationList)
       {
         var rel = TableMeta.Relations[param["relation"]];
+        var currentRecords = record.GetRecordSet(param["relation"], conn);
         foreach (var refId in form.GetValues(param["column"]))
         {
-          var relRecord = rel.TableMeta.CreateRecord();
-          relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
-          relRecord.SetValue(param["column"], refId);
-          conn.Save(relRecord);
+          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"]) == refId);
+          if(cRecord == null)
+          {
+            var relRecord = rel.TableMeta.CreateRecord();
+            relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
+            relRecord.SetValue(param["column"], refId);
+            conn.Save(relRecord);
+          }
         }
+
+        currentRecords.ForEach(crec => conn.Delete(crec));
       }
     }
   }

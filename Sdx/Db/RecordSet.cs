@@ -133,6 +133,17 @@ namespace Sdx.Db
       }
     }
 
+    public Record Pop(Predicate<Record> match)
+    {
+      var find = results.FindIndex(match);
+      if(find != -1)
+      {
+        Record tmp = results[find];
+        results.RemoveAt(find);
+        return tmp;
+      }
+      return null;
+    }
 
     public void ForEach(Action<Record> action)
     {

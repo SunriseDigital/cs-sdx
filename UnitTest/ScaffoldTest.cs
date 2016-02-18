@@ -647,6 +647,7 @@ namespace UnitTest
       post.Add("category_id", "1");
       post.Add("category_id", "2");
 
+      string savedId;
       using (var conn = scaffold.Db.CreateConnection())
       {
         conn.Open();
@@ -670,7 +671,7 @@ namespace UnitTest
         }
 
         //確認する
-        var savedId = record.GetString("id");
+        savedId = record.GetString("id");
         var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
         Assert.Equal("foobar", savedRecord.GetString("name"));
         Assert.Equal("1", savedRecord.GetString("area_id"));
@@ -681,10 +682,43 @@ namespace UnitTest
         Assert.Equal("2", shopCategories[1].GetString("category_id"));
       }
 
+      //編集する
+      query = new NameValueCollection();
+      query.Set("id", savedId);
 
+      post = new NameValueCollection();
+      post.Set("name", "foobar");
+      post.Set("area_id", "1");
+      post.Add("category_id", "2");
+      post.Add("category_id", "3");
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
 
+        var record = scaffold.LoadRecord(query, conn);
+        Assert.False(record.IsNew);
 
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, post, conn);
+          conn.Commit();
+        }
+        catch (Exception e)
+        {
+          conn.Rollback();
+          throw e;
+        }
 
+        //確認する
+        savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+
+        var shopCategories = savedRecord.GetRecordSet("shop_category", conn, select => select.AddOrder("category_id", Sdx.Db.Sql.Order.ASC));
+        Assert.Equal(2, shopCategories.Count);
+        Assert.Equal("2", shopCategories[0].GetString("category_id"));
+        Assert.Equal("3", shopCategories[1].GetString("category_id"));
+      }
     }
   }
 }

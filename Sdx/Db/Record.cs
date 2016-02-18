@@ -161,7 +161,7 @@ namespace Sdx.Db
         return (RecordSet)this.recordCache[contextName];
       }
 
-      if (this.Select.HasContext(contextName)) //already joined
+      if (this.Select != null && this.Select.HasContext(contextName)) //already joined
       {
         if (selectHook != null)
         {
@@ -181,12 +181,11 @@ namespace Sdx.Db
           throw new ArgumentNullException("connection");
         }
 
-        var table = this.Select.Context(this.ContextName).Table;
-        if (table.OwnMeta.Relations.ContainsKey(contextName))
+        if (OwnMeta.Relations.ContainsKey(contextName))
         {
-          var relations = table.OwnMeta.Relations[contextName];
+          var relations = OwnMeta.Relations[contextName];
 
-          var sel = new Select(this.Select.Adapter);
+          var sel = connection.Adapter.CreateSelect();
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
           sel.AddFrom(relations.TableMeta.CreateTable())
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
