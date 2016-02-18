@@ -23,6 +23,25 @@ namespace Sdx.Db
 
       }
 
+      public TableMeta TableMeta
+      {
+        get
+        {
+          var prop = TableType.GetProperty("Meta");
+          if (prop == null)
+          {
+            throw new NotImplementedException("Missing Meta property in " + this.GetType());
+          }
+
+          var meta = prop.GetValue(null, null) as TableMeta;
+          if (meta == null)
+          {
+            throw new NotImplementedException("Initialize TableMeta for " + this.GetType());
+          }
+
+          return meta;
+        }
+      }
       public Type TableType { get; private set; }
       public string ForeignKey { get; private set; }
       public string ReferenceKey { get; private set; }

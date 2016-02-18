@@ -668,6 +668,17 @@ namespace UnitTest
           conn.Rollback();
           throw e;
         }
+
+        //確認する
+        var savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        Assert.Equal("foobar", savedRecord.GetString("name"));
+        Assert.Equal("1", savedRecord.GetString("area_id"));
+        
+        var shopCategories = savedRecord.GetRecordSet("shop_category", conn, select => select.AddOrder("category_id", Sdx.Db.Sql.Order.ASC));
+        Assert.Equal(2, shopCategories.Count);
+        Assert.Equal("1", shopCategories[0].GetString("category_id"));
+        Assert.Equal("2", shopCategories[1].GetString("category_id"));
       }
 
 

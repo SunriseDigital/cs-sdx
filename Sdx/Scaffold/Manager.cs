@@ -224,12 +224,17 @@ namespace Sdx.Scaffold
       record.Bind(ownValues);
       conn.Save(record);
 
-      foreach(var param in relationList)
+      foreach (var param in relationList)
       {
         var rel = TableMeta.Relations[param["relation"]];
-        Sdx.Diagnostics.Debug.Console();
+        foreach (var refId in form.GetValues(param["column"]))
+        {
+          var relRecord = rel.TableMeta.CreateRecord();
+          relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
+          relRecord.SetValue(param["column"], refId);
+          conn.Save(relRecord);
+        }
       }
-      
     }
   }
 }

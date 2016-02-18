@@ -188,7 +188,7 @@ namespace Sdx.Db
 
           var sel = new Select(this.Select.Adapter);
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
-          sel.AddFrom((Table)Activator.CreateInstance(relations.TableType))
+          sel.AddFrom(relations.TableMeta.CreateTable())
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
           if (selectHook != null)
