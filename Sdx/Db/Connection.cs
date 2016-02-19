@@ -520,11 +520,6 @@ namespace Sdx.Db
         throw new InvalidOperationException("This record is already deleted.");
       }
 
-      if (record.UpdatedValues.Count == 0)
-      {
-        return;
-      }
-
       if (record.IsNew)
       {
         var insert = this.Adapter.CreateInsert();
@@ -583,6 +578,11 @@ namespace Sdx.Db
       }
       else
       {
+        if (record.UpdatedValues.Count == 0)
+        {
+          return;
+        }
+
         var update = this.Adapter.CreateUpdate();
         update.SetTable(record.OwnMeta.Name);
         foreach (var columnValue in record.UpdatedValues)

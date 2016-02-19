@@ -69,6 +69,7 @@ namespace Sdx.Scaffold
     {
       var form = new Html.Form();
 
+      var hasGetters = new List<Params>();
       foreach (var param in FormList)
       {
         Html.FormElement elem;
@@ -113,7 +114,22 @@ namespace Sdx.Scaffold
         elem.Label = param["label"];
 
         form.SetElement(elem);
+
+        if(param.ContainsKey("getter"))
+        {
+          hasGetters.Add(param);
+        }
       }
+
+      var binds = record.ToNameValueCollection();
+
+      hasGetters.ForEach(param => {
+        var method = record.GetType().GetMethods().First(m => m.Name == param["getter"] && !m.IsStatic && m.GetParameters().Count() == 0);
+        binds.Set(param["column"],(string) method.Invoke(record, null));
+      });
+
+      form.Bind(binds);
+
 
       return form;
     }
@@ -225,6 +241,11 @@ namespace Sdx.Scaffold
         if(param.ContainsKey("relation"))
         {
           relationList.Add(param);
+        }
+        else if(param.ContainsKey("setter"))
+        {
+          var method = record.GetType().GetMethods().First(m => m.Name == param["setter"] && !m.IsStatic && m.GetParameters().Count() == 1);
+          method.Invoke(record, new object[] { form[param["column"]] });
         }
         else
         {

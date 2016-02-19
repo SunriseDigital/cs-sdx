@@ -734,5 +734,93 @@ namespace UnitTest
         Assert.Equal("3", shopCategories[1].GetString("category_id"));
       }
     }
+
+    [Fact]
+    public void TestSwapRecordSetterMethod()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSwapRecordSetterMethod(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSwapRecordSetterMethod(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Params.Create()
+          .Set("label", "名前とコード")
+          .Set("column", "name_with_code")
+          .Set("setter", "SetNameWithCode")//カンマ区切りの[名前,コード]をそれぞれnameとcodeにセットする。
+        )
+        ;
+
+      var query = new NameValueCollection();
+      var post = new NameValueCollection();
+      post.Set("name_with_code", "名前,code");
+
+      string savedId;
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, post, conn);
+          conn.Commit();
+        }
+        catch (Exception e)
+        {
+          conn.Rollback();
+          throw e;
+        }
+
+        //確認する
+        savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Area(), savedId);
+        Assert.Equal("名前", savedRecord.GetString("name"));
+        Assert.Equal("code", savedRecord.GetString("code"));
+      }
+    }
+
+    [Fact]
+    public void TestSwapRecordGetterMethod()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSwapRecordGetterMethod(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSwapRecordGetterMethod(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Params.Create()
+          .Set("label", "名前とコード")
+          .Set("column", "name_with_code")
+          .Set("getter", "GetNameWithCode")
+        )
+        ;
+
+      var query = new NameValueCollection();
+      query.Add("id", "1");
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        Assert.Equal("新宿,sinjuku", form["name_with_code"].Value.First());
+      }
+    }
   }
 }
