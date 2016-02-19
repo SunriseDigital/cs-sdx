@@ -71,6 +71,7 @@
     <Compile Include="BaseDbTest.cs" />
     <Compile Include="CollectionTest.cs" />
     <Compile Include="ContextTest.cs" />
+    <Compile Include="DbAdapterTest.cs" />
     <Compile Include="DbConnectionTest.cs" />
     <Compile Include="ConfigTest.cs" />
     <Compile Include="DbSelectTest.cs" />

@@ -57,6 +57,7 @@
     <Compile Include="Data\TreeYaml.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Db\Adapter\Base.cs" />
+    <Compile Include="Db\Adapter\Manager.cs" />
     <Compile Include="Db\Connection.cs" />
     <Compile Include="Db\DbException.cs" />
     <Compile Include="Db\Sql\INonQueryBuilder.cs" />
