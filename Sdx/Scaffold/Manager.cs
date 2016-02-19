@@ -65,7 +65,7 @@ namespace Sdx.Scaffold
 
     public ParamsList DisplayList { get; private set; }
 
-    public Html.Form BuildForm(Db.Record record)
+    public Html.Form BuildForm(Db.Record record, Db.Connection conn)
     {
       var form = new Html.Form();
 
@@ -76,7 +76,19 @@ namespace Sdx.Scaffold
         var method = TableMeta.TableType.GetMethod(methodName);
         if (method != null)
         {
-          elem = (Sdx.Html.FormElement)method.Invoke(null, null);
+          var paramsCount = method.GetParameters().Count();
+          if(paramsCount == 1)
+          {
+            elem = (Sdx.Html.FormElement)method.Invoke(null, new object[] { conn });
+          }
+          else if (paramsCount == 2)
+          {
+            elem = (Sdx.Html.FormElement)method.Invoke(null, new object[] { conn, record });
+          }
+          else
+          {
+            elem = (Sdx.Html.FormElement)method.Invoke(null, null);
+          }
         }
         else
         {

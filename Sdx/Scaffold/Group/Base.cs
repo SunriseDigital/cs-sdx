@@ -35,13 +35,13 @@ namespace Sdx.Scaffold.Group
 
     private List<KeyValuePair<string, string>> pairListForSelector;
 
-    internal protected abstract List<KeyValuePair<string, string>> BuildPairListForSelector();
+    internal protected abstract List<KeyValuePair<string, string>> BuildPairListForSelector(Sdx.Db.Connection conn);
 
-    private List<KeyValuePair<string, string>> GetPairListForSelector()
+    private List<KeyValuePair<string, string>> GetPairListForSelector(Sdx.Db.Connection conn)
     {
       if (pairListForSelector == null)
       {
-        pairListForSelector = BuildPairListForSelector();
+        pairListForSelector = BuildPairListForSelector(conn);
         if(pairListForSelector == null)
         {
           pairListForSelector = new List<KeyValuePair<string, string>>();
@@ -51,9 +51,9 @@ namespace Sdx.Scaffold.Group
       return pairListForSelector;
     }
 
-    public Html.Select BuildSelector()
+    public Html.Select BuildSelector(Sdx.Db.Connection conn)
     {
-      var pairList = GetPairListForSelector();
+      var pairList = GetPairListForSelector(conn);
       if(pairList.Count == 0)
       {
         return null;
@@ -133,10 +133,6 @@ namespace Sdx.Scaffold.Group
           if (DefaultValue != null)
           {
             value = DefaultValue;
-          }
-          else if (HasSelector)
-          {
-            value = GetPairListForSelector().First().Key;
           }
 
           Manager.ListPageUrl.AddParam(TargetColumnName, value);

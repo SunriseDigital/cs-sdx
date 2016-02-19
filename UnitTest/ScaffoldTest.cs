@@ -109,7 +109,7 @@ namespace UnitTest
       using(var conn = scaffold.Db.CreateConnection())
       {
         var record = scaffold.LoadRecord(new NameValueCollection(), conn);
-        var form = scaffold.BuildForm(record);
+        var form = scaffold.BuildForm(record, conn);
         Assert.IsType<Sdx.Html.InputHidden>(form["id"]);
         Assert.Equal("ID", form["id"].Label);
         Assert.Equal("id", form["id"].Tag.Attr["name"]);
@@ -151,15 +151,15 @@ namespace UnitTest
 
         scaffold.Group.Init();
 
-
-        Assert.Null(scaffold.Group.BuildSelector());
-        Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
-        Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
-        Assert.Equal("東京", scaffold.Group.Name);
-
         using (var conn = db.Adapter.CreateConnection())
         {
           conn.Open();
+
+          Assert.Null(scaffold.Group.BuildSelector(conn));
+          Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
+          Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
+          Assert.Equal("東京", scaffold.Group.Name);
+
           var actualSet = scaffold.FetchRecordSet(conn);
           actualSet.ForEach((rec) =>
           {
@@ -222,16 +222,18 @@ namespace UnitTest
 
         Assert.True(scaffold.Group.HasSelector);
 
-        var select = scaffold.Group.BuildSelector();
-        Assert.IsType<Sdx.Html.Select>(select);
-        Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
-
-        List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
-        Assert.Equal("", options[0].Value.ToString());//最初は空
-
         using (var conn = db.Adapter.CreateConnection())
         {
           conn.Open();
+
+
+          var select = scaffold.Group.BuildSelector(conn);
+          Assert.IsType<Sdx.Html.Select>(select);
+          Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
+
+          List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
+          Assert.Equal("", options[0].Value.ToString());//最初は空
+
           var actual = conn.FetchRecordSet(Test.Orm.Table.LargeArea.Meta, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
           var key = 1;
           actual.ForEach((rec) =>
@@ -305,8 +307,13 @@ namespace UnitTest
         scaffold.Group.Strict = true;
 
         scaffold.Group.Init();
-        var select = scaffold.Group.BuildSelector();
-        Assert.Equal("<select name=\"large_area_id\"><option value=\"1\">東京</option><option value=\"2\" selected>愛知</option></select>", select.Tag.Render());
+
+        using(var conn = db.Adapter.CreateConnection())
+        {
+          conn.Open();
+          var select = scaffold.Group.BuildSelector(conn);
+          Assert.Equal("<select name=\"large_area_id\"><option value=\"1\">東京</option><option value=\"2\" selected>愛知</option></select>", select.Tag.Render());
+        }
 
       }))();
     }
@@ -338,14 +345,15 @@ namespace UnitTest
 
         scaffold.Group.Init();
 
-        Assert.Null(scaffold.Group.BuildSelector());
-        Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
-        Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
-        Assert.Equal("東京", scaffold.Group.Name);
-
         using (var conn = db.Adapter.CreateConnection())
         {
           conn.Open();
+
+          Assert.Null(scaffold.Group.BuildSelector(conn));
+          Assert.Equal("/scaffold/area/edit.aspx?large_area_id=1", scaffold.EditPageUrl.Build());
+          Assert.Equal("/scaffold/area/list.aspx?large_area_id=1", scaffold.ListPageUrl.Build());
+          Assert.Equal("東京", scaffold.Group.Name);
+
           var actualSet = scaffold.FetchRecordSet(conn);
           actualSet.ForEach((rec) =>
           {
@@ -405,16 +413,17 @@ namespace UnitTest
 
         Assert.True(scaffold.Group.HasSelector);
 
-        var select = scaffold.Group.BuildSelector();
-        Assert.IsType<Sdx.Html.Select>(select);
-        Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
-
-        List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
-        Assert.Equal("", options[0].Value.ToString());//最初は空
-
         using (var conn = db.Adapter.CreateConnection())
         {
           conn.Open();
+
+          var select = scaffold.Group.BuildSelector(conn);
+          Assert.IsType<Sdx.Html.Select>(select);
+          Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
+
+          List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
+          Assert.Equal("", options[0].Value.ToString());//最初は空
+
           var actual = conn.FetchRecordSet(Test.Orm.Table.LargeArea.Meta, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
           var key = 1;
           actual.ForEach((rec) =>
@@ -660,7 +669,7 @@ namespace UnitTest
         var record = scaffold.LoadRecord(query, conn);
         Assert.True(record.IsNew);
 
-        var form = scaffold.BuildForm(record);
+        var form = scaffold.BuildForm(record, conn);
         Assert.IsType<Sdx.Html.CheckableGroup>(form["category_id"]);
 
         conn.BeginTransaction();

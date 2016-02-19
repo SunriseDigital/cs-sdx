@@ -32,7 +32,7 @@ namespace Sdx.Scaffold.Group
       return name;
     }
 
-    protected internal override List<KeyValuePair<string, string>> BuildPairListForSelector()
+    protected internal override List<KeyValuePair<string, string>> BuildPairListForSelector(Sdx.Db.Connection conn)
     {
       if(!HasSelector)
       {
@@ -40,17 +40,13 @@ namespace Sdx.Scaffold.Group
       }
 
       List<KeyValuePair<string, string>> result = null;
-      using (var conn = Manager.Db.CreateConnection())
-      {
-        conn.Open();
-        var table = tableMeta.CreateTable();
-        var select = Manager.Db.CreateSelect();
-        select.AddFrom(table);
-        var method = table.GetType().GetMethods().First(m => m.Name == methodForList && !m.IsStatic && m.GetParameters()[0].ParameterType == typeof(Db.Sql.Select));
+      var table = tableMeta.CreateTable();
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(table);
+      var method = table.GetType().GetMethods().First(m => m.Name == methodForList && !m.IsStatic && m.GetParameters()[0].ParameterType == typeof(Db.Sql.Select));
 
-        method.Invoke(table, new object[] { select });
-        result = conn.FetchKeyValuePairList<string, string>(select);
-      }
+      method.Invoke(table, new object[] { select });
+      result = conn.FetchKeyValuePairList<string, string>(select);
 
       return result;
     }

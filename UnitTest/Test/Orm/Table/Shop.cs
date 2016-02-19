@@ -72,25 +72,20 @@ namespace Test.Orm.Table
       );
     }
 
-    public static Sdx.Html.FormElement CreateCategoryIdElement()
+    public static Sdx.Html.FormElement CreateCategoryIdElement(Sdx.Db.Connection conn, Sdx.Db.Record record)
     {
       var elem = new Sdx.Html.CheckableGroup();
       elem.Name = "category_id";
 
-      var db = Sdx.Db.Adapter.Manager.Get("main").Read;
-      using(var conn = db.CreateConnection())
-      {
-        conn.Open();
-        var select = db.CreateSelect();
-        select.AddFrom(new Test.Orm.Table.Category()).Table.SelectDefaultOrder(select);
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(new Test.Orm.Table.Category()).Table.SelectDefaultOrder(select);
 
-        conn.FetchRecordSet(select).ForEach(rec =>
-        {
-          var checkbox = new Sdx.Html.CheckBox();
-          checkbox.Tag.Attr["value"] = rec.GetString("id");
-          elem.AddCheckable(checkbox);
-        });
-      }
+      conn.FetchRecordSet(select).ForEach(rec =>
+      {
+        var checkbox = new Sdx.Html.CheckBox();
+        checkbox.Tag.Attr["value"] = rec.GetString("id");
+        elem.AddCheckable(checkbox);
+      });
 
       return elem;
     }

@@ -38,27 +38,23 @@ namespace Test.Orm.Table
       );
     }
 
-    public static Sdx.Html.FormElement CreateLargeAreaIdElement()
+    public static Sdx.Html.FormElement CreateLargeAreaIdElement(Sdx.Db.Connection conn)
     {
       var elem = new Sdx.Html.Select();
       elem.Name = "large_area_id";
 
-      var db = Sdx.Db.Adapter.Manager.Get("main").Write;
-      using(var conn = db.CreateConnection())
+      var select = conn.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.LargeArea())
+        .ClearColumns()
+        .AddColumns("id", "name").Table.SelectDefaultOrder(select);
+
+      elem.AddOption(Sdx.Html.Option.Create("", "大エリアを選択"));
+
+      conn.FetchKeyValuePairList<string, string>(select).ForEach((pair) =>
       {
-        conn.Open();
-        var select = db.CreateSelect();
-        select
-          .AddFrom(new Test.Orm.Table.LargeArea())
-          .ClearColumns()
-          .AddColumns("id", "name").Table.SelectDefaultOrder(select);
-
-        elem.AddOption(Sdx.Html.Option.Create("", "大エリアを選択"));
-
-        conn.FetchKeyValuePairList<string, string>(select).ForEach((pair) => {
-          elem.AddOption(Sdx.Html.Option.Create(pair));
-        });
-      }
+        elem.AddOption(Sdx.Html.Option.Create(pair));
+      });
 
       return elem;
     }
