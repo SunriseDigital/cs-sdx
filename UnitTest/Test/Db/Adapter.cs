@@ -18,33 +18,32 @@ namespace Test.Db
       get { return "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;"; }
     }
 
-    public static Sdx.Db.Adapter.Base CreateMySql()
+    public static void SetupManager()
     {
-      var db = new Sdx.Db.Adapter.MySql();
-      db.ConnectionString = MySqlConnectionString;
-      return db;
-    }
+      var sqlmg = new Sdx.Db.Adapter.Manager();
+      var sqldb = new Sdx.Db.Adapter.SqlServer();
+      sqldb.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
+      sqlmg.AddCommonAdapter(sqldb);
 
-    public static Sdx.Db.Adapter.Base CreateSqlServer()
-    {
-      var db = new Sdx.Db.Adapter.SqlServer();
-      db.ConnectionString = SqlServerConnectionString;
-      return db;
-    }
+      var mymg = new Sdx.Db.Adapter.Manager();
+      var mydb = new Sdx.Db.Adapter.MySql();
+      mydb.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
+      mymg.AddCommonAdapter(mydb);
 
-    public static Sdx.Db.Adapter.Base CreateDb()
-    {
-      var useMysql = false;
-      if(HttpContext.Current != null)
+      Sdx.Db.Adapter.Manager.Set("main", () =>
       {
-        var cookie = HttpContext.Current.Request.Cookies["sdx_test_use_mysql"];
-        if(cookie != null && cookie.Value == "1")
+        var useMysql = false;
+        if (HttpContext.Current != null)
         {
-          useMysql = true;
+          var cookie = HttpContext.Current.Request.Cookies["sdx_test_use_mysql"];
+          if (cookie != null && cookie.Value == "1")
+          {
+            useMysql = true;
+          }
         }
-      }
 
-      return useMysql ? CreateMySql() : CreateSqlServer();
+        return useMysql ? mymg : sqlmg;
+      });
     }
   }
 }

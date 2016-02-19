@@ -5,10 +5,16 @@ using System.Text;
 
 namespace Sdx.Db.Adapter
 {
+  /// <summary>
+  /// DB負荷分散用Class
+  /// 複数のAdapterをセットしておきランダムで取得する。
+  /// </summary>
   public class Manager
   {
     private List<Base> writeAdapters = new List<Base>();
     private List<Base> readAdapters = new List<Base>();
+
+    private static Dictionary<string, Object> managerDic = new Dictionary<string, Object>();
 
     private static Random random = new Random();
 
@@ -28,23 +34,28 @@ namespace Sdx.Db.Adapter
       writeAdapters.Add(adapter);
     }
 
+    private static Base GetRandom(List<Base> list)
+    {
+      if (list.Count == 0)
+      {
+        throw new InvalidOperationException("Adapter list is empty.");
+      }
+      else if (list.Count == 1)
+      {
+        return list[0];
+      }
+      else
+      {
+        //Random.Next(maxValue)はmaxValueを含みません
+        return list[random.Next(list.Count)];
+      }
+    }
+
     public Base Read
     {
       get
       {
-        if(readAdapters.Count == 0)
-        {
-          throw new InvalidOperationException("Read Adapter is empty.");
-        }
-        else if(readAdapters.Count == 1)
-        {
-          return readAdapters[0];
-        }
-        else
-        {
-          //Random.Next(maxValue)はmaxValueを含みません
-          return readAdapters[random.Next(readAdapters.Count)];
-        }
+        return Manager.GetRandom(readAdapters);
       }
     }
 
@@ -52,36 +63,34 @@ namespace Sdx.Db.Adapter
     {
       get
       {
-        if (writeAdapters.Count == 0)
-        {
-          throw new InvalidOperationException("Read Adapter is empty.");
-        }
-        else if (writeAdapters.Count == 1)
-        {
-          return writeAdapters[0];
-        }
-        else
-        {
-          return writeAdapters[random.Next(writeAdapters.Count)];
-        }
+        return Manager.GetRandom(writeAdapters);
       }
     }
 
-    public Base Share
+    public static void Set(string key, Manager manager)
     {
-      get
-      {
-        var totalCount = writeAdapters.Count + readAdapters.Count;
-        var seed = random.Next(totalCount);
+      managerDic[key] = manager;
+    }
 
-        if(seed < writeAdapters.Count)
-        {
-          return writeAdapters[seed];
-        }
-        else
-        {
-          return readAdapters[seed - writeAdapters.Count];
-        }
+    public static void Set(string key, Func<Manager> getter)
+    {
+      managerDic[key] = getter;
+    }
+
+    public static Manager Get(string key)
+    {
+      var target = managerDic[key];
+      if (target is Manager)
+      {
+        return (Manager)target;
+      }
+      else if(target is Func<Manager>)
+      {
+        return ((Func<Manager>) target)();
+      }
+      else
+      {
+        throw new InvalidOperationException("Invalid type " + target.GetType());
       }
     }
   }

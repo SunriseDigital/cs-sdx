@@ -43,7 +43,7 @@ namespace Test.Orm.Table
       var elem = new Sdx.Html.Select();
       elem.Name = "large_area_id";
 
-      var db = Test.Db.Adapter.CreateDb();
+      var db = Sdx.Db.Adapter.Manager.Get("main").Write;
       using(var conn = db.CreateConnection())
       {
         conn.Open();

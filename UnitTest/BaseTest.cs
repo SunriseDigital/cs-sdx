@@ -41,6 +41,7 @@ namespace UnitTest
     public BaseTest()
     {
       Sdx.Context.Current.Debug.Out = Console.Out;
+      Test.Db.Adapter.SetupManager();
     }
 
     public void SetFixture(Fixture fixture)

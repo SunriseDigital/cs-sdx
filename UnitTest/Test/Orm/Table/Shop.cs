@@ -77,7 +77,7 @@ namespace Test.Orm.Table
       var elem = new Sdx.Html.CheckableGroup();
       elem.Name = "category_id";
 
-      var db = Test.Db.Adapter.CreateDb();
+      var db = Sdx.Db.Adapter.Manager.Get("main").Read;
       using(var conn = db.CreateConnection())
       {
         conn.Open();

@@ -72,18 +72,6 @@ namespace UnitTest
       }
       Assert.Equal(5, connStr.Count);
 
-      connStr.Clear();
-      for (int i = 0; i < 300; i++)
-      {
-        var db = main.Share;
-        Assert.True(db.ConnectionString.StartsWith("SqlServer read"));
-        if (!connStr.Any(str => str == db.ConnectionString))
-        {
-          connStr.Add(db.ConnectionString);
-        }
-      }
-      Assert.Equal(5, connStr.Count);
-
       Exception ex2 = Record.Exception(new Assert.ThrowsDelegate(() =>
       {
         var db = main.Write;
@@ -108,18 +96,6 @@ namespace UnitTest
       for (int i = 0; i < 300; i++)
       {
         var db = main.Write;
-        Assert.True(db.ConnectionString.StartsWith("SqlServer write"));
-        if (!connStr.Any(str => str == db.ConnectionString))
-        {
-          connStr.Add(db.ConnectionString);
-        }
-      }
-      Assert.Equal(5, connStr.Count);
-
-      connStr.Clear();
-      for (int i = 0; i < 300; i++)
-      {
-        var db = main.Share;
         Assert.True(db.ConnectionString.StartsWith("SqlServer write"));
         if (!connStr.Any(str => str == db.ConnectionString))
         {
@@ -179,17 +155,6 @@ namespace UnitTest
         }
       }
       Assert.Equal(1, connStr.Count);
-
-      connStr.Clear();
-      for (int i = 0; i < 300; i++)
-      {
-        var db = main.Share;
-        if (!connStr.Any(str => str == db.ConnectionString))
-        {
-          connStr.Add(db.ConnectionString);
-        }
-      }
-      Assert.Equal(6, connStr.Count);
     }
 
     [Fact]
@@ -235,17 +200,55 @@ namespace UnitTest
         }
       }
       Assert.Equal(5, connStr.Count);
+    }
 
-      connStr.Clear();
+    [Fact]
+    public void TestManagerAddCommon()
+    {
+      var main = new Sdx.Db.Adapter.Manager();
+
+      for (int i = 0; i < 5; i++)
+      {
+        var db = new Sdx.Db.Adapter.SqlServer();
+        db.ConnectionString = "SqlServer read " + i.ToString();
+        main.AddReadAdapter(db);
+      }
+
+      for (int i = 0; i < 5; i++)
+      {
+        var db = new Sdx.Db.Adapter.SqlServer();
+        db.ConnectionString = "SqlServer write " + i.ToString();
+        main.AddCommonAdapter(db);
+      }
+
+
+      var connStr = new List<string>();
       for (int i = 0; i < 300; i++)
       {
-        var db = main.Share;
+        var db = main.Read;
+        Assert.True(
+          db.ConnectionString.StartsWith("SqlServer read")
+          ||
+          db.ConnectionString.StartsWith("SqlServer write")
+        );
         if (!connStr.Any(str => str == db.ConnectionString))
         {
           connStr.Add(db.ConnectionString);
         }
       }
       Assert.Equal(10, connStr.Count);
+
+      connStr.Clear();
+      for (int i = 0; i < 300; i++)
+      {
+        var db = main.Write;
+        Assert.True(db.ConnectionString.StartsWith("SqlServer write"));
+        if (!connStr.Any(str => str == db.ConnectionString))
+        {
+          connStr.Add(db.ConnectionString);
+        }
+      }
+      Assert.Equal(5, connStr.Count);
     }
   }
 }

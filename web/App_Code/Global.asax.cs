@@ -11,6 +11,8 @@ public class Global : System.Web.HttpApplication
     //  "form/current",
     //  "~/_routes/form/current.aspx"
     //);
+
+    Test.Db.Adapter.SetupManager();
   }
 
   protected void Application_BeginRequest(Object sender, EventArgs e)
