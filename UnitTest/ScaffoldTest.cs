@@ -789,38 +789,77 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestSwapRecordGetterMethod()
+    public void TestSwapRecordAccessorUsingMethodInfo()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunSwapRecordGetterMethod(db);
+        RunSwapRecordAccessorUsingMethodInfo(db);
         ExecSql(db);
       }
     }
 
-    private void RunSwapRecordGetterMethod(TestDb db)
+    private void RunSwapRecordAccessorUsingMethodInfo(TestDb db)
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
         .Add(Sdx.Scaffold.ConfigItem.Create()
           .Set("label", new Sdx.Scaffold.ConfigValue("名前とコード"))
           .Set("column", new Sdx.Scaffold.ConfigValue("name_with_code"))
-          .Set("getter", new Sdx.Scaffold.ConfigValue("GetNameWithCode"))
+          .Set("getter", new Sdx.Scaffold.ConfigValue(typeof(Test.Orm.Area).GetMethod("GetNameWithCode")))
+          .Set("setter", new Sdx.Scaffold.ConfigValue(typeof(Test.Orm.Area).GetMethod("SetNameWithCode")))
         )
         ;
 
-      var query = new NameValueCollection();
-      query.Add("id", "1");
-
-      using (var conn = scaffold.Db.CreateConnection())
+      ((Action)(() =>
       {
-        conn.Open();
+        var query = new NameValueCollection();
+        var post = new NameValueCollection();
+        post.Set("name_with_code", "名前,methodInfo");
 
-        var record = scaffold.LoadRecord(query, conn);
-        var form = scaffold.BuildForm(record, conn);
+        string savedId;
+        using (var conn = scaffold.Db.CreateConnection())
+        {
+          conn.Open();
 
-        Assert.Equal("新宿,sinjuku", form["name_with_code"].Value.First());
-      }
+          var record = scaffold.LoadRecord(query, conn);
+          var form = scaffold.BuildForm(record, conn);
+
+          conn.BeginTransaction();
+          try
+          {
+            scaffold.Save(record, post, conn);
+            conn.Commit();
+          }
+          catch (Exception e)
+          {
+            conn.Rollback();
+            throw e;
+          }
+
+          //確認する
+          savedId = record.GetString("id");
+          var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Area(), savedId);
+          Assert.Equal("名前", savedRecord.GetString("name"));
+          Assert.Equal("methodInfo", savedRecord.GetString("code"));
+        }
+      }))();
+
+
+      ((Action)(() =>
+      {
+        var query = new NameValueCollection();
+        query.Add("id", "1");
+
+        using (var conn = scaffold.Db.CreateConnection())
+        {
+          conn.Open();
+
+          var record = scaffold.LoadRecord(query, conn);
+          var form = scaffold.BuildForm(record, conn);
+
+          Assert.Equal("新宿,sinjuku", form["name_with_code"].Value.First());
+        }
+      }))();
     }
   }
 }
