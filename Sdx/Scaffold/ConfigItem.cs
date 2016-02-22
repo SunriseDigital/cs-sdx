@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Sdx.Scaffold
 {
-  public class Params : IEnumerable<KeyValuePair<string, string>>
+  public class ConfigItem : IEnumerable<KeyValuePair<string, string>>
   {
     public enum Type
     {
@@ -18,18 +18,18 @@ namespace Sdx.Scaffold
 
     private Type? type;
     
-    public static Params Create()
+    public static ConfigItem Create()
     {
-      return new Params();
+      return new ConfigItem();
     }
 
-    private Dictionary<string, string> vars = new Dictionary<string, string>();
+    private Dictionary<string, ConfigValue> vars = new Dictionary<string, ConfigValue>();
 
     private static Regex htmlRegex = new Regex(@"\{([^}]+)\}");
 
     public bool StrictCheck = true;
 
-    public string this[string key]
+    public ConfigValue this[string key]
     {
       set
       {
@@ -60,13 +60,13 @@ namespace Sdx.Scaffold
       return this.vars.ContainsKey(key);
     }
 
-    public Params Set(string key, string value)
+    public ConfigItem Set(string key, ConfigValue value)
     {
       this[key] = value;
       return this;
     }
 
-    public string Get(string key)
+    public ConfigValue Get(string key)
     {
       return this.vars[key];
     }
@@ -106,7 +106,7 @@ namespace Sdx.Scaffold
     {
       var replaced = new Dictionary<string, bool>();
 
-      var html = Get("html");
+      var html = Get("html").Value;
       var match = htmlRegex.Match(html);
 
       while(match.Success)
@@ -128,12 +128,12 @@ namespace Sdx.Scaffold
 
     private string BuildDynamic(Db.Record record, Db.Connection conn)
     {
-      return record.Get<string>(Get("dynamic"), conn);
+      return record.Get<string>(Get("dynamic").Value, conn);
     }
 
     private string BuildColumn(Db.Record record)
     {
-      return record.GetString(Get("column"));
+      return record.GetString(Get("column").Value);
     }
   }
 }

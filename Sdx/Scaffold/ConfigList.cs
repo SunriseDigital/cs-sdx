@@ -6,16 +6,16 @@ using System.Text;
 
 namespace Sdx.Scaffold
 {
-  public class ParamsList : IEnumerable<Params>
+  public class ConfigList : IEnumerable<ConfigItem>
   {
-    public static ParamsList Create()
+    public static ConfigList Create()
     {
-      return new ParamsList();
+      return new ConfigList();
     }
 
-    private List<Params> list = new List<Params>();
+    private List<ConfigItem> list = new List<ConfigItem>();
 
-    public Params this[int index]
+    public ConfigItem this[int index]
     {
       get
       {
@@ -23,13 +23,13 @@ namespace Sdx.Scaffold
       }
     }
 
-    public ParamsList Add(Params param)
+    public ConfigList Add(ConfigItem param)
     {
       this.list.Add(param);
       return this;
     }
 
-    public IEnumerator<Params> GetEnumerator()
+    public IEnumerator<ConfigItem> GetEnumerator()
     {
       return this.list.GetEnumerator();
     }

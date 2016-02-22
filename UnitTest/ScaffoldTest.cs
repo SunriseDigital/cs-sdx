@@ -47,10 +47,10 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("column", "name")
-        ).Add(Sdx.Scaffold.Params.Create()
-          .Set("column", "code")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
+        ).Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
         );
 
       // build expected record set
@@ -71,8 +71,8 @@ namespace UnitTest
           foreach (var param in scaffold.DisplayList)
           {
             Assert.Equal(
-              eRecord.GetString(param.Get("column")),
-              aRecord.GetString(param.Get("column"))
+              eRecord.GetString(param["column"].Value),
+              aRecord.GetString(param["column"].Value)
             );
           }
         }
@@ -94,19 +94,19 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("column", "id")
-          .Set("label", "ID")
-        ).Add(Sdx.Scaffold.Params.Create()
-          .Set("column", "name")
-          .Set("label", "名称")
-        ).Add(Sdx.Scaffold.Params.Create()
-          .Set("column", "code")
-          .Set("label", "コード")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("column", new Sdx.Scaffold.ConfigValue("id"))
+          .Set("label", new Sdx.Scaffold.ConfigValue("ID"))
+        ).Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
+          .Set("label", new Sdx.Scaffold.ConfigValue("名称"))
+        ).Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
+          .Set("label", new Sdx.Scaffold.ConfigValue("コード"))
         );
 
       //formの生成にレコードが必要なので接続を生成します。
-      using(var conn = scaffold.Db.CreateConnection())
+      using (var conn = scaffold.Db.CreateConnection())
       {
         var record = scaffold.LoadRecord(new NameValueCollection(), conn);
         var form = scaffold.BuildForm(record, conn);
@@ -308,7 +308,7 @@ namespace UnitTest
 
         scaffold.Group.Init();
 
-        using(var conn = db.Adapter.CreateConnection())
+        using (var conn = db.Adapter.CreateConnection())
         {
           conn.Open();
           var select = scaffold.Group.BuildSelector(conn);
@@ -569,13 +569,13 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("label", "大エリア名")
-          .Set("dynamic", "@large_area.name")
-          .Set("style", "width: 100px;")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("label", new Sdx.Scaffold.ConfigValue("大エリア名"))
+          .Set("dynamic", new Sdx.Scaffold.ConfigValue("@large_area.name"))
+          .Set("style", new Sdx.Scaffold.ConfigValue("width: 100px;"))
         )
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("dynamic", "@large_area.#GetCode")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("dynamic", new Sdx.Scaffold.ConfigValue("@large_area.#GetCode"))
         );
 
       using (var conn = db.Adapter.CreateConnection())
@@ -603,10 +603,10 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("label", "エリア編集")
-          .Set("html", "<a href=\"/path/to/area/list?large_area_id={id}\">{name}</a>")
-          .Set("style", "width: 100px;")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("label", new Sdx.Scaffold.ConfigValue("エリア編集"))
+          .Set("html", new Sdx.Scaffold.ConfigValue("<a href=\"/path/to/area/list?large_area_id={id}\">{name}</a>"))
+          .Set("style", new Sdx.Scaffold.ConfigValue("width: 100px;"))
         );
 
       using (var conn = db.Adapter.CreateConnection())
@@ -639,18 +639,18 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("label", "名前")
-          .Set("column", "name")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("label", new Sdx.Scaffold.ConfigValue("名前"))
+          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
         )
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("label", "場所")
-          .Set("column", "area_id")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("label", new Sdx.Scaffold.ConfigValue("場所"))
+          .Set("column", new Sdx.Scaffold.ConfigValue("area_id"))
         )
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("label", "業種")
-          .Set("relation", "shop_category")
-          .Set("column", "category_id")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("label", new Sdx.Scaffold.ConfigValue("業種"))
+          .Set("relation", new Sdx.Scaffold.ConfigValue("shop_category"))
+          .Set("column", new Sdx.Scaffold.ConfigValue("category_id"))
         );
 
       var query = new NameValueCollection();
@@ -678,7 +678,7 @@ namespace UnitTest
           scaffold.Save(record, post, conn);
           conn.Commit();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
           conn.Rollback();
           throw e;
@@ -689,7 +689,7 @@ namespace UnitTest
         var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
         Assert.Equal("foobar", savedRecord.GetString("name"));
         Assert.Equal("1", savedRecord.GetString("area_id"));
-        
+
         var shopCategories = savedRecord.GetRecordSet("shop_category", conn, select => select.AddOrder("category_id", Sdx.Db.Sql.Order.ASC));
         Assert.Equal(2, shopCategories.Count);
         Assert.Equal("1", shopCategories[0].GetString("category_id"));
@@ -749,10 +749,10 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("label", "名前とコード")
-          .Set("column", "name_with_code")
-          .Set("setter", "SetNameWithCode")//カンマ区切りの[名前,コード]をそれぞれnameとcodeにセットする。
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("label", new Sdx.Scaffold.ConfigValue("名前とコード"))
+          .Set("column", new Sdx.Scaffold.ConfigValue("name_with_code"))
+          .Set("setter", new Sdx.Scaffold.ConfigValue("SetNameWithCode"))//カンマ区切りの[名前,コード]をそれぞれnameとcodeにセットする。
         )
         ;
 
@@ -789,38 +789,77 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestSwapRecordGetterMethod()
+    public void TestSwapRecordAccessorUsingMethodInfo()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunSwapRecordGetterMethod(db);
+        RunSwapRecordAccessorUsingMethodInfo(db);
         ExecSql(db);
       }
     }
 
-    private void RunSwapRecordGetterMethod(TestDb db)
+    private void RunSwapRecordAccessorUsingMethodInfo(TestDb db)
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("label", "名前とコード")
-          .Set("column", "name_with_code")
-          .Set("getter", "GetNameWithCode")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("label", new Sdx.Scaffold.ConfigValue("名前とコード"))
+          .Set("column", new Sdx.Scaffold.ConfigValue("name_with_code"))
+          .Set("getter", new Sdx.Scaffold.ConfigValue(typeof(Test.Orm.Area).GetMethod("GetNameWithCode")))
+          .Set("setter", new Sdx.Scaffold.ConfigValue(typeof(Test.Orm.Area).GetMethod("SetNameWithCode")))
         )
         ;
 
-      var query = new NameValueCollection();
-      query.Add("id", "1");
-
-      using (var conn = scaffold.Db.CreateConnection())
+      ((Action)(() =>
       {
-        conn.Open();
+        var query = new NameValueCollection();
+        var post = new NameValueCollection();
+        post.Set("name_with_code", "名前,methodInfo");
 
-        var record = scaffold.LoadRecord(query, conn);
-        var form = scaffold.BuildForm(record, conn);
+        string savedId;
+        using (var conn = scaffold.Db.CreateConnection())
+        {
+          conn.Open();
 
-        Assert.Equal("新宿,sinjuku", form["name_with_code"].Value.First());
-      }
+          var record = scaffold.LoadRecord(query, conn);
+          var form = scaffold.BuildForm(record, conn);
+
+          conn.BeginTransaction();
+          try
+          {
+            scaffold.Save(record, post, conn);
+            conn.Commit();
+          }
+          catch (Exception e)
+          {
+            conn.Rollback();
+            throw e;
+          }
+
+          //確認する
+          savedId = record.GetString("id");
+          var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Area(), savedId);
+          Assert.Equal("名前", savedRecord.GetString("name"));
+          Assert.Equal("methodInfo", savedRecord.GetString("code"));
+        }
+      }))();
+
+
+      ((Action)(() =>
+      {
+        var query = new NameValueCollection();
+        query.Add("id", "1");
+
+        using (var conn = scaffold.Db.CreateConnection())
+        {
+          conn.Open();
+
+          var record = scaffold.LoadRecord(query, conn);
+          var form = scaffold.BuildForm(record, conn);
+
+          Assert.Equal("新宿,sinjuku", form["name_with_code"].Value.First());
+        }
+      }))();
     }
   }
 }

@@ -16,10 +16,10 @@ namespace Test.Scaffold
       scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/shop/list.aspx");
 
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.Params.Create()
-          .Set("column", "name")
-        ).Add(Sdx.Scaffold.Params.Create()
-          .Set("column", "code")
+        .Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
+        ).Add(Sdx.Scaffold.ConfigItem.Create()
+          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
         );
 
       return scaffold;

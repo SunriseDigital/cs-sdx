@@ -44,8 +44,8 @@ namespace Sdx.Scaffold
 
       Db = db;
 
-      DisplayList = new ParamsList();
-      FormList = new ParamsList();
+      DisplayList = new ConfigList();
+      FormList = new ConfigList();
     }
 
     internal Db.TableMeta TableMeta { get; set; }
@@ -61,19 +61,19 @@ namespace Sdx.Scaffold
 
     public string Title { get; set; }
 
-    public ParamsList FormList { get; private set; }
+    public ConfigList FormList { get; private set; }
 
-    public ParamsList DisplayList { get; private set; }
+    public ConfigList DisplayList { get; private set; }
 
     public Html.Form BuildForm(Db.Record record, Db.Connection conn)
     {
       var form = new Html.Form();
 
-      var hasGetters = new List<Params>();
-      foreach (var param in FormList)
+      var hasGetters = new List<ConfigItem>();
+      foreach (var config in FormList)
       {
         Html.FormElement elem;
-        var methodName = "Create" + Sdx.Util.String.ToCamelCase(param["column"]) + "Element";
+        var methodName = "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Element";
         var method = TableMeta.TableType.GetMethod(methodName);
         if (method != null)
         {
@@ -94,7 +94,7 @@ namespace Sdx.Scaffold
         else
         {
           //主キーはhidden
-          if (TableMeta.Pkeys.Exists((column) => column == param["column"]))
+          if (TableMeta.Pkeys.Exists((column) => column == config["column"].Value))
           {
             elem = new Sdx.Html.InputHidden();
           }
@@ -103,29 +103,31 @@ namespace Sdx.Scaffold
             elem = new Sdx.Html.InputText();
           }
           
-          elem.Name = param["column"];
+          elem.Name = config["column"].Value;
         }
 
-        if(!param.ContainsKey("label"))
+        if(!config.ContainsKey("label"))
         {
           throw new InvalidOperationException("Missing label param");
         }
 
-        elem.Label = param["label"];
+        elem.Label = config["label"].Value;
 
         form.SetElement(elem);
 
-        if(param.ContainsKey("getter"))
+        if(config.ContainsKey("getter"))
         {
-          hasGetters.Add(param);
+          hasGetters.Add(config);
         }
       }
 
       var binds = record.ToNameValueCollection();
 
-      hasGetters.ForEach(param => {
-        var method = record.GetType().GetMethods().First(m => m.Name == param["getter"] && !m.IsStatic && m.GetParameters().Count() == 0);
-        binds.Set(param["column"],(string) method.Invoke(record, null));
+      hasGetters.ForEach(config => {
+        binds.Set(
+          config["column"].Value,
+          (string)config["getter"].Invoke(record, null, m => !m.IsStatic && m.GetParameters().Count() == 0)
+        );
       });
 
       form.Bind(binds);
@@ -234,22 +236,25 @@ namespace Sdx.Scaffold
 
     public void Save(Sdx.Db.Record record, NameValueCollection form, Sdx.Db.Connection conn)
     {
-      var relationList = new ParamsList();
+      var relationList = new ConfigList();
       var ownValues = new NameValueCollection();
-      foreach (var param in FormList)
+      foreach (var config in FormList)
       {
-        if(param.ContainsKey("relation"))
+        if(config.ContainsKey("relation"))
         {
-          relationList.Add(param);
+          relationList.Add(config);
         }
-        else if(param.ContainsKey("setter"))
+        else if(config.ContainsKey("setter"))
         {
-          var method = record.GetType().GetMethods().First(m => m.Name == param["setter"] && !m.IsStatic && m.GetParameters().Count() == 1);
-          method.Invoke(record, new object[] { form[param["column"]] });
+          config["setter"].Invoke(
+            record,
+            new object[] { form[config["column"].Value] },
+            m => !m.IsStatic && m.GetParameters().Count() == 1
+          );
         }
         else
         {
-          var columnName = param["column"];
+          var columnName = config["column"].Value;
           ownValues.Set(columnName, form[columnName]);
         }
       }
@@ -259,16 +264,16 @@ namespace Sdx.Scaffold
 
       foreach (var param in relationList)
       {
-        var rel = TableMeta.Relations[param["relation"]];
-        var currentRecords = record.GetRecordSet(param["relation"], conn);
-        foreach (var refId in form.GetValues(param["column"]))
+        var rel = TableMeta.Relations[param["relation"].Value];
+        var currentRecords = record.GetRecordSet(param["relation"].Value, conn);
+        foreach (var refId in form.GetValues(param["column"].Value))
         {
-          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"]) == refId);
+          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"].Value) == refId);
           if(cRecord == null)
           {
             var relRecord = rel.TableMeta.CreateRecord();
             relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
-            relRecord.SetValue(param["column"], refId);
+            relRecord.SetValue(param["column"].Value, refId);
             conn.Save(relRecord);
           }
         }
