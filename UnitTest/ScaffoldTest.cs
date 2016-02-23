@@ -71,8 +71,8 @@ namespace UnitTest
           foreach (var param in scaffold.DisplayList)
           {
             Assert.Equal(
-              eRecord.GetString(param["column"].String),
-              aRecord.GetString(param["column"].String)
+              eRecord.GetString(param["column"].ToString()),
+              aRecord.GetString(param["column"].ToString())
             );
           }
         }

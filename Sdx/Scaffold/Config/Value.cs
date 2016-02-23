@@ -48,14 +48,6 @@ namespace Sdx.Scaffold.Config
       }
     }
 
-    public string String
-    {
-      get
-      {
-        return this.value.ToString();
-      }
-    }
-
     public override string ToString()
     {
       return value.ToString();

@@ -109,7 +109,7 @@ namespace Sdx.Scaffold.Config
     {
       var replaced = new Dictionary<string, bool>();
 
-      var html = Get("html").String;
+      var html = Get("html").ToString();
       var match = htmlRegex.Match(html);
 
       while(match.Success)
@@ -131,12 +131,12 @@ namespace Sdx.Scaffold.Config
 
     private string BuildDynamic(Db.Record record, Db.Connection conn)
     {
-      return record.Get<string>(Get("dynamic").String, conn);
+      return record.Get<string>(Get("dynamic").ToString(), conn);
     }
 
     private string BuildColumn(Db.Record record)
     {
-      return record.GetString(Get("column").String);
+      return record.GetString(Get("column").ToString());
     }
   }
 }

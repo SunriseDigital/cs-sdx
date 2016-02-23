@@ -94,7 +94,7 @@ namespace Sdx.Scaffold
         else
         {
           //主キーはhidden
-          if (TableMeta.Pkeys.Exists((column) => column == config["column"].String))
+          if (TableMeta.Pkeys.Exists((column) => column == config["column"].ToString()))
           {
             elem = new Sdx.Html.InputHidden();
           }
@@ -103,7 +103,7 @@ namespace Sdx.Scaffold
             elem = new Sdx.Html.InputText();
           }
 
-          elem.Name = config["column"].String;
+          elem.Name = config["column"].ToString();
         }
 
         if(!config.ContainsKey("label"))
@@ -111,7 +111,7 @@ namespace Sdx.Scaffold
           throw new InvalidOperationException("Missing label param");
         }
 
-        elem.Label = config["label"].String;
+        elem.Label = config["label"].ToString();
 
         form.SetElement(elem);
 
@@ -125,7 +125,7 @@ namespace Sdx.Scaffold
 
       hasGetters.ForEach(config => {
         binds.Set(
-          config["column"].String,
+          config["column"].ToString(),
           (string)config["getter"].Invoke(record, null, m => !m.IsStatic && m.GetParameters().Count() == 0)
         );
       });
@@ -248,13 +248,13 @@ namespace Sdx.Scaffold
         {
           config["setter"].Invoke(
             record,
-            new object[] { form[config["column"].String] },
+            new object[] { form[config["column"].ToString()] },
             m => !m.IsStatic && m.GetParameters().Count() == 1
           );
         }
         else
         {
-          var columnName = config["column"].String;
+          var columnName = config["column"].ToString();
           ownValues.Set(columnName, form[columnName]);
         }
       }
@@ -264,16 +264,16 @@ namespace Sdx.Scaffold
 
       foreach (var param in relationList)
       {
-        var rel = TableMeta.Relations[param["relation"].String];
-        var currentRecords = record.GetRecordSet(param["relation"].String, conn);
-        foreach (var refId in form.GetValues(param["column"].String))
+        var rel = TableMeta.Relations[param["relation"].ToString()];
+        var currentRecords = record.GetRecordSet(param["relation"].ToString(), conn);
+        foreach (var refId in form.GetValues(param["column"].ToString()))
         {
-          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"].String) == refId);
+          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"].ToString()) == refId);
           if(cRecord == null)
           {
             var relRecord = rel.TableMeta.CreateRecord();
             relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
-            relRecord.SetValue(param["column"].String, refId);
+            relRecord.SetValue(param["column"].ToString(), refId);
             conn.Save(relRecord);
           }
         }
