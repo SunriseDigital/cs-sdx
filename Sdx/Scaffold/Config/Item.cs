@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Sdx.Scaffold.Config
 {
-  public class Item : IEnumerable<KeyValuePair<string, string>>
+  public class Item : IEnumerable<KeyValuePair<string, Value>>
   {
     public enum Type
     {
@@ -74,14 +74,14 @@ namespace Sdx.Scaffold.Config
       return this.vars[key];
     }
 
-    public IEnumerator<KeyValuePair<string, string>> GetEnumerator()
+    public IEnumerator<KeyValuePair<string, Value>> GetEnumerator()
     {
-      return ((IEnumerable<KeyValuePair<string, string>>)vars).GetEnumerator();
+      return ((IEnumerable<KeyValuePair<string, Value>>)vars).GetEnumerator();
     }
 
     IEnumerator IEnumerable.GetEnumerator()
     {
-      return ((IEnumerable<KeyValuePair<string, string>>)vars).GetEnumerator();
+      return ((IEnumerable<KeyValuePair<string, Value>>)vars).GetEnumerator();
     }
 
 

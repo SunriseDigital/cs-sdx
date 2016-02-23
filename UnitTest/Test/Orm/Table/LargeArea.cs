@@ -36,5 +36,13 @@ namespace Test.Orm.Table
         typeof(Test.Orm.Table.LargeArea)
       );
     }
+
+    public static Sdx.Html.FormElement CreateIdElementForScaffold()
+    {
+      var elem = new Sdx.Html.TextArea();
+      elem.Name = "id";
+      elem.Tag.Attr["data-type"] = "scaffold";
+      return elem;
+    }
   }
 }

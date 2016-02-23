@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Web;
 
@@ -73,8 +74,24 @@ namespace Sdx.Scaffold
       foreach (var config in FormList)
       {
         Html.FormElement elem;
-        var methodName = "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Element";
-        var method = TableMeta.TableType.GetMethod(methodName);
+
+        MethodInfo method = null;
+        if(config.ContainsKey("factory"))
+        {
+          method = config["factory"].GetMethodInfo(TableMeta.TableType);
+          if(method == null)
+          {
+            throw new NotImplementedException("Missing " + config["factory"] + " method in " + TableMeta.TableType);
+          }
+        }
+        else
+        {
+          method = TableMeta.TableType.GetMethod(
+            "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Element"  
+          );
+        }
+        
+        
         if (method != null)
         {
           var paramsCount = method.GetParameters().Count();
@@ -102,9 +119,9 @@ namespace Sdx.Scaffold
           {
             elem = new Sdx.Html.InputText();
           }
-
-          elem.Name = config["column"].ToString();
         }
+
+        elem.Name = config["column"].ToString();
 
         if(!config.ContainsKey("label"))
         {

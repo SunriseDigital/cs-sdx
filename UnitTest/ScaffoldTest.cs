@@ -861,5 +861,50 @@ namespace UnitTest
         }
       }))();
     }
+
+    [Fact]
+    public void TestSwapFormElementCreator()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSwapFormElementCreator(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSwapFormElementCreator(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("id"))
+          .Set("label", new Sdx.Scaffold.Config.Value("ID"))
+          .Set("factory", new Sdx.Scaffold.Config.Value("CreateIdElementForScaffold"))
+        )
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("id2"))
+          .Set("label", new Sdx.Scaffold.Config.Value("ID2"))
+          .Set("factory", new Sdx.Scaffold.Config.Value(typeof(Test.Orm.Table.LargeArea).GetMethods().First(
+            m => m.Name == "CreateIdElementForScaffold" && m.IsStatic
+          )))
+        )
+          ;
+        ;
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        var record = scaffold.LoadRecord(new NameValueCollection(), conn);
+        var form = scaffold.BuildForm(record, conn);
+        Assert.IsType<Sdx.Html.TextArea>(form["id"]);
+        Assert.Equal("ID", form["id"].Label);
+        Assert.Equal("id", form["id"].Tag.Attr["name"]);
+        Assert.Equal("scaffold", form["id"].Tag.Attr["data-type"]);
+
+        Assert.IsType<Sdx.Html.TextArea>(form["id2"]);
+        Assert.Equal("ID2", form["id2"].Label);
+        Assert.Equal("id2", form["id2"].Tag.Attr["name"]);
+        Assert.Equal("scaffold", form["id2"].Tag.Attr["data-type"]);
+      }
+    }
   }
 }

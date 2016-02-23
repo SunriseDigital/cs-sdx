@@ -36,7 +36,7 @@ namespace Sdx.Scaffold.Config
       value = methodInfo;
     }
 
-    public string Invoke(object target, object[] args, Func<MethodInfo, bool> additinalCondition)
+    internal string Invoke(object target, object[] args, Func<MethodInfo, bool> additinalCondition)
     {
       if(value is MethodInfo)
       {
@@ -51,6 +51,18 @@ namespace Sdx.Scaffold.Config
     public override string ToString()
     {
       return value.ToString();
+    }
+
+    internal MethodInfo GetMethodInfo(Type type)
+    {
+      if (value is MethodInfo)
+      {
+        return (MethodInfo)value;
+      }
+      else
+      {
+        return type.GetMethod(value.ToString());
+      }
     }
   }
 }
