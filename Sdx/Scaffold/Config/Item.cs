@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Sdx.Scaffold
+namespace Sdx.Scaffold.Config
 {
-  public class ConfigItem : IEnumerable<KeyValuePair<string, string>>
+  public class Item : IEnumerable<KeyValuePair<string, string>>
   {
     public enum Type
     {
@@ -18,18 +18,21 @@ namespace Sdx.Scaffold
 
     private Type? type;
     
-    public static ConfigItem Create()
+    public static Item Create()
     {
-      return new ConfigItem();
+      return new Item();
     }
 
-    private Dictionary<string, ConfigValue> vars = new Dictionary<string, ConfigValue>();
+    private Dictionary<string, Value> vars = new Dictionary<string, Value>();
 
     private static Regex htmlRegex = new Regex(@"\{([^}]+)\}");
 
     public bool StrictCheck = true;
 
-    public ConfigValue this[string key]
+    //こいつをつけないとコンパイルできない。
+    //http://tyheeeee.hateblo.jp/entry/2014/01/25/C%23%E3%81%AB%E3%81%8A%E3%81%91%E3%82%8BIndexer%E8%A9%B3%E8%AA%AC%EF%BC%88%E3%83%9D%E3%83%AD%E3%83%AA%E3%82%82%E3%81%82%E3%82%8B%E3%82%88%EF%BC%81%EF%BC%89
+    [System.Runtime.CompilerServices.IndexerName("ItemIndexer")]
+    public Value this[string key]
     {
       set
       {
@@ -60,13 +63,13 @@ namespace Sdx.Scaffold
       return this.vars.ContainsKey(key);
     }
 
-    public ConfigItem Set(string key, ConfigValue value)
+    public Item Set(string key, Value value)
     {
       this[key] = value;
       return this;
     }
 
-    public ConfigValue Get(string key)
+    public Value Get(string key)
     {
       return this.vars[key];
     }
@@ -106,7 +109,7 @@ namespace Sdx.Scaffold
     {
       var replaced = new Dictionary<string, bool>();
 
-      var html = Get("html").Value;
+      var html = Get("html").String;
       var match = htmlRegex.Match(html);
 
       while(match.Success)
@@ -128,12 +131,12 @@ namespace Sdx.Scaffold
 
     private string BuildDynamic(Db.Record record, Db.Connection conn)
     {
-      return record.Get<string>(Get("dynamic").Value, conn);
+      return record.Get<string>(Get("dynamic").String, conn);
     }
 
     private string BuildColumn(Db.Record record)
     {
-      return record.GetString(Get("column").Value);
+      return record.GetString(Get("column").String);
     }
   }
 }

@@ -16,23 +16,23 @@ namespace Test.Scaffold
       scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/large-area/list.aspx");
 
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("name"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
         );
 
 
       scaffold.FormList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("id"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("ID"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("名称"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("コード"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("id"))
+          .Set("label", new Sdx.Scaffold.Config.Value("ID"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("name"))
+          .Set("label", new Sdx.Scaffold.Config.Value("名称"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
+          .Set("label", new Sdx.Scaffold.Config.Value("コード"))
         );
 
 

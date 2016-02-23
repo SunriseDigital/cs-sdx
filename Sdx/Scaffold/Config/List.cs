@@ -4,18 +4,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sdx.Scaffold
+namespace Sdx.Scaffold.Config
 {
-  public class ConfigList : IEnumerable<ConfigItem>
+  public class List : IEnumerable<Item>
   {
-    public static ConfigList Create()
+    public static List Create()
     {
-      return new ConfigList();
+      return new List();
     }
 
-    private List<ConfigItem> list = new List<ConfigItem>();
+    private List<Item> list = new List<Item>();
 
-    public ConfigItem this[int index]
+    public Item this[int index]
     {
       get
       {
@@ -23,13 +23,13 @@ namespace Sdx.Scaffold
       }
     }
 
-    public ConfigList Add(ConfigItem param)
+    public List Add(Item param)
     {
       this.list.Add(param);
       return this;
     }
 
-    public IEnumerator<ConfigItem> GetEnumerator()
+    public IEnumerator<Item> GetEnumerator()
     {
       return this.list.GetEnumerator();
     }

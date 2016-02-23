@@ -44,8 +44,8 @@ namespace Sdx.Scaffold
 
       Db = db;
 
-      DisplayList = new ConfigList();
-      FormList = new ConfigList();
+      DisplayList = new Config.List();
+      FormList = new Config.List();
     }
 
     internal Db.TableMeta TableMeta { get; set; }
@@ -61,15 +61,15 @@ namespace Sdx.Scaffold
 
     public string Title { get; set; }
 
-    public ConfigList FormList { get; private set; }
+    public Config.List FormList { get; private set; }
 
-    public ConfigList DisplayList { get; private set; }
+    public Config.List DisplayList { get; private set; }
 
     public Html.Form BuildForm(Db.Record record, Db.Connection conn)
     {
       var form = new Html.Form();
 
-      var hasGetters = new List<ConfigItem>();
+      var hasGetters = new List<Config.Item>();
       foreach (var config in FormList)
       {
         Html.FormElement elem;
@@ -94,7 +94,7 @@ namespace Sdx.Scaffold
         else
         {
           //主キーはhidden
-          if (TableMeta.Pkeys.Exists((column) => column == config["column"].Value))
+          if (TableMeta.Pkeys.Exists((column) => column == config["column"].String))
           {
             elem = new Sdx.Html.InputHidden();
           }
@@ -102,8 +102,8 @@ namespace Sdx.Scaffold
           {
             elem = new Sdx.Html.InputText();
           }
-          
-          elem.Name = config["column"].Value;
+
+          elem.Name = config["column"].String;
         }
 
         if(!config.ContainsKey("label"))
@@ -111,7 +111,7 @@ namespace Sdx.Scaffold
           throw new InvalidOperationException("Missing label param");
         }
 
-        elem.Label = config["label"].Value;
+        elem.Label = config["label"].String;
 
         form.SetElement(elem);
 
@@ -125,7 +125,7 @@ namespace Sdx.Scaffold
 
       hasGetters.ForEach(config => {
         binds.Set(
-          config["column"].Value,
+          config["column"].String,
           (string)config["getter"].Invoke(record, null, m => !m.IsStatic && m.GetParameters().Count() == 0)
         );
       });
@@ -236,7 +236,7 @@ namespace Sdx.Scaffold
 
     public void Save(Sdx.Db.Record record, NameValueCollection form, Sdx.Db.Connection conn)
     {
-      var relationList = new ConfigList();
+      var relationList = new Config.List();
       var ownValues = new NameValueCollection();
       foreach (var config in FormList)
       {
@@ -248,13 +248,13 @@ namespace Sdx.Scaffold
         {
           config["setter"].Invoke(
             record,
-            new object[] { form[config["column"].Value] },
+            new object[] { form[config["column"].String] },
             m => !m.IsStatic && m.GetParameters().Count() == 1
           );
         }
         else
         {
-          var columnName = config["column"].Value;
+          var columnName = config["column"].String;
           ownValues.Set(columnName, form[columnName]);
         }
       }
@@ -264,16 +264,16 @@ namespace Sdx.Scaffold
 
       foreach (var param in relationList)
       {
-        var rel = TableMeta.Relations[param["relation"].Value];
-        var currentRecords = record.GetRecordSet(param["relation"].Value, conn);
-        foreach (var refId in form.GetValues(param["column"].Value))
+        var rel = TableMeta.Relations[param["relation"].String];
+        var currentRecords = record.GetRecordSet(param["relation"].String, conn);
+        foreach (var refId in form.GetValues(param["column"].String))
         {
-          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"].Value) == refId);
+          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"].String) == refId);
           if(cRecord == null)
           {
             var relRecord = rel.TableMeta.CreateRecord();
             relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
-            relRecord.SetValue(param["column"].Value, refId);
+            relRecord.SetValue(param["column"].String, refId);
             conn.Save(relRecord);
           }
         }
