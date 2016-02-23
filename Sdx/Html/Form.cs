@@ -54,6 +54,7 @@ namespace Sdx.Html
             else
             {
               var vals = values.GetValues(name);
+              Sdx.Context.Current.Debug.Log(vals);
               if (vals.Length > 1)
               {
                 throw new InvalidOperationException(name + "element must have single value.");

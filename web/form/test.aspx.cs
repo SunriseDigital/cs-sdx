@@ -122,6 +122,16 @@ public partial class form_test : System.Web.UI.Page
       ;
     form.SetElement(startDate);
 
+    //Secret
+    Sdx.Html.FormElement secret = new Sdx.Html.InputText();
+    secret.Name = "secret";
+    secret.IsSecret = true;
+    secret
+      .AddValidator(new Sdx.Validation.NotEmpty())
+      .AddValidator(new Sdx.Validation.StringLength(min: 5));
+    form.SetElement(secret);
+    secret.Bind("CurrentValue");
+
     if(Request.Form.Count > 0)
     {
       form.Bind(Request.Form);

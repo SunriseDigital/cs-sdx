@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Sdx.Html
 {
-  public class FormValue: IEnumerable<string>
+  public class FormValue : IEnumerable<string>, ICloneable
   {
     private string[] values;
 
@@ -83,6 +83,11 @@ namespace Sdx.Html
       {
         return this.values.Length;
       }
+    }
+
+    public object Clone()
+    {
+      return this.MemberwiseClone();
     }
   }
 }

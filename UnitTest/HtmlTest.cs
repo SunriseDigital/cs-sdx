@@ -705,6 +705,53 @@ English
       Assert.Equal(1, input.Errors.Count);
     }
 
+    [Fact]
+    public void TestIsSecret()
+    {
+      ((Action)(() =>
+      {
+        var input = new Sdx.Html.InputText("secret");
+        input.AddValidator(new Sdx.Validation.NotEmpty());
+        input.IsSecret = true;
+
+        input.Bind("");
+
+        Assert.Equal("<input type=\"text\" name=\"secret\">", input.Tag.Render());
+        Assert.True(input.Value.IsEmpty);
+
+        //ここからサブミットされたときの挙動
+        input.Bind("");
+        Assert.Equal("<input type=\"text\" name=\"secret\">", input.Tag.Render());
+        //最初のBindが空だったら新規登録なので2度目のバリデータは動かす
+        Assert.False(input.ExecValidators());
+      }))();
+
+      ((Action)(() => 
+      {
+        var input = new Sdx.Html.InputText("secret");
+        input
+          .AddValidator(new Sdx.Validation.NotEmpty())
+          .AddValidator(new Sdx.Validation.StringLength(min: 5));
+        input.IsSecret = true;
+
+        input.Bind("100");
+
+        //BindしてもvalueにはRenderされません
+        Assert.Equal("<input type=\"text\" name=\"secret\">", input.Tag.Render());
+
+        //ここからサブミットされたときの挙動
+        input.Bind("");
+        Assert.Equal("<input type=\"text\" name=\"secret\" value=\"\">", input.Tag.Render());
+        //必須項目でも2度目で空は未編集とみなし、テストを通す。
+        Assert.True(input.ExecValidators());
+
+        input.Bind("1234");
+        Assert.Equal("<input type=\"text\" name=\"secret\" value=\"1234\">", input.Tag.Render());
+        //一度目が空ではなく、2度目も空じゃないときはバリデータを動かす
+        Assert.False(input.ExecValidators());
+      }))();
+    }
+
     //[Fact]
     //public void TestMock()
     //{
