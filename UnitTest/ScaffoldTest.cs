@@ -47,10 +47,10 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("name"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
         );
 
       // build expected record set
@@ -71,8 +71,8 @@ namespace UnitTest
           foreach (var param in scaffold.DisplayList)
           {
             Assert.Equal(
-              eRecord.GetString(param["column"].Value),
-              aRecord.GetString(param["column"].Value)
+              eRecord.GetString(param["column"].ToString()),
+              aRecord.GetString(param["column"].ToString())
             );
           }
         }
@@ -94,15 +94,15 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("id"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("ID"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("名称"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("コード"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("id"))
+          .Set("label", new Sdx.Scaffold.Config.Value("ID"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("name"))
+          .Set("label", new Sdx.Scaffold.Config.Value("名称"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
+          .Set("label", new Sdx.Scaffold.Config.Value("コード"))
         );
 
       //formの生成にレコードが必要なので接続を生成します。
@@ -569,13 +569,13 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("label", new Sdx.Scaffold.ConfigValue("大エリア名"))
-          .Set("dynamic", new Sdx.Scaffold.ConfigValue("@large_area.name"))
-          .Set("style", new Sdx.Scaffold.ConfigValue("width: 100px;"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("大エリア名"))
+          .Set("dynamic", new Sdx.Scaffold.Config.Value("@large_area.name"))
+          .Set("style", new Sdx.Scaffold.Config.Value("width: 100px;"))
         )
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("dynamic", new Sdx.Scaffold.ConfigValue("@large_area.#GetCode"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("dynamic", new Sdx.Scaffold.Config.Value("@large_area.#GetCode"))
         );
 
       using (var conn = db.Adapter.CreateConnection())
@@ -603,10 +603,10 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("label", new Sdx.Scaffold.ConfigValue("エリア編集"))
-          .Set("html", new Sdx.Scaffold.ConfigValue("<a href=\"/path/to/area/list?large_area_id={id}\">{name}</a>"))
-          .Set("style", new Sdx.Scaffold.ConfigValue("width: 100px;"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("エリア編集"))
+          .Set("html", new Sdx.Scaffold.Config.Value("<a href=\"/path/to/area/list?large_area_id={id}\">{name}</a>"))
+          .Set("style", new Sdx.Scaffold.Config.Value("width: 100px;"))
         );
 
       using (var conn = db.Adapter.CreateConnection())
@@ -639,18 +639,18 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("label", new Sdx.Scaffold.ConfigValue("名前"))
-          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("名前"))
+          .Set("column", new Sdx.Scaffold.Config.Value("name"))
         )
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("label", new Sdx.Scaffold.ConfigValue("場所"))
-          .Set("column", new Sdx.Scaffold.ConfigValue("area_id"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("場所"))
+          .Set("column", new Sdx.Scaffold.Config.Value("area_id"))
         )
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("label", new Sdx.Scaffold.ConfigValue("業種"))
-          .Set("relation", new Sdx.Scaffold.ConfigValue("shop_category"))
-          .Set("column", new Sdx.Scaffold.ConfigValue("category_id"))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("業種"))
+          .Set("relation", new Sdx.Scaffold.Config.Value("shop_category"))
+          .Set("column", new Sdx.Scaffold.Config.Value("category_id"))
         );
 
       var query = new NameValueCollection();
@@ -749,10 +749,10 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("label", new Sdx.Scaffold.ConfigValue("名前とコード"))
-          .Set("column", new Sdx.Scaffold.ConfigValue("name_with_code"))
-          .Set("setter", new Sdx.Scaffold.ConfigValue("SetNameWithCode"))//カンマ区切りの[名前,コード]をそれぞれnameとcodeにセットする。
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
+          .Set("column", new Sdx.Scaffold.Config.Value("name_with_code"))
+          .Set("setter", new Sdx.Scaffold.Config.Value("SetNameWithCode"))//カンマ区切りの[名前,コード]をそれぞれnameとcodeにセットする。
         )
         ;
 
@@ -802,11 +802,11 @@ namespace UnitTest
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("label", new Sdx.Scaffold.ConfigValue("名前とコード"))
-          .Set("column", new Sdx.Scaffold.ConfigValue("name_with_code"))
-          .Set("getter", new Sdx.Scaffold.ConfigValue(typeof(Test.Orm.Area).GetMethod("GetNameWithCode")))
-          .Set("setter", new Sdx.Scaffold.ConfigValue(typeof(Test.Orm.Area).GetMethod("SetNameWithCode")))
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
+          .Set("column", new Sdx.Scaffold.Config.Value("name_with_code"))
+          .Set("getter", new Sdx.Scaffold.Config.Value(typeof(Test.Orm.Area).GetMethod("GetNameWithCode")))
+          .Set("setter", new Sdx.Scaffold.Config.Value(typeof(Test.Orm.Area).GetMethod("SetNameWithCode")))
         )
         ;
 

@@ -91,12 +91,12 @@
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
     <Compile Include="Html\InputPassword.cs" />
-    <Compile Include="Scaffold\ConfigValue.cs" />
+    <Compile Include="Scaffold\Config\Value.cs" />
     <Compile Include="Scaffold\Group\Base.cs" />
     <Compile Include="Scaffold\Group\StaticClass.cs" />
     <Compile Include="Scaffold\Group\TableMeta.cs" />
-    <Compile Include="Scaffold\ConfigItem.cs" />
-    <Compile Include="Scaffold\ConfigList.cs" />
+    <Compile Include="Scaffold\Config\Item.cs" />
+    <Compile Include="Scaffold\Config\List.cs" />
     <Compile Include="Validation\DateTimeSpan.cs" />
     <Compile Include="Validation\DateSpan.cs" />
     <Compile Include="Validation\Email.cs" />

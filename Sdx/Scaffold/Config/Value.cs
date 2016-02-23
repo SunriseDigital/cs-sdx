@@ -4,13 +4,13 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace Sdx.Scaffold
+namespace Sdx.Scaffold.Config
 {
-  public class ConfigValue
+  public class Value
   {
     private object value;
 
-    public ConfigValue(string value)
+    public Value(string value)
     {
       var tmp = value.ToLower();
       if(tmp == "on" || tmp == "true")
@@ -27,7 +27,7 @@ namespace Sdx.Scaffold
       }
     }
 
-    public ConfigValue(MethodInfo methodInfo)
+    public Value(MethodInfo methodInfo)
     {
       if(methodInfo == null)
       {
@@ -45,14 +45,6 @@ namespace Sdx.Scaffold
       else
       {
         return (string)target.GetType().GetMethods().Where(m => m.Name == value.ToString()).First(additinalCondition).Invoke(target, args);
-      }
-    }
-
-    public string Value
-    {
-      get
-      {
-        return this.value.ToString();
       }
     }
 

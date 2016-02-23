@@ -5,6 +5,7 @@ using System.Text;
 
 namespace Test.Scaffold
 {
+  using Config = Sdx.Scaffold.Config;
   public class Area
   {
     public static Sdx.Scaffold.Manager Create()
@@ -19,25 +20,25 @@ namespace Test.Scaffold
       scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, "name", "SelectDefaultOrder");
 
       scaffold.DisplayList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
+        .Add(Config.Item.Create()
+          .Set("column", new Config.Value("name"))
+        ).Add(Config.Item.Create()
+          .Set("column", new Config.Value("code"))
         );
 
       scaffold.FormList
-        .Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("id"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("ID"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("large_area_id"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("大エリア"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("name"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("名称"))
-        ).Add(Sdx.Scaffold.ConfigItem.Create()
-          .Set("column", new Sdx.Scaffold.ConfigValue("code"))
-          .Set("label", new Sdx.Scaffold.ConfigValue("コード"))
+        .Add(Config.Item.Create()
+          .Set("column", new Config.Value("id"))
+          .Set("label", new Config.Value("ID"))
+        ).Add(Config.Item.Create()
+          .Set("column", new Config.Value("large_area_id"))
+          .Set("label", new Config.Value("大エリア"))
+        ).Add(Config.Item.Create()
+          .Set("column", new Config.Value("name"))
+          .Set("label", new Config.Value("名称"))
+        ).Add(Config.Item.Create()
+          .Set("column", new Config.Value("code"))
+          .Set("label", new Config.Value("コード"))
         );
 
       return scaffold;
