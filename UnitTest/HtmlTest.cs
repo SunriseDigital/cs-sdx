@@ -752,6 +752,190 @@ English
       }))();
     }
 
+    [Fact]
+    public void TestFormToNameValueCollection()
+    {
+      var form = new Sdx.Html.Form();
+
+      //Text
+      var inputText = new Sdx.Html.InputText();
+      inputText.Name = "input_text";
+      inputText
+        .AddValidator(new Sdx.Validation.NotEmpty(), true)
+        .AddValidator(new Sdx.Validation.Email());
+      form.SetElement(inputText);
+
+      var inputNumber = new Sdx.Html.InputText();
+      inputNumber.Name = "input_number";
+      inputNumber
+        .AddValidator(new Sdx.Validation.NotEmpty(), true)
+        .AddValidator(new Sdx.Validation.GreaterThan(100))
+        .AddValidator(new Sdx.Validation.LessThan(200));
+      form.SetElement(inputNumber);
+
+      //Select
+      var select = new Sdx.Html.Select();
+      select.Name = "select";
+      select.AddValidator(new Sdx.Validation.NotEmpty());
+      form.SetElement(select);
+
+      Sdx.Html.Option option;
+
+      option = new Sdx.Html.Option();
+      option.Text = "Select this !!";
+      option.Tag.Attr["value"] = "";
+      select.AddOption(option);
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "10";
+      option.Text = "foo";
+      select.AddOption(option, "group1");
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "12";
+      option.Text = "bar";
+      select.AddOption(option, "group2");
+
+      //select multi
+      var multiSelect = new Sdx.Html.Select();
+      multiSelect.Name = "multi_select";
+      multiSelect.IsMultiple = true;
+      multiSelect.AddValidator(new Sdx.Validation.NotEmpty());
+      form.SetElement(multiSelect);
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "100";
+      option.Text = "選択肢１００";
+      multiSelect.AddOption(option);
+
+      option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = "101";
+      option.Text = "選択肢１０１";
+      multiSelect.AddOption(option);
+
+
+      //Checkbox
+      var checkList = new Sdx.Html.CheckableGroup();
+      checkList.Name = "check_list";
+      checkList.AddValidator(new Sdx.Validation.NotEmpty());
+      form.SetElement(checkList);
+
+      Sdx.Html.CheckBox checkbox;
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "20";
+      checkbox.Tag.Attr["id"] = "check_list_20";
+      checkList.AddCheckable(checkbox, "いち");
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "21";
+      checkbox.Tag.Attr["id"] = "check_list_21";
+      checkList.AddCheckable(checkbox, "にい");
+
+      checkbox = new Sdx.Html.CheckBox();
+      checkbox.Tag.Attr["value"] = "22";
+      checkbox.Tag.Attr["id"] = "check_list_22";
+      checkList.AddCheckable(checkbox, "さん");
+
+      //Radio
+      var radios = new Sdx.Html.CheckableGroup();
+      radios.Name = "radios";
+      radios.AddValidator(new Sdx.Validation.NotEmpty());
+      form.SetElement(radios);
+
+      Sdx.Html.Radio radio;
+
+      radio = new Sdx.Html.Radio();
+      radio.Tag.Attr["value"] = "30";
+      radio.Tag.Attr["id"] = "radios_30";
+      radios.AddCheckable(radio, "らじお　いち");
+
+      radio = new Sdx.Html.Radio();
+      radio.Tag.Attr["value"] = "31";
+      radio.Tag.Attr["id"] = "radios_31";
+      radios.AddCheckable(radio, "らじお　さん");
+
+      //TextArea
+      var textArea = new Sdx.Html.TextArea();
+      textArea.Name = "textarea";
+      textArea
+        .AddValidator(new Sdx.Validation.NotEmpty())
+        .AddValidator(new Sdx.Validation.StringLength(10, 30));
+      form.SetElement(textArea);
+
+      //date
+      var startDate = new Sdx.Html.InputDate("start_date");
+      startDate.IsAllowEmpty = true;
+      startDate
+        .AddValidator(new Sdx.Validation.DateSpan(new DateTime(2015, 10, 1), new DateTime(2015, 10, 31), "yyyy年M月d日"))
+        ;
+      form.SetElement(startDate);
+
+      //Secret
+      Sdx.Html.FormElement secret = new Sdx.Html.InputText();
+      secret.Name = "secret";
+      secret.IsSecret = true;
+      secret
+        .AddValidator(new Sdx.Validation.NotEmpty())
+        .AddValidator(new Sdx.Validation.StringLength(min: 5));
+      form.SetElement(secret);
+
+      var existingData = new NameValueCollection();
+      existingData.Add("input_text",   "");
+      existingData.Add("input_number", "");
+      existingData.Add("start_date ",  "");
+      existingData.Add("select",       "");
+      existingData.Add("multi_select", "");
+      existingData.Add("check_list",   "");
+      existingData.Add("radios",       "");
+      existingData.Add("textarea",     "");
+      existingData.Add("secret",       "OriginValue");
+
+      form.Bind(existingData);
+
+      var post = new NameValueCollection();
+      post.Add("input_text", "test@example.com");
+      post.Add("input_number","123");
+      post.Add("start_date", "2015-10-02");
+      post.Add("select", "10");
+      post.Add("multi_select", "100");
+      post.Add("multi_select", "101");
+      post.Add("check_list", "20");
+      post.Add("check_list", "21");
+      post.Add("radios", "31");
+      post.Add("textarea", "aaaaaaaaaaaaaaaaaa");
+      post.Add("secret", "");//secretは空の時更新をしない
+
+      //validate前
+      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+      {
+        var errorResult = form.ToNameValueCollection();
+      }));
+
+      Assert.IsType<InvalidOperationException>(ex);
+
+      form.Bind(post);
+      Assert.True(form.ExecValidators());
+
+      var result = form.ToNameValueCollection();
+
+      Assert.Equal("test@example.com", result["input_text"]);
+      Assert.Equal("123", result["input_number"]);
+      Assert.Equal("2015-10-02", result["start_date"]);
+      Assert.Equal("10", result["select"]);
+      Assert.Equal("100,101", result["multi_select"]);
+      Assert.Equal("20,21", result["check_list"]);
+      Assert.Equal("31", result["radios"]);
+      Assert.Equal("aaaaaaaaaaaaaaaaaa", result["textarea"]);
+      Assert.Null(result["secret"]);//secretは空の時更新をしない
+
+      //secret更新
+      post.Set("secret", "NewValue");
+      form.Bind(post);
+      result = form.ToNameValueCollection();
+      Assert.Equal("NewValue", result["secret"]);
+    }
+
     //[Fact]
     //public void TestMock()
     //{
