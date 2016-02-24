@@ -64,6 +64,14 @@
         <%= form["textarea"].Tag.Render(Attr.Create().AddClass("form-control").Set("rows", "12")) %>
         <%= form["textarea"].Errors.Html.Render("h5", "text-danger", "list-unstyled") %>
       </div>
+      <div class="form-group<%if (form["secret"].Errors.Count > 0){ %> has-error<%}; %>">
+        <label>秘密</label><%if(!form["secret"].IsAllowEmpty){ %> <span class="label label-danger">必須</span><%}; %>
+        <%= form["secret"].Tag.Render(Attr.Create().AddClass("form-control").Set("rows", "12")) %>
+        <%= form["secret"].Errors.Html.Render("h5", "text-danger", "list-unstyled") %>
+        <% if (form["secret"].IsSecret){ %>
+        <div>現在の値は表示されません。空で送信した場合更新されませんのでご注意ください。</div>
+        <%} %>
+      </div>
       <div class="form-group<%if (form["input_text"].Errors.Count > 0){ %> has-error<%}; %>">
         <input type="submit" name="submit" value="SAVE" >
       </div>

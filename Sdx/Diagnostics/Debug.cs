@@ -4,6 +4,7 @@ using System.Collections;
 using System.Diagnostics;
 using System.IO;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace Sdx.Diagnostics
 {
@@ -100,12 +101,27 @@ namespace Sdx.Diagnostics
       }
       else if (value is IEnumerable)
       {
-        var result = GetDumpTitle(value, indent);
+        var enume = (IEnumerable)value;
+        var count = 0;
+        foreach(var elem in enume)
+        {
+          ++count;
+        }
+        var result = GetDumpTitle(value, indent, "(" + count + ")");
         return AppendEnumerableDump(result, value as IEnumerable, indent);
       }
       else
       {
-        return GetDumpTitle(value, indent, " " + value.ToString()).TrimEnd('\r', '\n'); ;
+        var type = value.GetType();
+        if (type.Namespace + "." + type.Name == "System.Collections.Generic.KeyValuePair`2")
+        {
+          var dynamicValue = (dynamic)value;
+          return indent + dynamicValue.Key.ToString()+ " " + Dump(dynamicValue.Value, indent);
+        }
+        else
+        {
+          return GetDumpTitle(value, indent, " " + value.ToString()).TrimEnd('\r', '\n');
+        }
       }
     }
 

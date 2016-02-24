@@ -65,23 +65,75 @@ namespace Sdx.Html
       }
     }
 
+    private bool? isValidCache = null;
+
     public bool ExecValidators()
     {
-      var result = true;
+      isValidCache = true;
       foreach(var kv in elements)
       {
         if(!kv.Value.ExecValidators())
         {
-          result = false;
+          isValidCache = false;
+        }
+      }
+
+      return (bool)isValidCache;
+    }
+
+    public bool IsValid
+    {
+      get
+      {
+        if(isValidCache == null)
+        {
+          throw new InvalidOperationException("Call ExecValidators before this.");
+        }
+
+        return (bool)isValidCache;
+      }
+    }
+
+    public T As<T>(string name) where T : FormElement
+    {
+      return (T)this[name];
+    }
+
+    public NameValueCollection ToNameValueCollection()
+    {
+      if(isValidCache != true)
+      {
+        throw new InvalidOperationException("Not pass validation yet.");
+      }
+
+      var result = new NameValueCollection();
+
+      foreach (var kv in elements)
+      {
+        var key = kv.Key;
+        var elem = kv.Value;
+        
+        foreach (var value in elem.Value)
+        {
+          if (!(elem.IsSecret && elem.Value.IsEmpty))
+          {
+            result.Add(key, value);
+          }
         }
       }
 
       return result;
     }
 
-    public T As<T>(string name) where T : FormElement
+    public Collection.OrderedDictionary<string, Validation.Errors> Errors()
     {
-      return (T)this[name];
+      var result = new Collection.OrderedDictionary<string, Validation.Errors>();
+      foreach(var kv in elements)
+      {
+        result[kv.Key] = kv.Value.Errors;
+      }
+
+      return result;
     }
   }
 }

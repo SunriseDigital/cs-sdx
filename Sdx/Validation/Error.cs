@@ -11,5 +11,10 @@ namespace Sdx.Validation
     public string ClassName { get; internal set; }
     public string Lang { get; internal set; }
     public string Message { get; internal set; }
+
+    public override string ToString()
+    {
+      return Message;
+    }
   }
 }
