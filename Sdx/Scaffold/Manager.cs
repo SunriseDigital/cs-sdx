@@ -279,19 +279,24 @@ namespace Sdx.Scaffold
       record.Bind(ownValues);
       conn.Save(record);
 
-      foreach (var param in relationList)
+      foreach (var config in relationList)
       {
-        var rel = TableMeta.Relations[param["relation"].ToString()];
-        var currentRecords = record.GetRecordSet(param["relation"].ToString(), conn);
-        foreach (var refId in form.GetValues(param["column"].ToString()))
+        var rel = TableMeta.Relations[config["relation"].ToString()];
+        var currentRecords = record.GetRecordSet(config["relation"].ToString(), conn);
+        var values = form.GetValues(config["column"].ToString());
+
+        if (values != null)
         {
-          var cRecord = currentRecords.Pop(crec => crec.GetString(param["column"].ToString()) == refId);
-          if(cRecord == null)
+          foreach (var refId in form.GetValues(config["column"].ToString()))
           {
-            var relRecord = rel.TableMeta.CreateRecord();
-            relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
-            relRecord.SetValue(param["column"].ToString(), refId);
-            conn.Save(relRecord);
+            var cRecord = currentRecords.Pop(crec => crec.GetString(config["column"].ToString()) == refId);
+            if (cRecord == null)
+            {
+              var relRecord = rel.TableMeta.CreateRecord();
+              relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
+              relRecord.SetValue(config["column"].ToString(), refId);
+              conn.Save(relRecord);
+            }
           }
         }
 

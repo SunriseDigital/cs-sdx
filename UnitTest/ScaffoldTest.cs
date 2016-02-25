@@ -678,10 +678,10 @@ namespace UnitTest
           scaffold.Save(record, post, conn);
           conn.Commit();
         }
-        catch (Exception e)
+        catch (Exception)
         {
           conn.Rollback();
-          throw e;
+          throw;
         }
 
         //確認する
@@ -718,10 +718,10 @@ namespace UnitTest
           scaffold.Save(record, post, conn);
           conn.Commit();
         }
-        catch (Exception e)
+        catch (Exception)
         {
           conn.Rollback();
-          throw e;
+          throw;
         }
 
         //確認する
@@ -732,6 +732,38 @@ namespace UnitTest
         Assert.Equal(2, shopCategories.Count);
         Assert.Equal("2", shopCategories[0].GetString("category_id"));
         Assert.Equal("3", shopCategories[1].GetString("category_id"));
+      }
+
+      //削除する
+      query = new NameValueCollection();
+      query.Set("id", savedId);
+
+      post = new NameValueCollection();
+      post.Set("name", "foobar");
+      post.Set("area_id", "1");
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, post, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        //確認する
+        savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+
+        var shopCategories = savedRecord.GetRecordSet("shop_category", conn, select => select.AddOrder("category_id", Sdx.Db.Sql.Order.ASC));
+        Assert.Equal(0, shopCategories.Count);
       }
     }
 
@@ -774,10 +806,10 @@ namespace UnitTest
           scaffold.Save(record, post, conn);
           conn.Commit();
         }
-        catch (Exception e)
+        catch (Exception)
         {
           conn.Rollback();
-          throw e;
+          throw;
         }
 
         //確認する
@@ -830,10 +862,10 @@ namespace UnitTest
             scaffold.Save(record, post, conn);
             conn.Commit();
           }
-          catch (Exception e)
+          catch (Exception)
           {
             conn.Rollback();
-            throw e;
+            throw;
           }
 
           //確認する
