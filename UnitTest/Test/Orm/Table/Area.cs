@@ -49,11 +49,11 @@ namespace Test.Orm.Table
         .ClearColumns()
         .AddColumns("id", "name").Table.SelectDefaultOrder(select);
 
-      elem.AddOption(Sdx.Html.Option.Create("", "大エリアを選択"));
+      elem.AddOption("", "大エリアを選択");
 
       conn.FetchKeyValuePairList<string, string>(select).ForEach((pair) =>
       {
-        elem.AddOption(Sdx.Html.Option.Create(pair));
+        elem.AddOption(pair);
       });
 
       return elem;

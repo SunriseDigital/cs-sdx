@@ -4,6 +4,8 @@
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,
+  login_id varchar(190),
+  password varchar(190),
   created_at datetime NOT NULL,
   PRIMARY KEY (id)
 );

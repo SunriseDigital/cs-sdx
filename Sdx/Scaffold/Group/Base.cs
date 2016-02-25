@@ -65,12 +65,12 @@ namespace Sdx.Scaffold.Group
       if(!Strict)
       {
         //TODO I18n
-        select.AddOption(Html.Option.Create("", "全て"));
+        select.AddOption("", "全て");
       }
 
       pairList.ForEach((pair) =>
       {
-        select.AddOption(Html.Option.Create(pair));
+        select.AddOption(pair);
       });
 
       if(TargetValue != null)

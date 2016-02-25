@@ -4,6 +4,8 @@
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,
+  login_id nvarchar(190),
+  password nvarchar(190),
   created_at datetime NOT NULL,
   CONSTRAINT pk_shop PRIMARY KEY CLUSTERED (id)
 );

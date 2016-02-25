@@ -19,6 +19,7 @@ using System.Linq;
 
 namespace UnitTest
 {
+  using Config = Sdx.Scaffold.Config;
   [TestClass]
   public class ScaffoldTest : BaseDbTest
   {
@@ -895,47 +896,89 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestSwapFormElementCreator()
+    public void TestSecretSave()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunSwapFormElementCreator(db);
+        RunSecretSave(db);
         ExecSql(db);
       }
     }
 
-    private void RunSwapFormElementCreator(TestDb db)
+    private void RunSecretSave(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
-      scaffold.FormList
-        .Add(Sdx.Scaffold.Config.Item.Create()
-          .Set("column", new Sdx.Scaffold.Config.Value("id"))
-          .Set("label", new Sdx.Scaffold.Config.Value("ID"))
-          .Set("factory", new Sdx.Scaffold.Config.Value("CreateIdElementForScaffold"))
-        )
-        .Add(Sdx.Scaffold.Config.Item.Create()
-          .Set("column", new Sdx.Scaffold.Config.Value("id2"))
-          .Set("label", new Sdx.Scaffold.Config.Value("ID2"))
-          .Set("factory", new Sdx.Scaffold.Config.Value(typeof(Test.Orm.Table.LargeArea).GetMethods().First(
-            m => m.Name == "CreateIdElementForScaffold" && m.IsStatic
-          )))
-        )
-          ;
-        ;
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+
+      var query = new NameValueCollection();
+
+      var post = new NameValueCollection();
+      post.Set("name", "foobar");
+      post.Set("area_id", "1");
+      post.Set("password", "1234");
+
+      string savedId = null;
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+        var record = scaffold.LoadRecord(query, conn);
+
+        //ここで最初のBind
+        var form = scaffold.BuildForm(record, conn);
+
+        //2度目のBind
+        form.Bind(post);
+        form.ExecValidators();
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, form.ToNameValueCollection(), conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        Assert.Equal("HASH@1234", savedRecord.GetString("password"));
+      }
+
+      query = new NameValueCollection();
+      query.Set("id", savedId);
+
+      post = new NameValueCollection();
+      post.Set("password", "");
 
       using (var conn = scaffold.Db.CreateConnection())
       {
-        var record = scaffold.LoadRecord(new NameValueCollection(), conn);
-        var form = scaffold.BuildForm(record, conn);
-        Assert.IsType<Sdx.Html.TextArea>(form["id"]);
-        Assert.Equal("ID", form["id"].Label);
-        Assert.Equal("id", form["id"].Tag.Attr["name"]);
-        Assert.Equal("scaffold", form["id"].Tag.Attr["data-type"]);
+        conn.Open();
+        var record = scaffold.LoadRecord(query, conn);
 
-        Assert.IsType<Sdx.Html.TextArea>(form["id2"]);
-        Assert.Equal("ID2", form["id2"].Label);
-        Assert.Equal("id2", form["id2"].Tag.Attr["name"]);
-        Assert.Equal("scaffold", form["id2"].Tag.Attr["data-type"]);
+        //ここで最初のBind
+        var form = scaffold.BuildForm(record, conn);
+
+        //2度目のBind
+        form.Bind(post);
+        form.ExecValidators();
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, form.ToNameValueCollection(), conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        Assert.Equal("HASH@1234", savedRecord.GetString("password"));
       }
     }
   }

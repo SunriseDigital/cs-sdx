@@ -513,6 +513,27 @@ namespace Sdx.Db
       }
     }
 
+    private bool NeedsAutoUpdate(string columnName, Record record)
+    {
+      if(columnName == null)
+      {
+        return false;
+      }
+
+      if (!record.OwnMeta.HasColumn(columnName))
+      {
+        return false;
+      }
+
+      var first = record.UpdatedValues.FirstOrDefault(kv => kv.Key == columnName);
+      if (first.Value != null)
+      {
+        return false;
+      }
+
+      return true;
+    }
+
     public void Save(Record record)
     {
       if (record.IsDeleted)
@@ -526,25 +547,13 @@ namespace Sdx.Db
         insert.SetInto(record.OwnMeta.Name);
 
         //自動登録日時更新
-        if (
-          AutoCreateDateColumn != null
-          &&
-          record.OwnMeta.HasColumn(AutoCreateDateColumn)
-          &&
-          !record.UpdatedValues.Any(kv => kv.Key == AutoCreateDateColumn)
-        )
+        if (NeedsAutoUpdate(AutoCreateDateColumn, record))
         {
           record.SetValue(AutoCreateDateColumn, DateTime.Now);
         }
 
         //自動更新日時更新
-        if (
-          AutoUpdateDateColumn != null
-          &&
-          record.OwnMeta.HasColumn(AutoUpdateDateColumn)
-          &&
-          !record.UpdatedValues.Any(kv => kv.Key == AutoUpdateDateColumn)
-        )
+        if (NeedsAutoUpdate(AutoUpdateDateColumn, record))
         {
           record.SetValue(AutoUpdateDateColumn, DateTime.Now);
         }
@@ -596,11 +605,7 @@ namespace Sdx.Db
         if (
           record.UpdatedValues.Count > 0 
           &&
-          AutoUpdateDateColumn != null 
-          &&
-          record.OwnMeta.HasColumn(AutoUpdateDateColumn)
-          &&
-          !record.UpdatedValues.Any(kv => kv.Key == AutoUpdateDateColumn)
+          NeedsAutoUpdate(AutoUpdateDateColumn, record)
         )
         {
           record.SetValue(AutoUpdateDateColumn, DateTime.Now);

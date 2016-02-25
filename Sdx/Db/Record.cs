@@ -234,10 +234,33 @@ namespace Sdx.Db
 
     public bool IsDeleted { get; internal set; }
 
+    private bool EqualsToCurrent(string columnName, object value)
+    {
+      var current = GetValue(columnName);
+      if(value == null)
+      {
+        return current == null;
+      }
+
+      if(current == null)
+      {
+        return value == null;
+      }
+
+      //DateTimeはミリ秒まで持っていてEquals更新していなくてもFalseを返し必ず更新されてしまうので秒までで比較します。
+      if(current is DateTime)
+      {
+        return current.ToString().Equals(value.ToString());
+      }
+      
+      value = Convert.ChangeType(value, current.GetType());
+      return current.Equals(value);
+    }
+
     public void SetValue(string columnName, object value)
     {
       this.OwnMeta.CheckColumn(columnName);
-      if(!value.Equals(this.GetValue(columnName)))
+      if (!EqualsToCurrent(columnName, value))
       {
         this.UpdatedValues[columnName] = value;
       }
@@ -305,7 +328,11 @@ namespace Sdx.Db
     {
       var col = new NameValueCollection();
       OwnMeta.Columns.ForEach((column) => {
-        col.Add(column.Name, this.GetString(column.Name));
+        var value = this.GetValue(column.Name);
+        if(value != null)
+        {
+          col.Add(column.Name, this.GetString(column.Name));
+        }
       });
 
       return col;

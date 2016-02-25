@@ -22,6 +22,8 @@ namespace Test.Orm.Table
           new Column("area_id"),
           new Column("main_image_id"),
           new Column("sub_image_id"),
+          new Column("login_id", isNotNull: false),
+          new Column("password", isNotNull: false),
           new Column("created_at"),
         },
         new Dictionary<string, Relation>()
@@ -72,20 +74,44 @@ namespace Test.Orm.Table
       );
     }
 
-    public static Sdx.Html.FormElement CreateCategoryIdElement(Sdx.Db.Connection conn, Sdx.Db.Record record)
+    public static Sdx.Html.FormElement CreateCategoryIdElement(Sdx.Db.Connection conn)
     {
       var elem = new Sdx.Html.CheckableGroup();
       elem.Name = "category_id";
 
       var select = conn.Adapter.CreateSelect();
       select.AddFrom(new Test.Orm.Table.Category()).Table.SelectDefaultOrder(select);
+      select.ClearColumns().AddColumns("id", "name");
 
-      conn.FetchRecordSet(select).ForEach(rec =>
+      conn.FetchKeyValuePairList<string, string>(select).ForEach(pair =>
       {
-        var checkbox = new Sdx.Html.CheckBox();
-        checkbox.Tag.Attr["value"] = rec.GetString("id");
-        elem.AddCheckable(checkbox);
+        elem.AddCheckable<Sdx.Html.CheckBox>(pair);
       });
+
+      return elem;
+    }
+
+    public static Sdx.Html.FormElement CreateAreaIdElement(Sdx.Db.Connection conn)
+    {
+      var elem = new Sdx.Html.Select("area_id");
+
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(new Test.Orm.Table.Area()).Table.SelectDefaultOrder(select);
+      select.ClearColumns().AddColumns("id", "name");
+
+      elem.AddOption("", "場所を選択してください");
+      conn.FetchKeyValuePairList<string, string>(select).ForEach(pair =>
+      {
+        elem.AddOption(pair);
+      });
+
+      return elem;
+    }
+
+    public static Sdx.Html.FormElement CreatePasswordElement()
+    {
+      var elem = new Sdx.Html.InputText("password");
+      elem.IsSecret = true;
 
       return elem;
     }

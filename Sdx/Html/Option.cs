@@ -38,18 +38,5 @@ namespace Sdx.Html
         this.tag.Attr.Set("selected");
       }
     }
-
-    public static Option Create(string key, string value)
-    {
-      var option = new Sdx.Html.Option();
-      option.Tag.Attr["value"] = key;
-      option.Text = value;
-      return option;
-    }
-
-    public static Option Create(System.Collections.Generic.KeyValuePair<string, string> pair)
-    {
-      return Option.Create(pair.Key, pair.Value);
-    }
   }
 }

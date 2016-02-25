@@ -13,6 +13,12 @@ namespace Test.Orm
     {
       Meta = Test.Orm.Table.Shop.Meta;
     }
+
+    public void SetRawPassword(string rawPassword)
+    {
+      //本当はhash化するが確認しやすいように文字列追加のみ。
+      SetValue("password", "HASH@" + rawPassword);
+    }
   }
 }
       

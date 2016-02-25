@@ -254,29 +254,33 @@ namespace Sdx.Scaffold
     public void Save(Sdx.Db.Record record, NameValueCollection form, Sdx.Db.Connection conn)
     {
       var relationList = new Config.List();
-      var ownValues = new NameValueCollection();
       foreach (var config in FormList)
       {
+        var columnName = config["column"].ToString();
         if(config.ContainsKey("relation"))
         {
           relationList.Add(config);
         }
         else if(config.ContainsKey("setter"))
         {
-          config["setter"].Invoke(
-            record,
-            new object[] { form[config["column"].ToString()] },
-            m => !m.IsStatic && m.GetParameters().Count() == 1
-          );
+          if (form[columnName] != null)
+          {
+            config["setter"].Invoke(
+              record,
+              new object[] { form[columnName] },
+              m => !m.IsStatic && m.GetParameters().Count() == 1
+            );
+          }
         }
         else
         {
-          var columnName = config["column"].ToString();
-          ownValues.Set(columnName, form[columnName]);
+          if (form[columnName] != null)
+          {
+            record.SetValue(columnName, form[columnName]);
+          }
         }
       }
 
-      record.Bind(ownValues);
       conn.Save(record);
 
       foreach (var config in relationList)
