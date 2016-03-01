@@ -44,5 +44,14 @@ namespace Test.Orm.Table
       elem.Tag.Attr["data-type"] = "scaffold";
       return elem;
     }
+
+    public Sdx.Db.RecordSet FetchRecordSetDefaultOrdered(Sdx.Db.Connection conn)
+    {
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+      SelectDefaultOrder(select);
+
+      return conn.FetchRecordSet(select);
+    }
   }
 }

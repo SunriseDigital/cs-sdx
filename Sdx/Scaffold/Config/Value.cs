@@ -44,7 +44,20 @@ namespace Sdx.Scaffold.Config
       }
       else
       {
-        return type.GetMethod(value.ToString()).Invoke(target, args);
+        var method = type.GetMethod(value.ToString());
+        if(method == null)
+        {
+          throw new NotImplementedException("Missing " + value.ToString() + " method in " + type);
+        }
+        return method.Invoke(target, args);
+      }
+    }
+
+    public bool IsString
+    {
+      get
+      {
+        return value is string;
       }
     }
 
@@ -63,6 +76,11 @@ namespace Sdx.Scaffold.Config
       {
         return type.GetMethod(value.ToString());
       }
+    }
+
+    public static explicit operator string (Value value)
+    {
+      return value.ToString();
     }
   }
 }

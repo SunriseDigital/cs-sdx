@@ -8,10 +8,11 @@ namespace Sdx.Scaffold.Group
   public class TableMeta : Base
   {
     private Db.TableMeta tableMeta;
-    private string display;
-    private string methodForList;
+    private Config.Value display;
+    private Config.Value methodForList;
 
-    public TableMeta(string columnName, Db.TableMeta tableMeta, string display, string methodForList = null):base(columnName, methodForList != null)
+    public TableMeta(string columnName, Db.TableMeta tableMeta, Config.Value display, Config.Value methodForList = null)
+      : base(columnName, methodForList != null)
     {
       this.tableMeta = tableMeta;
       this.display = display;
@@ -26,7 +27,15 @@ namespace Sdx.Scaffold.Group
         conn.Open();
         var table = tableMeta.CreateTable();
         var record = conn.FetchRecordByPkey(table, TargetValue);
-        name = record.GetString(display);
+        if(display.IsString)
+        {
+          name = record.GetString((string)display);
+        }
+        else
+        {
+          name = (string)display.Invoke(record.GetType(), record, null);
+        }
+        
       }
 
       return name;
@@ -43,9 +52,8 @@ namespace Sdx.Scaffold.Group
       var table = tableMeta.CreateTable();
       var select = conn.Adapter.CreateSelect();
       select.AddFrom(table);
-      var method = table.GetType().GetMethods().First(m => m.Name == methodForList && !m.IsStatic && m.GetParameters()[0].ParameterType == typeof(Db.Sql.Select));
 
-      method.Invoke(table, new object[] { select });
+      
       result = conn.FetchKeyValuePairList<string, string>(select);
 
       return result;
