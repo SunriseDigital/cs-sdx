@@ -342,7 +342,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
 
         scaffold.Group.Init();
 
@@ -376,7 +376,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
 
         scaffold.Group.Init();
 
@@ -408,7 +408,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName", "GetList");
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"), new Config.Value("GetList"));
 
         scaffold.Group.Init();
 
@@ -460,7 +460,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
         scaffold.Group.FixedValue = "1";
         scaffold.Group.Init();
 
@@ -491,7 +491,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
         scaffold.Group.FixedValue = "2";
         scaffold.Group.Init();
 
@@ -522,7 +522,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName", "GetList");
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"), new Config.Value("GetList"));
         scaffold.Group.FixedValue = "1";
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
@@ -544,7 +544,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
         scaffold.Group.FixedValue = "1";
         scaffold.Group.DefaultValue = "2";
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>

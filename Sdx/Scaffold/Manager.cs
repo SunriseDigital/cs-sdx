@@ -143,7 +143,7 @@ namespace Sdx.Scaffold
       hasGetters.ForEach(config => {
         binds.Set(
           config["column"].ToString(),
-          (string)config["getter"].Invoke(record, null, m => !m.IsStatic && m.GetParameters().Count() == 0)
+          (string)config["getter"].Invoke(record.GetType(), record, null)
         );
       });
 
@@ -266,9 +266,9 @@ namespace Sdx.Scaffold
           if (form[columnName] != null)
           {
             config["setter"].Invoke(
+              record.GetType(),
               record,
-              new object[] { form[columnName] },
-              m => !m.IsStatic && m.GetParameters().Count() == 1
+              new object[] { form[columnName] }
             );
           }
         }

@@ -36,15 +36,15 @@ namespace Sdx.Scaffold.Config
       value = methodInfo;
     }
 
-    internal string Invoke(object target, object[] args, Func<MethodInfo, bool> additinalCondition)
+    internal object Invoke(Type type, object target, object[] args)
     {
       if(value is MethodInfo)
       {
-        return (string)((MethodInfo)value).Invoke(target, args);
+        return ((MethodInfo)value).Invoke(target, args);
       }
       else
       {
-        return (string)target.GetType().GetMethods().Where(m => m.Name == value.ToString()).First(additinalCondition).Invoke(target, args);
+        return type.GetMethod(value.ToString()).Invoke(target, args);
       }
     }
 
