@@ -45,13 +45,15 @@ namespace Test.Orm.Table
       return elem;
     }
 
-    public Sdx.Db.RecordSet FetchRecordSetDefaultOrdered(Sdx.Db.Connection conn)
+    public List<KeyValuePair<string, string>> FetchPairsForOption(Sdx.Db.Connection conn)
     {
       var select = conn.Adapter.CreateSelect();
       select.AddFrom(this);
       SelectDefaultOrder(select);
 
-      return conn.FetchRecordSet(select);
+      select.ClearColumns().AddColumns("id", "name");
+
+      return conn.FetchKeyValuePairList<string, string>(select);
     }
   }
 }

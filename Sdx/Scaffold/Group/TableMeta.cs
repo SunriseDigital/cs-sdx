@@ -48,15 +48,8 @@ namespace Sdx.Scaffold.Group
         return null;
       }
 
-      List<KeyValuePair<string, string>> result = null;
       var table = tableMeta.CreateTable();
-      var select = conn.Adapter.CreateSelect();
-      select.AddFrom(table);
-
-      
-      result = conn.FetchKeyValuePairList<string, string>(select);
-
-      return result;
+      return (List<KeyValuePair<string, string>>)methodForList.Invoke(table.GetType(), table, new object[] { conn }); ;
     }
   }
 }

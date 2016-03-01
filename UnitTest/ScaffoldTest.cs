@@ -217,7 +217,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("SelectDefaultOrder"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("FetchPairsForOption"));
 
         scaffold.Group.Init();
 
@@ -304,7 +304,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("SelectDefaultOrder"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("FetchPairsForOption"));
         scaffold.Group.Strict = true;
 
         scaffold.Group.Init();
