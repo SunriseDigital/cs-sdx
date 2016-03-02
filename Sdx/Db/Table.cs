@@ -110,7 +110,7 @@ namespace Sdx.Db
       {
         var list = new List<Validation.Validator>();
 
-        if(IsNotNull)
+        if(IsNotNull && !IsAutoIncrement)
         {
           list.Add(new Validation.NotEmpty());
         }
@@ -119,23 +119,27 @@ namespace Sdx.Db
         {
           list.Add(new Validation.Numeric());
 
-          var min = 0L;
-          var max = (long)Math.Pow((double)2, (double)MaxLength - 1) - 1;
-          if (Type == ColumnType.Integer)
+          if(Type == ColumnType.UnsignedInteger)
           {
-            min = -max - 1;
+            var vGreater = new Validation.GreaterThan(0);
+            vGreater.IsInclusive = true;
+            list.Add(vGreater);
           }
-
-          var vGreater = new Validation.GreaterThan(min);
-          vGreater.IsInclusive = true;
-          list.Add(vGreater);
 
           if(MaxLength != null)
           {
+            var max = (long)Math.Pow((double)2, (double)MaxLength - 1) - 1;
             if(Type == ColumnType.UnsignedInteger)
             {
               max = max * 2 + 1;
             }
+            else
+            {
+              var vGreater = new Validation.GreaterThan(-max - 1);
+              vGreater.IsInclusive = true;
+              list.Add(vGreater);
+            }
+
             var vLess = new Validation.LessThan(max);
             vLess.IsInclusive = true;
             list.Add(vLess);
@@ -163,6 +167,11 @@ namespace Sdx.Db
         }
 
         return list;
+      }
+
+      public void AppendValidators(Html.FormElement element)
+      {
+        CreateValidatorList().ForEach(v => element.AddValidator(v, v is Validation.NotEmpty));
       }
     }
 

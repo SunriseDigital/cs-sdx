@@ -19,12 +19,12 @@ namespace Test.Orm.Table
         {
           new Column("id", isAutoIncrement: true),
           new Column("name"),
-          new Column("area_id"),
-          new Column("main_image_id"),
-          new Column("sub_image_id"),
+          new Column("area_id", type: ColumnType.Integer),
+          new Column("main_image_id", isNotNull: false),
+          new Column("sub_image_id", isNotNull: false),
           new Column("login_id", isNotNull: false),
           new Column("password", isNotNull: false),
-          new Column("created_at"),
+          new Column("created_at", type: ColumnType.DateTime),
         },
         new Dictionary<string, Relation>()
         {
@@ -114,6 +114,12 @@ namespace Test.Orm.Table
       elem.IsSecret = true;
 
       return elem;
+    }
+
+    public static void CreateNameValidators(Sdx.Html.FormElement element)
+    {
+      Meta.GetColumn("name").AppendValidators(element);
+      element.AddValidator(new Sdx.Validation.StringLength(min: 3, max: 50));
     }
   }
 }

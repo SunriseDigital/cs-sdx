@@ -981,5 +981,39 @@ namespace UnitTest
         Assert.Equal("HASH@1234", savedRecord.GetString("password"));
       }
     }
+
+    [Fact]
+    public void TestAutoValidate()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAutoValidate(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAutoValidate(TestDb db)
+    {
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+        var record = scaffold.LoadRecord(new NameValueCollection(), conn);
+
+        var form = scaffold.BuildForm(record, conn);
+       
+        var idValidators = form["id"].Validators.ToList();
+        Assert.Equal(1, idValidators.Count);
+        Assert.IsType<Sdx.Validation.Numeric>(idValidators[0]);
+
+        var nameValidators = form["name"].Validators.ToList();
+        Assert.Equal(2, nameValidators.Count);
+        Assert.IsType<Sdx.Validation.NotEmpty>(nameValidators[0]);
+        Assert.IsType<Sdx.Validation.StringLength>(nameValidators[1]);
+        Assert.Equal(3, ((Sdx.Validation.StringLength)nameValidators[1]).Min);
+        Assert.Equal(50, ((Sdx.Validation.StringLength)nameValidators[1]).Max);
+      }
+    }
   }
 }

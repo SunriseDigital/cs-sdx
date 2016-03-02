@@ -82,5 +82,10 @@ namespace Sdx.Scaffold.Config
     {
       return value.ToString();
     }
+
+    internal bool ToBool()
+    {
+      return (bool)value;
+    }
   }
 }

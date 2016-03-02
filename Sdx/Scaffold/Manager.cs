@@ -66,6 +66,68 @@ namespace Sdx.Scaffold
 
     public Config.List DisplayList { get; private set; }
 
+    private Html.FormElement CreateFormElement(Config.Item config, Db.Record record, Db.Connection conn)
+    {
+      Html.FormElement elem;
+
+      MethodInfo method = null;
+      if (config.ContainsKey("factory"))
+      {
+        method = config["factory"].GetMethodInfo(TableMeta.TableType);
+        if (method == null)
+        {
+          throw new NotImplementedException("Missing " + config["factory"] + " method in " + TableMeta.TableType);
+        }
+      }
+      else
+      {
+        method = TableMeta.TableType.GetMethod(
+          "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Element"
+        );
+      }
+
+
+      if (method != null)
+      {
+        var paramsCount = method.GetParameters().Count();
+        if (paramsCount == 2)
+        {
+          elem = (Sdx.Html.FormElement)method.Invoke(null, new object[] { record, conn });
+        }
+        else if (paramsCount == 1)
+        {
+          elem = (Sdx.Html.FormElement)method.Invoke(null, new object[] { conn });
+        }
+        else
+        {
+          elem = (Sdx.Html.FormElement)method.Invoke(null, null);
+        }
+      }
+      else
+      {
+        //主キーはhidden
+        if (TableMeta.Pkeys.Exists((column) => column == config["column"].ToString()))
+        {
+          elem = new Sdx.Html.InputHidden();
+        }
+        else
+        {
+          elem = new Sdx.Html.InputText();
+        }
+      }
+
+      elem.Name = config["column"].ToString();
+
+      if (!config.ContainsKey("label"))
+      {
+        throw new InvalidOperationException("Missing label param");
+      }
+
+      elem.Label = config["label"].ToString();
+
+      return elem;
+    }
+
     public Html.Form BuildForm(Db.Record record, Db.Connection conn)
     {
       var form = new Html.Form();
@@ -73,64 +135,58 @@ namespace Sdx.Scaffold
       var hasGetters = new List<Config.Item>();
       foreach (var config in FormList)
       {
-        Html.FormElement elem;
+        var elem = CreateFormElement(config, record, conn);
 
+        form.SetElement(elem);
+
+        //Validator
         MethodInfo method = null;
-        if(config.ContainsKey("factory"))
+        if (config.ContainsKey("validators"))
         {
-          method = config["factory"].GetMethodInfo(TableMeta.TableType);
-          if(method == null)
+          method = config["validators"].GetMethodInfo(TableMeta.TableType);
+          if (method == null)
           {
-            throw new NotImplementedException("Missing " + config["factory"] + " method in " + TableMeta.TableType);
+            throw new NotImplementedException("Missing " + config["validators"] + " method in " + TableMeta.TableType);
           }
         }
         else
         {
           method = TableMeta.TableType.GetMethod(
-            "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Element"  
+            "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Validators"
           );
         }
-        
-        
+
         if (method != null)
         {
           var paramsCount = method.GetParameters().Count();
-          if(paramsCount == 1)
+
+          if(paramsCount == 3)
           {
-            elem = (Sdx.Html.FormElement)method.Invoke(null, new object[] { conn });
+            method.Invoke(null, new object[] { elem, record, conn });
           }
           else if (paramsCount == 2)
           {
-            elem = (Sdx.Html.FormElement)method.Invoke(null, new object[] { conn, record });
+            method.Invoke(null, new object[] { elem, conn });
+          } 
+          else if (paramsCount == 1)
+          {
+            method.Invoke(null, new object[] { elem });
           }
           else
           {
-            elem = (Sdx.Html.FormElement)method.Invoke(null, null);
+            throw new InvalidOperationException("Illegal parameter count for " + method);
           }
         }
-        else
+        else if (config.ContainsKey("column"))
         {
-          //主キーはhidden
-          if (TableMeta.Pkeys.Exists((column) => column == config["column"].ToString()))
+          var columnName = config["column"].ToString();
+          var column = TableMeta.Columns.Find(c => c.Name == columnName);
+          if (column != null)
           {
-            elem = new Sdx.Html.InputHidden();
-          }
-          else
-          {
-            elem = new Sdx.Html.InputText();
+            column.AppendValidators(elem);
           }
         }
 
-        elem.Name = config["column"].ToString();
-
-        if(!config.ContainsKey("label"))
-        {
-          throw new InvalidOperationException("Missing label param");
-        }
-
-        elem.Label = config["label"].ToString();
-
-        form.SetElement(elem);
 
         if(config.ContainsKey("getter"))
         {
@@ -138,6 +194,7 @@ namespace Sdx.Scaffold
         }
       }
 
+      //値のBind
       var binds = record.ToNameValueCollection();
 
       hasGetters.ForEach(config => {

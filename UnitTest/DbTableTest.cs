@@ -371,13 +371,12 @@ namespace UnitTest
       );
 
       var list = column.CreateValidatorList();
-      Assert.Equal(4, list.Count);
-      Assert.IsType<Sdx.Validation.NotEmpty>(list[0]);
-      Assert.IsType<Sdx.Validation.Numeric>(list[1]);
-      Assert.IsType<Sdx.Validation.GreaterThan>(list[2]);
-      Assert.Equal(Int32.MinValue, ((Sdx.Validation.GreaterThan)list[2]).Min);
-      Assert.IsType<Sdx.Validation.LessThan>(list[3]);
-      Assert.Equal(Int32.MaxValue, ((Sdx.Validation.LessThan)list[3]).Max);
+      Assert.Equal(3, list.Count);
+      Assert.IsType<Sdx.Validation.Numeric>(list[0]);
+      Assert.IsType<Sdx.Validation.GreaterThan>(list[1]);
+      Assert.Equal(Int32.MinValue, ((Sdx.Validation.GreaterThan)list[1]).Min);
+      Assert.IsType<Sdx.Validation.LessThan>(list[2]);
+      Assert.Equal(Int32.MaxValue, ((Sdx.Validation.LessThan)list[2]).Max);
 
       column = new Sdx.Db.Table.Column(
         "id",
@@ -439,6 +438,17 @@ namespace UnitTest
       list = column.CreateValidatorList();
       Assert.Equal(1, list.Count);
       Assert.IsType<Sdx.Validation.Date>(list[0]);
+
+      //数字系でMaxLengthが空の時例外になっていたのでついか。
+      column = new Sdx.Db.Table.Column(
+        "id",
+        type: Sdx.Db.Table.ColumnType.Integer,
+        isNotNull: false
+      );
+
+      list = column.CreateValidatorList();
+      Assert.Equal(1, list.Count);
+      Assert.IsType<Sdx.Validation.Numeric>(list[0]);
     }
   }
 }
