@@ -358,5 +358,87 @@ namespace UnitTest
       Assert.Equal(3, db.Command.Parameters.Count);
       Assert.Equal("10", db.Command.Parameters["@2"].Value);
     }
+
+    [Fact]
+    public void TestAutoValidate()
+    {
+      var column = new Sdx.Db.Table.Column(
+        "id",
+        type: Sdx.Db.Table.ColumnType.Integer,
+        isAutoIncrement: true,
+        isNotNull: true,
+        maxLength: 32
+      );
+
+      var list = column.CreateValidatorList();
+      Assert.Equal(4, list.Count);
+      Assert.IsType<Sdx.Validation.NotEmpty>(list[0]);
+      Assert.IsType<Sdx.Validation.Numeric>(list[1]);
+      Assert.IsType<Sdx.Validation.GreaterThan>(list[2]);
+      Assert.Equal(Int32.MinValue, ((Sdx.Validation.GreaterThan)list[2]).Min);
+      Assert.IsType<Sdx.Validation.LessThan>(list[3]);
+      Assert.Equal(Int32.MaxValue, ((Sdx.Validation.LessThan)list[3]).Max);
+
+      column = new Sdx.Db.Table.Column(
+        "id",
+        type: Sdx.Db.Table.ColumnType.UnsignedInteger,
+        isNotNull: false,
+        maxLength: 32
+      );
+
+      list = column.CreateValidatorList();
+      Assert.Equal(3, list.Count);
+      Assert.IsType<Sdx.Validation.Numeric>(list[0]);
+      Assert.IsType<Sdx.Validation.GreaterThan>(list[1]);
+      Assert.Equal(UInt32.MinValue, ((Sdx.Validation.GreaterThan)list[1]).Min);
+      Assert.IsType<Sdx.Validation.LessThan>(list[2]);
+      Assert.Equal(UInt32.MaxValue, ((Sdx.Validation.LessThan)list[2]).Max);
+
+
+      column = new Sdx.Db.Table.Column(
+        "id",
+        type: Sdx.Db.Table.ColumnType.Float,
+        isNotNull: false,
+        maxLength: 32//Float系は長さを無視
+      );
+
+      list = column.CreateValidatorList();
+      Assert.Equal(1, list.Count);
+      Assert.IsType<Sdx.Validation.Numeric>(list[0]);
+
+
+      column = new Sdx.Db.Table.Column(
+        "id",
+        type: Sdx.Db.Table.ColumnType.String,
+        isNotNull: false,
+        maxLength: 100
+      );
+
+      list = column.CreateValidatorList();
+      Assert.Equal(1, list.Count);
+      Assert.IsType<Sdx.Validation.StringLength>(list[0]);
+      Assert.Equal(100, ((Sdx.Validation.StringLength) list[0]).Max);
+
+
+      column = new Sdx.Db.Table.Column(
+        "id",
+        type: Sdx.Db.Table.ColumnType.DateTime,
+        isNotNull: false
+      );
+
+      list = column.CreateValidatorList();
+      Assert.Equal(1, list.Count);
+      Assert.IsType<Sdx.Validation.DateTime>(list[0]);
+
+      column = new Sdx.Db.Table.Column(
+        "id",
+        type: Sdx.Db.Table.ColumnType.Date,
+        isNotNull: false
+      );
+
+      list = column.CreateValidatorList();
+      Assert.Equal(1, list.Count);
+      Assert.IsType<Sdx.Validation.Date>(list[0]);
+    }
   }
 }

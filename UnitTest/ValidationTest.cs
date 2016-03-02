@@ -304,5 +304,43 @@ namespace UnitTest
       Assert.Equal(maxDate.ToString() + "以前の日時を入力してください。", validator.Errors[0].Message);
 
     }
+
+    [Fact]
+    public void TestDateTime()
+    {
+      Sdx.Context.Current.Lang = "ja";
+      var validator = new Sdx.Validation.DateTime();
+      Assert.True(validator.IsValid("2014/1/1 1:00:00"));
+      Assert.True(validator.IsValid("2014/01/01 01:00:00"));
+      Assert.True(validator.IsValid("2014/01/01 01:00"));
+      Assert.True(validator.IsValid("14/01/01 01:00:00"));
+      Assert.True(validator.IsValid("2014-1-1 1:00:00"));
+      Assert.True(validator.IsValid("2014-01-01 01:00:00"));
+      Assert.True(validator.IsValid("14-01-01 01:00:00"));
+      Assert.True(validator.IsValid("12 Feb 2014 01:00"));
+
+
+      Assert.False(validator.IsValid("123"));
+      Assert.False(validator.IsValid("2014-01-01"));
+      Assert.Equal("日時を入力してください。", validator.Errors[0].Message);
+    }
+
+    [Fact]
+    public void TestDate()
+    {
+      Sdx.Context.Current.Lang = "ja";
+      var validator = new Sdx.Validation.Date();
+      Assert.True(validator.IsValid("2014/1/1"));
+      Assert.True(validator.IsValid("2014/01/01"));
+      Assert.True(validator.IsValid("14/01/01"));
+      Assert.True(validator.IsValid("2014-1-1"));
+      Assert.True(validator.IsValid("2014-01-01"));
+      Assert.True(validator.IsValid("14-01-01"));
+      Assert.True(validator.IsValid("12 Feb 2014"));
+
+      Assert.False(validator.IsValid("123"));
+      Assert.False(validator.IsValid("2014-01-01 00:00:00"));
+      Assert.Equal("日付を入力してください。", validator.Errors[0].Message);
+    }
   }
 }

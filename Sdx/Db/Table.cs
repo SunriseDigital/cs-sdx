@@ -54,21 +54,47 @@ namespace Sdx.Db
       }
     }
 
+    public enum ColumnType
+    {
+      Integer,
+      UnsignedInteger,
+      Float,
+      UnsignedFloat,
+      String,
+      DateTime,
+      Date
+    }
+
     public class Column
     {
-      //TODO TypeはValidationの自動設定に使う予定。独自Typeに変更したほうがいいと思われる。
-      public Column(string name, Type type = null, bool isNotNull = true, bool isAutoIncrement = false)
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="name"></param>
+      /// <param name="type"></param>
+      /// <param name="isNotNull"></param>
+      /// <param name="isAutoIncrement"></param>
+      /// <param name="maxLength">Stringの場合は文字数、Numberの場合はビット数</param>
+      public Column(
+        string name,
+        ColumnType? type = null,
+        bool isNotNull = true,
+        bool isAutoIncrement = false,
+        long? maxLength = null
+      )
       {
         this.Name = name;
         this.Type = type;
         this.IsNotNull = isNotNull;
         this.IsAutoIncrement = isAutoIncrement;
+        this.MaxLength = maxLength;
       }
 
       public string Name { get; private set; }
-      public Type Type { get; private set; }
+      public ColumnType? Type { get; private set; }
       public bool IsNotNull {get; private set;}
       public bool IsAutoIncrement { get; private set; }
+      public long? MaxLength { get; private set; }
 
       public TableMeta Meta { get; internal set; }
 
@@ -78,6 +104,65 @@ namespace Sdx.Db
         {
           return Meta.Pkeys.Exists((column) => this.Name == column);
         }
+      }
+
+      public List<Validation.Validator> CreateValidatorList()
+      {
+        var list = new List<Validation.Validator>();
+
+        if(IsNotNull)
+        {
+          list.Add(new Validation.NotEmpty());
+        }
+
+        if(Type == ColumnType.Integer || Type == ColumnType.UnsignedInteger || IsAutoIncrement)
+        {
+          list.Add(new Validation.Numeric());
+
+          var min = 0L;
+          var max = (long)Math.Pow((double)2, (double)MaxLength - 1) - 1;
+          if (Type == ColumnType.Integer)
+          {
+            min = -max - 1;
+          }
+
+          var vGreater = new Validation.GreaterThan(min);
+          vGreater.IsInclusive = true;
+          list.Add(vGreater);
+
+          if(MaxLength != null)
+          {
+            if(Type == ColumnType.UnsignedInteger)
+            {
+              max = max * 2 + 1;
+            }
+            var vLess = new Validation.LessThan(max);
+            vLess.IsInclusive = true;
+            list.Add(vLess);
+          }
+        }
+        else if(Type == ColumnType.Float)
+        {
+          // 浮動小数点も最大値出せそうな予感はするが需要がそれほどなさそうなので保留
+          list.Add(new Validation.Numeric());
+        }
+        else if(Type == ColumnType.String)
+        {
+          if (MaxLength != null)
+          {
+            list.Add(new Validation.StringLength(max: MaxLength));
+          }
+        }
+        else if (Type == ColumnType.DateTime)
+        {
+          list.Add(new Validation.DateTime());
+        }
+        else if (Type == ColumnType.Date)
+        {
+          list.Add(new Validation.Date());
+        }
+
+        return list;
       }
     }
 
