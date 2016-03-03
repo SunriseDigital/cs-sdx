@@ -13,8 +13,8 @@ namespace Sdx.Validation
 
     protected override bool IsValidString(string value)
     {
-      long result;
-      if (!Int64.TryParse(value, out result))
+      double result;
+      if (!double.TryParse(value, out result))
       {
         this.AddError(ErrorNotNumeric);
         return false;

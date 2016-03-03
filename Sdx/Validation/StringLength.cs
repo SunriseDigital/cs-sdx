@@ -10,10 +10,10 @@ namespace Sdx.Validation
     public const string ErrorTooShort = "ErrorTooShort";
     public const string ErrorTooLong = "ErrorTooLong";
 
-    private int? min;
-    private int? max;
+    private long? min;
+    private long? max;
 
-    public int? Min
+    public long? Min
     {
       get
       {
@@ -27,7 +27,7 @@ namespace Sdx.Validation
       }
     }
 
-    public int? Max
+    public long? Max
     {
       get
       {
@@ -41,7 +41,8 @@ namespace Sdx.Validation
       }
     }
 
-    public StringLength(int? min = null, int? max = null, string message = null) : base(message)
+    public StringLength(long? min = null, long? max = null, string message = null)
+      : base(message)
     {
       if(min == null && max == null)
       {

@@ -38,3 +38,10 @@
       ErrorInvalid:   "日時を入力してください。"
       ErrorIsEarlier: "%min%以降の日時を入力してください。"
       ErrorIsLater:   "%max%以前の日時を入力してください。"
+
+    DateTime:
+      ErrorNotDateTime: "日時を入力してください。"
+
+    Date:
+      ErrorNotDate: "日付を入力してください。"
+      

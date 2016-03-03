@@ -44,5 +44,16 @@ namespace Test.Orm.Table
       elem.Tag.Attr["data-type"] = "scaffold";
       return elem;
     }
+
+    public List<KeyValuePair<string, string>> FetchPairsForOption(Sdx.Db.Connection conn)
+    {
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+      SelectDefaultOrder(select);
+
+      select.ClearColumns().AddColumns("id", "name");
+
+      return conn.FetchKeyValuePairList<string, string>(select);
+    }
   }
 }

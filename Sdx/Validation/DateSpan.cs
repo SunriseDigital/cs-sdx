@@ -11,10 +11,10 @@ namespace Sdx.Validation
     public const string ErrorIsEarlier = "ErrorIsEarlier";
     public const string ErrorIsLater = "ErrorIsLater";
 
-    private DateTime? minDate;
-    private DateTime? maxDate;
+    private System.DateTime? minDate;
+    private System.DateTime? maxDate;
 
-    public DateTime? Min
+    public System.DateTime? Min
     {
       get
       {
@@ -27,7 +27,7 @@ namespace Sdx.Validation
       }
     }
 
-    public DateTime? Max
+    public System.DateTime? Max
     {
       get
       {
@@ -42,17 +42,18 @@ namespace Sdx.Validation
 
     public string DateFormat { get; private set; }
 
-    private DateTime? TruncateTime(DateTime? dateTime)
+    private System.DateTime? TruncateTime(System.DateTime? dateTime)
     {
       if(dateTime != null)
       {
-        dateTime = ((DateTime)dateTime).Date;
+        dateTime = ((System.DateTime)dateTime).Date;
       }
 
       return dateTime;
     }
 
-    public DateSpan(DateTime? min = null, DateTime? max = null, string dateFormat = null, string message = null): base(message)
+    public DateSpan(System.DateTime? min = null, System.DateTime? max = null, string dateFormat = null, string message = null)
+      : base(message)
     {
       if (min == null && max == null)
       {
@@ -70,8 +71,8 @@ namespace Sdx.Validation
 
     protected override bool IsValidString(string value)
     {
-      DateTime targetDate;
-      if (!DateTime.TryParse(value, out targetDate))
+      System.DateTime targetDate;
+      if (!System.DateTime.TryParse(value, out targetDate))
       {
         this.AddError(ErrorInvalid);
         return false;
@@ -81,7 +82,7 @@ namespace Sdx.Validation
 
       if(this.Min != null)
       {
-        var min = (DateTime)this.Min;
+        var min = (System.DateTime)this.Min;
         this.SetPlaceholder("min", min.ToString(this.DateFormat));
         if (min.CompareTo(targetDate) > 0)
         {
@@ -92,7 +93,7 @@ namespace Sdx.Validation
 
       if(this.Max != null)
       {
-        var max = (DateTime)this.Max;
+        var max = (System.DateTime)this.Max;
         this.SetPlaceholder("max", max.ToString(this.DateFormat));
         if (max.CompareTo(targetDate) < 0)
         {

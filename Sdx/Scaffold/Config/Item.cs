@@ -138,5 +138,15 @@ namespace Sdx.Scaffold.Config
     {
       return record.GetString(Get("column").ToString());
     }
+
+    internal bool Is(string key)
+    {
+      if(!this.ContainsKey(key))
+      {
+        return false;
+      }
+
+      return this[key].ToBool();
+    }
   }
 }

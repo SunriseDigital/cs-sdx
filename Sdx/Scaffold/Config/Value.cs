@@ -36,15 +36,28 @@ namespace Sdx.Scaffold.Config
       value = methodInfo;
     }
 
-    internal string Invoke(object target, object[] args, Func<MethodInfo, bool> additinalCondition)
+    internal object Invoke(Type type, object target, object[] args)
     {
       if(value is MethodInfo)
       {
-        return (string)((MethodInfo)value).Invoke(target, args);
+        return ((MethodInfo)value).Invoke(target, args);
       }
       else
       {
-        return (string)target.GetType().GetMethods().Where(m => m.Name == value.ToString()).First(additinalCondition).Invoke(target, args);
+        var method = type.GetMethod(value.ToString());
+        if(method == null)
+        {
+          throw new NotImplementedException("Missing " + value.ToString() + " method in " + type);
+        }
+        return method.Invoke(target, args);
+      }
+    }
+
+    public bool IsString
+    {
+      get
+      {
+        return value is string;
       }
     }
 
@@ -63,6 +76,16 @@ namespace Sdx.Scaffold.Config
       {
         return type.GetMethod(value.ToString());
       }
+    }
+
+    public static explicit operator string (Value value)
+    {
+      return value.ToString();
+    }
+
+    internal bool ToBool()
+    {
+      return (bool)value;
     }
   }
 }

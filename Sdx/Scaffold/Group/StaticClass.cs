@@ -9,10 +9,10 @@ namespace Sdx.Scaffold.Group
   {
     private string columnName;
     private Type type;
-    private string methodForDisplay;
-    private string methodForList;
+    private Config.Value methodForDisplay;
+    private Config.Value methodForList;
 
-    public StaticClass(string columnName, Type type, string methodForDisplay = null, string methodForList = null)
+    public StaticClass(string columnName, Type type, Config.Value methodForDisplay = null, Config.Value methodForList = null)
       : base(columnName, methodForList != null)
     {
       this.columnName = columnName;
@@ -23,8 +23,7 @@ namespace Sdx.Scaffold.Group
 
     protected override string FetchName()
     {
-      var method = type.GetMethods().First(m => m.Name == methodForDisplay && m.IsStatic && m.GetParameters()[0].ParameterType == typeof(String));
-      return (string)method.Invoke(null, new object[] { TargetValue });
+      return (string)methodForDisplay.Invoke(type, null, new object[] { TargetValue });
     }
 
     protected internal override List<KeyValuePair<string, string>> BuildPairListForSelector(Sdx.Db.Connection conn)
@@ -33,8 +32,7 @@ namespace Sdx.Scaffold.Group
       {
         return null;
       }
-      var method = type.GetMethods().First(m => m.Name == methodForList && m.IsStatic);
-      return (List<KeyValuePair<string, string>>)method.Invoke(null, null);
+      return (List<KeyValuePair<string, string>>)methodForList.Invoke(type, null, null);
     }
   }
 }

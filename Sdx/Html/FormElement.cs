@@ -29,6 +29,17 @@ namespace Sdx.Html
 
     internal protected abstract Tag CreateTag();
 
+    public IEnumerable<Validation.Validator> Validators
+    {
+      get
+      {
+        foreach(var dic in validators)
+        {
+          yield return (Validation.Validator)dic["validator"];
+        }
+      }
+    }
+
     public virtual string Name
     {
       get
@@ -108,6 +119,12 @@ namespace Sdx.Html
     {
       var result = true;
       this.Errors.Clear();
+
+      //bindされてtrue
+      if(bindedValues.Count == 0)
+      {
+        return true;
+      }
 
       if(this.IsAllowEmpty && this.Value.IsEmpty)
       {
