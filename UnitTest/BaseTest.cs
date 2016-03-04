@@ -7,9 +7,10 @@ using System.Text.RegularExpressions;
 using ClassInitialize = Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute;
 using TestInitializeAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute;
 using TestCleanupAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute;
+#endif
+
 using System.Threading;
 using System.Globalization;
-#endif
 
 namespace UnitTest
 {
