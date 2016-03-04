@@ -9,14 +9,14 @@ namespace Sdx.Scaffold.Config
 {
   public class Item : IEnumerable<KeyValuePair<string, Value>>
   {
-    public enum Type
+    private enum DisplayType
     {
       COLUMN,
       DYNAMIC,
       HTML,
     }
 
-    private Type? type;
+    private DisplayType? type;
     
     public static Item Create()
     {
@@ -39,13 +39,13 @@ namespace Sdx.Scaffold.Config
         switch(key)
         {
           case "column":
-            type = Type.COLUMN;
+            type = DisplayType.COLUMN;
             break;
           case "dynamic":
-            type = Type.DYNAMIC;
+            type = DisplayType.DYNAMIC;
             break;
           case "html":
-            type = Type.HTML;
+            type = DisplayType.HTML;
             break;
         }
 
@@ -85,7 +85,7 @@ namespace Sdx.Scaffold.Config
     }
 
 
-    public string Build(Db.Record record, Db.Connection conn)
+    public string Display(Db.Record record, Db.Connection conn)
     {
       if(type == null)
       {
@@ -94,11 +94,11 @@ namespace Sdx.Scaffold.Config
 
       switch (type)
       {
-        case Type.COLUMN:
+        case DisplayType.COLUMN:
           return this.BuildColumn(record);
-        case Type.DYNAMIC:
+        case DisplayType.DYNAMIC:
           return this.BuildDynamic(record, conn);
-        case Type.HTML:
+        case DisplayType.HTML:
           return this.BuildHtml(record);
       }
 

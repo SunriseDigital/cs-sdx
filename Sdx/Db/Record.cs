@@ -359,11 +359,6 @@ namespace Sdx.Db
       var chunk = path.Split('.');
       foreach(var key in chunk)
       {
-        if (result == null)
-        {
-          throw new InvalidOperationException("Before " + key + " owner " + " is NULL in " + path);
-        }
-
         //record
         if (key.StartsWith("@"))
         {
@@ -379,6 +374,12 @@ namespace Sdx.Db
         {
           result = result.GetValue(key);
         }
+
+        if (result == null)
+        {
+          break;
+        }
+        
       }
       return result;
     }

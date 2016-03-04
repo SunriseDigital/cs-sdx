@@ -17,13 +17,16 @@ namespace Test.Scaffold
       scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
       //scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), "GetName");
-      scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("SelectDefaultOrder"));
+      scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("FetchPairsForOption"));
 
       scaffold.DisplayList
         .Add(Config.Item.Create()
           .Set("column", new Config.Value("name"))
         ).Add(Config.Item.Create()
           .Set("column", new Config.Value("code"))
+        ).Add(Config.Item.Create()
+          .Set("label", new Config.Value("大エリア名"))
+          .Set("dynamic", new Config.Value("@large_area.name"))
         );
 
       scaffold.FormList

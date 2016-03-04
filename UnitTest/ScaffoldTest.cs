@@ -583,10 +583,10 @@ namespace UnitTest
       {
         conn.Open();
         var records = scaffold.FetchRecordSet(conn);
-        Assert.Equal("東京", scaffold.DisplayList[0].Build(records[0], conn));
-        Assert.Equal("tokyo", scaffold.DisplayList[1].Build(records[0], conn));
-        Assert.Equal("愛知", scaffold.DisplayList[0].Build(records.First(r => r.Get("large_area_id") == 2), conn));
-        Assert.Equal("aichi", scaffold.DisplayList[1].Build(records.First(r => r.Get("large_area_id") == 2), conn));
+        Assert.Equal("東京", scaffold.DisplayList[0].Display(records[0], conn));
+        Assert.Equal("tokyo", scaffold.DisplayList[1].Display(records[0], conn));
+        Assert.Equal("愛知", scaffold.DisplayList[0].Display(records.First(r => r.Get("large_area_id") == 2), conn));
+        Assert.Equal("aichi", scaffold.DisplayList[1].Display(records.First(r => r.Get("large_area_id") == 2), conn));
       }
     }
 
@@ -616,11 +616,11 @@ namespace UnitTest
         var records = scaffold.FetchRecordSet(conn);
         Assert.Equal(
           "<a href=\"/path/to/area/list?large_area_id=1\">東京</a>",
-          scaffold.DisplayList[0].Build(records[0], conn)
+          scaffold.DisplayList[0].Display(records[0], conn)
         );
         Assert.Equal(
           "<a href=\"/path/to/area/list?large_area_id=2\">愛知</a>",
-          scaffold.DisplayList[0].Build(records[1], conn)
+          scaffold.DisplayList[0].Display(records[1], conn)
         );
       }
 
