@@ -97,6 +97,7 @@
     <Compile Include="Scaffold\Group\TableMeta.cs" />
     <Compile Include="Scaffold\Config\Item.cs" />
     <Compile Include="Scaffold\Config\List.cs" />
+    <Compile Include="Util\Path.cs" />
     <Compile Include="Validation\Date.cs" />
     <Compile Include="Validation\DateTime.cs" />
     <Compile Include="Validation\DateTimeSpan.cs" />

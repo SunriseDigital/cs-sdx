@@ -62,6 +62,9 @@ namespace Sdx
 
     private bool isDebugMode;
 
+    /// <summary>
+    /// <seealso cref="Sdx.Diagnostics.DebugHttpModule.Application_BeginRequest"/>
+    /// </summary>
     public bool IsDebugMode
     {
       get
