@@ -21,10 +21,21 @@ namespace Test.Scaffold
 
       scaffold.DisplayList
         .Add(Config.Item.Create()
+          .Set("column", new Config.Value("id"))
+          .Set("label", new Config.Value("ID"))
+          .Set("style", new Config.Value("width: 80px;"))
+        )
+        .Add(Config.Item.Create()
           .Set("column", new Config.Value("name"))
-        ).Add(Config.Item.Create()
+          .Set("label", new Config.Value("名称"))
+          .Set("style", new Config.Value("width: 120px;"))
+        )
+        .Add(Config.Item.Create()
           .Set("column", new Config.Value("code"))
-        ).Add(Config.Item.Create()
+          .Set("label", new Config.Value("コード"))
+          .Set("style", new Config.Value("width: 120px;"))
+        )
+        .Add(Config.Item.Create()
           .Set("label", new Config.Value("大エリア名"))
           .Set("dynamic", new Config.Value("@large_area.name"))
         );

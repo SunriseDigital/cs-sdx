@@ -54,6 +54,10 @@ namespace Sdx.Scaffold.Config
 
       get
       {
+        if(!vars.ContainsKey(key))
+        {
+          return null;
+        }
         return this.vars[key];
       }
     }
