@@ -96,9 +96,6 @@ namespace UnitTest
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
-          .Set("column", new Sdx.Scaffold.Config.Value("id"))
-          .Set("label", new Sdx.Scaffold.Config.Value("ID"))
-        ).Add(Sdx.Scaffold.Config.Item.Create()
           .Set("column", new Sdx.Scaffold.Config.Value("name"))
           .Set("label", new Sdx.Scaffold.Config.Value("名称"))
         ).Add(Sdx.Scaffold.Config.Item.Create()
@@ -111,9 +108,6 @@ namespace UnitTest
       {
         var record = scaffold.LoadRecord(new NameValueCollection(), conn);
         var form = scaffold.BuildForm(record, conn);
-        Assert.IsType<Sdx.Html.InputHidden>(form["id"]);
-        Assert.Equal("ID", form["id"].Label);
-        Assert.Equal("id", form["id"].Tag.Attr["name"]);
 
         Assert.IsType<Sdx.Html.InputText>(form["name"]);
         Assert.Equal("名称", form["name"].Label);
@@ -1002,10 +996,6 @@ namespace UnitTest
         var record = scaffold.LoadRecord(new NameValueCollection(), conn);
 
         var form = scaffold.BuildForm(record, conn);
-       
-        var idValidators = form["id"].Validators.ToList();
-        Assert.Equal(1, idValidators.Count);
-        Assert.IsType<Sdx.Validation.Numeric>(idValidators[0]);
 
         var nameValidators = form["name"].Validators.ToList();
         Assert.Equal(2, nameValidators.Count);

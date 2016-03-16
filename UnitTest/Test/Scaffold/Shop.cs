@@ -40,9 +40,6 @@ namespace Test.Scaffold
 
       scaffold.FormList
         .Add(Config.Item.Create()
-          .Set("column", new Config.Value("id"))
-          .Set("label", new Config.Value("ID"))
-        ).Add(Config.Item.Create()
           .Set("column", new Config.Value("name"))
           .Set("label", new Config.Value("店名"))
         ).Add(Config.Item.Create()

@@ -42,9 +42,6 @@ namespace Test.Scaffold
 
       scaffold.FormList
         .Add(Config.Item.Create()
-          .Set("column", new Config.Value("id"))
-          .Set("label", new Config.Value("ID"))
-        ).Add(Config.Item.Create()
           .Set("column", new Config.Value("large_area_id"))
           .Set("label", new Config.Value("大エリア"))
         ).Add(Config.Item.Create()

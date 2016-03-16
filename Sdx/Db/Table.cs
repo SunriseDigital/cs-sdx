@@ -109,8 +109,7 @@ namespace Sdx.Db
       public List<Validation.Validator> CreateValidatorList()
       {
         var list = new List<Validation.Validator>();
-
-        if(IsNotNull && !IsAutoIncrement)
+        if(IsNotNull && !IsAutoFill)
         {
           list.Add(new Validation.NotEmpty());
         }
@@ -172,6 +171,19 @@ namespace Sdx.Db
       public void AppendValidators(Html.FormElement element)
       {
         CreateValidatorList().ForEach(v => element.AddValidator(v, v is Validation.NotEmpty));
+      }
+
+      private bool IsAutoFill
+      {
+        get
+        { 
+          if(IsAutoIncrement)
+          {
+            return true;
+          }
+
+          return Name == Connection.AutoCreateDateColumn || Name == Connection.AutoUpdateDateColumn;
+        }
       }
     }
 

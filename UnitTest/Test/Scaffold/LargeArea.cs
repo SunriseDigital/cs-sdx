@@ -25,9 +25,6 @@ namespace Test.Scaffold
 
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
-          .Set("column", new Sdx.Scaffold.Config.Value("id"))
-          .Set("label", new Sdx.Scaffold.Config.Value("ID"))
-        ).Add(Sdx.Scaffold.Config.Item.Create()
           .Set("column", new Sdx.Scaffold.Config.Value("name"))
           .Set("label", new Sdx.Scaffold.Config.Value("名称"))
         ).Add(Sdx.Scaffold.Config.Item.Create()

@@ -105,25 +105,17 @@ namespace Sdx.Scaffold
       }
       else
       {
-        //主キーはhidden
-        if (TableMeta.Pkeys.Exists((column) => column == config["column"].ToString()))
+        elem = new Sdx.Html.InputText();
+
+        elem.Name = config["column"].ToString();
+
+        if (!config.ContainsKey("label"))
         {
-          elem = new Sdx.Html.InputHidden();
+          throw new InvalidOperationException("Missing label param");
         }
-        else
-        {
-          elem = new Sdx.Html.InputText();
-        }
+
+        elem.Label = config["label"].ToString();
       }
-
-      elem.Name = config["column"].ToString();
-
-      if (!config.ContainsKey("label"))
-      {
-        throw new InvalidOperationException("Missing label param");
-      }
-
-      elem.Label = config["label"].ToString();
 
       return elem;
     }
@@ -187,12 +179,18 @@ namespace Sdx.Scaffold
           }
         }
 
-
         if(config.ContainsKey("getter"))
         {
           hasGetters.Add(config);
         }
+
+        if (!elem.Validators.Any(valid => valid is Sdx.Validation.NotEmpty))
+        {
+          elem.IsAllowEmpty = true;
+        }
       }
+
+
 
       //値のBind
       var binds = record.ToNameValueCollection();
