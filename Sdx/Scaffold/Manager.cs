@@ -364,5 +364,15 @@ namespace Sdx.Scaffold
         currentRecords.ForEach(crec => conn.Delete(crec));
       }
     }
+
+    public void DeleteRecord(dynamic pkeyValues, Sdx.Db.Connection conn)
+    {
+      var delete = Db.CreateDelete();
+
+      delete.SetFrom(TableMeta.Name);
+      TableMeta.Pkeys.ForEach(column => delete.Where.Add(column, pkeyValues[column]));
+
+      conn.Execute(delete);
+    }
   }
 }
