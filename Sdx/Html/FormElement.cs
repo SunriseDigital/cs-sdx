@@ -178,5 +178,7 @@ namespace Sdx.Html
     public string Label { get; set; }
 
     public bool IsSecret { get; set; }
+
+    public bool HasError { get { return Errors.Count > 0; } }
   }
 }
