@@ -6,6 +6,7 @@ using System.Data;
 
 using Sdx.Db.Sql;
 using System.Collections.Specialized;
+using System.Web.Script.Serialization;
 
 namespace Sdx.Db
 {
@@ -382,6 +383,14 @@ namespace Sdx.Db
         
       }
       return result;
+    }
+
+    public Dictionary<string, object> GetPkeyValues()
+    {
+      var dic = new Dictionary<string, object>();
+      OwnMeta.Pkeys.ForEach((col) => dic[col] = GetValue(col));
+
+      return dic;
     }
   }
 }
