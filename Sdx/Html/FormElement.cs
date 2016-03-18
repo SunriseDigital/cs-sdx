@@ -100,6 +100,7 @@ namespace Sdx.Html
       Bind<string[]>(value);
     }
 
+    //TODOこのジェネリックの使い方変じゃないか？
     private void Bind<T>(T value)
     {
       Value.Set(value);

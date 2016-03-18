@@ -50,8 +50,6 @@ namespace UnitTest
     public void TestRequestTimer()
     {
       Assert.Equal(typeof(Stopwatch), Sdx.Context.Current.Timer.GetType());
-      Assert.False(Sdx.Context.Current.Timer.IsRunning);
-      Sdx.Context.Current.Timer.Start();
       Assert.True(Sdx.Context.Current.Timer.IsRunning);
     }
   }

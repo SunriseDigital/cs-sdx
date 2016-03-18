@@ -124,7 +124,8 @@ namespace Sdx.Scaffold
     {
       var form = new Html.Form();
 
-      var hasGetters = new List<Config.Item>();
+      var bind = new NameValueCollection();
+      //var hasGetters = new List<Config.Item>();
       foreach (var config in FormList)
       {
         var elem = CreateFormElement(config, record, conn);
@@ -179,31 +180,40 @@ namespace Sdx.Scaffold
           }
         }
 
-        if(config.ContainsKey("getter"))
-        {
-          hasGetters.Add(config);
-        }
 
         if (!elem.Validators.Any(valid => valid is Sdx.Validation.NotEmpty))
         {
           elem.IsAllowEmpty = true;
         }
+
+        if (config.ContainsKey("getter"))
+        {
+          bind.Set(
+            config["column"].ToString(),
+            (string)config["getter"].Invoke(record.GetType(), record, null)
+          );
+        }
+        else if(config.ContainsKey("relation"))
+        {
+          var columnName = config["column"].ToString();
+          var relationName = config["relation"].ToString();
+          var values = record.GetRecordSet(relationName, conn).toStringArray(rec => rec.GetString(columnName));
+          foreach(var val in values)
+          {
+            bind.Add(columnName, val);
+          }
+        }
+        else if (config.ContainsKey("column"))
+        {
+          var columnName = config["column"].ToString();
+          if (record.HasValue(columnName))
+          {
+            bind.Set(columnName, record.GetString(columnName));
+          }
+        }
       }
 
-
-
-      //値のBind
-      var binds = record.ToNameValueCollection();
-
-      hasGetters.ForEach(config => {
-        binds.Set(
-          config["column"].ToString(),
-          (string)config["getter"].Invoke(record.GetType(), record, null)
-        );
-      });
-
-      form.Bind(binds);
-
+      form.Bind(bind);
 
       return form;
     }
@@ -340,10 +350,10 @@ namespace Sdx.Scaffold
 
       foreach (var config in relationList)
       {
-        var rel = TableMeta.Relations[config["relation"].ToString()];
-        var currentRecords = record.GetRecordSet(config["relation"].ToString(), conn);
+        var relName = config["relation"].ToString();
+        var rel = TableMeta.Relations[relName];
+        var currentRecords = record.GetRecordSet(relName, conn);
         var values = form.GetValues(config["column"].ToString());
-
         if (values != null)
         {
           foreach (var refId in form.GetValues(config["column"].ToString()))

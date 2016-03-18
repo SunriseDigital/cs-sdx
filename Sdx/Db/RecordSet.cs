@@ -159,5 +159,16 @@ namespace Sdx.Db
     {
       return this.results.GetEnumerator();
     }
+
+    public string[] toStringArray(Func<Record, string> func)
+    {
+      var result = new string[Count];
+      int key = 0;
+      ForEach(record => {
+        result.SetValue(func(record), key++);
+      });
+
+      return result;
+    }
   }
 }

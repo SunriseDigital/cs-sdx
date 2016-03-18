@@ -43,6 +43,7 @@ namespace UnitTest
   {
     public BaseTest()
     {
+      Sdx.Context.Current.Timer.Start();
       Sdx.Context.Current.Debug.Out = Console.Out;
       Test.Db.Adapter.SetupManager();
     }

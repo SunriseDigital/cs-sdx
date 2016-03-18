@@ -944,6 +944,8 @@ namespace UnitTest
       query.Set("id", savedId);
 
       post = new NameValueCollection();
+      post.Set("name", "test");
+      post.Set("area_id", "1");
       post.Set("password", "");
 
       using (var conn = scaffold.Db.CreateConnection())
@@ -1003,6 +1005,96 @@ namespace UnitTest
         Assert.IsType<Sdx.Validation.StringLength>(nameValidators[1]);
         Assert.Equal(3, ((Sdx.Validation.StringLength)nameValidators[1]).Min);
         Assert.Equal(50, ((Sdx.Validation.StringLength)nameValidators[1]).Max);
+      }
+    }
+
+        [Fact]
+    public void TestBindRelation()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunBindRelation(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunBindRelation(TestDb db)
+    {
+      Func<Sdx.Db.Connection, string, string[], Sdx.Db.Record> resetCategory = (conn, id, categories) => 
+      {
+        var record = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), id);
+        var currentRecords = record.GetRecordSet("shop_category", conn);
+        currentRecords.ForEach(crec => conn.Delete(crec));
+
+        foreach (var category_id in categories)
+        {
+          var shop_category = new Test.Orm.ShopCategory();
+          shop_category.SetValue("shop_id", record.GetString("id"));
+          shop_category.SetValue("category_id", category_id);
+          conn.BeginTransaction();
+          try
+          {
+            conn.Save(shop_category);
+            conn.Commit();
+          }
+          catch (Exception)
+          {
+            conn.Rollback();
+            throw;
+          }
+        }
+
+        return record;
+      };
+
+      Action<Sdx.Db.Connection, Sdx.Html.Form, string[]> assertCheckbox = (conn, form, categories) => 
+      {
+        var checkboxies = ((Sdx.Html.CheckableGroup)form["category_id"]).Checkables;
+        //categoriesにあるものは空ではない
+        foreach (var cid in categories)
+        {
+          Assert.False(checkboxies.First(ck => ck.Tag.Attr["value"] == cid).Value.IsEmpty);
+        }
+
+        //categoriesに無いものは空。
+        foreach (var checkbox in checkboxies.Where(ck => categories.All(cid => ck.Tag.Attr["value"] != cid)))
+        {
+          Assert.True(checkbox.Value.IsEmpty);
+        }
+      };
+
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      using(var conn = db.Adapter.CreateConnection())
+      {
+        conn.Open();
+        var categories = new string[] { "1", "2" };
+        var record = resetCategory(conn, "1", categories);
+        record.ClearRecordCache();
+
+        var form = scaffold.BuildForm(record, conn);
+        assertCheckbox(conn, form, categories);
+      }
+
+      using (var conn = db.Adapter.CreateConnection())
+      {
+        conn.Open();
+        var categories = new string[] { };
+        var record = resetCategory(conn, "1", categories);
+        record.ClearRecordCache();
+
+        var form = scaffold.BuildForm(record, conn);
+        assertCheckbox(conn, form, categories);
+      }
+
+      using (var conn = db.Adapter.CreateConnection())
+      {
+        conn.Open();
+        var categories = new string[] { "3", "4", "5" };
+        var record = resetCategory(conn, "1", categories);
+        record.ClearRecordCache();
+
+        var form = scaffold.BuildForm(record, conn);
+        assertCheckbox(conn, form, categories);
       }
     }
   }

@@ -24,7 +24,7 @@ namespace Test.Orm.Table
         new Dictionary<string, Relation>()
         {
           {
-            "shop_category",
+            "shop",
             new Relation(
               typeof(Test.Orm.Table.ShopCategory),
               "id",
