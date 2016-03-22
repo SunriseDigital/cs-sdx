@@ -354,6 +354,7 @@ namespace Sdx.Scaffold
         var rel = TableMeta.Relations[relName];
         var currentRecords = record.GetRecordSet(relName, conn);
         var values = form.GetValues(config["column"].ToString());
+
         if (values != null)
         {
           foreach (var refId in form.GetValues(config["column"].ToString()))

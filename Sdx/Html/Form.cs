@@ -41,60 +41,37 @@ namespace Sdx.Html
 
     public void Bind(params NameValueCollection[] collections)
     {
-      //foreach (var values in collections)
-      //{
-      //  foreach(var kv in elements)
-      //  {
-      //    var elem = kv.Value;
-      //    var name = kv.Key;
-      //    var vals = values.GetValues(name);
-      //    if(elem.Value.IsMultiple)
-      //    {
-      //      if(vals == null)
-      //      {
-      //        elem.Bind(new string[]{});
-      //      }
-      //      else
-      //      {
-      //        elem.Bind(vals);
-      //      }
-      //    }
-      //    else
-      //    {
-      //      if (vals == null)
-      //      {
-      //        elem.Bind("");
-      //      }
-      //      else
-      //      {
-      //        if (vals.Length > 1)
-      //        {
-      //          throw new InvalidOperationException(name + "element must have single value.");
-      //        }
-      //        elem.Bind(vals[0]);
-      //      }
-      //    }
-      //  }
-      //}
-
       foreach (var values in collections)
       {
-        foreach (var name in values.AllKeys)
+        foreach (var kv in elements)
         {
-          if (this.elements.ContainsKey(name))
+          var elem = kv.Value;
+          var name = kv.Key;
+          var vals = values.GetValues(name);
+          if (elem.Value.IsMultiple)
           {
-            if (this.elements[name].Value.IsMultiple)
+            if (vals == null)
             {
-              this.elements[name].Bind(values.GetValues(name));
+              elem.Bind(new string[] { });
             }
             else
             {
-              var vals = values.GetValues(name);
+              elem.Bind(vals);
+            }
+          }
+          else
+          {
+            if (vals == null)
+            {
+              elem.Bind("");
+            }
+            else
+            {
               if (vals.Length > 1)
               {
                 throw new InvalidOperationException(name + "element must have single value.");
               }
-              this.elements[name].Bind(vals[0]);
+              elem.Bind(vals[0]);
             }
           }
         }

@@ -526,12 +526,17 @@ namespace Sdx.Db
       }
 
       var first = record.UpdatedValues.FirstOrDefault(kv => kv.Key == columnName);
-      if (first.Value != null)
+      if (first.Value == null)
       {
-        return false;
+        return true;
       }
 
-      return true;
+      if (first.Value.ToString() == "")
+      {
+        return true;
+      }
+
+      return false;
     }
 
     public void Save(Record record)

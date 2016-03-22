@@ -909,6 +909,7 @@ namespace UnitTest
       post.Set("name", "foobar");
       post.Set("area_id", "1");
       post.Set("password", "1234");
+      post.Set("created_at", "");
 
       string savedId = null;
       using (var conn = scaffold.Db.CreateConnection())
@@ -947,6 +948,7 @@ namespace UnitTest
       post.Set("name", "test");
       post.Set("area_id", "1");
       post.Set("password", "");
+      post.Set("created_at", "2014-02-27 00:00:00");
 
       using (var conn = scaffold.Db.CreateConnection())
       {
