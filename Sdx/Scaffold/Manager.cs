@@ -386,8 +386,14 @@ namespace Sdx.Scaffold
       }
     }
 
-    public void DeleteRecord(dynamic pkeyValues, Sdx.Db.Connection conn)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pkeyJson">`{id: 1}`のようなJSON文字列を想定しています</param>
+    /// <param name="conn"></param>
+    public void DeleteRecord(string pkeyJson, Sdx.Db.Connection conn)
     {
+      var pkeyValues = (Dictionary<string, object>)Sdx.Util.Json.Decode(pkeyJson);
       var delete = Db.CreateDelete();
 
       delete.SetFrom(TableMeta.Name);
@@ -399,17 +405,17 @@ namespace Sdx.Scaffold
     /// <summary>
     /// 
     /// </summary>
-    /// <param name="pkeysArray">`{id: 1}`のようなJSON文字列を想定しています</param>
-    public void Sort(Db.RecordSet recordSet, string[] pkeysArray, Sdx.Db.Connection conn)
+    /// <param name="pkeyJsons">`{id: 1}`のようなJSON文字列の配列を想定しています</param>
+    public void Sort(Db.RecordSet recordSet, string[] pkeyJsons, Sdx.Db.Connection conn)
     {
       var secValue = 0;
       var direction = SortingOrder["direction"].ToString().ToUpper();
       if (direction == "DESC")
       {
-        secValue = pkeysArray.Length - 1;
+        secValue = pkeyJsons.Length - 1;
       }
 
-      foreach (var pkeys in pkeysArray)
+      foreach (var pkeys in pkeyJsons)
       {
         var pkeyValues = (Dictionary<string, object>)Sdx.Util.Json.Decode(pkeys);
         var record = recordSet.First((rec) => pkeyValues.All(kv => rec.GetString(kv.Key) == kv.Value.ToString()));

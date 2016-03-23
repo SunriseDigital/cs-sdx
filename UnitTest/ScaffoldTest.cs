@@ -1164,11 +1164,10 @@ namespace UnitTest
         var record = scaffold.LoadRecord(query, conn);
         var pkeyJson = Sdx.Util.Json.Encoder(record.GetPkeyValues());
 
-        var pkeyValues = Sdx.Util.Json.Decode(pkeyJson);
         conn.BeginTransaction();
         try
         {
-          scaffold.DeleteRecord(pkeyValues, conn);
+          scaffold.DeleteRecord(pkeyJson, conn);
           conn.Commit();
         }
         catch (Exception)
