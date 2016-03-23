@@ -66,5 +66,5 @@ CREATE TABLE shop_category (
   PRIMARY KEY (shop_id, category_id)
 );
 
-ALTER TABLE shop_category ADD FOREIGN KEY (shop_id) REFERENCES shop(id);
+ALTER TABLE shop_category ADD FOREIGN KEY (shop_id) REFERENCES shop(id) ON DELETE CASCADE;
 ALTER TABLE shop_category ADD FOREIGN KEY (category_id) REFERENCES category(id);

@@ -1099,5 +1099,89 @@ namespace UnitTest
         assertCheckbox(conn, form, categories);
       }
     }
+
+    [Fact]
+    public void TestDelete()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunDelete(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunDelete(TestDb db)
+    {
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+
+      var query = new NameValueCollection();
+
+      var post = new NameValueCollection();
+      post.Set("name", "foobar");
+      post.Set("area_id", "1");
+      post.Add("category_id", "2");
+      post.Add("category_id", "3");
+
+      string savedId;
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, post, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        //確認する
+        savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        Assert.Equal("foobar", savedRecord.GetString("name"));
+        Assert.Equal("1", savedRecord.GetString("area_id"));
+
+        var shopCategories = savedRecord.GetRecordSet("shop_category", conn, select => select.AddOrder("category_id", Sdx.Db.Sql.Order.ASC));
+        Assert.Equal(2, shopCategories.Count);
+        Assert.Equal("2", shopCategories[0].GetString("category_id"));
+        Assert.Equal("3", shopCategories[1].GetString("category_id"));
+      }
+
+      query = new NameValueCollection();
+      query.Set("id", savedId);
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        var pkeyJson = Sdx.Util.Json.Encoder(record.GetPkeyValues());
+
+        var pkeyValues = Sdx.Util.Json.Decode(pkeyJson);
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.DeleteRecord(pkeyValues, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        //確認する
+        savedId = record.GetString("id");
+        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        Assert.Null(savedRecord);
+      }
+    }
   }
 }

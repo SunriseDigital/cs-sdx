@@ -81,7 +81,8 @@ CREATE TABLE shop_category (
 
 ALTER TABLE shop_category ADD CONSTRAINT fk_shop_category_shop_id
 　FOREIGN KEY (shop_id)
-　REFERENCES shop(id);
+　REFERENCES shop(id)
+  ON DELETE CASCADE;
 
 ALTER TABLE shop_category ADD CONSTRAINT fk_shop_category_category_id
 　FOREIGN KEY (category_id)
