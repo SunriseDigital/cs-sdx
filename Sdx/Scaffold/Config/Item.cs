@@ -62,6 +62,14 @@ namespace Sdx.Scaffold.Config
       }
     }
 
+    public bool IsEmpty
+    {
+      get
+      {
+        return vars.Count == 0;
+      }
+    }
+
     public bool ContainsKey(string key)
     {
       return this.vars.ContainsKey(key);

@@ -104,7 +104,8 @@ namespace UnitTest
           {0}area{1}.{0}id{1} AS {0}id@area{1},
           {0}area{1}.{0}name{1} AS {0}name@area{1},
           {0}area{1}.{0}code{1} AS {0}code@area{1},
-          {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1}
+          {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1},
+          {0}area{1}.{0}sequence{1} AS {0}sequence@area{1}
         FROM {0}shop{1} 
         INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"), db.Command.CommandText);
 
@@ -128,7 +129,8 @@ namespace UnitTest
           {0}area{1}.{0}id{1} AS {0}id@area{1},
           {0}area{1}.{0}name{1} AS {0}name@area{1},
           {0}area{1}.{0}code{1} AS {0}code@area{1},
-          {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1}
+          {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1},
+          {0}area{1}.{0}sequence{1} AS {0}sequence@area{1}
         FROM {0}shop{1} 
         LEFT JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}"), db.Command.CommandText);
 
@@ -159,7 +161,8 @@ namespace UnitTest
           {0}area{1}.{0}id{1} AS {0}id@area{1},
           {0}area{1}.{0}name{1} AS {0}name@area{1},
           {0}area{1}.{0}code{1} AS {0}code@area{1},
-          {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1}
+          {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1},
+          {0}area{1}.{0}sequence{1} AS {0}sequence@area{1}
         FROM {0}shop{1} 
         INNER JOIN {0}area{1}
           ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1}
@@ -241,6 +244,7 @@ namespace UnitTest
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
         {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1},
+        {0}area{1}.{0}sequence{1} AS {0}sequence@area{1},
         {0}large_area{1}.{0}id{1} AS {0}id@large_area{1},
         {0}large_area{1}.{0}name{1} AS {0}name@large_area{1},
         {0}large_area{1}.{0}code{1} AS {0}code@large_area{1},
@@ -270,6 +274,7 @@ namespace UnitTest
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
         {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1},
+        {0}area{1}.{0}sequence{1} AS {0}sequence@area{1},
         {0}large_area{1}.{0}id{1} AS {0}id@large_area{1},
         {0}large_area{1}.{0}name{1} AS {0}name@large_area{1},
         {0}large_area{1}.{0}code{1} AS {0}code@large_area{1},
@@ -303,6 +308,7 @@ namespace UnitTest
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
         {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1},
+        {0}area{1}.{0}sequence{1} AS {0}sequence@area{1},
         {0}large_area{1}.{0}id{1} AS {0}id@large_area{1},
         {0}large_area{1}.{0}name{1} AS {0}name@large_area{1},
         {0}large_area{1}.{0}code{1} AS {0}code@large_area{1},
@@ -340,6 +346,7 @@ namespace UnitTest
         {0}area{1}.{0}name{1} AS {0}name@area{1},
         {0}area{1}.{0}code{1} AS {0}code@area{1},
         {0}area{1}.{0}large_area_id{1} AS {0}large_area_id@area{1},
+        {0}area{1}.{0}sequence{1} AS {0}sequence@area{1},
         {0}large_area{1}.{0}id{1} AS {0}id@large_area{1},
         {0}large_area{1}.{0}name{1} AS {0}name@large_area{1},
         {0}large_area{1}.{0}code{1} AS {0}code@large_area{1},

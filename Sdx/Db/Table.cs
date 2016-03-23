@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sdx.Db
 {
@@ -277,6 +278,21 @@ namespace Sdx.Db
     public virtual Table SelectDefaultOrder(Sql.Select select)
     {
       return this;
+    }
+
+    public Db.Sql.Context FindSelfContext(Db.Sql.Select select)
+    {
+      return select.ContextList.First(c => c.Value.Table == this).Value;
+    }
+
+    public Db.RecordSet FetchRecordSetDefaultOrder(Db.Connection conn)
+    {
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+
+      this.SelectDefaultOrder(select);
+
+      return conn.FetchRecordSet(select);
     }
   }
 }

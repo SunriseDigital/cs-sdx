@@ -47,6 +47,7 @@ namespace Sdx.Scaffold
 
       DisplayList = new Config.List();
       FormList = new Config.List();
+      SortingOrder = new Config.Item();
     }
 
     internal Db.TableMeta TableMeta { get; set; }
@@ -65,6 +66,8 @@ namespace Sdx.Scaffold
     public Config.List FormList { get; private set; }
 
     public Config.List DisplayList { get; private set; }
+
+    public Config.Item SortingOrder { get; private set; }
 
     private Html.FormElement CreateFormElement(Config.Item config, Db.Record record, Db.Connection conn)
     {
@@ -302,18 +305,27 @@ namespace Sdx.Scaffold
 
     public Db.RecordSet FetchRecordSet(Sdx.Db.Connection conn)
     {
-      return FetchRecordSet(conn, (select) =>
+      if(ListMethod == null)
       {
-        if (Group != null)
+        return FetchRecordSet(conn, (select) =>
         {
-          if (Group.TargetValue != null)
+          var context = select.ContextList.First(kv => kv.Value.JoinType == Sdx.Db.Sql.JoinType.From).Value;
+          if (Group != null)
           {
-            select.Where.Add(Group.TargetColumnName, Group.TargetValue);
+            if (Group.TargetValue != null)
+            {
+              context.Where.Add(Group.TargetColumnName, Group.TargetValue);
+            }
           }
-        }
 
-        return true;
-      });
+          return true;
+        });
+      }
+      else
+      {
+        var table = TableMeta.CreateTable();
+        return (Db.RecordSet)ListMethod.Invoke(TableMeta.TableType, table, new object[]{conn});
+      }
     }
 
     public void Save(Sdx.Db.Record record, NameValueCollection form, Sdx.Db.Connection conn)
@@ -383,5 +395,30 @@ namespace Sdx.Scaffold
 
       conn.Execute(delete);
     }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="pkeysArray">`{id: 1}`のようなJSON文字列を想定しています</param>
+    public void Sort(Db.RecordSet recordSet, string[] pkeysArray, Sdx.Db.Connection conn)
+    {
+      var secValue = 0;
+      var direction = SortingOrder["direction"].ToString().ToUpper();
+      if (direction == "DESC")
+      {
+        secValue = pkeysArray.Length - 1;
+      }
+
+      foreach (var pkeys in pkeysArray)
+      {
+        var pkeyValues = (Dictionary<string, object>)Sdx.Util.Json.Decode(pkeys);
+        var record = recordSet.First((rec) => pkeyValues.All(kv => rec.GetString(kv.Key) == kv.Value.ToString()));
+        record.SetValue(SortingOrder["column"].ToString(), secValue);
+        conn.Save(record);
+        secValue = direction == "DESC" ? secValue - 1 : secValue + 1;
+      }
+    }
+
+    public Config.Value ListMethod { get; set; }
   }
 }

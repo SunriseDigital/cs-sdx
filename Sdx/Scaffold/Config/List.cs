@@ -29,6 +29,14 @@ namespace Sdx.Scaffold.Config
       return this;
     }
 
+    public bool IsEmpty
+    {
+      get
+      {
+        return this.list.Count == 0;
+      }
+    }
+
     public IEnumerator<Item> GetEnumerator()
     {
       return this.list.GetEnumerator();

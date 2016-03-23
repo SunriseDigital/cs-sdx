@@ -21,6 +21,7 @@ namespace Test.Orm.Table
           new Column("name"),
           new Column("code"),
           new Column("large_area_id"),
+          new Column("sequence"),
         },
         new Dictionary<string, Relation>()
         {
@@ -57,6 +58,13 @@ namespace Test.Orm.Table
       });
 
       return elem;
+    }
+
+    public override Sdx.Db.Table SelectDefaultOrder(Sdx.Db.Sql.Select select)
+    {
+      var context = FindSelfContext(select);
+      context.AddOrder("sequence", Sdx.Db.Sql.Order.DESC);
+      return this;
     }
   }
 }

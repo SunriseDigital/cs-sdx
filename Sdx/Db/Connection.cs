@@ -431,6 +431,19 @@ namespace Sdx.Db
       return result;
     }
 
+    public Db.Record FetchRecordByPkey(Table table, Dictionary<string, object> dictionary)
+    {
+      var select = this.Adapter.CreateSelect();
+      select.AddFrom(table);
+
+      foreach (var col in table.OwnMeta.Pkeys)
+      {
+        select.Where.Add(col, dictionary[col]);
+      }
+
+      return this.FetchRecord(select);
+    }
+
     public Record FetchRecordByPkey(Db.Table table, string pkeyValue)
     {
       if (table.OwnMeta.Pkeys.Count > 1)
