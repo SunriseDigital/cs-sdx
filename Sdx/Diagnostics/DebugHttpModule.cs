@@ -75,9 +75,30 @@ namespace Sdx.Diagnostics
       debugString.Append("<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both;\">");
       this.AppendDebugLogs(debugString);
       this.AppendDbQueryLogs(debugString);
+      this.AppendPostData(debugString);
       debugString.Append("</div>");
 
       context.Response.Write(debugString.ToString());
+    }
+
+    private void AppendPostData(StringBuilder debugString)
+    {
+      var postLog = new StringBuilder();
+      foreach (var key in HttpContext.Current.Request.Form.AllKeys)
+      {
+        var values = HttpContext.Current.Request.Form.GetValues(key);
+        postLog
+          .Append(key)
+          .Append(Environment.NewLine)
+          .Append(Debug.Export(values))
+          .Append(Environment.NewLine)
+          .Append(Environment.NewLine);
+      }
+      debugString.Append(String.Format(
+        LogBlockFormat,
+        "Post",
+        "<pre>" + postLog.ToString() + "</pre>"
+      ));
     }
 
     private void AppendDbQueryLogs(StringBuilder debugString)

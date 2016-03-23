@@ -46,13 +46,30 @@ namespace Sdx.Diagnostics
       Out.WriteLine();
     }
 
-    private static string GetDumpTitle(object value, string indent, string appendText = "")
+    private static string GetDumpTitle(object value, string indent, bool needType, string appendText = "")
     {
-      Type type = value.GetType();
-      return indent + type.Namespace + "." + type.Name + appendText + Environment.NewLine;
+      if(needType)
+      {
+        Type type = value.GetType();
+        return indent + type.Namespace + "." + type.Name + appendText + Environment.NewLine;
+      }
+      else
+      {
+        return indent;
+      }
     }
 
-    public static string Dump(object value, string indent = "")
+    public static string Export(object value)
+    {
+      return Dump(value, "", false);
+    }
+
+    public static string Dump(object value)
+    {
+      return Dump(value, "", true);
+    }
+
+    private static string Dump(object value, string indent, bool needType)
     {
       if (value == null)
       {
@@ -62,18 +79,25 @@ namespace Sdx.Diagnostics
       {
         string strVal = value as string;
         //stringは型名を付与して改行するのは冗長なのでString(文字数)を付与
-        return indent + "String(" + strVal.Length + ") " + strVal;
+        if(needType)
+        {
+          return indent + "String(" + strVal.Length + ") " + strVal;
+        }
+        else
+        {
+          return indent + strVal;
+        }
       }
       else if (value is IDictionary)
       {
         var dic = value as IDictionary;
 
-        var result =  GetDumpTitle(value, indent, "(" + dic.Count + ")");
+        var result =  GetDumpTitle(value, indent, needType, "(" + dic.Count + ")");
 
         foreach (var key in dic.Keys)
         {
           // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
-          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ") + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ", needType) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -84,10 +108,10 @@ namespace Sdx.Diagnostics
       {
         var nvcol = value as NameValueCollection;
 
-        var result = GetDumpTitle(value, indent, "(" + nvcol.Count + ")");
+        var result = GetDumpTitle(value, indent, needType, "(" + nvcol.Count + ")");
         foreach (var key in nvcol.Keys)
         {
-          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ") + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ", needType) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -96,8 +120,8 @@ namespace Sdx.Diagnostics
       else if (value is IList)
       {
         IList list = value as IList;
-        var result = GetDumpTitle(value, indent, "(" + list.Count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent);
+        var result = GetDumpTitle(value, indent, needType, "(" + list.Count + ")");
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType);
       }
       else if (value is IEnumerable)
       {
@@ -107,8 +131,8 @@ namespace Sdx.Diagnostics
         {
           ++count;
         }
-        var result = GetDumpTitle(value, indent, "(" + count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent);
+        var result = GetDumpTitle(value, indent, needType, "(" + count + ")");
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType);
       }
       else
       {
@@ -116,20 +140,20 @@ namespace Sdx.Diagnostics
         if (type.Namespace + "." + type.Name == "System.Collections.Generic.KeyValuePair`2")
         {
           var dynamicValue = (dynamic)value;
-          return indent + dynamicValue.Key.ToString()+ " " + Dump(dynamicValue.Value, indent);
+          return indent + dynamicValue.Key.ToString() + " " + Dump(dynamicValue.Value, indent, needType);
         }
         else
         {
-          return GetDumpTitle(value, indent, " " + value.ToString()).TrimEnd('\r', '\n');
+          return GetDumpTitle(value, indent, needType, " " + value.ToString()).TrimEnd('\r', '\n');
         }
       }
     }
 
-    private static String AppendEnumerableDump(String result, IEnumerable values, String indent)
+    private static String AppendEnumerableDump(String result, IEnumerable values, String indent, bool needType)
     { 
       foreach (Object obj in values as IEnumerable)
       {
-        result += Dump(obj, indent + DumpIndent) + Environment.NewLine;
+        result += Dump(obj, indent + DumpIndent, needType) + Environment.NewLine;
       }
 
       //改行を取り除く
