@@ -96,6 +96,7 @@
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
     <Compile Include="Html\InputPassword.cs" />
+    <Compile Include="Pager.cs" />
     <Compile Include="Scaffold\Config\Value.cs" />
     <Compile Include="Scaffold\Group\Base.cs" />
     <Compile Include="Scaffold\Group\StaticClass.cs" />
