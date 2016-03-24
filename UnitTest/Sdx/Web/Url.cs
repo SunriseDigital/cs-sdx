@@ -15,7 +15,7 @@ using System.Collections.Generic;
 namespace UnitTest
 {
   [TestClass]
-  public class UrlTest : BaseTest
+  public class Web_Url : BaseTest
   {
     [Fact]
     public void TestMultipleParams()

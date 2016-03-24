@@ -16,7 +16,7 @@ using System;
 namespace UnitTest
 {
   [TestClass]
-  public class ContextTest : BaseTest
+  public class Context : BaseTest
   {
     [Fact]
     public void TestVar()

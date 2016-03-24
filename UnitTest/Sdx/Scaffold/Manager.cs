@@ -19,9 +19,8 @@ using System.Linq;
 
 namespace UnitTest
 {
-  using Config = Sdx.Scaffold.Config;
   [TestClass]
-  public class ScaffoldTest : BaseDbTest
+  public class Scaffold_Manager : BaseDbTest
   {
     [ClassInitialize]
     public new static void InitilizeClass(TestContext context)
@@ -142,7 +141,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Sdx.Scaffold.Config.Value("name"));
 
         scaffold.Group.Init();
 
@@ -176,7 +175,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Sdx.Scaffold.Config.Value("name"));
 
         scaffold.Group.Init();
 
@@ -211,7 +210,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("FetchPairsForOption"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Sdx.Scaffold.Config.Value("name"), new Sdx.Scaffold.Config.Value("FetchPairsForOption"));
 
         scaffold.Group.Init();
 
@@ -252,7 +251,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Sdx.Scaffold.Config.Value("name"));
         scaffold.Group.Strict = true;
 
         //Handlerが無ければ例外
@@ -276,7 +275,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Sdx.Scaffold.Config.Value("name"));
         scaffold.Group.Strict = true;
 
         var handlerCalled = false;
@@ -298,7 +297,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Config.Value("name"), new Config.Value("FetchPairsForOption"));
+        scaffold.Group = new Sdx.Scaffold.Group.TableMeta("large_area_id", Test.Orm.Table.LargeArea.Meta, new Sdx.Scaffold.Config.Value("name"), new Sdx.Scaffold.Config.Value("FetchPairsForOption"));
         scaffold.Group.Strict = true;
 
         scaffold.Group.Init();
@@ -336,7 +335,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"));
 
         scaffold.Group.Init();
 
@@ -370,7 +369,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"));
 
         scaffold.Group.Init();
 
@@ -402,7 +401,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"), new Config.Value("GetList"));
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"), new Sdx.Scaffold.Config.Value("GetList"));
 
         scaffold.Group.Init();
 
@@ -454,7 +453,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"));
         scaffold.Group.FixedValue = "1";
         scaffold.Group.Init();
 
@@ -485,7 +484,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"));
         scaffold.Group.FixedValue = "2";
         scaffold.Group.Init();
 
@@ -516,7 +515,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"), new Config.Value("GetList"));
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"), new Sdx.Scaffold.Config.Value("GetList"));
         scaffold.Group.FixedValue = "1";
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
@@ -538,7 +537,7 @@ namespace UnitTest
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
-        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Config.Value("GetName"));
+        scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"));
         scaffold.Group.FixedValue = "1";
         scaffold.Group.DefaultValue = "2";
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
@@ -1010,7 +1009,7 @@ namespace UnitTest
       }
     }
 
-        [Fact]
+    [Fact]
     public void TestBindRelation()
     {
       foreach (TestDb db in this.CreateTestDbList())
@@ -1022,7 +1021,7 @@ namespace UnitTest
 
     private void RunBindRelation(TestDb db)
     {
-      Func<Sdx.Db.Connection, string, string[], Sdx.Db.Record> resetCategory = (conn, id, categories) => 
+      Func<Sdx.Db.Connection, string, string[], Sdx.Db.Record> resetCategory = (conn, id, categories) =>
       {
         var record = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), id);
         var currentRecords = record.GetRecordSet("shop_category", conn);
@@ -1049,7 +1048,7 @@ namespace UnitTest
         return record;
       };
 
-      Action<Sdx.Db.Connection, Sdx.Html.Form, string[]> assertCheckbox = (conn, form, categories) => 
+      Action<Sdx.Db.Connection, Sdx.Html.Form, string[]> assertCheckbox = (conn, form, categories) =>
       {
         var checkboxies = ((Sdx.Html.CheckableGroup)form["category_id"]).Checkables;
         //categoriesにあるものは空ではない
@@ -1066,7 +1065,7 @@ namespace UnitTest
       };
 
       var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
-      using(var conn = db.Adapter.CreateConnection())
+      using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
         var categories = new string[] { "1", "2" };

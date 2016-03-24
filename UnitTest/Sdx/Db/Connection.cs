@@ -16,7 +16,7 @@ using System;
 namespace UnitTest
 {
   [TestClass]
-  public class DbConnectionTest : BaseDbTest
+  public class Db_Connection : BaseDbTest
   {
     [ClassInitialize]
     public new static void InitilizeClass(TestContext context)

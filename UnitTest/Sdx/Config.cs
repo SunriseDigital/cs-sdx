@@ -19,7 +19,7 @@ using System.Text;
 namespace UnitTest
 {
   [TestClass]
-  public class ConfigTest : BaseTest
+  public class Config : BaseTest
   {
     [Fact]
     public void TestYaml()

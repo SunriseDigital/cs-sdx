@@ -17,12 +17,12 @@ using System.Collections.Generic;
 namespace UnitTest
 {
   [TestClass]
-  public class CollectionTest : BaseTest
+  public class Collection_OrderedDictionary : BaseTest
   {
     [ClassInitialize]
     public static void InitilizeClass(TestContext context)
     {
-      Console.WriteLine("CollectionTest");
+      
     }
 
     [Fact]

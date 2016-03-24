@@ -16,7 +16,7 @@ using System;
 namespace UnitTest
 {
   [TestClass]
-  public class DbRecordTest : BaseDbTest
+  public class Db_Record : BaseDbTest
   {
     [ClassInitialize]
     public new static void InitilizeClass(TestContext context)

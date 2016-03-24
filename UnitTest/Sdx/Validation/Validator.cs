@@ -17,7 +17,7 @@ using System.Globalization;
 namespace UnitTest
 {
   [TestClass]
-  public class ValidationTest : BaseTest
+  public class Validation_Validator : BaseTest
   {
     [Fact]
     public void TestNotEmpty()

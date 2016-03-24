@@ -16,7 +16,7 @@ using System.Linq;
 namespace UnitTest
 {
   [TestClass]
-  public class DbAdapterTest : BaseTest
+  public class Db_Adapter : BaseTest
   {
     [ClassInitialize]
     public static void InitilizeClass(TestContext context)
@@ -36,14 +36,14 @@ namespace UnitTest
 
     override public void FixtureSetUp()
     {
-      DbAdapterTest.InitilizeClass(null);
+      Db_Adapter.InitilizeClass(null);
       //ここのクラス名は適宜書き換えてください。
       //MSTestのFixtureSetUpがstaticじゃないとだめだったのでこのような構造になってます。
     }
 
     override public void FixtureTearDown()
     {
-      DbAdapterTest.CleanupClass();
+      Db_Adapter.CleanupClass();
       //@see FixtureSetUp
     }
 

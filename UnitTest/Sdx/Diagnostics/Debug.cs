@@ -19,7 +19,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 namespace UnitTest
 {
   [TestClass]
-  public class DiagnosticsTest : BaseTest
+  public class Diagnostics_Debug : BaseTest
   {
     [Fact]
     public void TestDumpString()
