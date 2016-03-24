@@ -1,5 +1,8 @@
-﻿using System;
-using System.Web.Script.Serialization;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+
 
 namespace Sdx.Util
 {
@@ -7,12 +10,12 @@ namespace Sdx.Util
   {
     public static string Encoder(object obj)
     {
-      return new JavaScriptSerializer().Serialize(obj);
+      return JsonConvert.SerializeObject(obj);
     }
 
-    public static dynamic Decode(string json)
+    public static T Decode<T>(string json)
     {
-      return new JavaScriptSerializer().Deserialize<dynamic>(json);
+      return JsonConvert.DeserializeObject<T>(json);
     }
   }
 }

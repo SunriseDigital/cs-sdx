@@ -393,7 +393,7 @@ namespace Sdx.Scaffold
     /// <param name="conn"></param>
     public void DeleteRecord(string pkeyJson, Sdx.Db.Connection conn)
     {
-      var pkeyValues = (Dictionary<string, object>)Sdx.Util.Json.Decode(pkeyJson);
+      var pkeyValues = Sdx.Util.Json.Decode<Dictionary<string, object>>(pkeyJson);
       var delete = Db.CreateDelete();
 
       delete.SetFrom(TableMeta.Name);
@@ -417,7 +417,7 @@ namespace Sdx.Scaffold
 
       foreach (var pkeys in pkeyJsons)
       {
-        var pkeyValues = (Dictionary<string, object>)Sdx.Util.Json.Decode(pkeys);
+        var pkeyValues = Sdx.Util.Json.Decode<Dictionary<string, object>>(pkeys);
         var record = recordSet.First((rec) => pkeyValues.All(kv => rec.GetString(kv.Key) == kv.Value.ToString()));
         record.SetValue(SortingOrder["column"].ToString(), secValue);
         conn.Save(record);
