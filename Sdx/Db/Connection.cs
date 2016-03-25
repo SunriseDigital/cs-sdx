@@ -673,5 +673,19 @@ namespace Sdx.Db
 
       return FetchRecordSet(select);
     }
+
+    public int FetchRowCount(Select select)
+    {
+      //TODO JOINして行数が重複してる時のCOUNTに対応する
+      var clonedSel = (Select)select.Clone();
+      clonedSel.OrderList.Clear();
+      clonedSel.ClearColumns().AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
+
+      //DBベンダーによって帰ってくる型がintだったりlongだったりします。
+      //いちいち型を識別してキャストするの面倒だったのでこんな感じに。
+      var count = FetchOne<string>(clonedSel);
+
+      return Int32.Parse(count);
+    }
   }
 }
