@@ -27,7 +27,9 @@ namespace UnitTest
     public void TestTotalCount()
     {
       var pager = new Sdx.Pager();
-      pager.SetPageData("1", 10, 38);
+      pager.SetPage("1");
+      pager.PerPage = 10;
+      pager.TotalCount = 38;
 
       Assert.Equal(4, pager.LastPage);
       Assert.Equal(10, pager.PerPage);
@@ -36,12 +38,12 @@ namespace UnitTest
       Assert.True(pager.HasNext);
       Assert.False(pager.HasPrev);
 
-      pager.SetPageData("2", 10, 38);
+      pager.SetPage("2");
       Assert.Equal(2, pager.Page);
       Assert.True(pager.HasNext);
       Assert.True(pager.HasPrev);
 
-      pager.SetPageData("4", 10, 38);
+      pager.SetPage("4");
       Assert.Equal(4, pager.Page);
       Assert.False(pager.HasNext);
       Assert.True(pager.HasPrev);
@@ -51,14 +53,15 @@ namespace UnitTest
     public void TestSimple()
     {
       var pager = new Sdx.Pager();
-      pager.SetPageData("1", true);
+      pager.SetPage("1");
+      pager.HasNext = true;
 
       Assert.Equal(1, pager.Page);
       Assert.True(pager.HasNext);
       Assert.False(pager.HasPrev);
 
       Exception ex;
-      ex = Record.Exception(() => 
+      ex = Record.Exception(() =>
       {
         Assert.Equal(4, pager.LastPage);
       });
@@ -79,7 +82,8 @@ namespace UnitTest
 
       Assert.IsType<InvalidOperationException>(ex);
 
-      pager.SetPageData("5", false);
+      pager.SetPage("5");
+      pager.HasNext = false; ;
 
       Assert.Equal(5, pager.Page);
       Assert.False(pager.HasNext);

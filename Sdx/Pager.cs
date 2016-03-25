@@ -10,42 +10,30 @@ namespace Sdx
     private int? lastPage;
     private int? perPage;
     private int? totalCount;
+    private int? page;
+    private bool? hasNext;
 
-    private void SetPage(string page)
+    public void SetPage(string page)
     {
-      Page = page == null ? 1 : Int32.Parse(page);
-    }
-
-    public void SetPageData(string page, bool hasNext)
-    {
-      SetPage(page);
-      HasNext = hasNext;
-    }
-
-    public void SetPageData(string page, int perPage, int totalCount)
-    {
-      SetPage(page);
-
-      this.perPage = perPage;
-      this.totalCount = totalCount;
-
-      this.lastPage = TotalCount / PerPage;
-      if (this.totalCount % this.perPage != 0)
-      {
-        ++this.lastPage;
-      }
-
-      HasNext = Page < this.lastPage;
+      this.page = page == null ? 1 : Int32.Parse(page);
+      this.hasNext = null;
     }
 
     public int LastPage
     {
       get
       {
-        if (lastPage == null)
+        if(lastPage != null)
         {
-          throw new InvalidOperationException("You must call `SetPageData(string int int)` before use this.");
+          return (int)lastPage;
         }
+
+        lastPage = TotalCount / PerPage;
+        if (TotalCount % PerPage != 0)
+        {
+          ++lastPage;
+        }
+
         return (int)lastPage;
       }
     }
@@ -56,9 +44,16 @@ namespace Sdx
       {
         if (perPage == null)
         {
-          throw new InvalidOperationException("You must call `SetPageData(string int int)` before use this.");
+          throw new InvalidOperationException("Missing PerPage data.");
         }
+
         return (int)perPage;
+      }
+
+      set
+      {
+        perPage = value;
+        lastPage = null;
       }
     }
 
@@ -68,15 +63,50 @@ namespace Sdx
       {
         if (totalCount == null)
         {
-          throw new InvalidOperationException("You must call `SetPageData(string int int)` before use this.");
+          throw new InvalidOperationException("Missing TotalCount data.");
         }
+
         return (int)totalCount;
+      }
+
+      set
+      {
+        totalCount = value;
+        lastPage = null;
       }
     }
 
-    public int Page { get; private set; }
+    public int Page
+    {
+      get
+      {
+        if (page == null)
+        {
+          throw new InvalidOperationException("Missing Page data.");
+        }
 
-    public bool HasNext { get; private set; }
+        return (int)page;
+      }
+    }
+
+    public bool HasNext
+    {
+      get
+      {
+        if(hasNext != null)
+        {
+          return (bool)hasNext;
+        }
+
+        hasNext = Page < LastPage;
+        return (bool)hasNext;
+      }
+
+      set
+      {
+        hasNext = value;
+      }
+    }
 
     public bool HasPrev
     {

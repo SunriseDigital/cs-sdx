@@ -569,5 +569,17 @@ namespace Sdx.Db.Sql
     }
 
     public bool ForUpdate { get; set; }
+
+
+    public void LimitPage(int page, int perPage)
+    {
+      Offset = perPage * (page - 1);
+      Limit = perPage;
+    }
+
+    public void LimitPager(Pager Pager)
+    {
+      LimitPage(Pager.Page, Pager.PerPage);
+    }
   }
 }

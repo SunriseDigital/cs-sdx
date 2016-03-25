@@ -14,6 +14,8 @@ namespace Sdx.Scaffold
     private const string DEFAULT_NAME = "SDX.SCAFFOLD.MANAGER.DEFAULT_NAME";
     public String Name { get; private set; }
 
+    private int? perPage;
+
     public static void ClearContextCache()
     {
       Dictionary<string, Manager> instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
@@ -305,27 +307,37 @@ namespace Sdx.Scaffold
 
     public Db.RecordSet FetchRecordSet(Sdx.Db.Connection conn)
     {
-      if(ListMethod == null)
+      if(HasPerPage)
       {
-        return FetchRecordSet(conn, (select) =>
-        {
-          var context = select.ContextList.First(kv => kv.Value.JoinType == Sdx.Db.Sql.JoinType.From).Value;
-          if (Group != null)
-          {
-            if (Group.TargetValue != null)
-            {
-              context.Where.Add(Group.TargetColumnName, Group.TargetValue);
-            }
-          }
+        Pager = new Pager();
+        Pager.PerPage = PerPage;
+      }
 
-          return true;
-        });
-      }
-      else
+      return FetchRecordSet(conn, (select) =>
       {
-        var table = TableMeta.CreateTable();
-        return (Db.RecordSet)ListMethod.Invoke(TableMeta.TableType, table, new object[]{conn});
-      }
+        var context = select.ContextList.First(kv => kv.Value.JoinType == Sdx.Db.Sql.JoinType.From).Value;
+        if (ListSelectHook != null)
+        {
+          ListSelectHook.Invoke(TableMeta.TableType, context.Table, new object[] { select });
+        }
+        
+        if (Group != null)
+        {
+          if (Group.TargetValue != null)
+          {
+            context.Where.Add(Group.TargetColumnName, Group.TargetValue);
+          }
+        }
+
+        if (Pager != null)
+        {
+          Pager.SetPage(HttpContext.Current.Request.QueryString["pid"]);
+          Pager.TotalCount = conn.FetchRowCount(select);
+          select.LimitPager(Pager);
+        }
+
+        return true;
+      });
     }
 
     public void Save(Sdx.Db.Record record, NameValueCollection form, Sdx.Db.Connection conn)
@@ -425,6 +437,28 @@ namespace Sdx.Scaffold
       }
     }
 
-    public Config.Value ListMethod { get; set; }
+    public Config.Value ListSelectHook { get; set; }
+
+    public bool HasPerPage
+    {
+      get
+      {
+        return perPage != null;
+      }
+    }
+
+    public int PerPage
+    {
+      get
+      {
+        return (int)perPage;
+      }
+      set
+      {
+        this.perPage = value;
+      }
+    }
+
+    public Pager Pager { get; private set; }
   }
 }

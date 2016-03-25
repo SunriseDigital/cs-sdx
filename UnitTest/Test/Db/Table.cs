@@ -9,7 +9,17 @@ namespace Test.Db
   {
     public override Sdx.Db.Table SelectDefaultOrder(Sdx.Db.Sql.Select select)
     {
-      select.AddOrder("id", Sdx.Db.Sql.Order.ASC);
+      var context = FindSelfContext(select);
+      
+      if(OwnMeta.HasColumn("sequence"))
+      {
+        context.AddOrder("sequence", Sdx.Db.Sql.Order.DESC);
+      }
+      else
+      {
+        context.AddOrder("id", Sdx.Db.Sql.Order.ASC);
+      }
+      
       return this;
     }
   }

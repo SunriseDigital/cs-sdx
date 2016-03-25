@@ -31,6 +31,7 @@ namespace UnitTest
     protected override void TearDown()
     {
       Sdx.Scaffold.Manager.ClearContextCache();
+      HttpContext.Current = null;
     }
 
     [Fact]
@@ -1063,7 +1064,7 @@ namespace UnitTest
           Assert.True(checkbox.Value.IsEmpty);
         }
       };
-
+      
       var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
       using (var conn = db.Adapter.CreateConnection())
       {
@@ -1179,6 +1180,54 @@ namespace UnitTest
         savedId = record.GetString("id");
         var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
         Assert.Null(savedRecord);
+      }
+    }
+
+    [Fact]
+    public void TestPerPage()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunPerPage(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunPerPage(TestDb db)
+    {
+      InitHttpContextMock("pid=1");
+
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      scaffold.PerPage = 2;
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        Assert.True(scaffold.HasPerPage);
+
+        var recordSet = scaffold.FetchRecordSet(conn);
+        Assert.NotNull(scaffold.Pager);
+        Assert.Equal(1, scaffold.Pager.Page);
+        Assert.Equal(scaffold.PerPage, recordSet.Count);
+        Assert.Equal(1, recordSet[0].GetValue("id"));
+        Assert.Equal(2, recordSet[1].GetValue("id"));
+      }
+
+      InitHttpContextMock("pid=2");
+      scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      scaffold.PerPage = 2;
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        Assert.True(scaffold.HasPerPage);
+
+        var recordSet = scaffold.FetchRecordSet(conn);
+        Assert.NotNull(scaffold.Pager);
+        Assert.Equal(2, scaffold.Pager.Page);
+        Assert.Equal(scaffold.PerPage, recordSet.Count);
+        Assert.Equal(3, recordSet[0].GetValue("id"));
+        Assert.Equal(4, recordSet[1].GetValue("id"));
       }
     }
   }

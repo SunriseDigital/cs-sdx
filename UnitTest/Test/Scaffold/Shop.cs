@@ -38,6 +38,9 @@ namespace Test.Scaffold
           .Set("column", new Config.Value("created_at"))
         );
 
+      scaffold.PerPage = 2;
+      scaffold.ListSelectHook = new Config.Value("SelectDefaultOrder");
+
       scaffold.FormList
         .Add(Config.Item.Create()
           .Set("column", new Config.Value("name"))

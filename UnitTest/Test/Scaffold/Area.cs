@@ -40,7 +40,7 @@ namespace Test.Scaffold
           .Set("dynamic", new Config.Value("@large_area.name"))
         );
 
-      scaffold.ListMethod = new Config.Value("FetchRecordSetDefaultOrder");
+      scaffold.ListSelectHook = new Config.Value("SelectDefaultOrder");
 
       scaffold.SortingOrder
         .Set("column", new Sdx.Scaffold.Config.Value("sequence"))
