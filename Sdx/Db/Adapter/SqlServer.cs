@@ -35,6 +35,10 @@ namespace Sdx.Db.Adapter
       select.AfterOrderFunc = (sel) => {
         if (sel.Limit >= 0)
         {
+          if (select.OrderList.Count == 0)
+          {
+            throw new InvalidOperationException("Needs ORDER BY statement to use OFFSET/LIMIT on SQLServer.");
+          }
           return " OFFSET " + sel.Offset + " ROWS FETCH NEXT " + sel.Limit + " ROWS ONLY";
         }
 
