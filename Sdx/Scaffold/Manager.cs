@@ -331,7 +331,7 @@ namespace Sdx.Scaffold
 
         if (Pager != null)
         {
-          Pager.SetPage(HttpContext.Current.Request.QueryString["pid"]);
+          Pager.SetPage(HttpContext.Current.Request.QueryString[Html.PagerLink.DEFAULT_VAR_NAME]);
           Pager.TotalCount = conn.FetchRowCount(select);
           select.LimitPager(Pager);
         }

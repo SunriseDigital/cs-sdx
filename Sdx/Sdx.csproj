@@ -84,6 +84,7 @@
     <Compile Include="Db\Sql\Update.cs" />
     <Compile Include="Db\Table.cs" />
     <Compile Include="Db\TableMeta.cs" />
+    <Compile Include="Diagnostics\Bench.cs" />
     <Compile Include="Diagnostics\Debug.cs" />
     <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
     <Compile Include="Diagnostics\DebugHttpModule.cs" />
@@ -96,6 +97,7 @@
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
     <Compile Include="Html\InputPassword.cs" />
+    <Compile Include="Html\PagerLink.cs" />
     <Compile Include="Pager.cs" />
     <Compile Include="Scaffold\Config\Value.cs" />
     <Compile Include="Scaffold\Group\Base.cs" />

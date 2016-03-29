@@ -31,6 +31,14 @@ namespace Sdx.Html
       return this.Render(attr);
     }
 
+    public string Render(Action<Attr> callback)
+    {
+      var attr = new Attr();
+      callback.Invoke(attr);
+
+      return this.Render(attr);
+    }
+
     public string RenderStartTag(params string[] classes)
     {
       var attr = new Attr();
@@ -42,6 +50,19 @@ namespace Sdx.Html
       return this.RenderStartTag(attr);
     }
 
+    public string RenderStartTag(Action<Attr> callback)
+    {
+      var attr = new Attr();
+      callback.Invoke(attr);
+
+      return this.RenderStartTag(attr);
+    }
+
+    public HtmlBase AttrCall(Action<Attr> callback)
+    {
+      callback.Invoke(Attr);
+      return this;
+    }
 
     public Attr Attr { get; internal protected set; }
 
@@ -63,6 +84,20 @@ namespace Sdx.Html
       {
         return this.children;
       }
+    }
+
+    public HtmlBase If(Predicate<HtmlBase> condition, Action<HtmlBase> trueCallback, Action<HtmlBase> falseCallback = null)
+    {
+      if (condition.Invoke(this))
+      {
+        trueCallback.Invoke(this);
+      }
+      else if (falseCallback != null)
+      {
+        falseCallback.Invoke(this);
+      }
+
+      return this;
     }
   }
 }

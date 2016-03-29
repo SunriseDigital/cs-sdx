@@ -77,5 +77,21 @@ namespace UnitTest
         span.Render()
       );
     }
+
+    [Fact]
+    public void TestIf()
+    {
+      var div = new Sdx.Html.Tag("div");
+      div.If(h => h.TagName == "div", h => h.Attr.AddClass("disabled"), h => h.Attr.AddClass("enabled"));
+
+      Assert.True(div.Attr.HasClass("disabled"));
+      Assert.False(div.Attr.HasClass("enabled"));
+
+      var span = new Sdx.Html.Tag("span");
+      span.If(h => h.TagName == "div", h => h.Attr.AddClass("disabled"), h => h.Attr.AddClass("enabled"));
+
+      Assert.False(span.Attr.HasClass("disabled"));
+      Assert.True(span.Attr.HasClass("enabled"));
+    }
   }
 }
