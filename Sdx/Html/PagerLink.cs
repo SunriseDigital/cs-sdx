@@ -54,8 +54,14 @@ namespace Sdx.Html
 
     public Pager Pager { get; private set; }
 
+    /// <summary>
+    /// リンク先URL。ページ番号のクエリはついたままでOK。上書きされます。
+    /// </summary>
     public Web.Url BaseUrl { get; set; }
 
+    /// <summary>
+    /// URLクエリーのページ番号のキー
+    /// </summary>
     public string VarName
     {
       get

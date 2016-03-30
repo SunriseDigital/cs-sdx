@@ -10,7 +10,7 @@ namespace Sdx
     private int? lastPage;
     private int? perPage;
     private int? totalCount;
-    private int? page;
+    private int page = 1;
     private bool? hasNext;
 
     public Pager()
@@ -23,10 +23,13 @@ namespace Sdx
       PerPage = perPage;
     }
 
+    /// <summary>
+    /// 現在のページをセットする。<see cref="System.Web.HttpContext.Requset.QueryString"/>からデータをセットしやすくするためです。クエリが空の場合は1がセットされます。
+    /// </summary>
+    /// <param name="page"></param>
     public void SetPage(string page)
     {
-      this.page = page == null ? 1 : Int32.Parse(page);
-      this.hasNext = null;
+      Page = Util.String.IsEmpty(page) ? 1 : Int32.Parse(page);
     }
 
     public int LastPage
@@ -90,12 +93,13 @@ namespace Sdx
     {
       get
       {
-        if (page == null)
-        {
-          throw new InvalidOperationException("Missing Page data.");
-        }
-
         return (int)page;
+      }
+
+      set
+      {
+        this.page = value;
+        this.hasNext = null;
       }
     }
 

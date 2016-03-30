@@ -16,12 +16,21 @@ namespace Sdx.Scaffold
 
     private int? perPage;
 
+    /// <summary>
+    /// 生成したMagegerはUserControlで参照するために<see cref="Name"/>をキーにContext.Currentにキャッシュされます。そのキャッシュを強制的にクリアします。通常の使用では必要ありません。ユニットテストで使いまいした。
+    /// </summary>
     public static void ClearContextCache()
     {
       Dictionary<string, Manager> instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
       instances.Clear();
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tableMeta"></param>
+    /// <param name="db"></param>
+    /// <param name="name">UserControl側で参照するための名前。基本デフォルトでOK。一ページに複数のScaffoldを使用する場合必要（テストしてません）。</param>
     public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db, string name = Manager.DEFAULT_NAME)
     {
       this.Name = name;
@@ -63,12 +72,24 @@ namespace Sdx.Scaffold
       return select;
     }
 
+    /// <summary>
+    /// ページのタイトル
+    /// </summary>
     public string Title { get; set; }
 
+    /// <summary>
+    /// フォーム用の設定
+    /// </summary>
     public Config.List FormList { get; private set; }
 
+    /// <summary>
+    /// リスト用の設定
+    /// </summary>
     public Config.List DisplayList { get; private set; }
 
+    /// <summary>
+    /// 並び替えが必要な場合セットします。リストの並び順には影響しません。別途<see cref="ListSelectHook"/>で並び順を指定します。
+    /// </summary>
     public Config.Item SortingOrder { get; private set; }
 
     private Html.FormElement CreateFormElement(Config.Item config, Db.Record record, Db.Connection conn)
@@ -430,6 +451,9 @@ namespace Sdx.Scaffold
       }
     }
 
+    /// <summary>
+    /// リストの並び順の変更が必要な場合こちらで。
+    /// </summary>
     public Config.Value ListSelectHook { get; set; }
 
     public bool HasPerPage
@@ -440,6 +464,9 @@ namespace Sdx.Scaffold
       }
     }
 
+    /// <summary>
+    /// ページングが必要な場合セットします。
+    /// </summary>
     public int PerPage
     {
       get
