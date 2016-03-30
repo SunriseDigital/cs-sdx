@@ -13,6 +13,16 @@ namespace Sdx
     private int? page;
     private bool? hasNext;
 
+    public Pager()
+    {
+
+    }
+
+    public Pager(int perPage)
+    {
+      PerPage = perPage;
+    }
+
     public void SetPage(string page)
     {
       this.page = page == null ? 1 : Int32.Parse(page);

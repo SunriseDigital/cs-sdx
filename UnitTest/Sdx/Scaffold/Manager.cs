@@ -1205,9 +1205,9 @@ namespace UnitTest
 
         Assert.True(scaffold.HasPerPage);
 
-        var recordSet = scaffold.FetchRecordSet(conn);
-        Assert.NotNull(scaffold.Pager);
-        Assert.Equal(1, scaffold.Pager.Page);
+        var pagerLink = new Sdx.Html.PagerLink(new Sdx.Pager(scaffold.PerPage), "pid");
+        var recordSet = scaffold.FetchRecordSet(conn, pagerLink.Pager);
+        Assert.Equal(1, pagerLink.Pager.Page);
         Assert.Equal(scaffold.PerPage, recordSet.Count);
         Assert.Equal(1, recordSet[0].GetValue("id"));
         Assert.Equal(2, recordSet[1].GetValue("id"));
@@ -1222,12 +1222,30 @@ namespace UnitTest
 
         Assert.True(scaffold.HasPerPage);
 
-        var recordSet = scaffold.FetchRecordSet(conn);
-        Assert.NotNull(scaffold.Pager);
-        Assert.Equal(2, scaffold.Pager.Page);
+        var pagerLink = new Sdx.Html.PagerLink(new Sdx.Pager(scaffold.PerPage), "pid");
+        var recordSet = scaffold.FetchRecordSet(conn, pagerLink.Pager);
+        Assert.Equal(2, pagerLink.Pager.Page);
         Assert.Equal(scaffold.PerPage, recordSet.Count);
         Assert.Equal(3, recordSet[0].GetValue("id"));
         Assert.Equal(4, recordSet[1].GetValue("id"));
+      }
+
+      //クエリーなし
+      InitHttpContextMock("");
+      scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      scaffold.PerPage = 2;
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        Assert.True(scaffold.HasPerPage);
+
+        var pagerLink = new Sdx.Html.PagerLink(new Sdx.Pager(scaffold.PerPage), "pid");
+        var recordSet = scaffold.FetchRecordSet(conn, pagerLink.Pager);
+        Assert.Equal(1, pagerLink.Pager.Page);
+        Assert.Equal(scaffold.PerPage, recordSet.Count);
+        Assert.Equal(1, recordSet[0].GetValue("id"));
+        Assert.Equal(2, recordSet[1].GetValue("id"));
       }
     }
   }

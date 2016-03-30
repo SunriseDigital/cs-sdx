@@ -18,9 +18,33 @@ namespace Sdx.Html
       return this;
     }
 
-    public Tag AddText(string text)
+    /// <summary>
+    /// 子要素にテキストを追加します。
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="htmlEncode">HTMLエンティティにエンコードするかどうか。デフォルトtrue</param>
+    /// <returns></returns>
+    public Tag AddText(string text, bool htmlEncode = true)
     {
-      this.AddHtml(new RawText(text));
+      this.AddHtml(new RawText(text, htmlEncode));
+      return this;
+    }
+
+    public Tag AddChild(object target)
+    {
+      if(target is HtmlBase)
+      {
+        AddHtml((HtmlBase)target);
+      }
+      else if(target is string)
+      {
+        AddText((string)target);
+      }
+      else
+      {
+        throw new ArgumentException("Illegal type argument");
+      }
+
       return this;
     }
 

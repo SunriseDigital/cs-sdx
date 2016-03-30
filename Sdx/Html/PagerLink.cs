@@ -10,25 +10,67 @@ namespace Sdx.Html
   {
     public const string DEFAULT_VAR_NAME = "page";
 
-    public PagerLink(Pager pager):this(pager, null)
+    private string varName;
+
+    public PagerLink(Pager pager, Web.Url baseUrl, string varName)
     {
-      BaseUrl = new Web.Url(HttpContext.Current.Request.Url.PathAndQuery);
+      Pager = pager;
+      if(baseUrl == null)
+      {
+        BaseUrl = new Web.Url(HttpContext.Current.Request.Url.PathAndQuery);
+      }
+      else
+      {
+        BaseUrl = baseUrl;
+      }
+
+      if(varName == null)
+      {
+        VarName = PagerLink.DEFAULT_VAR_NAME;
+      }
+      else
+      {
+        VarName = varName;
+      }
+    }
+
+    public PagerLink(Pager pager)
+      : this(pager, null, null)
+    {
+
+    }
+
+    public PagerLink(Sdx.Pager pager, string varName)
+      :this(pager, null, varName)
+    {
+
     }
 
     public PagerLink(Pager pager, Web.Url baseUrl)
+      :this(pager, baseUrl, null)
     {
-      Pager = pager;
-      BaseUrl = baseUrl;
-      VarName = PagerLink.DEFAULT_VAR_NAME;
+
     }
 
     public Pager Pager { get; private set; }
 
     public Web.Url BaseUrl { get; set; }
 
-    public string VarName { get; set; }
+    public string VarName
+    {
+      get
+      {
+        return varName;
+      }
+      
+      set
+      {
+        varName = value;
+        Pager.SetPage(HttpContext.Current.Request.QueryString[varName]);
+      }
+    }
 
-    private Tag CrateLinkTag(string linkText, string targetPage)
+    private Tag CrateLinkTag(string targetPage)
     {
       var url = (Web.Url)BaseUrl.Clone();
       Html.Tag tag;
@@ -44,19 +86,18 @@ namespace Sdx.Html
         tag.Attr.AddClass("disabled");
       }
 
-      tag.AddText(linkText);
-
       return tag;
     }
 
-    public Tag GetPrev(string linkText)
+    public Tag GetPrev()
     {
-      return CrateLinkTag(linkText, Pager.HasPrev ? (Pager.Page - 1).ToString(): null);
+      return CrateLinkTag(Pager.HasPrev ? (Pager.Page - 1).ToString() : null);
     }
 
-    public Tag GetNext(string linkText)
+
+    public Tag GetNext()
     {
-      return CrateLinkTag(linkText, Pager.HasNext ? (Pager.Page + 1).ToString() : null);
+      return CrateLinkTag(Pager.HasNext ? (Pager.Page + 1).ToString() : null);
     }
   }
 }

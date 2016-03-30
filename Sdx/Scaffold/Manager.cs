@@ -305,14 +305,8 @@ namespace Sdx.Scaffold
       return records;
     }
 
-    public Db.RecordSet FetchRecordSet(Sdx.Db.Connection conn)
+    public Db.RecordSet FetchRecordSet(Sdx.Db.Connection conn, Sdx.Pager pager = null)
     {
-      if(HasPerPage)
-      {
-        Pager = new Pager();
-        Pager.PerPage = PerPage;
-      }
-
       return FetchRecordSet(conn, (select) =>
       {
         var context = select.ContextList.First(kv => kv.Value.JoinType == Sdx.Db.Sql.JoinType.From).Value;
@@ -329,11 +323,10 @@ namespace Sdx.Scaffold
           }
         }
 
-        if (Pager != null)
+        if (pager != null)
         {
-          Pager.SetPage(HttpContext.Current.Request.QueryString[Html.PagerLink.DEFAULT_VAR_NAME]);
-          Pager.TotalCount = conn.FetchRowCount(select);
-          select.LimitPager(Pager);
+          pager.TotalCount = conn.FetchRowCount(select);
+          select.LimitPager(pager);
         }
 
         return true;
@@ -458,7 +451,5 @@ namespace Sdx.Scaffold
         this.perPage = value;
       }
     }
-
-    public Pager Pager { get; private set; }
   }
 }
