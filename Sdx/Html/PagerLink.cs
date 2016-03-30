@@ -102,12 +102,12 @@ namespace Sdx.Html
 
     public Tag GetFisrt()
     {
-      return CrateLinkTag("1");
+      return CrateLinkTag(Pager.Page == 1 ? null : "1");
     }
 
     public Tag GetLast()
     {
-      return CrateLinkTag(Pager.LastPage.ToString());
+      return CrateLinkTag(Pager.Page == Pager.LastPage ? null : Pager.LastPage.ToString());
     }
   }
 }
