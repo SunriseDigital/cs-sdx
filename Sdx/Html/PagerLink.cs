@@ -99,5 +99,15 @@ namespace Sdx.Html
     {
       return CrateLinkTag(Pager.HasNext ? (Pager.Page + 1).ToString() : null);
     }
+
+    public Tag GetFisrt()
+    {
+      return CrateLinkTag("1");
+    }
+
+    public Tag GetLast()
+    {
+      return CrateLinkTag(Pager.LastPage.ToString());
+    }
   }
 }
