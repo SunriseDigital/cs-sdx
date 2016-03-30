@@ -223,7 +223,7 @@ namespace Sdx.Scaffold
         {
           var columnName = config["column"].ToString();
           var relationName = config["relation"].ToString();
-          var values = record.GetRecordSet(relationName, conn).toStringArray(rec => rec.GetString(columnName));
+          var values = record.GetRecordSet(relationName, conn).ToStringArray(rec => rec.GetString(columnName));
           foreach(var val in values)
           {
             bind.Add(columnName, val);

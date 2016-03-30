@@ -19,6 +19,12 @@ namespace Test.Orm
       //本当はhash化するが確認しやすいように文字列追加のみ。
       SetValue("password", "HASH@" + rawPassword);
     }
+
+    public string GetCategoryNames(Sdx.Db.Connection conn = null)
+    {
+      var categories = GetRecordSet("shop_category", conn);
+      return string.Join(" / ", categories.ToStringArray(rec => rec.GetRecord("category", conn).GetString("name")));
+    }
   }
 }
       

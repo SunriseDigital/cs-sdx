@@ -26,15 +26,23 @@ namespace Test.Scaffold
 
       scaffold.DisplayList
         .Add(Config.Item.Create()
+          .Set("label", new Config.Value("名前"))
           .Set("column", new Config.Value("name"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
-          .Set("column", new Config.Value("area_id"))
+          .Set("label", new Config.Value("エリア"))
+          .Set("dynamic", new Config.Value("@area.name"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Config.Value("ログインID"))
           .Set("column", new Config.Value("login_id"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Config.Value("業種"))
+          .Set("dynamic", new Config.Value("#GetCategoryNames"))
+        )
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Config.Value("登録日時"))
           .Set("column", new Config.Value("created_at"))
         );
 

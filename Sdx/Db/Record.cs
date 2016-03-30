@@ -369,7 +369,25 @@ namespace Sdx.Db
         {
           var method = key.Substring(1);
           System.Type type = result.GetType();
-          result = type.GetMethods().First(m => m.Name == method && !m.IsStatic && m.GetParameters().Count() == 0).Invoke(result, null);
+          var methodInfo = type.GetMethods().FirstOrDefault(m => m.Name == method && !m.IsStatic);
+          if (methodInfo == null)
+          {
+            throw new NotImplementedException("Missing " + method + " method in " + GetType());
+          }
+
+          var paramsCount = methodInfo.GetParameters().Count();
+          if (paramsCount == 0)
+          {
+            result = methodInfo.Invoke(result, null);
+          }
+          else if (paramsCount == 1)
+          {
+            result = methodInfo.Invoke(result, new object[] { conn });
+          }
+          else
+          {
+            throw new NotSupportedException(method + "'s parameter must be nothing or Sdx.Db.Connection.");
+          }
         }
         else
         {
