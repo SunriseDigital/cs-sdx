@@ -94,6 +94,7 @@
     <Compile Include="Test\Data\LargeArea.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
     <Compile Include="Test\Db\Table.cs" />
+    <Compile Include="Test\Route\LangRouteHandler.cs" />
     <Compile Include="Test\Scaffold\Area.cs" />
     <Compile Include="Test\Scaffold\LargeArea.cs" />
     <Compile Include="Test\Scaffold\Shop.cs" />
