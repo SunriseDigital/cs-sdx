@@ -18,6 +18,10 @@ msgstr ""
 "Language-Team: \n"
 "X-Generator: Poedit 1.8.7\n"
 
+#: Sdx/Scaffold/Group/Base.cs:67
+msgid "絞り込む"
+msgstr ""
+
 #: web/lib/_private/control/scaffold/list.ascx:9
 msgid "リスト"
 msgstr ""
