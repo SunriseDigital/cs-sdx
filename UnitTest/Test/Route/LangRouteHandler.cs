@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -23,7 +24,7 @@ namespace Test.Route
         .Replace("{controller}", requestContext.RouteData.Values["controller"].ToString())
         .Replace("{action}", requestContext.RouteData.Values["action"].ToString())
         ;
-      Sdx.Context.Current.Lang = requestContext.RouteData.Values["lang"].ToString();
+      Sdx.Context.Current.Culture = new CultureInfo(requestContext.RouteData.Values["lang"].ToString());
       return BuildManager.CreateInstanceFromVirtualPath(vPath, typeof(System.Web.UI.Page)) as IHttpHandler;
     }
   }

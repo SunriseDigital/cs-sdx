@@ -9,6 +9,13 @@ namespace Sdx.Validation
     public const string ErrorGreaterThanInclusive = "ErrorGreaterThanInclusive";
     public const string ErrorGreaterThan = "ErrorGreaterThan";
 
+    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    {
+      defaultMessages[ErrorInvalid] = I18n.GetString("数字を入力してください。");
+      defaultMessages[ErrorGreaterThanInclusive] = I18n.GetString("%min%以上の数字を入力してください。");
+      defaultMessages[ErrorGreaterThan] = I18n.GetString("%min%より大きな数字を入力してください。");
+    }
+
     private long min;
 
     public long Min

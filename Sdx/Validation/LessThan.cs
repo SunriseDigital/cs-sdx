@@ -9,6 +9,13 @@ namespace Sdx.Validation
     public const string ErrorLessThanInclusive = "ErrorLessThanInclusive";
     public const string ErrorLessThan = "ErrorLessThan";
 
+    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    {
+      defaultMessages[ErrorInvalid] = I18n.GetString("数字を入力してください。");
+      defaultMessages[ErrorLessThanInclusive] = I18n.GetString("%max%以下の数字を入力してください。");
+      defaultMessages[ErrorLessThan] = I18n.GetString("%max%未満の数字を入力してください。");
+    }
+
     private long max;
 
     public long Max

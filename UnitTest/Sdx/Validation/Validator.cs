@@ -22,7 +22,7 @@ namespace UnitTest
     [Fact]
     public void TestNotEmpty()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
       var validator = new Sdx.Validation.NotEmpty();
 
       Assert.True(validator.IsValid("aaa"));
@@ -79,7 +79,7 @@ namespace UnitTest
     [Fact]
     public void TestLessThanAndMessagePlaceholder()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
       var validator = new Sdx.Validation.LessThan(10);
       Assert.Equal(10, validator.Max);
@@ -121,7 +121,7 @@ namespace UnitTest
     [Fact]
     public void TestGreaterThan()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
       var validator = new Sdx.Validation.GreaterThan(10);
       Assert.Equal(10, validator.Min);
@@ -148,7 +148,7 @@ namespace UnitTest
     [Fact]
     public void TestStringLength()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
       var validator = new Sdx.Validation.StringLength(3);
       Assert.Equal(3, validator.Min);
@@ -177,7 +177,7 @@ namespace UnitTest
     [Fact]
     public void TestNumeric()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
       var validator = new Sdx.Validation.Numeric();
       Assert.True(validator.IsValid("1234567"));
@@ -188,12 +188,12 @@ namespace UnitTest
     [Fact]
     public void TestClassMessages()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
       var validator = new Test.Validation.Numeric();
       validator.IsValid("aaa");
       Assert.Equal("あへあへうひは", validator.Errors[0].Message);
 
-      Sdx.Context.Current.Lang = "en";
+      Sdx.Context.Current.Culture = new CultureInfo("en");
       validator = new Test.Validation.Numeric();
       validator.IsValid("aaa");
       Assert.Equal("Ahe ahe uhiha", validator.Errors[0].Message);
@@ -202,7 +202,7 @@ namespace UnitTest
     [Fact]
     public void TestEmail()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
       var validator = new Sdx.Validation.Email();
 
       Assert.True(validator.IsValid("foo@bar.com"));
@@ -235,7 +235,7 @@ namespace UnitTest
     [Fact]
     public void TestRegex()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
       var validator = new Sdx.Validation.Regex("[0-9]+");
       Assert.Equal("[0-9]+", validator.Pattern.ToString());
       Assert.True(validator.IsValid("0123"));
@@ -246,8 +246,8 @@ namespace UnitTest
     [Fact]
     public void TestWhitelist()
     {
-      Sdx.Context.Current.Lang = "ja";
-      var validator = new Sdx.Validation.Whitelist(new string[] {"10", "20"});
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
+      var validator = new Sdx.Validation.Whitelist(new string[] { "10", "20" });
 
       Assert.True(validator.IsValid("10"));
       Assert.True(validator.IsValid("20"));
@@ -258,9 +258,9 @@ namespace UnitTest
     [Fact]
     public void TestDateSpan()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
-      var validator = new Sdx.Validation.DateSpan(min:new DateTime(2015, 10, 12), dateFormat:"yyyy年M月d日");
+      var validator = new Sdx.Validation.DateSpan(min: new DateTime(2015, 10, 12), dateFormat: "yyyy年M月d日");
       Assert.Equal("yyyy年M月d日", validator.DateFormat);
       Assert.True(validator.IsValid("2015/10/12"));
       Assert.True(validator.IsValid("2015-10-12"));
@@ -283,7 +283,7 @@ namespace UnitTest
     [Fact]
     public void TestDateTimeSpan()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
       var validator = new Sdx.Validation.DateTimeSpan(min: new DateTime(2015, 10, 12, 16, 30, 0), dateFormat: "yyyy年M月d日 H時m分");
       Assert.Equal("yyyy年M月d日 H時m分", validator.DateFormat);
@@ -308,7 +308,7 @@ namespace UnitTest
     [Fact]
     public void TestDateTime()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
       var validator = new Sdx.Validation.DateTime();
       Assert.True(validator.IsValid("2014/1/1 1:00:00"));
       Assert.True(validator.IsValid("2014/01/01 01:00:00"));
@@ -328,7 +328,7 @@ namespace UnitTest
     [Fact]
     public void TestDate()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
       var validator = new Sdx.Validation.Date();
       Assert.True(validator.IsValid("2014/1/1"));
       Assert.True(validator.IsValid("2014/01/01"));

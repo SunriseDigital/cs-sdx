@@ -458,7 +458,7 @@ English
     [Fact]
     public void TestFormValidation()
     {
-      Sdx.Context.Current.Lang = "ja";
+      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
       var mock = new Mock<System.Web.HttpRequestBase>();
       mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
@@ -481,7 +481,6 @@ English
       Assert.Equal(2, loginId.Errors.Count);
       Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li><li>メールアドレスの書式が正しくありません。</li></ul>", loginId.Errors.Html.Render());
       Assert.Equal("必須項目です。", loginId.Errors[0].Message);
-      Assert.Equal("ja", loginId.Errors[0].Lang);
 
       //BreakChain
       form = new Sdx.Html.Form();

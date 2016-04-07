@@ -12,13 +12,13 @@ namespace Sdx.Validation
   {
     private const string ErrorAll = "Sdx.Validation.Validator.ErrorAll";
 
-    private static Dictionary<string, Data.Tree> messageMemoryCache = new Dictionary<string, Data.Tree>();
-
     public Errors Errors { get; internal set; }
 
     private Dictionary<string, string> messages = new Dictionary<string, string>();
 
     private Dictionary<string, string> placeholders = new Dictionary<string, string>();
+
+    private Dictionary<string, string> defaultMessages = new Dictionary<string, string>();
 
     public IDictionary<string, string> Messages
     {
@@ -54,9 +54,18 @@ namespace Sdx.Validation
       {
         this.messages[ErrorAll] = message;
       }
+      else
+      {
+        InitDefaultMessages(defaultMessages);
+      }
     }
 
     protected abstract bool IsValidString(string value);
+
+    protected virtual void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    {
+
+    }
 
 
     protected void SetPlaceholder(string key, string value)
@@ -75,14 +84,12 @@ namespace Sdx.Validation
       //インスタンスメッセージ（簡易）
       if (this.messages.ContainsKey(ErrorAll))
       {
-        error.Lang = null;
         return this.messages[ErrorAll];
       }
 
       //インスタンスメッセージ
       if (this.messages.ContainsKey(error.ErrorType))
       {
-        error.Lang = null;
         return this.messages[error.ErrorType];
       }
 
@@ -92,10 +99,11 @@ namespace Sdx.Validation
       var prop = this.GetType().GetProperty("MessageTemplates");
       if (prop != null)
       {
+        var lang = Context.Current.Culture.TwoLetterISOLanguageName;
         var templates = (Dictionary<string, Dictionary<string, string>>)prop.GetValue(null, null);
-        if (templates.ContainsKey(error.Lang))
+        if (templates.ContainsKey(lang))
         {
-          var msgs = templates[error.Lang];
+          var msgs = templates[lang];
           if (msgs.ContainsKey(error.ErrorType))
           {
             return msgs[error.ErrorType];
@@ -103,35 +111,40 @@ namespace Sdx.Validation
         }
       }
 
-      //設定ファイルから読む
-      if (!messageMemoryCache.ContainsKey(error.Lang))
+      ////設定ファイルから読む
+      //if (!messageMemoryCache.ContainsKey(error.Lang))
+      //{
+      //  var tree = new Data.TreeYaml();
+
+      //  var stream = this.GetMessagesStream(error.Lang);
+      //  if (stream == null)
+      //  {
+      //    error.Lang = "ja";
+      //    stream = this.GetMessagesStream(error.Lang);
+      //  }
+
+      //  using (stream)
+      //  {
+      //    StreamReader sr = new StreamReader(
+      //        stream,
+      //        Encoding.GetEncoding("utf-8")
+      //    );
+      //    tree.Load(sr);
+      //  }
+
+      //  messageMemoryCache[error.Lang] = tree;
+      //}
+
+      //var messages = messageMemoryCache[error.Lang];
+      //var path = error.ClassName + "." + error.ErrorType;
+      //if (messages.Exsits(path))
+      //{
+      //  return messages.Get(path).Value;
+      //}
+
+      if (defaultMessages.ContainsKey(error.ErrorType))
       {
-        var tree = new Data.TreeYaml();
-
-        var stream = this.GetMessagesStream(error.Lang);
-        if (stream == null)
-        {
-          error.Lang = "ja";
-          stream = this.GetMessagesStream(error.Lang);
-        }
-
-        using (stream)
-        {
-          StreamReader sr = new StreamReader(
-              stream,
-              Encoding.GetEncoding("utf-8")
-          );
-          tree.Load(sr);
-        }
-
-        messageMemoryCache[error.Lang] = tree;
-      }
-
-      var messages = messageMemoryCache[error.Lang];
-      var path = error.ClassName + "." + error.ErrorType;
-      if (messages.Exsits(path))
-      {
-        return messages.Get(path).Value;
+        return defaultMessages[error.ErrorType];
       }
       return "";
     }
@@ -142,7 +155,6 @@ namespace Sdx.Validation
 
       error.ClassName = this.GetType().FullName;
       error.ErrorType = errorType;
-      error.Lang = Sdx.Context.Current.Lang;
 
       var message = this.DetectMessage(error);
       

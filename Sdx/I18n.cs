@@ -34,7 +34,7 @@ namespace Sdx
     }
     public static string GetString(string key, params object[] args)
     {
-      return GetCatalog(Sdx.Context.Current.Lang).GetString(key, args);
+      return GetCatalog(Sdx.Context.Current.Culture.TwoLetterISOLanguageName).GetString(key, args);
     }
 
     public static string GetPluralString(string key, params int[] counts)

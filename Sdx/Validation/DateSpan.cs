@@ -11,6 +11,14 @@ namespace Sdx.Validation
     public const string ErrorIsEarlier = "ErrorIsEarlier";
     public const string ErrorIsLater = "ErrorIsLater";
 
+    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    {
+      defaultMessages[ErrorInvalid] = I18n.GetString("日付を入力してください。");
+      defaultMessages[ErrorIsEarlier] = I18n.GetString("%min%以降の日付を入力してください。");
+      defaultMessages[ErrorIsLater] = I18n.GetString("%max%以前の日付を入力してください。");
+    }
+
+
     private System.DateTime? minDate;
     private System.DateTime? maxDate;
 
