@@ -58,5 +58,10 @@ namespace Sdx.Util
     {
       return value == null || value == "";
     }
+
+    public static string StandardizeLineBreak(string value)
+    {
+      return value.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine);
+    }
   }
 }

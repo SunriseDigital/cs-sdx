@@ -116,7 +116,7 @@ namespace UnitTest
         { "key2", "value2"},
       });
       Assert.Equal(
-        @"
+        Sdx.Util.String.StandardizeLineBreak(@"
 System.Collections.Generic.Dictionary`2(3)
   string : String(6) foobar
   array : System.String[](2)
@@ -124,7 +124,7 @@ System.Collections.Generic.Dictionary`2(3)
    String(4) arr2
   dic : System.Collections.Generic.Dictionary`2(2)
    key1 : String(6) value1
-   key2 : String(6) value2".Trim(),
+   key2 : String(6) value2".Trim()),
         Debug.Dump(dic)
       );
     }

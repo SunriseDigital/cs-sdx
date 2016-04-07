@@ -45,7 +45,7 @@ namespace UnitTest
       public String Sql(String sql)
       {
         //改行を取り除く
-        sql = sql.Replace(Environment.NewLine, "");
+        sql = sql.Replace("\r", "").Replace("\n", "");
 
         //連続したスペースを一個のスペースに置き換える
         Regex re = new Regex(" +", RegexOptions.Singleline);
