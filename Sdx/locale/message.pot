@@ -31,6 +31,10 @@ msgstr ""
 msgid "並び順を保存"
 msgstr ""
 
+#: web/lib/_private/control/scaffold/list.ascx:33
+msgid "編集"
+msgstr ""
+
 #: web/lib/_private/control/scaffold/list.ascx:70
 msgid "削除します。よろしいですか？"
 msgstr ""
