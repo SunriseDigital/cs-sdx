@@ -150,7 +150,6 @@
   <ItemGroup>
     <EmbeddedResource Include="locale\en\message.mo" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="_resources\validation\messages\ja.yml" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

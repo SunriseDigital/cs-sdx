@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Sdx.Validation
 {
   public class Regex: Validator
   {
     public const string ErrorNotMatch = "ErrorNotMatch";
+
+    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    {
+      defaultMessages[ErrorNotMatch] = I18n.GetString("書式が正しくありません。");
+    }
 
     public System.Text.RegularExpressions.Regex Pattern { get; set; }
 

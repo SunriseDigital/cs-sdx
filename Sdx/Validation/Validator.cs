@@ -111,42 +111,15 @@ namespace Sdx.Validation
         }
       }
 
-      ////設定ファイルから読む
-      //if (!messageMemoryCache.ContainsKey(error.Lang))
-      //{
-      //  var tree = new Data.TreeYaml();
-
-      //  var stream = this.GetMessagesStream(error.Lang);
-      //  if (stream == null)
-      //  {
-      //    error.Lang = "ja";
-      //    stream = this.GetMessagesStream(error.Lang);
-      //  }
-
-      //  using (stream)
-      //  {
-      //    StreamReader sr = new StreamReader(
-      //        stream,
-      //        Encoding.GetEncoding("utf-8")
-      //    );
-      //    tree.Load(sr);
-      //  }
-
-      //  messageMemoryCache[error.Lang] = tree;
-      //}
-
-      //var messages = messageMemoryCache[error.Lang];
-      //var path = error.ClassName + "." + error.ErrorType;
-      //if (messages.Exsits(path))
-      //{
-      //  return messages.Get(path).Value;
-      //}
-
       if (defaultMessages.ContainsKey(error.ErrorType))
       {
         return defaultMessages[error.ErrorType];
       }
-      return "";
+      else
+      {
+        throw new NotImplementedException("Missing default message for error " + error.ErrorType);
+      }
+      
     }
 
     protected void AddError(string errorType)

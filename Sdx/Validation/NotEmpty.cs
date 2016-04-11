@@ -9,6 +9,11 @@ namespace Sdx.Validation
   {
     public const string ErrorIsEmpty = "ErrorIsEmpty";
 
+    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    {
+      defaultMessages[ErrorIsEmpty] = I18n.GetString("必須項目です。");
+    }
+
     public NotEmpty(string message = null) : base(message)
     {
     }

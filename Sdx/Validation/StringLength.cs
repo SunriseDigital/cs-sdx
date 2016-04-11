@@ -10,6 +10,12 @@ namespace Sdx.Validation
     public const string ErrorTooShort = "ErrorTooShort";
     public const string ErrorTooLong = "ErrorTooLong";
 
+    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    {
+      defaultMessages[ErrorTooShort] = I18n.GetString("%min%文字以上入力してください（現在%actual_length%文字）。");
+      defaultMessages[ErrorTooLong] = I18n.GetString("%max%文字までしか入力できません（現在%actual_length%文字）。");
+    }
+
     private long? min;
     private long? max;
 
