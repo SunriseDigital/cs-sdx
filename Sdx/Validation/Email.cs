@@ -10,7 +10,7 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorInvalidFormat] = I18n.GetString("メールアドレスの書式が正しくありません。");
+      defaultMessages[ErrorInvalidFormat] = Sdx.I18n.GetString("メールアドレスの書式が正しくありません。");
     }
 
     private static System.Text.RegularExpressions.Regex domainRegex = new System.Text.RegularExpressions.Regex(@"^([A-Za-z0-9][A-Za-z0-9\-]{0,61}[A-Za-z0-9]\.)+[A-Za-z]+$");

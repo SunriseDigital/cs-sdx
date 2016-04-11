@@ -11,7 +11,7 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorNotDateTime] = I18n.GetString("日時を入力してください。");
+      defaultMessages[ErrorNotDateTime] = Sdx.I18n.GetString("日時を入力してください。");
     }
 
     public DateTime(string message = null)

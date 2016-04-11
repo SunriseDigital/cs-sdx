@@ -10,7 +10,7 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorNotIn] = I18n.GetString("不正な値です。");
+      defaultMessages[ErrorNotIn] = Sdx.I18n.GetString("不正な値です。");
     }
 
     public IEnumerable<string> List { get; private set; }

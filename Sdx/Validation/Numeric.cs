@@ -9,7 +9,7 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorNotNumeric] = I18n.GetString("数字を入力してください。");
+      defaultMessages[ErrorNotNumeric] = Sdx.I18n.GetString("数字を入力してください。");
     }
 
     public Numeric(string message = null) : base(message)

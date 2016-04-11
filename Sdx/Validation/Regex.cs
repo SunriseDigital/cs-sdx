@@ -9,7 +9,7 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorNotMatch] = I18n.GetString("書式が正しくありません。");
+      defaultMessages[ErrorNotMatch] = Sdx.I18n.GetString("書式が正しくありません。");
     }
 
     public System.Text.RegularExpressions.Regex Pattern { get; set; }

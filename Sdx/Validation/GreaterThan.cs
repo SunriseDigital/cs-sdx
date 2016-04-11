@@ -11,9 +11,9 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorInvalid] = I18n.GetString("数字を入力してください。");
-      defaultMessages[ErrorGreaterThanInclusive] = I18n.GetString("%min%以上の数字を入力してください。");
-      defaultMessages[ErrorGreaterThan] = I18n.GetString("%min%より大きな数字を入力してください。");
+      defaultMessages[ErrorInvalid] = Sdx.I18n.GetString("数字を入力してください。");
+      defaultMessages[ErrorGreaterThanInclusive] = Sdx.I18n.GetString("%min%以上の数字を入力してください。");
+      defaultMessages[ErrorGreaterThan] = Sdx.I18n.GetString("%min%より大きな数字を入力してください。");
     }
 
     private long min;

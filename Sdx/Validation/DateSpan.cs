@@ -13,9 +13,9 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorInvalid] = I18n.GetString("日付を入力してください。");
-      defaultMessages[ErrorIsEarlier] = I18n.GetString("%min%以降の日付を入力してください。");
-      defaultMessages[ErrorIsLater] = I18n.GetString("%max%以前の日付を入力してください。");
+      defaultMessages[ErrorInvalid] = Sdx.I18n.GetString("日付を入力してください。");
+      defaultMessages[ErrorIsEarlier] = Sdx.I18n.GetString("%min%以降の日付を入力してください。");
+      defaultMessages[ErrorIsLater] = Sdx.I18n.GetString("%max%以前の日付を入力してください。");
     }
 
 

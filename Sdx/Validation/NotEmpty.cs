@@ -11,7 +11,7 @@ namespace Sdx.Validation
 
     protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
     {
-      defaultMessages[ErrorIsEmpty] = I18n.GetString("必須項目です。");
+      defaultMessages[ErrorIsEmpty] = Sdx.I18n.GetString("必須項目です。");
     }
 
     public NotEmpty(string message = null) : base(message)
