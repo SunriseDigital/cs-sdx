@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-12 14:33+0900\n"
-"PO-Revision-Date: 2016-04-12 14:34+0900\n"
+"POT-Creation-Date: 2016-04-12 16:08+0900\n"
+"PO-Revision-Date: 2016-04-12 16:14+0900\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: en\n"
@@ -27,24 +27,28 @@ msgid "日付を入力してください。"
 msgstr "Please enter a valid day."
 
 #: Sdx/Validation/DateSpan.cs:22
-msgid "%min%以降の日付を入力してください。"
-msgstr "Please enter a date after %min%."
+#, csharp-format
+msgid "{0}以降の日付を入力してください。"
+msgstr "Please enter a date after {0}."
 
 #: Sdx/Validation/DateSpan.cs:24
-msgid "%max%以前の日付を入力してください。"
-msgstr "Please enter a date before %max%."
+#, csharp-format
+msgid "{0}以前の日付を入力してください。"
+msgstr "Please enter a date before {0}."
 
 #: Sdx/Validation/DateTime.cs:17 Sdx/Validation/DateTimeSpan.cs:19
 msgid "日時を入力してください。"
 msgstr "Please enter a valid date and time."
 
 #: Sdx/Validation/DateTimeSpan.cs:21
-msgid "%min%以降の日時を入力してください。"
-msgstr "Please enter a date and time after %min%."
+#, csharp-format
+msgid "{0}以降の日時を入力してください。"
+msgstr "Please enter a date and time after {0}."
 
 #: Sdx/Validation/DateTimeSpan.cs:23
-msgid "%max%以前の日時を入力してください。"
-msgstr "Please enter a date and time before %max%."
+#, csharp-format
+msgid "{0}以前の日時を入力してください。"
+msgstr "Please enter a date and time before {0}."
 
 #: Sdx/Validation/Email.cs:16
 msgid "メールアドレスの書式が正しくありません。"
@@ -56,20 +60,24 @@ msgid "数字を入力してください。"
 msgstr "Please enter a valid number."
 
 #: Sdx/Validation/GreaterThan.cs:19
-msgid "%min%以上の数字を入力してください。"
-msgstr "Please enter a number greater than or equal to %min%"
+#, csharp-format
+msgid "{0}以上の数字を入力してください。"
+msgstr "Please enter a number greater than or equal to {0}."
 
 #: Sdx/Validation/GreaterThan.cs:21
-msgid "%min%より大きな数字を入力してください。"
-msgstr "Please enter a number greater than %min%"
+#, csharp-format
+msgid "{0}より大きな数字を入力してください。"
+msgstr "Please enter a number greater than {0}."
 
 #: Sdx/Validation/LessThan.cs:19
-msgid "%max%以下の数字を入力してください。"
-msgstr "Please enter a number less than or equal to %max%"
+#, csharp-format
+msgid "{0}以下の数字を入力してください。"
+msgstr "Please enter a number less than or equal to {0}."
 
 #: Sdx/Validation/LessThan.cs:21
-msgid "%max%未満の数字を入力してください。"
-msgstr "Please enter a number less than %max%"
+#, csharp-format
+msgid "{0}未満の数字を入力してください。"
+msgstr "Please enter a number less than {0}."
 
 #: Sdx/Validation/NotEmpty.cs:17
 msgid "必須項目です。"
@@ -79,19 +87,19 @@ msgstr "This is a require item."
 msgid "書式が正しくありません。"
 msgstr "This is not the correct format."
 
-#: Sdx/Validation/StringLength.cs:15
+#: Sdx/Validation/StringLength.cs:20
 #, csharp-format
 msgid "現在{0}文字"
 msgid_plural "現在{0}文字"
 msgstr[0] "{0} character now"
 msgstr[1] "{0} characters now"
 
-#: Sdx/Validation/StringLength.cs:19
+#: Sdx/Validation/StringLength.cs:24
 #, csharp-format
 msgid "{0}文字以上入力してください（{1}）。"
 msgstr "Please enter {0} or more characters, {1}."
 
-#: Sdx/Validation/StringLength.cs:21
+#: Sdx/Validation/StringLength.cs:26
 #, csharp-format
 msgid "{0}文字までしか入力できません（{1}）。"
 msgid_plural "{0}文字までしか入力できません（{1}）。"
@@ -122,3 +130,27 @@ msgstr "Edit"
 #: web/lib/_private/control/scaffold/list.ascx:70
 msgid "削除します。よろしいですか？"
 msgstr "Are you sure you want to delete ?"
+
+#~ msgid "%min%以降の日付を入力してください。"
+#~ msgstr "Please enter a date after %min%."
+
+#~ msgid "%max%以前の日付を入力してください。"
+#~ msgstr "Please enter a date before %max%."
+
+#~ msgid "%min%以降の日時を入力してください。"
+#~ msgstr "Please enter a date and time after %min%."
+
+#~ msgid "%max%以前の日時を入力してください。"
+#~ msgstr "Please enter a date and time before %max%."
+
+#~ msgid "%min%以上の数字を入力してください。"
+#~ msgstr "Please enter a number greater than or equal to %min%"
+
+#~ msgid "%min%より大きな数字を入力してください。"
+#~ msgstr "Please enter a number greater than %min%"
+
+#~ msgid "%max%以下の数字を入力してください。"
+#~ msgstr "Please enter a number less than or equal to %max%"
+
+#~ msgid "%max%未満の数字を入力してください。"
+#~ msgstr "Please enter a number less than %max%"
