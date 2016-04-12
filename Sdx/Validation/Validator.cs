@@ -12,8 +12,6 @@ namespace Sdx.Validation
   {
     private const string ErrorAll = "Sdx.Validation.Validator.ErrorAll";
 
-    private static Dictionary<string, Data.Tree> messageMemoryCache = new Dictionary<string, Data.Tree>();
-
     public Errors Errors { get; internal set; }
 
     private Dictionary<string, string> messages = new Dictionary<string, string>();
@@ -58,16 +56,12 @@ namespace Sdx.Validation
 
     protected abstract bool IsValidString(string value);
 
+    protected abstract string GetDefaultMessage(string errorType);
+
 
     protected void SetPlaceholder(string key, string value)
     {
       placeholders[key] = value;
-    }
-
-    private Stream GetMessagesStream(string lang)
-    {
-      var assembly = Assembly.GetExecutingAssembly();
-      return assembly.GetManifestResourceStream("Sdx._resources.validation.messages." + lang + ".yml");
     }
 
     private string DetectMessage(Error error)
@@ -75,14 +69,12 @@ namespace Sdx.Validation
       //インスタンスメッセージ（簡易）
       if (this.messages.ContainsKey(ErrorAll))
       {
-        error.Lang = null;
         return this.messages[ErrorAll];
       }
 
       //インスタンスメッセージ
       if (this.messages.ContainsKey(error.ErrorType))
       {
-        error.Lang = null;
         return this.messages[error.ErrorType];
       }
 
@@ -92,10 +84,11 @@ namespace Sdx.Validation
       var prop = this.GetType().GetProperty("MessageTemplates");
       if (prop != null)
       {
+        var lang = Context.Current.Culture.TwoLetterISOLanguageName;
         var templates = (Dictionary<string, Dictionary<string, string>>)prop.GetValue(null, null);
-        if (templates.ContainsKey(error.Lang))
+        if (templates.ContainsKey(lang))
         {
-          var msgs = templates[error.Lang];
+          var msgs = templates[lang];
           if (msgs.ContainsKey(error.ErrorType))
           {
             return msgs[error.ErrorType];
@@ -103,37 +96,13 @@ namespace Sdx.Validation
         }
       }
 
-      //設定ファイルから読む
-      if (!messageMemoryCache.ContainsKey(error.Lang))
+      var message = GetDefaultMessage(error.ErrorType);
+      if (message == null)
       {
-        var tree = new Data.TreeYaml();
-
-        var stream = this.GetMessagesStream(error.Lang);
-        if (stream == null)
-        {
-          error.Lang = "ja";
-          stream = this.GetMessagesStream(error.Lang);
-        }
-
-        using (stream)
-        {
-          StreamReader sr = new StreamReader(
-              stream,
-              Encoding.GetEncoding("utf-8")
-          );
-          tree.Load(sr);
-        }
-
-        messageMemoryCache[error.Lang] = tree;
+        throw new NotImplementedException("Missing default message for error " + error.ErrorType);
       }
 
-      var messages = messageMemoryCache[error.Lang];
-      var path = error.ClassName + "." + error.ErrorType;
-      if (messages.Exsits(path))
-      {
-        return messages.Get(path).Value;
-      }
-      return "";
+      return message;
     }
 
     protected void AddError(string errorType)
@@ -142,7 +111,6 @@ namespace Sdx.Validation
 
       error.ClassName = this.GetType().FullName;
       error.ErrorType = errorType;
-      error.Lang = Sdx.Context.Current.Lang;
 
       var message = this.DetectMessage(error);
       

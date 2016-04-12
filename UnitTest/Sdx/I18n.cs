@@ -15,6 +15,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Text;
+using System.Globalization;
 
 namespace UnitTest
 {
@@ -24,7 +25,7 @@ namespace UnitTest
     [Fact]
     public void Test()
     {
-
+      //Sdx.Context.Current.Debug.Log();
     }
   }
 }

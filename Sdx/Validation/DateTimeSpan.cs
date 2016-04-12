@@ -11,6 +11,21 @@ namespace Sdx.Validation
     public const string ErrorIsEarlier = "ErrorIsEarlier";
     public const string ErrorIsLater = "ErrorIsLater";
 
+    protected override string GetDefaultMessage(string errorType)
+    {
+      switch (errorType)
+      {
+        case ErrorInvalid:
+          return Sdx.I18n.GetString("日時を入力してください。");
+        case ErrorIsEarlier:
+          return Sdx.I18n.GetString("%min%以降の日時を入力してください。");
+        case ErrorIsLater:
+          return Sdx.I18n.GetString("%max%以前の日時を入力してください。");
+        default:
+          return null;
+      }
+    }
+
     public System.DateTime? Min { get; set; }
     public System.DateTime? Max { get; set; }
 

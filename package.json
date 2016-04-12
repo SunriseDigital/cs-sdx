@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "xgettext": "find . -name *.cs -o -name *.ascx | xargs xgettext --from-code=utf-8 --language=c# -k -kSdx.I18n.GetString -kSdx.I18n.GetPluralString:1,2 -kSdx.I18n.GetParticularString:1c,2 -kSdx.I18n.GetParticularPluralString:1c,2,3 -oSdx/locale/message.pot"
+    "xgettext": "find . -name *.cs -o -name *.ascx -o -name *.aspx -o -name *.asax | xargs xgettext --from-code=utf-8 --language=c# -k -kSdx.I18n.GetString -kSdx.I18n.GetPluralString:1,2 -kSdx.I18n.GetParticularString:1c,2 -kSdx.I18n.GetParticularPluralString:1c,2,3 -oSdx/locale/message.pot"
   },
   "repository": {
     "type": "git",
