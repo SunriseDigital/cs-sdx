@@ -13,8 +13,9 @@ namespace Sdx
   public class I18n
   {
     private static Dictionary<string, ICatalog> catalogDic = new Dictionary<string, ICatalog>();
-    private static ICatalog GetCatalog(string lang)
+    private static ICatalog GetCatalog(CultureInfo info)
     {
+      var lang = info.TwoLetterISOLanguageName;
       if(!catalogDic.ContainsKey(lang))
       {
         var assembly = Assembly.GetExecutingAssembly();
@@ -22,11 +23,11 @@ namespace Sdx
 
         if (stream == null)
         {
-          catalogDic[lang] = new Catalog();
+          catalogDic[lang] = new Catalog(info);
         }
         else
         {
-          catalogDic[lang] = new Catalog(new MoLoader(stream));
+          catalogDic[lang] = new Catalog(new MoLoader(stream), info);
         }
       }
 
@@ -34,12 +35,17 @@ namespace Sdx
     }
     public static string GetString(string key, params object[] args)
     {
-      return GetCatalog(Sdx.Context.Current.Culture.TwoLetterISOLanguageName).GetString(key, args);
+      return GetCatalog(Sdx.Context.Current.Culture).GetString(key, args);
     }
 
-    public static string GetPluralString(string key, params int[] counts)
+    public static string GetPluralString(string text, string pluralText, long n)
     {
-      return key;
+      return GetCatalog(Sdx.Context.Current.Culture).GetPluralString(text, pluralText, n);
+    }
+
+    public static string GetPluralString(string text, string pluralText, long n, params object[] args)
+    {
+      return GetCatalog(Sdx.Context.Current.Culture).GetPluralString(text, pluralText, n, args);
     }
   }
 }

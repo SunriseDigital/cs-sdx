@@ -9,9 +9,16 @@ namespace Sdx.Validation
   {
     public const string ErrorNotDate = "ErrorNotDate";
 
-    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+
+    protected override string GetDefaultMessage(string errorType)
     {
-      defaultMessages[ErrorNotDate] = Sdx.I18n.GetString("日付を入力してください。");
+      switch (errorType)
+      {
+        case ErrorNotDate:
+          return Sdx.I18n.GetString("日付を入力してください。");
+        default:
+          return null;
+      }
     }
 
     public Date(string message = null)

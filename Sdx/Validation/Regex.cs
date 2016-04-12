@@ -7,9 +7,15 @@ namespace Sdx.Validation
   {
     public const string ErrorNotMatch = "ErrorNotMatch";
 
-    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    protected override string GetDefaultMessage(string errorType)
     {
-      defaultMessages[ErrorNotMatch] = Sdx.I18n.GetString("書式が正しくありません。");
+      switch(errorType)
+      {
+        case ErrorNotMatch:
+          return Sdx.I18n.GetString("書式が正しくありません。");
+        default:
+          return null;
+      }
     }
 
     public System.Text.RegularExpressions.Regex Pattern { get; set; }

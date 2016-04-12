@@ -342,5 +342,32 @@ namespace UnitTest
       Assert.False(validator.IsValid("2014-01-01 00:00:00"));
       Assert.Equal("日付を入力してください。", validator.Errors[0].Message);
     }
+
+    [Fact]
+    public void TestStringLengthEnglish()
+    {
+      Sdx.Context.Current.Culture = new CultureInfo("en-US");
+
+      var validator = new Sdx.Validation.StringLength(3);
+      Assert.Equal(3, validator.Min);
+      Assert.Null(validator.Max);
+      Assert.True(validator.IsValid("aaa"));
+      Assert.False(validator.IsValid("a"));
+      Assert.Equal("Please enter 3 or more characters, 1 character now.", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.StringLength(3);
+      Assert.False(validator.IsValid("aa"));
+      Assert.Equal("Please enter 3 or more characters, 2 characters now.", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.StringLength(max: 1);
+      Assert.True(validator.IsValid("1"));
+      Assert.False(validator.IsValid("12"));
+      Assert.Equal("You can enter only 1 character, 2 characters now.", validator.Errors[0].Message);
+
+      validator = new Sdx.Validation.StringLength(max: 9);
+      Assert.True(validator.IsValid("123456789"));
+      Assert.False(validator.IsValid("12345678910"));
+      Assert.Equal("You can enter only 9 characters, 11 characters now.", validator.Errors[0].Message);
+    }
   }
 }

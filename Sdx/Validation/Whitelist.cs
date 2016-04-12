@@ -8,9 +8,15 @@ namespace Sdx.Validation
   {
     public const string ErrorNotIn = "ErrorNotIn";
 
-    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    protected override string GetDefaultMessage(string errorType)
     {
-      defaultMessages[ErrorNotIn] = Sdx.I18n.GetString("不正な値です。");
+      switch (errorType)
+      {
+        case ErrorNotIn:
+          return Sdx.I18n.GetString("不正な値です。");
+        default:
+          return null;
+      }
     }
 
     public IEnumerable<string> List { get; private set; }

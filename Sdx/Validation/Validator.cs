@@ -18,8 +18,6 @@ namespace Sdx.Validation
 
     private Dictionary<string, string> placeholders = new Dictionary<string, string>();
 
-    private Dictionary<string, string> defaultMessages = new Dictionary<string, string>();
-
     public IDictionary<string, string> Messages
     {
       get
@@ -54,29 +52,16 @@ namespace Sdx.Validation
       {
         this.messages[ErrorAll] = message;
       }
-      else
-      {
-        InitDefaultMessages(defaultMessages);
-      }
     }
 
     protected abstract bool IsValidString(string value);
 
-    protected virtual void InitDefaultMessages(Dictionary<string, string> defaultMessages)
-    {
-
-    }
+    protected abstract string GetDefaultMessage(string errorType);
 
 
     protected void SetPlaceholder(string key, string value)
     {
       placeholders[key] = value;
-    }
-
-    private Stream GetMessagesStream(string lang)
-    {
-      var assembly = Assembly.GetExecutingAssembly();
-      return assembly.GetManifestResourceStream("Sdx._resources.validation.messages." + lang + ".yml");
     }
 
     private string DetectMessage(Error error)
@@ -111,15 +96,13 @@ namespace Sdx.Validation
         }
       }
 
-      if (defaultMessages.ContainsKey(error.ErrorType))
-      {
-        return defaultMessages[error.ErrorType];
-      }
-      else
+      var message = GetDefaultMessage(error.ErrorType);
+      if (message == null)
       {
         throw new NotImplementedException("Missing default message for error " + error.ErrorType);
       }
-      
+
+      return message;
     }
 
     protected void AddError(string errorType)

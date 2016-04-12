@@ -7,9 +7,15 @@ namespace Sdx.Validation
   {
     public const string ErrorNotNumeric = "ErrorNotNumeric";
 
-    protected override void InitDefaultMessages(Dictionary<string, string> defaultMessages)
+    protected override string GetDefaultMessage(string errorType)
     {
-      defaultMessages[ErrorNotNumeric] = Sdx.I18n.GetString("数字を入力してください。");
+      switch (errorType)
+      {
+        case ErrorNotNumeric:
+          return Sdx.I18n.GetString("数字を入力してください。");
+        default:
+          return null;
+      }
     }
 
     public Numeric(string message = null) : base(message)
