@@ -19,9 +19,9 @@ namespace Sdx.Validation
         case ErrorInvalid:
           return Sdx.I18n.GetString("日付を入力してください。");
         case ErrorIsEarlier:
-          return Sdx.I18n.GetString("%min%以降の日付を入力してください。");
+          return Sdx.I18n.GetString("{0}以降の日付を入力してください。", ((System.DateTime)Min).ToString(DateFormat));
         case ErrorIsLater:
-          return Sdx.I18n.GetString("%max%以前の日付を入力してください。");
+          return Sdx.I18n.GetString("{0}以前の日付を入力してください。", ((System.DateTime)Max).ToString(DateFormat));
         default:
           return null;
       }
@@ -69,8 +69,7 @@ namespace Sdx.Validation
       return dateTime;
     }
 
-    public DateSpan(System.DateTime? min = null, System.DateTime? max = null, string dateFormat = null, string message = null)
-      : base(message)
+    public DateSpan(System.DateTime? min = null, System.DateTime? max = null, string dateFormat = null)
     {
       if (min == null && max == null)
       {
@@ -100,7 +99,6 @@ namespace Sdx.Validation
       if(this.Min != null)
       {
         var min = (System.DateTime)this.Min;
-        this.SetPlaceholder("min", min.ToString(this.DateFormat));
         if (min.CompareTo(targetDate) > 0)
         {
           this.AddError(ErrorIsEarlier);
@@ -111,7 +109,6 @@ namespace Sdx.Validation
       if(this.Max != null)
       {
         var max = (System.DateTime)this.Max;
-        this.SetPlaceholder("max", max.ToString(this.DateFormat));
         if (max.CompareTo(targetDate) < 0)
         {
           this.AddError(ErrorIsLater);

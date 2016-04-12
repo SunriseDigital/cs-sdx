@@ -18,10 +18,6 @@ namespace Sdx.Validation
       }
     }
 
-    public Numeric(string message = null) : base(message)
-    {
-    }
-
     protected override bool IsValidString(string value)
     {
       double result;

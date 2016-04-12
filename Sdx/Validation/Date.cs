@@ -21,11 +21,6 @@ namespace Sdx.Validation
       }
     }
 
-    public Date(string message = null)
-      : base(message)
-    {
-    }
-
     protected override bool IsValidString(string value)
     {
       System.DateTime result;

@@ -17,7 +17,7 @@ namespace Sdx.Validation
 
     protected override string GetDefaultMessage(string errorType)
     {
-      var currentMessage = Sdx.I18n.GetPluralString("現在{0}文字", "現在{0}文字", AcutualLength, AcutualLength);
+      var currentMessage = Sdx.I18n.GetPluralString("現在{0}文字", "現在{0}文字", ValueLength, ValueLength);
       switch (errorType)
       {
         case ErrorTooShort:
@@ -42,7 +42,6 @@ namespace Sdx.Validation
       set
       {
         this.min = value;
-        this.SetPlaceholder("min", value.ToString());
       }
     }
 
@@ -56,12 +55,10 @@ namespace Sdx.Validation
       set
       {
         this.max = value;
-        this.SetPlaceholder("max", this.max.ToString());
       }
     }
 
-    public StringLength(long? min = null, long? max = null, string message = null)
-      : base(message)
+    public StringLength(long? min = null, long? max = null)
     {
       if(min == null && max == null)
       {
@@ -75,8 +72,6 @@ namespace Sdx.Validation
     protected override bool IsValidString(string value)
     {
       int length = value.Length;
-      this.SetPlaceholder("actual_length", length.ToString());
-      this.AcutualLength = length;
 
       if (this.Min != null && length < this.Min)
       {
@@ -92,7 +87,5 @@ namespace Sdx.Validation
 
       return true;
     }
-
-    public long AcutualLength { get; private set; }
   }
 }

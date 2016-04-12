@@ -16,9 +16,9 @@ namespace Sdx.Validation
         case ErrorInvalid:
           return Sdx.I18n.GetString("数字を入力してください。");
         case ErrorLessThanInclusive:
-          return Sdx.I18n.GetString("%max%以下の数字を入力してください。");
+          return Sdx.I18n.GetString("{0}以下の数字を入力してください。", Max);
         case ErrorLessThan:
-          return Sdx.I18n.GetString("%max%未満の数字を入力してください。");
+          return Sdx.I18n.GetString("{0}未満の数字を入力してください。", Max);
         default:
           return null;
       }
@@ -36,19 +36,18 @@ namespace Sdx.Validation
       set
       {
         this.max = value;
-        this.SetPlaceholder("max", this.max.ToString());
       }
     }
 
     public bool IsInclusive { get; set; }
 
-    public LessThan(long max, string message = null) : base(message)
+    public LessThan(long max)
     {
       this.Max = max;
       this.IsInclusive = false;
     }
 
-    public LessThan(long max, bool isInclusive, string message = null) : base(message)
+    public LessThan(long max, bool isInclusive)
     {
       this.Max = max;
       this.IsInclusive = isInclusive;

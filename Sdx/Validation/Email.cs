@@ -23,9 +23,6 @@ namespace Sdx.Validation
 
     private static System.Text.RegularExpressions.Regex localPartRegex = new System.Text.RegularExpressions.Regex(@"^[A-Za-z0-9\!#\$%&’\*\+\-/=\?\^_`\{\|\}~\.]{1,64}$");
 
-    public Email(string message = null) : base(message)
-    {
-    }
 
     protected override bool IsValidString(string value)
     {

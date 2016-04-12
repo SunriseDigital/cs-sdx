@@ -20,11 +20,6 @@ namespace Sdx.Validation
       }
     }
 
-    public DateTime(string message = null)
-      : base(message)
-    {
-    }
-
     protected override bool IsValidString(string value)
     {
       System.DateTime result;

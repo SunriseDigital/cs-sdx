@@ -63,17 +63,11 @@ namespace UnitTest
     [Fact]
     public void TestSwapMessage()
     {
-      var validator = new Sdx.Validation.NotEmpty("SWAP MESSAGE STRING");
+      var validator = new Sdx.Validation.NotEmpty();
+      validator.MessageDetector = (type, valid) => "SWAP MESSAGE STRING";
       Assert.False(validator.IsValid(""));
       Assert.Equal(1, validator.Errors.Count);
       Assert.Equal("SWAP MESSAGE STRING", validator.Errors[0].Message);
-
-      validator = new Sdx.Validation.NotEmpty();
-      validator.Messages[Sdx.Validation.NotEmpty.ErrorIsEmpty] = "SWAP MESSAGE DIC";
-      Assert.False(validator.IsValid(""));
-      Assert.Equal(1, validator.Errors.Count);
-      Assert.Equal("SWAP MESSAGE DIC", validator.Errors[0].Message);
-
     }
 
     [Fact]
@@ -102,11 +96,13 @@ namespace UnitTest
       Assert.Equal("数字を入力してください。", validator.Errors[0].Message);
 
 
-      validator = new Sdx.Validation.LessThan(10, "%max% and %max%");
+      validator = new Sdx.Validation.LessThan(10);
+      validator.MessageDetector = (type, valid) => String.Format("{0} and {0}", validator.Max);
       Assert.False(validator.IsValid("10"));
       Assert.Equal("10 and 10", validator.Errors[0].Message);
 
-      validator = new Sdx.Validation.LessThan(10, true, "%max% and %max%");
+      validator = new Sdx.Validation.LessThan(10, true);
+      validator.MessageDetector = (type, valid) => String.Format("{0} and {0}", validator.Max);
       Assert.True(validator.IsValid("10"));
       Assert.False(validator.IsValid("11"));
       Assert.Equal("10 and 10", validator.Errors[0].Message);
@@ -140,7 +136,8 @@ namespace UnitTest
       Assert.Equal("数字を入力してください。", validator.Errors[0].Message);
 
 
-      validator = new Sdx.Validation.GreaterThan(10, true, "%min% and %min%");
+      validator = new Sdx.Validation.GreaterThan(10, true);
+      validator.MessageDetector = (type, valid) => String.Format("{0} and {0}", validator.Min);
       Assert.False(validator.IsValid("9"));
       Assert.Equal("10 and 10", validator.Errors[0].Message);
     }
@@ -183,20 +180,6 @@ namespace UnitTest
       Assert.True(validator.IsValid("1234567"));
       Assert.False(validator.IsValid("１２３"));//全角はだめ
       Assert.Equal("数字を入力してください。", validator.Errors[0].Message);
-    }
-
-    [Fact]
-    public void TestClassMessages()
-    {
-      Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
-      var validator = new Test.Validation.Numeric();
-      validator.IsValid("aaa");
-      Assert.Equal("あへあへうひは", validator.Errors[0].Message);
-
-      Sdx.Context.Current.Culture = new CultureInfo("en");
-      validator = new Test.Validation.Numeric();
-      validator.IsValid("aaa");
-      Assert.Equal("Ahe ahe uhiha", validator.Errors[0].Message);
     }
 
     [Fact]

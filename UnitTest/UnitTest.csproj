@@ -98,7 +98,6 @@
     <Compile Include="Test\Scaffold\Area.cs" />
     <Compile Include="Test\Scaffold\LargeArea.cs" />
     <Compile Include="Test\Scaffold\Shop.cs" />
-    <Compile Include="Test\Validation\Numeric.cs" />
     <Compile Include="Sdx\Web\Url.cs" />
     <Compile Include="Test\Orm\LargeArea.cs" />
     <Compile Include="Test\Orm\Category.cs" />

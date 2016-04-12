@@ -20,10 +20,6 @@ namespace Sdx.Validation
       }
     }
 
-    public NotEmpty(string message = null) : base(message)
-    {
-    }
-
     public override bool IsValid(IEnumerable<string> values)
     {
       if (values == null)

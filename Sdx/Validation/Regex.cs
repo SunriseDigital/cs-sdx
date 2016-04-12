@@ -20,7 +20,7 @@ namespace Sdx.Validation
 
     public System.Text.RegularExpressions.Regex Pattern { get; set; }
 
-    public Regex(string pattern, string message = null):base(message)
+    public Regex(string pattern)
     {
       this.Pattern = new System.Text.RegularExpressions.Regex(pattern);
     }
