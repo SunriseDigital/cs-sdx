@@ -27,11 +27,13 @@ msgid "日付を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/DateSpan.cs:22
-msgid "%min%以降の日付を入力してください。"
+#, csharp-format
+msgid "{0}以降の日付を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/DateSpan.cs:24
-msgid "%max%以前の日付を入力してください。"
+#, csharp-format
+msgid "{0}以前の日付を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/DateTime.cs:17 Sdx/Validation/DateTimeSpan.cs:19
@@ -39,11 +41,13 @@ msgid "日時を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/DateTimeSpan.cs:21
-msgid "%min%以降の日時を入力してください。"
+#, csharp-format
+msgid "{0}以降の日時を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/DateTimeSpan.cs:23
-msgid "%max%以前の日時を入力してください。"
+#, csharp-format
+msgid "{0}以前の日時を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/Email.cs:16
@@ -56,19 +60,23 @@ msgid "数字を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/GreaterThan.cs:19
-msgid "%min%以上の数字を入力してください。"
+#, csharp-format
+msgid "{0}以上の数字を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/GreaterThan.cs:21
-msgid "%min%より大きな数字を入力してください。"
+#, csharp-format
+msgid "{0}より大きな数字を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/LessThan.cs:19
-msgid "%max%以下の数字を入力してください。"
+#, csharp-format
+msgid "{0}以下の数字を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/LessThan.cs:21
-msgid "%max%未満の数字を入力してください。"
+#, csharp-format
+msgid "{0}未満の数字を入力してください。"
 msgstr ""
 
 #: Sdx/Validation/NotEmpty.cs:17
@@ -79,19 +87,19 @@ msgstr ""
 msgid "書式が正しくありません。"
 msgstr ""
 
-#: Sdx/Validation/StringLength.cs:15
+#: Sdx/Validation/StringLength.cs:20
 #, csharp-format
 msgid "現在{0}文字"
 msgid_plural "現在{0}文字"
 msgstr[0] ""
 msgstr[1] ""
 
-#: Sdx/Validation/StringLength.cs:19
+#: Sdx/Validation/StringLength.cs:24
 #, csharp-format
 msgid "{0}文字以上入力してください（{1}）。"
 msgstr ""
 
-#: Sdx/Validation/StringLength.cs:21
+#: Sdx/Validation/StringLength.cs:26
 #, csharp-format
 msgid "{0}文字までしか入力できません（{1}）。"
 msgid_plural "{0}文字までしか入力できません（{1}）。"
