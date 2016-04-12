@@ -19,7 +19,7 @@ namespace Sdx
       if(!catalogDic.ContainsKey(lang))
       {
         var assembly = Assembly.GetExecutingAssembly();
-        var stream = assembly.GetManifestResourceStream("Sdx.locale."+lang+".message.mo");
+        var stream = assembly.GetManifestResourceStream("Sdx._locale."+lang+".message.mo");
 
         if (stream == null)
         {

@@ -148,7 +148,7 @@
     <Compile Include="Util\String.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="locale\en\message.mo" />
+    <EmbeddedResource Include="_locale\en\message.mo" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
