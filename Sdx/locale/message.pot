@@ -1,0 +1,124 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-04-12 14:33+0900\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Sunrise co.,ltd <dev@sunrisedigital.jp>\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7\n"
+
+#: Sdx/Scaffold/Group/Base.cs:67
+msgid "絞り込む"
+msgstr ""
+
+#: Sdx/Validation/Date.cs:18 Sdx/Validation/DateSpan.cs:20
+msgid "日付を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/DateSpan.cs:22
+msgid "%min%以降の日付を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/DateSpan.cs:24
+msgid "%max%以前の日付を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/DateTime.cs:17 Sdx/Validation/DateTimeSpan.cs:19
+msgid "日時を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/DateTimeSpan.cs:21
+msgid "%min%以降の日時を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/DateTimeSpan.cs:23
+msgid "%max%以前の日時を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/Email.cs:16
+msgid "メールアドレスの書式が正しくありません。"
+msgstr ""
+
+#: Sdx/Validation/GreaterThan.cs:17 Sdx/Validation/LessThan.cs:17
+#: Sdx/Validation/Numeric.cs:15
+msgid "数字を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/GreaterThan.cs:19
+msgid "%min%以上の数字を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/GreaterThan.cs:21
+msgid "%min%より大きな数字を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/LessThan.cs:19
+msgid "%max%以下の数字を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/LessThan.cs:21
+msgid "%max%未満の数字を入力してください。"
+msgstr ""
+
+#: Sdx/Validation/NotEmpty.cs:17
+msgid "必須項目です。"
+msgstr ""
+
+#: Sdx/Validation/Regex.cs:15
+msgid "書式が正しくありません。"
+msgstr ""
+
+#: Sdx/Validation/StringLength.cs:15
+#, csharp-format
+msgid "現在{0}文字"
+msgid_plural "現在{0}文字"
+msgstr[0] ""
+msgstr[1] ""
+
+#: Sdx/Validation/StringLength.cs:19
+#, csharp-format
+msgid "{0}文字以上入力してください（{1}）。"
+msgstr ""
+
+#: Sdx/Validation/StringLength.cs:21
+#, csharp-format
+msgid "{0}文字までしか入力できません（{1}）。"
+msgid_plural "{0}文字までしか入力できません（{1}）。"
+msgstr[0] ""
+msgstr[1] ""
+
+#: Sdx/Validation/Whitelist.cs:16
+msgid "不正な値です。"
+msgstr ""
+
+#: web/lib/_private/control/scaffold/list.ascx:9
+msgid "リスト"
+msgstr ""
+
+#: web/lib/_private/control/scaffold/list.ascx:13
+msgid "新規追加"
+msgstr ""
+
+#: web/lib/_private/control/scaffold/list.ascx:17
+#: web/lib/_private/control/scaffold/list.ascx:51
+msgid "並び順を保存"
+msgstr ""
+
+#: web/lib/_private/control/scaffold/list.ascx:33
+msgid "編集"
+msgstr ""
+
+#: web/lib/_private/control/scaffold/list.ascx:70
+msgid "削除します。よろしいですか？"
+msgstr ""

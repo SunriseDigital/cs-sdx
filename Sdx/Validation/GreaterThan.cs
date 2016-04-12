@@ -9,6 +9,21 @@ namespace Sdx.Validation
     public const string ErrorGreaterThanInclusive = "ErrorGreaterThanInclusive";
     public const string ErrorGreaterThan = "ErrorGreaterThan";
 
+    protected override string GetDefaultMessage(string errorType)
+    {
+      switch (errorType)
+      {
+        case ErrorInvalid:
+          return Sdx.I18n.GetString("数字を入力してください。");
+        case ErrorGreaterThanInclusive:
+          return Sdx.I18n.GetString("{0}以上の数字を入力してください。", Min);
+        case ErrorGreaterThan:
+          return Sdx.I18n.GetString("{0}より大きな数字を入力してください。", Min);
+        default:
+          return null;
+      }
+    }
+
     private long min;
 
     public long Min
@@ -21,20 +36,19 @@ namespace Sdx.Validation
       set
       {
         this.min = value;
-        this.SetPlaceholder("min", value.ToString());
       }
     }
 
     public bool IsInclusive { get; set; }
 
 
-    public GreaterThan(long min, string message = null) : base(message)
+    public GreaterThan(long min)
     {
       this.Min = min;
       this.IsInclusive = false;
     }
 
-    public GreaterThan(long min, bool isInclusive, string message = null) : base(message)
+    public GreaterThan(long min, bool isInclusive)
     {
       this.Min = min;
       this.IsInclusive = isInclusive;

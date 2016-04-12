@@ -6,11 +6,12 @@ public class Global : System.Web.HttpApplication
 {
   protected void Application_Start(Object sender, EventArgs e)
   {
-    //RouteTable.Routes.MapPageRoute(
-    //  "FormCurrent",
-    //  "form/current",
-    //  "~/_routes/form/current.aspx"
-    //);
+    RouteTable.Routes.Add(new Route(
+      "{lang}/{controller}/{*action}",
+      new RouteValueDictionary { { "lang", "ja" }, { "controller", "default" }, { "action", "default" } },
+      new RouteValueDictionary { { "lang", "ja|en" } },
+      new Test.Route.LangRouteHandler("~/{controller}/{action}")
+    ));
 
     Test.Db.Adapter.SetupManager();
   }

@@ -195,6 +195,9 @@ FakesAssemblies/
 # Visual Studio 6 workspace options file
 *.opt
 
+### MAC
+
+.DS_Store
 
 ### sdx original
 

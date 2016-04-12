@@ -9,9 +9,15 @@ namespace Sdx.Validation
   {
     public const string ErrorNotDateTime = "ErrorNotDateTime";
 
-    public DateTime(string message = null)
-      : base(message)
+    protected override string GetDefaultMessage(string errorType)
     {
+      switch (errorType)
+      {
+        case ErrorNotDateTime:
+          return Sdx.I18n.GetString("日時を入力してください。");
+        default:
+          return null;
+      }
     }
 
     protected override bool IsValidString(string value)

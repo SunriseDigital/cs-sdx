@@ -64,8 +64,7 @@ namespace Sdx.Scaffold.Group
 
       if(!Strict)
       {
-        //TODO I18n
-        select.AddOption("", "全て");
+        select.AddOption("", Sdx.I18n.GetString("絞り込む"));
       }
 
       pairList.ForEach((pair) =>

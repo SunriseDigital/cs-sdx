@@ -224,7 +224,7 @@ namespace UnitTest
 
           var select = scaffold.Group.BuildSelector(conn);
           Assert.IsType<Sdx.Html.Select>(select);
-          Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
+          Assert.Equal("<select name=\"large_area_id\"><option value=\"\">絞り込む</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
 
           List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
           Assert.Equal("", options[0].Value.ToString());//最初は空
@@ -414,7 +414,7 @@ namespace UnitTest
 
           var select = scaffold.Group.BuildSelector(conn);
           Assert.IsType<Sdx.Html.Select>(select);
-          Assert.Equal("<select name=\"large_area_id\"><option value=\"\">全て</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
+          Assert.Equal("<select name=\"large_area_id\"><option value=\"\">絞り込む</option><option value=\"1\" selected>東京</option><option value=\"2\">愛知</option></select>", select.Tag.Render());
 
           List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
           Assert.Equal("", options[0].Value.ToString());//最初は空

@@ -97,7 +97,7 @@ namespace UnitTest
 
     protected string HtmlLiner(string html)
     {
-      html = html.Replace(Environment.NewLine, "");
+      html = html.Replace("\r", "").Replace("\n", "");
 
       Regex re = new Regex("> +<", RegexOptions.Singleline);
       html = re.Replace(html, "><");
