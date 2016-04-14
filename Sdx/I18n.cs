@@ -15,7 +15,7 @@ namespace Sdx
     private static Dictionary<string, ICatalog> catalogDic = new Dictionary<string, ICatalog>();
     private static ICatalog GetCatalog(CultureInfo info)
     {
-      var lang = info.TwoLetterISOLanguageName;
+      var lang = info.ToString();
       if(!catalogDic.ContainsKey(lang))
       {
         var assembly = Assembly.GetExecutingAssembly();

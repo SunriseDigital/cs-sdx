@@ -329,7 +329,7 @@ namespace UnitTest
     [Fact]
     public void TestStringLengthEnglish()
     {
-      Sdx.Context.Current.Culture = new CultureInfo("en-US");
+      Sdx.Context.Current.Culture = new CultureInfo("en");
 
       var validator = new Sdx.Validation.StringLength(3);
       Assert.Equal(3, validator.Min);
