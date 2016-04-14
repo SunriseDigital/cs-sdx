@@ -18,7 +18,7 @@ namespace Sdx
     {
       this.Timer = new Stopwatch();
       this.isDebugMode = false;
-      this.Culture = CultureInfo.CurrentCulture;
+      this.Culture = new CultureInfo("ja");
       this.HttpErrorHandler = new Web.HttpErrorHandler();
     }
 
