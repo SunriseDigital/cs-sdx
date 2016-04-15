@@ -745,6 +745,7 @@ namespace UnitTest
         //再び取得
         shop = conn.FetchRecord(select);
         Assert.Equal(DBNull.Value, shop.GetValue("login_id"));
+        Assert.True(shop.IsNull("login_id"));
       }
     }
   }

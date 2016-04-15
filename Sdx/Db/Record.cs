@@ -410,5 +410,10 @@ namespace Sdx.Db
 
       return dic;
     }
+
+    public bool IsNull(string columnName)
+    {
+      return GetValue(columnName) == DBNull.Value;
+    }
   }
 }
