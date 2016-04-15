@@ -234,7 +234,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord(select);
+        var shop = select.FetchRecord(conn);
 
         Assert.Equal("SimpleLiteralSub", shop.GetValue("name"));
         Assert.Equal(4, shop.GetValue("area_id"));
@@ -288,7 +288,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord(select);
+        var shop = select.FetchRecord(conn);
 
         Assert.Equal("SimpleSelectSub", shop.GetValue("name"));
         Assert.Equal(5, shop.GetValue("area_id"));
@@ -352,7 +352,7 @@ namespace UnitTest
           .AddColumns("login_id")
           .WhereCall((where) => where.Add("name", "Baaaz"));
 
-        var login_id = conn.FetchOne<object>(select);
+        var login_id = select.FetchOne<object>(conn);
         Assert.Equal(DBNull.Value, login_id);
       }
     }

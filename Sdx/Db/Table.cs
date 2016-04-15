@@ -292,7 +292,7 @@ namespace Sdx.Db
 
       this.SelectDefaultOrder(select);
 
-      return conn.FetchRecordSet(select);
+      return select.FetchRecordSet(conn);
     }
   }
 }

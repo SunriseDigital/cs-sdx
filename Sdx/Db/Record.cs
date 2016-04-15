@@ -191,7 +191,7 @@ namespace Sdx.Db
             selectHook.Invoke(sel);
           }
 
-          RecordSet resultSet = connection.FetchRecordSet(sel);
+          RecordSet resultSet = sel.FetchRecordSet(connection);
 
           //キャッシュする
           this.recordCache[contextName] = resultSet;

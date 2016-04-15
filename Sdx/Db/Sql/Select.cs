@@ -587,5 +587,133 @@ namespace Sdx.Db.Sql
     {
       LimitPage(Pager.Page, Pager.PerPage);
     }
+
+
+
+    public Dictionary<string, T> FetchDictionary<T>(Db.Connection conn)
+    {
+      Dictionary<string, T> result;
+      using (var command = Build())
+      {
+        result = conn.FetchDictionary<T>(command);
+      }
+
+      return result;
+    }
+
+    public T FetchOne<T>(Db.Connection conn)
+    {
+      T result = default(T);
+      using (var command = Build())
+      {
+        result = conn.FetchOne<T>(command);
+      }
+
+      return result;
+    }
+
+    public List<T> FetchList<T>(Db.Connection conn)
+    {
+      List<T> result = null;
+      using (var command = Build())
+      {
+        result = conn.FetchList<T>(command);
+      }
+
+      return result;
+    }
+
+    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Db.Connection conn)
+    {
+      List<KeyValuePair<TKey, TValue>> result = null;
+      using (var command = Build())
+      {
+        result = conn.FetchKeyValuePairList<TKey, TValue>(command);
+      }
+
+      return result;
+    }
+
+    public List<Dictionary<string, T>> FetchDictionaryList<T>(Db.Connection conn)
+    {
+      List<Dictionary<string, T>> result = null;
+      using (var command = Build())
+      {
+        result = conn.FetchDictionaryList<T>(command);
+      }
+
+      return result;
+    }
+
+    public Record FetchRecord(Db.Connection conn)
+    {
+      var resultSet = this.FetchRecordSet(conn);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
+    public Record FetchRecord(Db.Connection conn, string contextName)
+    {
+      var resultSet = this.FetchRecordSet(conn, contextName);
+
+      if (resultSet.Count == 0)
+      {
+        return null;
+      }
+
+      return resultSet[0];
+    }
+
+    /// <summary>
+    /// SQLを実行しRecordSetを生成して返します。
+    /// </summary>
+    /// <typeparam name="T">Recordのクラスを指定</typeparam>
+    /// TODO ↓このコメントは古い？ただ、このオプションが無いと同じテーブルを二つJOINした時にまとめられないのでは？調査する。
+    /// <param name="contextName">
+    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
+    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
+    /// </param>
+    /// <returns></returns>
+    public RecordSet FetchRecordSet(Db.Connection conn)
+    {
+
+      var firstFrom = ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
+      return FetchRecordSet(conn, firstFrom.Name);
+    }
+
+    public RecordSet FetchRecordSet(Db.Connection conn, string contextName)
+    {
+      RecordSet recordSet = null;
+      using (var command = Build())
+      {
+        recordSet = conn.Fetch<RecordSet>(command, (reader) =>
+        {
+          var resultSet = new RecordSet();
+          resultSet.Build(reader, this, contextName);
+          return resultSet;
+        });
+      }
+
+      return recordSet;
+    }
+
+    public int CountRow(Db.Connection conn)
+    {
+      //TODO JOINして行数が重複してる時のCOUNTに対応する
+      var clonedSel = (Select)Clone();
+      clonedSel.OrderList.Clear();
+      clonedSel.ClearColumns().AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
+
+      //DBベンダーによって帰ってくる型がintだったりlongだったりします。
+      //いちいち型を識別してキャストするの面倒だったのでこんな感じに。
+      var count = clonedSel.FetchOne<string>(conn);
+
+      return Int32.Parse(count);
+    }
   }
 }

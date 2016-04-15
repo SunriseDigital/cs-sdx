@@ -1500,7 +1500,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var rset = conn.FetchRecordSet(select);
+        var rset = select.FetchRecordSet(conn);
 
         Assert.Equal(1, profiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.Equal("No where comment", profiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList()[0].Comment);
@@ -1517,7 +1517,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var rset = conn.FetchRecordSet(select);
+        var rset = select.FetchRecordSet(conn);
         Assert.Equal(2, profiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.Equal("Where and order limit", profiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList()[1].Comment);
       }
@@ -1739,7 +1739,7 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       {
         con.Open();
         con.BeginTransaction();
-        var shop = con.FetchRecord(select);
+        var shop = select.FetchRecord(con);
         con.Commit();
       }
     }

@@ -53,7 +53,7 @@ namespace Test.Orm.Table
 
       select.ClearColumns().AddColumns("id", "name");
 
-      return conn.FetchKeyValuePairList<string, string>(select);
+      return select.FetchKeyValuePairList<string, string>(conn);
     }
   }
 }

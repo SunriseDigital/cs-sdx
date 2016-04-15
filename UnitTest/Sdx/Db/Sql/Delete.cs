@@ -65,7 +65,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord(select);
+        var shop = select.FetchRecord(conn);
 
         Assert.Equal("Delete", shop.GetValue("name"));
       }
@@ -101,7 +101,7 @@ namespace UnitTest
       using (var conn = db.CreateConnection())
       {
         conn.Open();
-        var shop = conn.FetchRecord(select);
+        var shop = select.FetchRecord(conn);
 
         Assert.Null(shop);
       }
@@ -157,7 +157,7 @@ namespace UnitTest
             .AddFrom(new Test.Orm.Table.Shop())
             .Where.Add("id", id);
 
-        var newShop = conn.FetchRecord(select);
+        var newShop = select.FetchRecord(conn);
 
         Assert.Equal(newName, newShop.GetString("name"));
         Assert.Equal(3, newShop.GetInt32("area_id"));
@@ -173,7 +173,7 @@ namespace UnitTest
         Assert.True(newShop.IsDeleted);
 
         //確認
-        var deletedShop = conn.FetchRecord(select);
+        var deletedShop = select.FetchRecord(conn);
         Assert.Null(deletedShop);
       }
     }

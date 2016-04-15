@@ -320,7 +320,7 @@ namespace Sdx.Scaffold
 
       if(ret)
       {
-        records = conn.FetchRecordSet(select);
+        records = select.FetchRecordSet(conn);
       }
 
       return records;
@@ -346,7 +346,7 @@ namespace Sdx.Scaffold
 
         if (pager != null)
         {
-          pager.TotalCount = conn.FetchRowCount(select);
+          pager.TotalCount = select.CountRow(conn);
           select.LimitPager(pager);
         }
 

@@ -281,7 +281,7 @@ namespace Sdx.Db
       });
     }
 
-    private T Fetch<T>(DbCommand command, Func<DbDataReader, T> func)
+    internal T Fetch<T>(DbCommand command, Func<DbDataReader, T> func)
     {
       this.ThrowExceptionIfDisposed();
       command.Connection = this.DbConnection;
@@ -376,61 +376,6 @@ namespace Sdx.Db
       return command.Connection == this.DbConnection && command.Transaction == this.DbTransaction;
     }
 
-    public Dictionary<string, T> FetchDictionary<T>(Sql.Select select)
-    {
-      Dictionary<string, T> result;
-      using (var command = select.Build())
-      {
-        result = this.FetchDictionary<T>(command);
-      }
-
-      return result;
-    }
-
-    public T FetchOne<T>(Sql.Select select)
-    {
-      T result = default(T);
-      using (var command = select.Build())
-      {
-        result = this.FetchOne<T>(command);
-      }
-
-      return result;
-    }
-
-    public List<T> FetchList<T>(Sql.Select select)
-    {
-      List<T> result = null;
-      using (var command = select.Build())
-      {
-        result = this.FetchList<T>(command);
-      }
-
-      return result;
-    }
-
-    public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Sql.Select select)
-    {
-      List<KeyValuePair<TKey, TValue>> result = null;
-      using (var command = select.Build())
-      {
-        result = this.FetchKeyValuePairList<TKey, TValue>(command);
-      }
-
-      return result;
-    }
-
-    public List<Dictionary<string, T>> FetchDictionaryList<T>(Sql.Select select)
-    {
-      List<Dictionary<string, T>> result = null;
-      using (var command = select.Build())
-      {
-        result = this.FetchDictionaryList<T>(command);
-      }
-
-      return result;
-    }
-
     public Db.Record FetchRecordByPkey(Table table, Dictionary<string, object> dictionary)
     {
       var select = this.Adapter.CreateSelect();
@@ -441,7 +386,7 @@ namespace Sdx.Db
         select.Where.Add(col, dictionary[col]);
       }
 
-      return this.FetchRecord(select);
+      return select.FetchRecord(this);
     }
 
     public Record FetchRecordByPkey(Db.Table table, string pkeyValue)
@@ -454,64 +399,7 @@ namespace Sdx.Db
       select.AddFrom(table);
       select.Where.Add(table.OwnMeta.Pkeys[0], pkeyValue);
 
-      return this.FetchRecord(select);
-    }
-
-    public Record FetchRecord(Sql.Select select)
-    {
-      var resultSet = this.FetchRecordSet(select);
-
-      if (resultSet.Count == 0)
-      {
-        return null;
-      }
-
-      return resultSet[0];
-    }
-
-    public Record FetchRecord(Sql.Select select, string contextName)
-    {
-      var resultSet = this.FetchRecordSet(select, contextName);
-
-      if (resultSet.Count == 0)
-      {
-        return null;
-      }
-
-      return resultSet[0];
-    }
-
-    /// <summary>
-    /// SQLを実行しRecordSetを生成して返します。
-    /// </summary>
-    /// <typeparam name="T">Recordのクラスを指定</typeparam>
-    /// TODO ↓このコメントは古い？ただ、このオプションが無いと同じテーブルを二つJOINした時にまとめられないのでは？調査する。
-    /// <param name="contextName">
-    /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
-    /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
-    /// </param>
-    /// <returns></returns>
-    public RecordSet FetchRecordSet(Sql.Select select)
-    {
-
-      var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
-      return FetchRecordSet(select, firstFrom.Name);
-    }
-
-    public RecordSet FetchRecordSet(Select select, string contextName)
-    {
-      RecordSet recordSet = null;
-      using (var command = select.Build())
-      {
-        recordSet = this.Fetch<RecordSet>(command, (reader) =>
-        {
-          var resultSet = new RecordSet();
-          resultSet.Build(reader, select, contextName);
-          return resultSet;
-        });
-      }
-
-      return recordSet;
+      return select.FetchRecord(this);
     }
 
     private T castDbValue<T>(object value)
@@ -671,21 +559,7 @@ namespace Sdx.Db
         action.Invoke(select);
       }
 
-      return FetchRecordSet(select);
-    }
-
-    public int FetchRowCount(Select select)
-    {
-      //TODO JOINして行数が重複してる時のCOUNTに対応する
-      var clonedSel = (Select)select.Clone();
-      clonedSel.OrderList.Clear();
-      clonedSel.ClearColumns().AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
-
-      //DBベンダーによって帰ってくる型がintだったりlongだったりします。
-      //いちいち型を識別してキャストするの面倒だったのでこんな感じに。
-      var count = FetchOne<string>(clonedSel);
-
-      return Int32.Parse(count);
+      return select.FetchRecordSet(this);
     }
   }
 }
