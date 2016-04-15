@@ -294,5 +294,57 @@ namespace Sdx.Db
 
       return select.FetchRecordSet(conn);
     }
+
+    public Db.Record FetchRecordByPkey(Db.Connection conn, Dictionary<string, object> pkeyValues)
+    {
+      var select = this.Adapter.CreateSelect();
+      select.AddFrom(this);
+
+      foreach (var col in OwnMeta.Pkeys)
+      {
+        select.Where.Add(col, pkeyValues[col]);
+      }
+
+      return select.FetchRecord(conn);
+    }
+
+    public Record FetchRecordByPkey(Db.Connection conn, string pkeyValue)
+    {
+      if (OwnMeta.Pkeys.Count > 1)
+      {
+        throw new InvalidOperationException("This table has multiple pkeys.");
+      }
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+      select.Where.Add(OwnMeta.Pkeys[0], pkeyValue);
+
+      return select.FetchRecord(conn);
+    }
+
+    public Record FetchRecord(Db.Connection conn, Action<Sql.Select> action = null)
+    {
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+
+      if (action != null)
+      {
+        action.Invoke(select);
+      }
+
+      return select.FetchRecord(conn);
+    }
+
+    public RecordSet FetchRecordSet(Db.Connection conn, Action<Sql.Select> action = null)
+    {
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+
+      if (action != null)
+      {
+        action.Invoke(select);
+      }
+
+      return select.FetchRecordSet(conn);
+    }
   }
 }

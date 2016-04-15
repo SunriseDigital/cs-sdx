@@ -376,32 +376,6 @@ namespace Sdx.Db
       return command.Connection == this.DbConnection && command.Transaction == this.DbTransaction;
     }
 
-    public Db.Record FetchRecordByPkey(Table table, Dictionary<string, object> dictionary)
-    {
-      var select = this.Adapter.CreateSelect();
-      select.AddFrom(table);
-
-      foreach (var col in table.OwnMeta.Pkeys)
-      {
-        select.Where.Add(col, dictionary[col]);
-      }
-
-      return select.FetchRecord(this);
-    }
-
-    public Record FetchRecordByPkey(Db.Table table, string pkeyValue)
-    {
-      if (table.OwnMeta.Pkeys.Count > 1)
-      {
-        throw new InvalidOperationException("This table has multiple pkeys.");
-      }
-      var select = this.Adapter.CreateSelect();
-      select.AddFrom(table);
-      select.Where.Add(table.OwnMeta.Pkeys[0], pkeyValue);
-
-      return select.FetchRecord(this);
-    }
-
     private T castDbValue<T>(object value)
     {
       if (typeof(T) == typeof(string))
@@ -547,19 +521,6 @@ namespace Sdx.Db
       this.Execute(delete);
 
       record.IsDeleted = true;
-    }
-
-    public RecordSet FetchRecordSet(TableMeta tableMeta, Action<Select> action = null)
-    {
-      var select = Adapter.CreateSelect();
-      select.AddFrom(tableMeta.CreateTable());
-
-      if (action != null)
-      {
-        action.Invoke(select);
-      }
-
-      return select.FetchRecordSet(this);
     }
   }
 }
