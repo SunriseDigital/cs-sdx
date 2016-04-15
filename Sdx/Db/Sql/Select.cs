@@ -479,6 +479,12 @@ namespace Sdx.Db.Sql
       }
     }
 
+    public Select WhereCall(Action<Condition> callback)
+    {
+      callback.Invoke(Where);
+      return this;
+    }
+
     /// <summary>
     /// GROUP句を追加します。繰り返しコールすると繰り返し追加します。
     /// </summary>

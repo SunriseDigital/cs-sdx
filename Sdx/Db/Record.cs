@@ -94,11 +94,6 @@ namespace Sdx.Db
       }
       var value = this.ValuesList[0][keyWithContext];
 
-      if(value is DBNull)
-      {
-        return null;
-      }
-
       return value;
     }
 
@@ -252,6 +247,11 @@ namespace Sdx.Db
       if(current is DateTime)
       {
         return current.ToString().Equals(value.ToString());
+      }
+
+      if(current is DBNull)
+      {
+        return current == value;
       }
       
       value = Convert.ChangeType(value, current.GetType());

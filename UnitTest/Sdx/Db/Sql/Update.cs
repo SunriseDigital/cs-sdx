@@ -239,8 +239,88 @@ namespace UnitTest
         Assert.Equal(newName, updatedShop.GetString("name"));
         Assert.Equal(2, updatedShop.GetInt32("area_id"));
         Assert.Equal(1, updatedShop.GetInt32("main_image_id"));
-        Assert.Equal(null, updatedShop.GetValue("sub_image_id"));
+        Assert.Equal(DBNull.Value, updatedShop.GetValue("sub_image_id"));
         Assert.Equal(dateTime, updatedShop.GetDateTime("created_at"));
+      }
+    }
+
+    [Fact]
+    public void TestUpdateNull()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunUpdateNull(db);
+      }
+    }
+
+    private void RunUpdateNull(TestDb testDb)
+    {
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
+      var db = testDb.Adapter;
+
+      var insert = db.CreateInsert();
+
+      insert
+         .SetInto("shop")
+         .AddColumnValue("name", "Baaaz")
+         .AddColumnValue("area_id", 1)
+         .AddColumnValue("login_id", "BaaazId")
+         .AddColumnValue("created_at", DateTime.Now);
+
+      object id = 0;
+      using (var command = insert.Build())
+      {
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+
+          conn.ExecuteNonQuery(command);
+
+          id = conn.FetchLastInsertId();
+
+          conn.Commit();
+        }
+      }
+
+      var update = db.CreateUpdate();
+
+      update
+        .SetTable("shop")
+        .AddColumnValue("login_id", DBNull.Value)
+        .Where.Add("id", id);
+
+      using (var command = update.Build())
+      {
+        Assert.Equal(testDb.Sql(@"UPDATE
+          {0}shop{1}
+          SET
+            {0}login_id{1} = @0
+          WHERE {0}id{1} = @1"), command.CommandText);
+
+        Assert.Equal(DBNull.Value, command.Parameters["@0"].Value);
+        Assert.Equal(id, command.Parameters["@1"].Value);
+
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          conn.BeginTransaction();
+          conn.ExecuteNonQuery(command);
+          conn.Commit();
+        }
+      }
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var select = db.CreateSelect();
+        select
+          .AddFrom("shop")
+          .AddColumns("login_id")
+          .WhereCall((where) => where.Add("name", "Baaaz"));
+
+        var login_id = conn.FetchOne<object>(select);
+        Assert.Equal(DBNull.Value, login_id);
       }
     }
   }

@@ -218,6 +218,12 @@ namespace Sdx.Db.Sql
       }
     }
 
+    public Context WhereCall(Action<Condition> callback)
+    {
+      callback.Invoke(Where);
+      return this;
+    }
+
     /// <summary>
     /// <see cref="Sql.Select"/>にHAVING句を付与します。
     /// このプロパティー経由で付与されるHAVING句はカラム名にこの<see cref="Context"/>の名前が付与されます。
