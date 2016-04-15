@@ -595,7 +595,7 @@ namespace Sdx.Db
         //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
         var pkey = record.OwnMeta.Pkeys[0];
         var pkeyValue = record.GetValue(pkey);
-        if (pkeyValue == null)
+        if (pkeyValue == DBNull.Value)
         {
           var key = Record.BuildColumnAliasWithContextName(pkey, record.ContextName);
           newValues[key] = this.FetchLastInsertId();

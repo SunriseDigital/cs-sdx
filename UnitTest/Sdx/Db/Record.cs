@@ -619,7 +619,7 @@ namespace UnitTest
         Assert.Equal("エスペリア", shops[1].GetString("name"));
 
         //取得しなかったキーはNULL
-        Assert.Null(shops[0].GetValue("area_id"));
+        Assert.Equal(DBNull.Value, shops[0].GetValue("area_id"));
       }
     }
 
@@ -676,6 +676,75 @@ namespace UnitTest
         var str = shop.GetString("id");
         Assert.IsType<string>(str);
         Assert.Equal("1", str);
+      }
+    }
+
+    [Fact]
+    public void TestWithNullValue()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RutWithNullValue(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RutWithNullValue(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      Sdx.Db.Record shop = new Test.Orm.Shop();
+      shop.SetValue("name", "RecordNullValueTest");
+      shop.SetValue("area_id", "1");
+      shop.SetValue("login_id", "foobar");
+
+      object id = null;
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        try
+        {
+          conn.Save(shop);
+          conn.Commit();
+          id = shop.GetValue("id");
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+      }
+
+      Assert.Equal("foobar", shop.GetValue("login_id"));
+      Assert.Equal(DBNull.Value, shop.GetValue("password"));
+
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var select = db.CreateSelect();
+        select
+          .AddFrom(new Test.Orm.Table.Shop())
+          .WhereCall((where) => where.Add("id", id));
+
+        shop = conn.FetchRecord(select);
+        Assert.Equal(DBNull.Value, shop.GetValue("password"));
+
+        shop.SetValue("login_id", DBNull.Value);
+        conn.BeginTransaction();
+        try
+        {
+          conn.Save(shop);
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        //再び取得
+        shop = conn.FetchRecord(select);
+        Assert.Equal(DBNull.Value, shop.GetValue("login_id"));
       }
     }
   }

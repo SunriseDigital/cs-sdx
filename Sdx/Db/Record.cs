@@ -84,13 +84,13 @@ namespace Sdx.Db
 
       if (IsNew)
       {
-        return null;
+        return DBNull.Value;
       }
 
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if(!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        return null;
+        return DBNull.Value;
       }
       var value = this.ValuesList[0][keyWithContext];
 
