@@ -143,7 +143,7 @@ namespace UnitTest
         //新規保存
         conn.Open();
         conn.BeginTransaction();
-        conn.Save(shop);
+        shop.Save(conn);
         conn.Commit();
 
         Assert.False(shop.IsUpdated);
@@ -167,7 +167,7 @@ namespace UnitTest
 
         //削除
         conn.BeginTransaction();
-        conn.Delete(newShop);
+        newShop.Delete(conn);
         conn.Commit();
 
         Assert.True(newShop.IsDeleted);

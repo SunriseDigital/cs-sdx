@@ -183,7 +183,7 @@ namespace Sdx.Db
             return true;
           }
 
-          return Name == Connection.AutoCreateDateColumn || Name == Connection.AutoUpdateDateColumn;
+          return Name == Record.AutoCreateDateColumn || Name == Record.AutoUpdateDateColumn;
         }
       }
     }

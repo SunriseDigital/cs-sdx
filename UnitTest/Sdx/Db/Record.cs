@@ -705,7 +705,7 @@ namespace UnitTest
         conn.BeginTransaction();
         try
         {
-          conn.Save(shop);
+          shop.Save(conn);
           conn.Commit();
           id = shop.GetValue("id");
         }
@@ -734,7 +734,7 @@ namespace UnitTest
         conn.BeginTransaction();
         try
         {
-          conn.Save(shop);
+          shop.Save(conn);
         }
         catch (Exception)
         {

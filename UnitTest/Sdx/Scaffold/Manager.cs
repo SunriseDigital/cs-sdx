@@ -1026,7 +1026,7 @@ namespace UnitTest
       {
         var record = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, id);
         var currentRecords = record.GetRecordSet("shop_category", conn);
-        currentRecords.ForEach(crec => conn.Delete(crec));
+        currentRecords.ForEach(crec => crec.Delete(conn));
 
         foreach (var category_id in categories)
         {
@@ -1036,7 +1036,7 @@ namespace UnitTest
           conn.BeginTransaction();
           try
           {
-            conn.Save(shop_category);
+            shop_category.Save(conn);
             conn.Commit();
           }
           catch (Exception)
