@@ -10,15 +10,6 @@ namespace Sdx.Db
 {
   public class Connection : IDisposable
   {
-    public static string AutoCreateDateColumn { get; set; }
-    public static string AutoUpdateDateColumn { get; set; }
-
-    static Connection()
-    {
-      AutoCreateDateColumn = "created_at";
-      AutoUpdateDateColumn = "updated_at";
-    }
-
     private bool disposed = false;
 
     public Adapter.Base Adapter { get; private set; }
@@ -431,32 +422,6 @@ namespace Sdx.Db
       return result;
     }
 
-    public Db.Record FetchRecordByPkey(Table table, Dictionary<string, object> dictionary)
-    {
-      var select = this.Adapter.CreateSelect();
-      select.AddFrom(table);
-
-      foreach (var col in table.OwnMeta.Pkeys)
-      {
-        select.Where.Add(col, dictionary[col]);
-      }
-
-      return this.FetchRecord(select);
-    }
-
-    public Record FetchRecordByPkey(Db.Table table, string pkeyValue)
-    {
-      if (table.OwnMeta.Pkeys.Count > 1)
-      {
-        throw new InvalidOperationException("This table has multiple pkeys.");
-      }
-      var select = this.Adapter.CreateSelect();
-      select.AddFrom(table);
-      select.Where.Add(table.OwnMeta.Pkeys[0], pkeyValue);
-
-      return this.FetchRecord(select);
-    }
-
     public Record FetchRecord(Sql.Select select)
     {
       var resultSet = this.FetchRecordSet(select);
@@ -526,155 +491,7 @@ namespace Sdx.Db
       }
     }
 
-    private bool NeedsAutoUpdate(string columnName, Record record)
-    {
-      if(columnName == null)
-      {
-        return false;
-      }
-
-      if (!record.OwnMeta.HasColumn(columnName))
-      {
-        return false;
-      }
-
-      var first = record.UpdatedValues.FirstOrDefault(kv => kv.Key == columnName);
-      if (first.Value == null)
-      {
-        return true;
-      }
-
-      if (first.Value.ToString() == "")
-      {
-        return true;
-      }
-
-      return false;
-    }
-
-    public void Save(Record record)
-    {
-      if (record.IsDeleted)
-      {
-        throw new InvalidOperationException("This record is already deleted.");
-      }
-
-      if (record.IsNew)
-      {
-        var insert = this.Adapter.CreateInsert();
-        insert.SetInto(record.OwnMeta.Name);
-
-        //自動登録日時更新
-        if (NeedsAutoUpdate(AutoCreateDateColumn, record))
-        {
-          record.SetValue(AutoCreateDateColumn, DateTime.Now);
-        }
-
-        //自動更新日時更新
-        if (NeedsAutoUpdate(AutoUpdateDateColumn, record))
-        {
-          record.SetValue(AutoUpdateDateColumn, DateTime.Now);
-        }
-
-        foreach (var columnValue in record.UpdatedValues)
-        {
-          insert.AddColumnValue(columnValue.Key, columnValue.Value);
-        }
-
-        this.Execute(insert);
-
-        //値を保存後も取得できるようにする
-        var newValues = new Dictionary<string, object>();
-        foreach (var columnValue in record.UpdatedValues)
-        {
-          var key = Record.BuildColumnAliasWithContextName(columnValue.Key, record.ContextName);
-          newValues[key] = columnValue.Value;
-        }
-
-        //保存に成功し、PkeyがNullだったらAutoincrementのはず。
-        //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
-        var pkey = record.OwnMeta.Pkeys[0];
-        var pkeyValue = record.GetValue(pkey);
-        if (pkeyValue == DBNull.Value)
-        {
-          var key = Record.BuildColumnAliasWithContextName(pkey, record.ContextName);
-          newValues[key] = this.FetchLastInsertId();
-        }
-
-        record.ValuesList.Add(newValues);
-      }
-      else
-      {
-        if (record.UpdatedValues.Count == 0)
-        {
-          return;
-        }
-
-        var update = this.Adapter.CreateUpdate();
-        update.SetTable(record.OwnMeta.Name);
-        foreach (var columnValue in record.UpdatedValues)
-        {
-          update.AddColumnValue(columnValue.Key, columnValue.Value);
-        }
-
-        record.AppendPkeyWhere(update.Where);
-
-        //自動更新日時更新
-        if (
-          record.UpdatedValues.Count > 0 
-          &&
-          NeedsAutoUpdate(AutoUpdateDateColumn, record)
-        )
-        {
-          record.SetValue(AutoUpdateDateColumn, DateTime.Now);
-        }
-
-        this.Execute(update);
-
-        //値を保存後も取得できるようにする
-        foreach (var row in record.ValuesList)
-        {
-          foreach (var columnValue in record.UpdatedValues)
-          {
-            var key = Record.BuildColumnAliasWithContextName(columnValue.Key, record.ContextName);
-            row[key] = columnValue.Value;
-          }
-        }
-      }
-
-      record.UpdatedValues.Clear();
-    }
-
-    public void Delete(Record record)
-    {
-      if (record.IsNew)
-      {
-        return;
-      }
-
-      var delete = this.Adapter.CreateDelete();
-      delete.From = record.OwnMeta.Name;
-      record.AppendPkeyWhere(delete.Where);
-
-      this.Execute(delete);
-
-      record.IsDeleted = true;
-    }
-
-    public RecordSet FetchRecordSet(TableMeta tableMeta, Action<Select> action = null)
-    {
-      var select = Adapter.CreateSelect();
-      select.AddFrom(tableMeta.CreateTable());
-
-      if (action != null)
-      {
-        action.Invoke(select);
-      }
-
-      return FetchRecordSet(select);
-    }
-
-    public int FetchRowCount(Select select)
+    public int CountRow(Select select)
     {
       //TODO JOINして行数が重複してる時のCOUNTに対応する
       var clonedSel = (Select)select.Clone();

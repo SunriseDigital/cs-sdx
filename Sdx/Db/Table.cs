@@ -183,7 +183,7 @@ namespace Sdx.Db
             return true;
           }
 
-          return Name == Connection.AutoCreateDateColumn || Name == Connection.AutoUpdateDateColumn;
+          return Name == Record.AutoCreateDateColumn || Name == Record.AutoUpdateDateColumn;
         }
       }
     }
@@ -291,6 +291,58 @@ namespace Sdx.Db
       select.AddFrom(this);
 
       this.SelectDefaultOrder(select);
+
+      return conn.FetchRecordSet(select);
+    }
+
+    public Db.Record FetchRecordByPkey(Db.Connection conn, Dictionary<string, object> pkeyValues)
+    {
+      var select = this.Adapter.CreateSelect();
+      select.AddFrom(this);
+
+      foreach (var col in OwnMeta.Pkeys)
+      {
+        select.Where.Add(col, pkeyValues[col]);
+      }
+
+      return conn.FetchRecord(select);
+    }
+
+    public Record FetchRecordByPkey(Db.Connection conn, string pkeyValue)
+    {
+      if (OwnMeta.Pkeys.Count > 1)
+      {
+        throw new InvalidOperationException("This table has multiple pkeys.");
+      }
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+      select.Where.Add(OwnMeta.Pkeys[0], pkeyValue);
+
+      return conn.FetchRecord(select);
+    }
+
+    public Record FetchRecord(Db.Connection conn, Action<Sql.Select> action = null)
+    {
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+
+      if (action != null)
+      {
+        action.Invoke(select);
+      }
+
+      return conn.FetchRecord(select);
+    }
+
+    public RecordSet FetchRecordSet(Db.Connection conn, Action<Sql.Select> action = null)
+    {
+      var select = conn.Adapter.CreateSelect();
+      select.AddFrom(this);
+
+      if (action != null)
+      {
+        action.Invoke(select);
+      }
 
       return conn.FetchRecordSet(select);
     }

@@ -346,7 +346,7 @@ namespace Sdx.Scaffold
 
         if (pager != null)
         {
-          pager.TotalCount = conn.FetchRowCount(select);
+          pager.TotalCount = conn.CountRow(select);
           select.LimitPager(pager);
         }
 
@@ -384,7 +384,7 @@ namespace Sdx.Scaffold
         }
       }
 
-      conn.Save(record);
+      record.Save(conn);
 
       foreach (var config in relationList)
       {
@@ -403,12 +403,12 @@ namespace Sdx.Scaffold
               var relRecord = rel.TableMeta.CreateRecord();
               relRecord.SetValue(rel.ReferenceKey, record.GetValue(rel.ForeignKey));
               relRecord.SetValue(config["column"].ToString(), refId);
-              conn.Save(relRecord);
+              relRecord.Save(conn);
             }
           }
         }
 
-        currentRecords.ForEach(crec => conn.Delete(crec));
+        currentRecords.ForEach(crec => crec.Delete(conn));
       }
     }
 
@@ -446,7 +446,7 @@ namespace Sdx.Scaffold
         var pkeyValues = Sdx.Util.Json.Decode<Dictionary<string, object>>(pkeys);
         var record = recordSet.First((rec) => pkeyValues.All(kv => rec.GetString(kv.Key) == kv.Value.ToString()));
         record.SetValue(SortingOrder["column"].ToString(), secValue);
-        conn.Save(record);
+        record.Save(conn);
         secValue = direction == "DESC" ? secValue - 1 : secValue + 1;
       }
     }

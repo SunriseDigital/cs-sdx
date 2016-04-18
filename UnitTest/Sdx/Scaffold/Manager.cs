@@ -229,7 +229,7 @@ namespace UnitTest
           List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
           Assert.Equal("", options[0].Value.ToString());//最初は空
 
-          var actual = conn.FetchRecordSet(Test.Orm.Table.LargeArea.Meta, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
+          var actual = Test.Orm.Table.LargeArea.Meta.CreateTable().FetchRecordSet(conn, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
           var key = 1;
           actual.ForEach((rec) =>
           {
@@ -419,7 +419,7 @@ namespace UnitTest
           List<Sdx.Html.Option> options = (List<Sdx.Html.Option>)select.Options;
           Assert.Equal("", options[0].Value.ToString());//最初は空
 
-          var actual = conn.FetchRecordSet(Test.Orm.Table.LargeArea.Meta, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
+          var actual = Test.Orm.Table.LargeArea.Meta.CreateTable().FetchRecordSet(conn, (sel) => sel.Context("large_area").Table.SelectDefaultOrder(sel));
           var key = 1;
           actual.ForEach((rec) =>
           {
@@ -681,7 +681,7 @@ namespace UnitTest
 
         //確認する
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        var savedRecord = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, savedId);
         Assert.Equal("foobar", savedRecord.GetString("name"));
         Assert.Equal("1", savedRecord.GetString("area_id"));
 
@@ -721,7 +721,7 @@ namespace UnitTest
 
         //確認する
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        var savedRecord = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, savedId);
 
         var shopCategories = savedRecord.GetRecordSet("shop_category", conn, select => select.AddOrder("category_id", Sdx.Db.Sql.Order.ASC));
         Assert.Equal(2, shopCategories.Count);
@@ -755,7 +755,7 @@ namespace UnitTest
 
         //確認する
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        var savedRecord = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, savedId);
 
         var shopCategories = savedRecord.GetRecordSet("shop_category", conn, select => select.AddOrder("category_id", Sdx.Db.Sql.Order.ASC));
         Assert.Equal(0, shopCategories.Count);
@@ -809,7 +809,7 @@ namespace UnitTest
 
         //確認する
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Area(), savedId);
+        var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, savedId);
         Assert.Equal("名前", savedRecord.GetString("name"));
         Assert.Equal("code", savedRecord.GetString("code"));
       }
@@ -865,7 +865,7 @@ namespace UnitTest
 
           //確認する
           savedId = record.GetString("id");
-          var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Area(), savedId);
+          var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, savedId);
           Assert.Equal("名前", savedRecord.GetString("name"));
           Assert.Equal("methodInfo", savedRecord.GetString("code"));
         }
@@ -937,7 +937,7 @@ namespace UnitTest
         }
 
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        var savedRecord = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, savedId);
         Assert.Equal("HASH@1234", savedRecord.GetString("password"));
       }
 
@@ -975,7 +975,7 @@ namespace UnitTest
         }
 
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        var savedRecord = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, savedId);
         Assert.Equal("HASH@1234", savedRecord.GetString("password"));
       }
     }
@@ -1024,9 +1024,9 @@ namespace UnitTest
     {
       Func<Sdx.Db.Connection, string, string[], Sdx.Db.Record> resetCategory = (conn, id, categories) =>
       {
-        var record = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), id);
+        var record = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, id);
         var currentRecords = record.GetRecordSet("shop_category", conn);
-        currentRecords.ForEach(crec => conn.Delete(crec));
+        currentRecords.ForEach(crec => crec.Delete(conn));
 
         foreach (var category_id in categories)
         {
@@ -1036,7 +1036,7 @@ namespace UnitTest
           conn.BeginTransaction();
           try
           {
-            conn.Save(shop_category);
+            shop_category.Save(conn);
             conn.Commit();
           }
           catch (Exception)
@@ -1144,7 +1144,7 @@ namespace UnitTest
 
         //確認する
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        var savedRecord = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, savedId);
         Assert.Equal("foobar", savedRecord.GetString("name"));
         Assert.Equal("1", savedRecord.GetString("area_id"));
 
@@ -1178,7 +1178,7 @@ namespace UnitTest
 
         //確認する
         savedId = record.GetString("id");
-        var savedRecord = conn.FetchRecordByPkey(new Test.Orm.Table.Shop(), savedId);
+        var savedRecord = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, savedId);
         Assert.Null(savedRecord);
       }
     }

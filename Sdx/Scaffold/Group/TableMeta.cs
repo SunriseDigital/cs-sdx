@@ -26,7 +26,7 @@ namespace Sdx.Scaffold.Group
       {
         conn.Open();
         var table = tableMeta.CreateTable();
-        var record = conn.FetchRecordByPkey(table, TargetValue);
+        var record = table.FetchRecordByPkey(conn, TargetValue);
         if(display.IsString)
         {
           name = record.GetString((string)display);

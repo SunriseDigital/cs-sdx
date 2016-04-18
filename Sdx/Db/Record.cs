@@ -12,6 +12,15 @@ namespace Sdx.Db
 {
   public abstract class Record
   {
+    public static string AutoCreateDateColumn { get; set; }
+    public static string AutoUpdateDateColumn { get; set; }
+
+    static Record()
+    {
+      AutoCreateDateColumn = "created_at";
+      AutoUpdateDateColumn = "updated_at";
+    }
+
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
     internal string ContextName { get; set; }
@@ -414,6 +423,141 @@ namespace Sdx.Db
     public bool IsNull(string columnName)
     {
       return GetValue(columnName) == DBNull.Value;
+    }
+
+    private bool NeedsAutoUpdate(string columnName)
+    {
+      if (columnName == null)
+      {
+        return false;
+      }
+
+      if (!OwnMeta.HasColumn(columnName))
+      {
+        return false;
+      }
+
+      var first = UpdatedValues.FirstOrDefault(kv => kv.Key == columnName);
+      if (first.Value == null)
+      {
+        return true;
+      }
+
+      if (first.Value.ToString() == "")
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    public void Save(Db.Connection conn)
+    {
+      if (IsDeleted)
+      {
+        throw new InvalidOperationException("This record is already deleted.");
+      }
+
+      if (IsNew)
+      {
+        var insert = conn.Adapter.CreateInsert();
+        insert.SetInto(OwnMeta.Name);
+
+        //自動登録日時更新
+        if (NeedsAutoUpdate(AutoCreateDateColumn))
+        {
+          SetValue(AutoCreateDateColumn, DateTime.Now);
+        }
+
+        //自動更新日時更新
+        if (NeedsAutoUpdate(AutoUpdateDateColumn))
+        {
+          SetValue(AutoUpdateDateColumn, DateTime.Now);
+        }
+
+        foreach (var columnValue in UpdatedValues)
+        {
+          insert.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        conn.Execute(insert);
+
+        //値を保存後も取得できるようにする
+        var newValues = new Dictionary<string, object>();
+        foreach (var columnValue in UpdatedValues)
+        {
+          var key = Record.BuildColumnAliasWithContextName(columnValue.Key, ContextName);
+          newValues[key] = columnValue.Value;
+        }
+
+        //保存に成功し、PkeyがNullだったらAutoincrementのはず。
+        //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
+        var pkey = OwnMeta.Pkeys[0];
+        var pkeyValue = GetValue(pkey);
+        if (pkeyValue == DBNull.Value)
+        {
+          var key = Record.BuildColumnAliasWithContextName(pkey, ContextName);
+          newValues[key] = conn.FetchLastInsertId();
+        }
+
+        ValuesList.Add(newValues);
+      }
+      else
+      {
+        if (UpdatedValues.Count == 0)
+        {
+          return;
+        }
+
+        var update = conn.Adapter.CreateUpdate();
+        update.SetTable(OwnMeta.Name);
+        foreach (var columnValue in UpdatedValues)
+        {
+          update.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        AppendPkeyWhere(update.Where);
+
+        //自動更新日時更新
+        if (
+          UpdatedValues.Count > 0
+          &&
+          NeedsAutoUpdate(AutoUpdateDateColumn)
+        )
+        {
+          SetValue(AutoUpdateDateColumn, DateTime.Now);
+        }
+
+        conn.Execute(update);
+
+        //値を保存後も取得できるようにする
+        foreach (var row in ValuesList)
+        {
+          foreach (var columnValue in UpdatedValues)
+          {
+            var key = Record.BuildColumnAliasWithContextName(columnValue.Key, ContextName);
+            row[key] = columnValue.Value;
+          }
+        }
+      }
+
+      UpdatedValues.Clear();
+    }
+
+    public void Delete(Db.Connection conn)
+    {
+      if (IsNew)
+      {
+        return;
+      }
+
+      var delete = conn.Adapter.CreateDelete();
+      delete.From = OwnMeta.Name;
+      AppendPkeyWhere(delete.Where);
+
+      conn.Execute(delete);
+
+      IsDeleted = true;
     }
   }
 }

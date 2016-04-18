@@ -225,7 +225,7 @@ namespace UnitTest
         Assert.Equal(dateTime, shop.GetDateTime("created_at"));
 
         conn.BeginTransaction();
-        conn.Save(shop);
+        shop.Save(conn);
         conn.Commit();
 
         Assert.False(shop.IsUpdated);
