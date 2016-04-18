@@ -292,7 +292,7 @@ namespace Sdx.Db
 
       this.SelectDefaultOrder(select);
 
-      return select.FetchRecordSet(conn);
+      return conn.FetchRecordSet(select);
     }
 
     public Db.Record FetchRecordByPkey(Db.Connection conn, Dictionary<string, object> pkeyValues)
@@ -305,7 +305,7 @@ namespace Sdx.Db
         select.Where.Add(col, pkeyValues[col]);
       }
 
-      return select.FetchRecord(conn);
+      return conn.FetchRecord(select);
     }
 
     public Record FetchRecordByPkey(Db.Connection conn, string pkeyValue)
@@ -318,7 +318,7 @@ namespace Sdx.Db
       select.AddFrom(this);
       select.Where.Add(OwnMeta.Pkeys[0], pkeyValue);
 
-      return select.FetchRecord(conn);
+      return conn.FetchRecord(select);
     }
 
     public Record FetchRecord(Db.Connection conn, Action<Sql.Select> action = null)
@@ -331,7 +331,7 @@ namespace Sdx.Db
         action.Invoke(select);
       }
 
-      return select.FetchRecord(conn);
+      return conn.FetchRecord(select);
     }
 
     public RecordSet FetchRecordSet(Db.Connection conn, Action<Sql.Select> action = null)
@@ -344,7 +344,7 @@ namespace Sdx.Db
         action.Invoke(select);
       }
 
-      return select.FetchRecordSet(conn);
+      return conn.FetchRecordSet(select);
     }
   }
 }

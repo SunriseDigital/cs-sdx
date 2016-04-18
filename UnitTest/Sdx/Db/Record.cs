@@ -47,7 +47,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
         shops.ForEach(shop =>
         {
@@ -86,7 +86,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(2, shops.Count);
@@ -146,7 +146,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, shops.Count);
@@ -191,7 +191,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(2, shops.Count);
@@ -236,7 +236,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         var areaSet = shops[0].GetRecordSet("area", conn);
@@ -277,7 +277,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         var menuSet = shops[0].GetRecordSet(
           "menu",
@@ -331,7 +331,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         var shopCategorySet = shops[0].GetRecordSet(
           "shop_category",
@@ -385,7 +385,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, shops.Count);
@@ -421,7 +421,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
 
         Assert.Null(shops[0].GetRecord("main_image"));
@@ -454,7 +454,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
         Assert.Equal(1, shops.Count);
@@ -489,7 +489,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
         Assert.Equal(1, shops.Count);
 
         Assert.Null(shops[0].GetRecord("main_image", conn));
@@ -522,7 +522,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shop = select.FetchRecord(conn);
+        var shop = conn.FetchRecord(select);
         Assert.True(shop is Test.Orm.Shop);
         Assert.Equal(1, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
 
@@ -581,7 +581,7 @@ namespace UnitTest
         //Tableを使ってないと、MetaDataが取れないので主キーがわからず組み立てられない。
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          var shop = select.FetchRecord(conn);
+          var shop = conn.FetchRecord(select);
         }));
 
         Assert.IsType<InvalidOperationException>(ex);
@@ -613,7 +613,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shops = select.FetchRecordSet(conn);
+        var shops = conn.FetchRecordSet(select);
 
         Assert.Equal("天祥", shops[0].GetString("name"));
         Assert.Equal("エスペリア", shops[1].GetString("name"));
@@ -647,7 +647,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var shop = select.FetchRecord(conn);
+        var shop = conn.FetchRecord(select);
 
         var datetime = shop.GetDateTime("created_at");
         Assert.IsType<DateTime>(datetime);
@@ -727,7 +727,7 @@ namespace UnitTest
           .AddFrom(new Test.Orm.Table.Shop())
           .WhereCall((where) => where.Add("id", id));
 
-        shop = select.FetchRecord(conn);
+        shop = conn.FetchRecord(select);
         Assert.Equal(DBNull.Value, shop.GetValue("password"));
 
         shop.SetValue("login_id", DBNull.Value);
@@ -743,7 +743,7 @@ namespace UnitTest
         }
 
         //再び取得
-        shop = select.FetchRecord(conn);
+        shop = conn.FetchRecord(select);
         Assert.Equal(DBNull.Value, shop.GetValue("login_id"));
         Assert.True(shop.IsNull("login_id"));
       }

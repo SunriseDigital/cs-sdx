@@ -191,7 +191,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var list = sel.FetchDictionaryList<string>(conn);
+        var list = conn.FetchDictionaryList<string>(sel);
         Assert.IsType<List<Dictionary<string, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]["name"]);
@@ -245,7 +245,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var list = sel.FetchKeyValuePairList<int, string>(conn);
+        var list = conn.FetchKeyValuePairList<int, string>(sel);
         Assert.IsType<List<KeyValuePair<int, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal(3, list[0].Key);
@@ -299,7 +299,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var list = sel.FetchList<string>(conn);
+        var list = conn.FetchList<string>(sel);
         Assert.IsType<List<string>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]);
@@ -320,7 +320,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var intList = sel.FetchList<int>(conn);
+        var intList = conn.FetchList<int>(sel);
         Assert.IsType<List<int>>(intList);
         Assert.Equal(2, intList.Count);
         Assert.Equal(5, intList[0]);
@@ -341,7 +341,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var datetimes = sel.FetchList<DateTime>(conn);
+        var datetimes = conn.FetchList<DateTime>(sel);
         Assert.IsType<List<DateTime>>(datetimes);
         Assert.Equal(2, datetimes.Count);
         Assert.Equal("2015-01-01 12:30:00", datetimes[0].ToString("yyyy-MM-dd HH:mm:ss"));
@@ -393,7 +393,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var strValue = sel.FetchOne<string>(conn);
+        var strValue = conn.FetchOne<string>(sel);
         Assert.IsType<string>(strValue);
         Assert.Equal("天府舫", strValue);
       }
@@ -414,7 +414,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var dtValue = sel.FetchOne<DateTime>(conn);
+        var dtValue = conn.FetchOne<DateTime>(sel);
         Assert.IsType<DateTime>(dtValue);
         Assert.Equal("2015-01-04 12:30:00", dtValue.ToString("yyyy-MM-dd HH:mm:ss"));
       }
@@ -463,7 +463,7 @@ namespace UnitTest
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
-        var objDic = sel.FetchDictionary<object>(conn);
+        var objDic = conn.FetchDictionary<object>(sel);
         Assert.IsType<Dictionary<string, object>>(objDic);
         Assert.Equal(3, objDic["id"]);
         Assert.Equal("天府舫", objDic["name"]);
@@ -493,13 +493,13 @@ namespace UnitTest
         string id = null;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          id = select.FetchOne<string>(con);
+          id = con.FetchOne<string>(select);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        id = select.FetchOne<string>(con);
+        id = con.FetchOne<string>(select);
         Assert.Equal("1", id);
         Assert.Equal(System.Data.ConnectionState.Open, con.State);
       }
@@ -578,13 +578,13 @@ namespace UnitTest
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          list = sel.FetchList<string>(con);
+          list = con.FetchList<string>(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = sel.FetchList<string>(con);
+        list = con.FetchList<string>(sel);
         Assert.IsType<List<string>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]);
@@ -647,13 +647,13 @@ namespace UnitTest
         Dictionary<string, object> objDic;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          objDic = sel.FetchDictionary<object>(con);
+          objDic = con.FetchDictionary<object>(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        objDic = sel.FetchDictionary<object>(con);
+        objDic = con.FetchDictionary<object>(sel);
         Assert.IsType<Dictionary<string, object>>(objDic);
         Assert.Equal(3, objDic["id"]);
         Assert.Equal("天府舫", objDic["name"]);
@@ -715,13 +715,13 @@ namespace UnitTest
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          list = sel.FetchDictionaryList<string>(con);
+          list = con.FetchDictionaryList<string>(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = sel.FetchDictionaryList<string>(con);
+        list = con.FetchDictionaryList<string>(sel);
         Assert.IsType<List<Dictionary<string, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal("天府舫", list[0]["name"]);
@@ -784,13 +784,13 @@ namespace UnitTest
       {
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          list = sel.FetchKeyValuePairList<int, string>(con);
+          list = con.FetchKeyValuePairList<int, string>(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        list = sel.FetchKeyValuePairList<int, string>(con);
+        list = con.FetchKeyValuePairList<int, string>(sel);
         Assert.IsType<List<KeyValuePair<int, string>>>(list);
         Assert.Equal(2, list.Count);
         Assert.Equal(3, list[0].Key);
@@ -821,13 +821,13 @@ namespace UnitTest
         Test.Orm.Shop shop;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          shop = (Test.Orm.Shop)sel.FetchRecord(con);
+          shop = (Test.Orm.Shop)con.FetchRecord(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        shop = (Test.Orm.Shop)sel.FetchRecord(con);
+        shop = (Test.Orm.Shop)con.FetchRecord(sel);
         Assert.Equal(1, shop.GetInt32("id"));
         Assert.Equal("天祥", shop.GetString("name"));
       }
@@ -857,13 +857,13 @@ namespace UnitTest
         Sdx.Db.RecordSet set;
         Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
         {
-          set = sel.FetchRecordSet(con);
+          set = con.FetchRecordSet(sel);
         }));
         //connectionを開いてないので例外になるはず
         Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
-        set = sel.FetchRecordSet(con);
+        set = con.FetchRecordSet(sel);
         Assert.Equal(2, set.Count);
         Assert.Equal(3, set[0].GetInt32("id"));
         Assert.Equal("天府舫", set[0].GetString("name"));
@@ -944,7 +944,7 @@ namespace UnitTest
       {
         dynamic set;
         con.Open();
-        set = sel.FetchRecordSet(con);
+        set = con.FetchRecordSet(sel);
         Assert.Equal(2, set.Count);
         Assert.Equal(3, set[0].GetInt32("id"));
         Assert.Equal("天府舫", set[0].GetString("name"));
@@ -972,7 +972,7 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         con.Open();
-        Sdx.Db.Record shop = sel.FetchRecord(con);
+        Sdx.Db.Record shop = con.FetchRecord(sel);
         Assert.Equal(1, shop.GetInt32("id"));
         Assert.Equal("天祥", shop.GetString("name"));
       }

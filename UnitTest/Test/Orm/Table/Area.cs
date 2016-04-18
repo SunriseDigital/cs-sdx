@@ -52,7 +52,7 @@ namespace Test.Orm.Table
 
       elem.AddOption("", "大エリアを選択");
 
-      select.FetchKeyValuePairList<string, string>(conn).ForEach((pair) =>
+      conn.FetchKeyValuePairList<string, string>(select).ForEach((pair) =>
       {
         elem.AddOption(pair);
       });

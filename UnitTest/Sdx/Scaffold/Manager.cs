@@ -61,7 +61,7 @@ namespace UnitTest
       {
         conn.Open();
         var actualSet = scaffold.FetchRecordSet(conn);
-        var expectedSet = select.FetchRecordSet(conn);
+        var expectedSet = conn.FetchRecordSet(select);
 
         Assert.Equal(expectedSet.Count, actualSet.Count);
 

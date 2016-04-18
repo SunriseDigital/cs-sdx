@@ -83,7 +83,7 @@ namespace Test.Orm.Table
       select.AddFrom(new Test.Orm.Table.Category()).Table.SelectDefaultOrder(select);
       select.ClearColumns().AddColumns("id", "name");
 
-      select.FetchKeyValuePairList<string, string>(conn).ForEach(pair =>
+      conn.FetchKeyValuePairList<string, string>(select).ForEach(pair =>
       {
         elem.AddCheckable<Sdx.Html.CheckBox>(pair);
       });
@@ -100,7 +100,7 @@ namespace Test.Orm.Table
       select.ClearColumns().AddColumns("id", "name");
 
       elem.AddOption("", "場所を選択してください");
-      select.FetchKeyValuePairList<string, string>(conn).ForEach(pair =>
+      conn.FetchKeyValuePairList<string, string>(select).ForEach(pair =>
       {
         elem.AddOption(pair);
       });
