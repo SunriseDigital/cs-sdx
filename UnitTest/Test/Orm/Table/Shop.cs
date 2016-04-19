@@ -11,13 +11,9 @@ namespace Test.Orm.Table
     {
       Meta =  new Sdx.Db.TableMeta(
         "shop",
-        new List<string>()
-        {
-          "id"
-        },
         new List<Column>()
         {
-          new Column("id", isAutoIncrement: true),
+          new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("name"),
           new Column("area_id", type: ColumnType.Integer),
           new Column("main_image_id", isNotNull: false),

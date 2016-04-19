@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Sdx.Db
 {
@@ -11,14 +12,12 @@ namespace Sdx.Db
   {
     public TableMeta(
       string name,
-      List<string> pkeys,
       List<Table.Column> columns,
       Dictionary<string, Sdx.Db.Table.Relation> relations,
       Type recordType,
       Type tableType
     ){
       this.Name = name;
-      this.Pkeys = pkeys;
       this.Columns = columns;
       this.Relations = relations;
 
@@ -41,13 +40,27 @@ namespace Sdx.Db
     }
 
     public string Name { get; private set; }
-    public List<string> Pkeys { get; private set; }
     public List<Table.Column> Columns { get; private set; }
     public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; private set; }
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }
 
     private Dictionary<string, Table.Column> columnsCache = new Dictionary<string, Table.Column>();
+
+    private List<Table.Column> pkeys;
+
+    public IEnumerable<Table.Column> Pkeys
+    {
+      get
+      {
+        if(pkeys == null)
+        {
+          pkeys = Columns.Where((col) => col.IsPkey).ToList();
+        }
+
+        return pkeys;
+      }
+    }
 
     public Table CreateTable()
     {

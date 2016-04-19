@@ -81,7 +81,8 @@ namespace Sdx.Db
         ColumnType? type = null,
         bool isNotNull = true,
         bool isAutoIncrement = false,
-        long? maxLength = null
+        long? maxLength = null,
+        bool isPkey = false
       )
       {
         this.Name = name;
@@ -89,6 +90,7 @@ namespace Sdx.Db
         this.IsNotNull = isNotNull;
         this.IsAutoIncrement = isAutoIncrement;
         this.MaxLength = maxLength;
+        this.IsPkey = isPkey;
       }
 
       public string Name { get; private set; }
@@ -99,13 +101,7 @@ namespace Sdx.Db
 
       public TableMeta Meta { get; internal set; }
 
-      public bool IsPkey
-      {
-        get
-        {
-          return Meta.Pkeys.Exists((column) => this.Name == column);
-        }
-      }
+      public bool IsPkey { get; private set; }
 
       public List<Validation.Validator> CreateValidatorList()
       {
@@ -302,7 +298,7 @@ namespace Sdx.Db
 
       foreach (var col in OwnMeta.Pkeys)
       {
-        select.Where.Add(col, pkeyValues[col]);
+        select.Where.Add(col.Name, pkeyValues[col.Name]);
       }
 
       return conn.FetchRecord(select);
@@ -310,13 +306,13 @@ namespace Sdx.Db
 
     public Record FetchRecordByPkey(Db.Connection conn, string pkeyValue)
     {
-      if (OwnMeta.Pkeys.Count > 1)
+      if (OwnMeta.Pkeys.Count() > 1)
       {
         throw new InvalidOperationException("This table has multiple pkeys.");
       }
       var select = conn.Adapter.CreateSelect();
       select.AddFrom(this);
-      select.Where.Add(OwnMeta.Pkeys[0], pkeyValue);
+      select.Where.Add(OwnMeta.Pkeys.First((col) => true).Name, pkeyValue);
 
       return conn.FetchRecord(select);
     }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
-
+using System.Linq;
 using Sdx.Db.Sql;
 
 namespace Sdx.Db
@@ -46,7 +46,7 @@ namespace Sdx.Db
         throw new NotImplementedException("Missing Pkeys setting in " + table.ToString() + ".Meta");
       }
 
-      if (pkeys.Count == 0)
+      if (!pkeys.Any())
       {
         throw new NotImplementedException("Missing Pkeys setting in " + table.ToString() + ".Meta");
       }
@@ -56,18 +56,18 @@ namespace Sdx.Db
       });
     }
 
-    private void BuildResults(Select select, Dictionary<string, object>  row, List<string> pkeys, string contextName)
+    private void BuildResults(Select select, Dictionary<string, object> row, IEnumerable<Table.Column> pkeys, string contextName)
     {
       //対象テーブルの主キーがNULLの場合（LEFTJOINの時）、関係ない行なのでスルーする
       var exists = true;
-      pkeys.ForEach(column =>
+      foreach(var column in pkeys)
       {
-        if (row[Record.BuildColumnAliasWithContextName(column, contextName)] is DBNull)
+        if (row[Record.BuildColumnAliasWithContextName(column.Name, contextName)] is DBNull)
         {
           exists = false;
-          return;
+          break;
         }
-      });
+      }
 
       if (!exists)
       {
@@ -92,18 +92,19 @@ namespace Sdx.Db
     }
 
 
-    private string BuildUniqueKey(Dictionary<string, object> row, List<string> pkeys, string contextName)
+    private string BuildUniqueKey(Dictionary<string, object> row, IEnumerable<Table.Column> pkeys, string contextName)
     {
       var key = "";
 
-      pkeys.ForEach(column => {
+      foreach(var column in pkeys)
+      {
         if (key != "")
         {
           key += "%%SDX%%";
         }
 
-        key += row[Record.BuildColumnAliasWithContextName(column, contextName)];
-      });
+        key += row[Record.BuildColumnAliasWithContextName(column.Name, contextName)];
+      }
 
       return key;
     }

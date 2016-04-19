@@ -288,20 +288,21 @@ namespace Sdx.Db
 
     internal void AppendPkeyWhere(Condition where)
     {
-      if (this.OwnMeta.Pkeys.Count == 0)
+      //pkeyがなかったら例外
+      if (!OwnMeta.Pkeys.Any())
       {
         throw new InvalidOperationException("Missing Pkey data in " + this.OwnMeta.Name + " table");
       }
 
-      this.OwnMeta.Pkeys.ForEach(column =>
+      foreach(var column in OwnMeta.Pkeys)
       {
-        var value = this.GetValue(column);
+        var value = this.GetValue(column.Name);
         if (value == null)
         {
           throw new InvalidOperationException("Primary key " + column + " is null.");
         }
-        where.Add(column, value);
-      });
+        where.Add(column.Name, value);
+      }
     }
 
     public override string ToString()
@@ -425,7 +426,10 @@ namespace Sdx.Db
     public Dictionary<string, object> GetPkeyValues()
     {
       var dic = new Dictionary<string, object>();
-      OwnMeta.Pkeys.ForEach((col) => dic[col] = GetValue(col));
+      foreach (var column in OwnMeta.Pkeys)
+      {
+        dic[column.Name] = GetValue(column.Name);
+      }
 
       return dic;
     }
@@ -500,15 +504,21 @@ namespace Sdx.Db
           newValues[key] = columnValue.Value;
         }
 
-        //保存に成功し、PkeyがNullだったらAutoincrementのはず。
+        //AutoincrementのPkeyを取得できるようにしておく。
         //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
-        var pkey = OwnMeta.Pkeys[0];
-        var pkeyValue = GetValue(pkey);
-        if (pkeyValue == DBNull.Value)
+        var firstPkey = OwnMeta.Pkeys.FirstOrDefault();
+        if (firstPkey != null)
         {
-          var key = Record.BuildColumnAliasWithContextName(pkey, ContextName);
-          newValues[key] = conn.FetchLastInsertId();
+          var pkeyValue = GetValue(firstPkey.Name);
+          //保存に成功し、PkeyがNullだったらAutoincrementのはず。
+          //IsAutoincrementを見ると強引に挿入していることもあるので。
+          if (pkeyValue == DBNull.Value)
+          {
+            var key = Record.BuildColumnAliasWithContextName(firstPkey.Name, ContextName);
+            newValues[key] = conn.FetchLastInsertId();
+          }
         }
+
 
         ValuesList.Add(newValues);
       }

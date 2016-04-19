@@ -265,15 +265,16 @@ namespace Sdx.Scaffold
     {
       var recordSet = FetchRecordSet(conn, (select) => {
         var exists = false;
-        TableMeta.Pkeys.ForEach((column) =>
+        foreach (var column in TableMeta.Pkeys)
         {
-          var values = parameters.GetValues(column);
+          var values = parameters.GetValues(column.Name);
           if (values != null && values.Length > 0 && values[0].Length > 0)
           {
+            //TODO これはどっちか片っぽがあっただけでもtrueになるが問題ないのか？
             exists = true;
-            select.Where.Add(column, values[0]);
+            select.Where.Add(column.Name, values[0]);
           }
-        });
+        }
 
         if (!exists)
         {
@@ -426,7 +427,10 @@ namespace Sdx.Scaffold
       var delete = Db.CreateDelete();
 
       delete.SetFrom(TableMeta.Name);
-      TableMeta.Pkeys.ForEach(column => delete.Where.Add(column, pkeyValues[column]));
+      foreach(var column in TableMeta.Pkeys)
+      {
+        delete.Where.Add(column.Name, pkeyValues[column.Name]);
+      }
 
       conn.Execute(delete);
     }
