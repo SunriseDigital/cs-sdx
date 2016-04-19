@@ -21,8 +21,11 @@ namespace Sdx.Scaffold
     /// </summary>
     public static void ClearContextCache()
     {
-      Dictionary<string, Manager> instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
-      instances.Clear();
+      if(Context.Current.Vars.ContainsKey(CONTEXT_KEY))
+      {
+        Dictionary<string, Manager> instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
+        instances.Clear();
+      }
     }
 
     /// <summary>

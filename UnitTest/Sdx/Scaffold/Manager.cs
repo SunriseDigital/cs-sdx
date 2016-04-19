@@ -1196,7 +1196,6 @@ namespace UnitTest
     private void RunPerPage(TestDb db)
     {
       InitHttpContextMock("pid=1");
-
       var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
       scaffold.PerPage = 2;
       using (var conn = scaffold.Db.CreateConnection())
