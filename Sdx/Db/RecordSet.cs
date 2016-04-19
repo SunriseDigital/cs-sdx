@@ -133,16 +133,26 @@ namespace Sdx.Db
       }
     }
 
-    public Record Pop(Predicate<Record> match)
+    public T Pop<T>(Predicate<T> match) where T : Sdx.Db.Record
     {
-      var find = results.FindIndex(match);
-      if(find != -1)
+      var find = results.FindIndex((rec) => match((T) rec));
+      if (find != -1)
       {
-        Record tmp = results[find];
+        var tmp = (T)results[find];
         results.RemoveAt(find);
         return tmp;
       }
       return null;
+    }
+
+    public Record Pop(Predicate<Record> match)
+    {
+      return Pop<Record>(match);
+    }
+
+    public void ForEach<T>(Action<T> action) where T : Sdx.Db.Record
+    {
+      this.results.ForEach((rec) => action((T) rec));
     }
 
     public void ForEach(Action<Record> action)
@@ -160,15 +170,21 @@ namespace Sdx.Db
       return this.results.GetEnumerator();
     }
 
-    public string[] ToStringArray(Func<Record, string> func)
+    public string[] ToStringArray<T>(Func<T, string> func) where T : Sdx.Db.Record
     {
       var result = new string[Count];
       int key = 0;
-      ForEach(record => {
-        result.SetValue(func(record), key++);
+      ForEach(record =>
+      {
+        result.SetValue(func((T)record), key++);
       });
 
       return result;
+    }
+
+    public string[] ToStringArray(Func<Record, string> func)
+    {
+      return ToStringArray<Record>(func);
     }
   }
 }

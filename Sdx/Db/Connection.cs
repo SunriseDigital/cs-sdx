@@ -283,6 +283,11 @@ namespace Sdx.Db
       }
     }
 
+    public List<Dictionary<string, object>> FetchDictionaryList(DbCommand command)
+    {
+      return FetchDictionaryList<object>(command);
+    }
+
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
     {
       return this.Fetch<List<Dictionary<string, T>>>(command, (reader) => {
@@ -303,6 +308,11 @@ namespace Sdx.Db
       });
     }
 
+    public List<KeyValuePair<object, object>> FetchKeyValuePairList(DbCommand command)
+    {
+      return FetchKeyValuePairList<object, object>(command);
+    }
+
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command)
     {
       return this.Fetch<List<KeyValuePair<TKey, TValue>>>(command, (reader) => {
@@ -320,6 +330,11 @@ namespace Sdx.Db
       });
     }
 
+    public List<object> FetchList(DbCommand command)
+    {
+      return FetchList<object>(command);
+    }
+
     public List<T> FetchList<T>(DbCommand command)
     {
       return this.Fetch<List<T>>(command, (reader) => {
@@ -332,6 +347,11 @@ namespace Sdx.Db
       });
     }
 
+    public object FetchOne(DbCommand command)
+    {
+      return FetchOne<object>(command);
+    }
+
     public T FetchOne<T>(DbCommand command)
     {
       return this.Fetch<T>(command, (reader) => {
@@ -342,6 +362,11 @@ namespace Sdx.Db
 
         return default(T);
       });
+    }
+
+    public Dictionary<string, object> FetchDictionary(DbCommand command)
+    {
+      return FetchDictionary<object>(command);
     }
 
     public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
@@ -367,6 +392,11 @@ namespace Sdx.Db
       return command.Connection == this.DbConnection && command.Transaction == this.DbTransaction;
     }
 
+    public Dictionary<string, object> FetchDictionary(Sql.Select select)
+    {
+      return FetchDictionary<object>(select);
+    }
+
     public Dictionary<string, T> FetchDictionary<T>(Sql.Select select)
     {
       Dictionary<string, T> result;
@@ -376,6 +406,11 @@ namespace Sdx.Db
       }
 
       return result;
+    }
+
+    public object FetchOne(Sql.Select select)
+    {
+      return FetchOne<object>(select);
     }
 
     public T FetchOne<T>(Sql.Select select)
@@ -389,6 +424,11 @@ namespace Sdx.Db
       return result;
     }
 
+    public List<object> FetchList(Sql.Select select)
+    {
+      return FetchList<object>(select);
+    }
+
     public List<T> FetchList<T>(Sql.Select select)
     {
       List<T> result = null;
@@ -400,6 +440,11 @@ namespace Sdx.Db
       return result;
     }
 
+    public List<KeyValuePair<object, object>> FetchKeyValuePairList(Sql.Select select)
+    {
+      return FetchKeyValuePairList<object, object>(select);
+    }
+
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Sql.Select select)
     {
       List<KeyValuePair<TKey, TValue>> result = null;
@@ -409,6 +454,11 @@ namespace Sdx.Db
       }
 
       return result;
+    }
+
+    public List<Dictionary<string, object>> FetchDictionaryList(Sql.Select select)
+    {
+      return FetchDictionaryList<object>(select);
     }
 
     public List<Dictionary<string, T>> FetchDictionaryList<T>(Sql.Select select)
@@ -424,6 +474,11 @@ namespace Sdx.Db
 
     public Record FetchRecord(Sql.Select select)
     {
+      return FetchRecord<Record>(select);
+    }
+
+    public T FetchRecord<T>(Sql.Select select) where T : Sdx.Db.Record
+    {
       var resultSet = this.FetchRecordSet(select);
 
       if (resultSet.Count == 0)
@@ -431,10 +486,15 @@ namespace Sdx.Db
         return null;
       }
 
-      return resultSet[0];
+      return (T)resultSet[0];
     }
 
     public Record FetchRecord(Sql.Select select, string contextName)
+    {
+      return FetchRecord<Record>(select, contextName);
+    }
+
+    public T FetchRecord<T>(Sql.Select select, string contextName) where T : Sdx.Db.Record
     {
       var resultSet = this.FetchRecordSet(select, contextName);
 
@@ -443,7 +503,7 @@ namespace Sdx.Db
         return null;
       }
 
-      return resultSet[0];
+      return (T)resultSet[0];
     }
 
     /// <summary>
@@ -458,7 +518,6 @@ namespace Sdx.Db
     /// <returns></returns>
     public RecordSet FetchRecordSet(Sql.Select select)
     {
-
       var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
       return FetchRecordSet(select, firstFrom.Name);
     }

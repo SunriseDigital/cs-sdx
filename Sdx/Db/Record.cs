@@ -133,12 +133,12 @@ namespace Sdx.Db
       return this;
     }
 
-    public Record GetRecord(string contextName, Action<Select> selectHook = null)
+    public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Sdx.Db.Record
     {
-      return this.GetRecord(contextName, null, selectHook);
+      return this.GetRecord<T>(contextName, null, selectHook);
     }
 
-    public Record GetRecord(string contextName, Connection connection, Action<Select> selectHook = null)
+    public T GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Sdx.Db.Record
     {
       var records = this.GetRecordSet(contextName, connection, selectHook);
       if (records.Count == 0)
@@ -146,7 +146,17 @@ namespace Sdx.Db
         return null;
       }
 
-      return records[0];
+      return (T)records[0];
+    }
+
+    public Record GetRecord(string contextName, Action<Select> selectHook = null)
+    {
+      return this.GetRecord<Record>(contextName, null);
+    }
+
+    public Record GetRecord(string contextName, Connection connection, Action<Select> selectHook = null)
+    {
+      return this.GetRecord<Record>(contextName, connection, selectHook);
     }
 
     public RecordSet GetRecordSet(string contextName, Action<Select> selectHook = null)
