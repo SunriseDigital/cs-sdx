@@ -455,5 +455,22 @@ namespace UnitTest
       Assert.Equal("/path/to/no-domain", url.Build(new List<string>() { "foo" }));
       Assert.Equal("/path/to/no-domain?foo=var&foo=hoge&hoge=fuga", url.Build(new Dictionary<string, string>() { { "hoge", "fuga" } }));
     }
+
+    [Fact]
+    public void TestNoScheme()
+    {
+      var url = new Sdx.Web.Url("//www.example.com/path/to/no-scheme?baz=grr");
+
+      Assert.Null(url.Scheme);
+      Assert.Equal("www.example.com", url.Domain);
+      Assert.Equal("/path/to/no-scheme", url.LocalPath);
+      Assert.Equal("grr", url.GetParam("baz"));
+      Assert.Equal("/path/to/no-scheme?baz=grr", url.Build());
+
+      url.AddParam("baz", "hoge");
+      Assert.Equal("/path/to/no-scheme?baz=grr&baz=hoge", url.Build());
+      Assert.Equal("/path/to/no-scheme", url.Build(new List<string>() { "baz" }));
+      Assert.Equal("/path/to/no-scheme?baz=grr&baz=hoge&hoge=fuga", url.Build(new Dictionary<string, string>() { { "hoge", "fuga" } }));
+    }
   }
 }

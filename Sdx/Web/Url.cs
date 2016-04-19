@@ -12,15 +12,20 @@ namespace Sdx.Web
     public Url(string urlStr)
     {
       Uri uri;
-      if(!urlStr.StartsWith("http"))
-      {
-        uri = new Uri("http://sdx.com" + urlStr);
-      }
-      else
+      if(urlStr.StartsWith("http"))
       {
         uri = new Uri(urlStr);
         this.Scheme = uri.Scheme;
         this.Domain = uri.Host;
+      }
+      else if(urlStr.StartsWith("//"))
+      {
+        uri = new Uri("http:" + urlStr);
+        this.Domain = uri.Host;
+      }
+      else
+      {
+        uri = new Uri("http://sdx.com" + urlStr);
       }
       
       this.ParamList = new List<Tuple<string,string>>();
