@@ -552,10 +552,20 @@ namespace Sdx.Db
 
     public int CountRow(Select select)
     {
-      //TODO JOINして行数が重複してる時のCOUNTに対応する
-      var clonedSel = (Select)select.Clone();
-      clonedSel.OrderList.Clear();
-      clonedSel.ClearColumns().AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
+      Select clonedSel = null;
+
+      if (select.GroupList.Any())
+      {
+        clonedSel = select.Adapter.CreateSelect();
+        clonedSel.AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
+        clonedSel.AddFrom(select, "_t");
+      }
+      else
+      {
+        clonedSel = (Select)select.Clone();
+        clonedSel.ClearColumns().AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
+        clonedSel.OrderList.Clear();
+      }
 
       //DBベンダーによって帰ってくる型がintだったりlongだったりします。
       //いちいち型を識別してキャストするの面倒だったのでこんな感じに。

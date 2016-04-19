@@ -1998,5 +1998,47 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
 
       Assert.NotEqual(origin.Build().CommandText, cloned.Build().CommandText);
     }
+
+
+    [Fact]
+    public void TestCountRow()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunCountRow(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunCountRow(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+
+        var select = db.CreateSelect();
+        select
+          .AddFrom(new Test.Orm.Table.ShopCategory())
+          ;
+
+        var scSet = conn.FetchRecordSet(select);
+        Assert.Equal(scSet.Count, conn.CountRow(select));
+
+        select = db.CreateSelect();
+        select
+          .AddFrom(new Test.Orm.Table.Shop())
+          .ClearColumns().AddColumn("id")
+          .AddGroup("id")
+          .InnerJoin(new Test.Orm.Table.ShopCategory())
+          .ClearColumns()
+          ;
+
+        var count = conn.CountRow(select);
+        Assert.NotEqual(scSet.Count, count);
+        Assert.Equal(scSet.GroupBy(sc => sc.GetValue("shop_id")).Count(), count);
+      }
+    }
   }
 }
