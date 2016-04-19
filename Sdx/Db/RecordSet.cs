@@ -8,8 +8,8 @@ namespace Sdx.Db
 {
   public class RecordSet : IEnumerable<Record>
   {
-    private List<Record> results = new List<Record>();
-    private Dictionary<string, Record> resultDic = new Dictionary<string, Record>();
+    //主キーでユニークなのでOrderedDictionaryを使っています。
+    private Collection.OrderedDictionary<string, Record> resultDic = new Collection.OrderedDictionary<string, Record>();
 
     internal void Build(DbDataReader reader, Select select, string contextName)
     {
@@ -81,8 +81,7 @@ namespace Sdx.Db
         result = select.Context(contextName).Table.OwnMeta.CreateRecord();
         result.ContextName = contextName;
         result.Select = select;
-        this.results.Add(result);
-        this.resultDic[key] = result;
+        this.resultDic.Add(key, result);
       }
       else
       {
@@ -113,7 +112,7 @@ namespace Sdx.Db
     {
       get
       {
-        return this.results.Count;
+        return this.resultDic.Count;
       }
     }
 
@@ -121,7 +120,7 @@ namespace Sdx.Db
     {
       get
       {
-        return this.results[0];
+        return this.resultDic.ItemAt(0);
       }
     }
 
@@ -129,17 +128,17 @@ namespace Sdx.Db
     {
       get
       {
-        return this.results[key];
+        return this.resultDic.ItemAt(key);
       }
     }
 
     public T Pop<T>(Predicate<T> match) where T : Sdx.Db.Record
     {
-      var find = results.FindIndex((rec) => match((T) rec));
+      var find = resultDic.FindIndex((kv) => match((T)kv.Value));
       if (find != -1)
       {
-        var tmp = (T)results[find];
-        results.RemoveAt(find);
+        var tmp = (T)resultDic.ItemAt(find);
+        resultDic.RemoveAt(find);
         return tmp;
       }
       return null;
@@ -152,22 +151,25 @@ namespace Sdx.Db
 
     public void ForEach<T>(Action<T> action) where T : Sdx.Db.Record
     {
-      this.results.ForEach((rec) => action((T) rec));
+      this.resultDic.ForEach((key, rec) => action((T) rec));
     }
 
     public void ForEach(Action<Record> action)
     {
-      this.results.ForEach(action);
+      this.resultDic.ForEach((key, rec) => action(rec));
     }
 
     public IEnumerator<Record> GetEnumerator()
     {
-      return this.results.GetEnumerator();
+      foreach(var kv in resultDic)
+      {
+        yield return kv.Value;
+      }
     }
 
     System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
     {
-      return this.results.GetEnumerator();
+      return GetEnumerator();
     }
 
     public string[] ToStringArray<T>(Func<T, string> func) where T : Sdx.Db.Record
