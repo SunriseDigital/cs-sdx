@@ -162,8 +162,54 @@ namespace Sdx.Db.Sql
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column);
+        this.AddColumnObject(column);
       }
+      return this;
+    }
+
+    public Context AddColumn(Select subquery, string alias = null)
+    {
+      this.AddColumnObject(subquery, alias);
+      return this;
+    }
+
+    public Context AddColumn(Expr expr, string alias = null)
+    {
+      this.AddColumnObject(expr, alias);
+      return this;
+    }
+
+    public Context AddColumn(string columnName, string alias = null)
+    {
+      this.AddColumnObject(columnName, alias);
+      return this;
+    }
+
+    public Context SetColumns(params object[] columns)
+    {
+      this.ClearColumns();
+      this.AddColumns(columns);
+      return this;
+    }
+
+    public Context SetColumn(Select subquery, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(subquery, alias);
+      return this;
+    }
+
+    public Context SetColumn(Expr expr, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(expr, alias);
+      return this;
+    }
+
+    public Context SetColumn(string columnName, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(columnName, alias);
       return this;
     }
 
@@ -173,7 +219,7 @@ namespace Sdx.Db.Sql
     /// <param name="columnName"></param>
     /// <param name="alias"></param>
     /// <returns></returns>
-    public Context AddColumn(object columnName, string alias = null)
+    internal Context AddColumnObject(object columnName, string alias = null)
     {
       var column = new Column(columnName);
       column.Alias = alias;

@@ -2029,7 +2029,7 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         select = db.CreateSelect();
         select
           .AddFrom(new Test.Orm.Table.Shop())
-          .ClearColumns().AddColumn("id")
+          .SetColumn("id")
           .AddGroup("id")
           .InnerJoin(new Test.Orm.Table.ShopCategory())
           .ClearColumns()

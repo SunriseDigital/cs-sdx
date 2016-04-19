@@ -212,7 +212,34 @@ namespace Sdx.Db
       return this;
     }
 
-    public Table AddColumn(object columnName, string alias = null)
+    public Table AddColumns(params object[] columns)
+    {
+      foreach (var columnName in columns)
+      {
+        this.AddColumnObject(columnName);
+      }
+      return this;
+    }
+
+    public Table AddColumn(Sql.Select subquery, string alias = null)
+    {
+      this.AddColumnObject(subquery, alias);
+      return this;
+    }
+
+    public Table AddColumn(Sql.Expr expr, string alias = null)
+    {
+      this.AddColumnObject(expr, alias);
+      return this;
+    }
+
+    public Table AddColumn(string columnName, string alias = null)
+    {
+      this.AddColumnObject(columnName, alias);
+      return this;
+    }
+
+    private Table AddColumnObject(object columnName, string alias = null)
     {
       if (this.Context == null)
       {
@@ -220,7 +247,7 @@ namespace Sdx.Db
       }
 
       alias = Record.BuildColumnAliasWithContextName(alias != null ? alias : columnName.ToString(), this.Context.Name);
-      this.Select.Context(this.Context.Name).AddColumn(columnName, alias);
+      this.Select.Context(this.Context.Name).AddColumnObject(columnName, alias);
 
       return this;
     }
@@ -232,12 +259,24 @@ namespace Sdx.Db
       return this;
     }
 
-    public Table AddColumns(params object[] columns)
+    public Table SetColumn(Sql.Select subquery, string alias = null)
     {
-      foreach (var columnName in columns)
-      {
-        this.AddColumn(columnName);
-      }
+      this.ClearColumns();
+      this.AddColumn(subquery, alias);
+      return this;
+    }
+
+    public Table SetColumn(Sql.Expr expr, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(expr, alias);
+      return this;
+    }
+
+    public Table SetColumn(string columnName, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(columnName, alias);
       return this;
     }
 

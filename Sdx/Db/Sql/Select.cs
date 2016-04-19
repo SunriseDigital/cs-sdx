@@ -418,6 +418,34 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Select SetColumns(params object[] columns)
+    {
+      this.ClearColumns();
+      this.AddColumns(columns);
+      return this;
+    }
+
+    public Select SetColumn(Select subquery, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(subquery, alias);
+      return this;
+    }
+
+    public Select SetColumn(Expr expr, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(expr, alias);
+      return this;
+    }
+
+    public Select SetColumn(string columnName, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(columnName, alias);
+      return this;
+    }
+
     /// <summary>
     /// カラムを一つ追加します。
     /// </summary>
