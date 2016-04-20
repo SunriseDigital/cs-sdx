@@ -369,6 +369,15 @@ namespace UnitTest
     [Fact]
     public void TestAutoValidate()
     {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAutoValidate(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAutoValidate(TestDb testDb)
+    {
       var column = new Sdx.Db.Table.Column(
         "id",
         type: Sdx.Db.Table.ColumnType.Integer,
@@ -377,7 +386,9 @@ namespace UnitTest
         maxLength: 32
       );
 
-      var list = column.CreateValidatorList();
+      var record = new Test.Orm.Shop();
+
+      var list = column.CreateValidatorList(record);
       Assert.Equal(3, list.Count);
       Assert.IsType<Sdx.Validation.Numeric>(list[0]);
       Assert.IsType<Sdx.Validation.GreaterThan>(list[1]);
@@ -392,7 +403,7 @@ namespace UnitTest
         maxLength: 32
       );
 
-      list = column.CreateValidatorList();
+      list = column.CreateValidatorList(record);
       Assert.Equal(3, list.Count);
       Assert.IsType<Sdx.Validation.Numeric>(list[0]);
       Assert.IsType<Sdx.Validation.GreaterThan>(list[1]);
@@ -408,7 +419,7 @@ namespace UnitTest
         maxLength: 32//Float系は長さを無視
       );
 
-      list = column.CreateValidatorList();
+      list = column.CreateValidatorList(record);
       Assert.Equal(1, list.Count);
       Assert.IsType<Sdx.Validation.Numeric>(list[0]);
 
@@ -420,10 +431,10 @@ namespace UnitTest
         maxLength: 100
       );
 
-      list = column.CreateValidatorList();
+      list = column.CreateValidatorList(record);
       Assert.Equal(1, list.Count);
       Assert.IsType<Sdx.Validation.StringLength>(list[0]);
-      Assert.Equal(100, ((Sdx.Validation.StringLength) list[0]).Max);
+      Assert.Equal(100, ((Sdx.Validation.StringLength)list[0]).Max);
 
 
       column = new Sdx.Db.Table.Column(
@@ -432,7 +443,7 @@ namespace UnitTest
         isNotNull: false
       );
 
-      list = column.CreateValidatorList();
+      list = column.CreateValidatorList(record);
       Assert.Equal(1, list.Count);
       Assert.IsType<Sdx.Validation.DateTime>(list[0]);
 
@@ -442,7 +453,7 @@ namespace UnitTest
         isNotNull: false
       );
 
-      list = column.CreateValidatorList();
+      list = column.CreateValidatorList(record);
       Assert.Equal(1, list.Count);
       Assert.IsType<Sdx.Validation.Date>(list[0]);
 
@@ -453,9 +464,33 @@ namespace UnitTest
         isNotNull: false
       );
 
-      list = column.CreateValidatorList();
+      list = column.CreateValidatorList(record);
       Assert.Equal(1, list.Count);
       Assert.IsType<Sdx.Validation.Numeric>(list[0]);
+
+      //isAutoFill
+
+
+      var db = testDb.Adapter;
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        column = new Sdx.Db.Table.Column(
+          Sdx.Db.Record.AutoCreateDateColumn,
+          type: Sdx.Db.Table.ColumnType.DateTime,
+          isNotNull: true
+        );
+
+        list = column.CreateValidatorList(record);
+        Assert.Equal(1, list.Count);
+        Assert.IsType<Sdx.Validation.DateTime>(list[0]);
+
+        record = (Test.Orm.Shop)(new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, "1");
+        list = column.CreateValidatorList(record);
+        Assert.Equal(2, list.Count);
+        Assert.IsType<Sdx.Validation.NotEmpty>(list[0]);
+      }
+      
     }
   }
 }

@@ -103,12 +103,20 @@ namespace Sdx.Db
 
       public bool IsPkey { get; private set; }
 
-      public List<Validation.Validator> CreateValidatorList()
+      public List<Validation.Validator> CreateValidatorList(Record record)
       {
         var list = new List<Validation.Validator>();
-        if(IsNotNull && !IsAutoFill)
+        if(IsNotNull)
         {
-          list.Add(new Validation.NotEmpty());
+          //AutoFillでも編集時はNotEmptyをつける
+          if (IsAutoFill && !record.IsNew)
+          {
+            list.Add(new Validation.NotEmpty());
+          }
+          else if (!IsAutoFill)
+          {
+            list.Add(new Validation.NotEmpty());
+          }
         }
 
         if(Type == ColumnType.Integer || Type == ColumnType.UnsignedInteger || IsAutoIncrement)
@@ -165,9 +173,9 @@ namespace Sdx.Db
         return list;
       }
 
-      public void AppendValidators(Html.FormElement element)
+      public void AppendValidators(Html.FormElement element, Record record)
       {
-        CreateValidatorList().ForEach(v => element.AddValidator(v, v is Validation.NotEmpty));
+        CreateValidatorList(record).ForEach(v => element.AddValidator(v, v is Validation.NotEmpty));
       }
 
       private bool IsAutoFill

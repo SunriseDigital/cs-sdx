@@ -200,7 +200,7 @@ namespace Sdx.Scaffold
           var column = TableMeta.Columns.Find(c => c.Name == columnName);
           if (column != null)
           {
-            column.AppendValidators(elem);
+            column.AppendValidators(elem, record);
           }
         }
 
