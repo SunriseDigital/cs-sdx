@@ -25,7 +25,7 @@ namespace Sdx.Diagnostics
         <span style=""color: gray; font-size: 11px; float: right;"">{2}</span>
   </div>
   <div style=""margin-bottom: 5px;"">{3}</div>
-  <div>{4}</div>
+  <pre style=""background: none; border: none; padding: 0;"">{4}</pre>
 </div>
 ";
 
@@ -154,11 +154,12 @@ namespace Sdx.Diagnostics
 
     private string buildQueryString(Sdx.Db.Sql.Log query)
     {
+      if (query.CommandText == null) throw new Exception("aaaaaa");
       return String.Format(
         QueryBlockFormat,
         query.FormatedElapsedTime,
-        query.Comment,
-        query.Adapter.ToString(),
+        query.Comment != null ? query.Comment : "",
+        query.Adapter != null ? query.Adapter.ToString() : "",
         query.CommandText,
         query.FormatedParameters
       );

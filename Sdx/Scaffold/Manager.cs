@@ -137,14 +137,9 @@ namespace Sdx.Scaffold
         elem = new Sdx.Html.InputText();
 
         elem.Name = config["column"].ToString();
-
-        if (!config.ContainsKey("label"))
-        {
-          throw new InvalidOperationException("Missing label param");
-        }
-
-        elem.Label = config["label"].ToString();
       }
+
+      elem.Label = config["label"].ToString();
 
       return elem;
     }

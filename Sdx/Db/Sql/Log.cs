@@ -97,7 +97,7 @@ namespace Sdx.Db.Sql
           }
 
           result += string.Format(
-            "{0, "+this.maxParameterKeyLength.ToString()+"} : {1}",
+            "{0, "+this.maxParameterKeyLength.ToString()+"} = {1}",
             param.Key,
             param.Value
           );

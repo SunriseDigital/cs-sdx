@@ -479,7 +479,7 @@ English
 
       Assert.False(form.ExecValidators());
       Assert.Equal(2, loginId.Errors.Count);
-      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li><li>メールアドレスの書式が正しくありません。</li></ul>", loginId.Errors.Html.Render());
+      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li><li>メールアドレスの書式が正しくありません。</li></ul>", loginId.Errors.Html().Render());
       Assert.Equal("必須項目です。", loginId.Errors[0].Message);
 
       //BreakChain
@@ -497,7 +497,7 @@ English
 
       Assert.False(form.ExecValidators());
       Assert.Equal(1, loginId.Errors.Count);
-      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li></ul>", loginId.Errors.Html.Render());
+      Assert.Equal("<ul class=\"sdx-has-error\"><li>必須項目です。</li></ul>", loginId.Errors.Html().Render());
 
       mock.SetupGet(x => x.Form).Returns(new NameValueCollection {
         {"login_id", "some@mail.com" },
@@ -507,7 +507,7 @@ English
 
       Assert.True(form.ExecValidators());
       Assert.Equal(0, loginId.Errors.Count);
-      Assert.Equal("", loginId.Errors.Html.Render());
+      Assert.Equal("", loginId.Errors.Html().Render());
     }
 
     [Fact]

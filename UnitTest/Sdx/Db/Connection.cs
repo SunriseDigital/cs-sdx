@@ -122,7 +122,7 @@ namespace UnitTest
       Assert.True(profiler.Logs[0].ElapsedTime > 0);
       Assert.True(profiler.Logs[0].FormatedElapsedTime is String);
       Assert.Equal("SELECT * FROM shop WHERE id > @id", profiler.Logs[1].CommandText);
-      Assert.Equal("@id : 1", profiler.Logs[1].FormatedParameters);
+      Assert.Equal("@id = 1", profiler.Logs[1].FormatedParameters);
 
 
       command.CommandText = "SELECT * FROM shop WHERE id > @id AND name = @name";
@@ -141,7 +141,7 @@ namespace UnitTest
       Assert.True(profiler.Logs[1].ElapsedTime > 0);
       Assert.True(profiler.Logs[1].FormatedElapsedTime is String);
       Assert.Equal("SELECT * FROM shop WHERE id > @id AND name = @name", profiler.Logs[4].CommandText);
-      Assert.Equal("  @id : 1" + System.Environment.NewLine + "@name : foobar", profiler.Logs[4].FormatedParameters);
+      Assert.Equal("  @id = 1" + System.Environment.NewLine + "@name = foobar", profiler.Logs[4].FormatedParameters);
     }
 
     [Fact]
