@@ -214,42 +214,39 @@ namespace Sdx.Db
 
     public Table AddColumns(params object[] columns)
     {
-      foreach (var columnName in columns)
+      foreach (var column in columns)
       {
-        this.AddColumnObject(columnName);
+        Select.ColumnList.Add(new Sql.Column((dynamic)column, this.Context.Name, NormalizeAlias(column, null)));
       }
       return this;
     }
 
-    public Table AddColumn(Sql.Select subquery, string alias = null)
+    public Table AddColumn(Sql.Select select, string alias = null)
     {
-      this.AddColumnObject(subquery, alias);
+      Select.ColumnList.Add(new Sql.Column(select, this.Context.Name, NormalizeAlias(select, alias)));
       return this;
     }
 
     public Table AddColumn(Sql.Expr expr, string alias = null)
     {
-      this.AddColumnObject(expr, alias);
+      Select.ColumnList.Add(new Sql.Column(expr, this.Context.Name, NormalizeAlias(expr, alias)));
       return this;
     }
 
     public Table AddColumn(string columnName, string alias = null)
     {
-      this.AddColumnObject(columnName, alias);
+      Select.ColumnList.Add(new Sql.Column(columnName, this.Context.Name, NormalizeAlias(columnName, alias)));
       return this;
     }
 
-    private Table AddColumnObject(object columnName, string alias = null)
+    private string NormalizeAlias(object columnName, string alias)
     {
       if (this.Context == null)
       {
         throw new InvalidOperationException("ContextName is null");
       }
 
-      alias = Record.BuildColumnAliasWithContextName(alias != null ? alias : columnName.ToString(), this.Context.Name);
-      this.Select.Context(this.Context.Name).AddColumnObject(columnName, alias);
-
-      return this;
+      return Record.BuildColumnAliasWithContextName(alias != null ? alias : columnName.ToString(), this.Context.Name);
     }
 
     public Table SetColumns(params object[] columns)

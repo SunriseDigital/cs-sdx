@@ -18,37 +18,33 @@ namespace Sdx.Db.Sql
 
     internal object Value { get; set; }
 
-    public Column(object columnName)
+    public Column(Expr expr, string contextName = null, string alias = null)
     {
-      if(columnName is Expr)
+      target = expr;
+      ContextName = contextName;
+      Alias = alias;
+    }
+
+    public Column(Select select, string contextName = null, string alias = null)
+    {
+      target = select;
+      ContextName = contextName;
+      Alias = alias;
+    }
+
+    public Column(string columnName, string contextName = null, string alias = null)
+    {
+      if (columnName == "*")
       {
-        target = columnName;
-      }
-      else if (columnName is Select)
-      {
-        target = columnName;
-      }
-      else if( columnName is string)
-      {
-        var strName = columnName as string;
-        if (strName == "*")
-        {
-          target = Expr.Wrap(strName);
-        }
-        else
-        {
-          target = columnName;
-        }
+        target = Expr.Wrap(columnName);
       }
       else
       {
-        throw new NotSupportedException("columnName support only Expr or string or Select, " + columnName.GetType() + " given.");
+        target = columnName;
       }
-    }
 
-    public Column(object columnName, string contextName) : this(columnName)
-    {
-      this.ContextName = contextName;
+      ContextName = contextName;
+      Alias = alias;
     }
 
     public object Target

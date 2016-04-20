@@ -44,13 +44,13 @@ namespace Sdx.Db.Sql
 
     public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.Or, comparison, Type.Comparison);
+      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
     public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.Or, comparison, Type.Comparison);
+      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
@@ -62,37 +62,37 @@ namespace Sdx.Db.Sql
 
     public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.And, comparison, Type.Comparison);
+      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.And, comparison, Type.Comparison);
       return this;
     }
 
     public Condition Add(Expr column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(column, value, Logical.And, comparison, Type.Comparison);
+      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.And, comparison, Type.Comparison);
       return this;
     }
 
     public Condition AddIsNull(string column)
     {
-      this.AddWithColumn(column, null, Logical.And, Comparison.Equal, Type.NullCompare);
+      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.And, Comparison.Equal, Type.NullCompare);
       return this;
     }
 
     public Condition AddIsNotNullOr(string column)
     {
-      this.AddWithColumn(column, null, Logical.Or, Comparison.NotEqual, Type.NullCompare);
+      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.Or, Comparison.NotEqual, Type.NullCompare);
       return this;
     }
 
     public Condition AddIsNullOr(string column)
     {
-      this.AddWithColumn(column, null, Logical.Or, Comparison.Equal, Type.NullCompare);
+      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.Or, Comparison.Equal, Type.NullCompare);
       return this;
     }
 
     public Condition AddIsNotNull(string column)
     {
-      this.AddWithColumn(column, null, Logical.And, Comparison.NotEqual, Type.NullCompare);
+      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.And, Comparison.NotEqual, Type.NullCompare);
       return this;
     }
 
@@ -133,23 +133,8 @@ namespace Sdx.Db.Sql
       });
     }
 
-    private void AddWithColumn(Object columnName, Object value, Logical? logical, Comparison? comparison, Type type)
+    private void AddWithColumn(Column column, Object value, Logical? logical, Comparison? comparison, Type type)
     {
-      Column column;
-      if (!(columnName is Column))
-      {
-        column = new Column(columnName);
-
-        if (this.ContextName != null)
-        {
-          column.ContextName = this.ContextName;
-        }
-      }
-      else
-      {
-        column = (Column)columnName;
-      }
-
       this.Add(new Holder
       {
         Column = column,
@@ -355,49 +340,49 @@ namespace Sdx.Db.Sql
 
     public Condition AddBetween(string column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] {min, max}, Logical.And, Comparison.Equal, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
       return this;
     }
 
     public Condition AddBetween(Expr column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
       return this;
     }
 
     public Condition AddBetweenOr(string column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
       return this;
     }
 
     public Condition AddBetweenOr(Expr column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
       return this;
     }
 
     public Condition AddNotBetween(string column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
       return this;
     }
 
     public Condition AddNotBetween(Expr column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
       return this;
     }
 
     public Condition AddNotBetweenOr(string column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
       return this;
     }
 
     public Condition AddNotBetweenOr(Expr column, string min, string max)
     {
-      this.AddWithColumn(column, new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
       return this;
     }
 
@@ -409,7 +394,7 @@ namespace Sdx.Db.Sql
     /// <returns></returns>
     public Condition Add(string expression)
     {
-      this.AddWithColumn(expression, null, null, null, Type.Free);
+      this.AddWithColumn(new Column(expression, this.ContextName), null, null, null, Type.Free);
       return this;
     }
   }
