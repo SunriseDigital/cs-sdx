@@ -358,32 +358,32 @@ namespace Sdx.Scaffold
       });
     }
 
-    public void Save(Sdx.Db.Record record, NameValueCollection form, Sdx.Db.Connection conn)
+    public void Save(Sdx.Db.Record record, NameValueCollection values, Sdx.Db.Connection conn)
     {
       var relationList = new Config.List();
       foreach (var config in FormList)
       {
         var columnName = config["column"].ToString();
-        if(config.ContainsKey("relation"))
+        if (config.ContainsKey("relation"))
         {
           relationList.Add(config);
         }
-        else if(config.ContainsKey("setter"))
-        {
-          if (form[columnName] != null)
-          {
-            config["setter"].Invoke(
-              record.GetType(),
-              record,
-              new object[] { form[columnName] }
-            );
-          }
-        }
         else
         {
-          if (form[columnName] != null)
+          if (values[columnName] != null)
           {
-            record.SetValue(columnName, form[columnName]);
+            if (config.ContainsKey("setter"))
+            {
+              config["setter"].Invoke(
+                record.GetType(),
+                record,
+                new object[] { values[columnName] }
+              );
+            }
+            else
+            {
+              record.SetValue(columnName, values[columnName]);
+            }
           }
         }
       }
@@ -395,11 +395,11 @@ namespace Sdx.Scaffold
         var relName = config["relation"].ToString();
         var rel = TableMeta.Relations[relName];
         var currentRecords = record.GetRecordSet(relName, conn);
-        var values = form.GetValues(config["column"].ToString());
+        var relValues = values.GetValues(config["column"].ToString());
 
-        if (values != null)
+        if (relValues != null)
         {
-          foreach (var refId in form.GetValues(config["column"].ToString()))
+          foreach (var refId in values.GetValues(config["column"].ToString()))
           {
             var cRecord = currentRecords.Pop(crec => crec.GetString(config["column"].ToString()) == refId);
             if (cRecord == null)

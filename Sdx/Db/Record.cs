@@ -268,7 +268,7 @@ namespace Sdx.Db
         return current.ToString().Equals(value.ToString());
       }
 
-      if(current is DBNull)
+      if(current is DBNull || value is DBNull)
       {
         return current == value;
       }
@@ -277,13 +277,51 @@ namespace Sdx.Db
       return current.Equals(value);
     }
 
-    public void SetValue(string columnName, object value)
+    /// <summary>
+    /// テーブルに存在しないカラムは無視されます。
+    /// NameValueCollectionにキーが存在しない場合は無視します。
+    /// </summary>
+    /// <param name="values"></param>
+    /// <param name="isRaw"><see cref="SetValue"/></param>
+    /// <returns></returns>
+    public Record SetValues(NameValueCollection values, bool isRaw = false)
+    {
+      var allKeys = values.AllKeys;
+      foreach (var column in OwnMeta.Columns)
+      {
+        if (allKeys.Contains(column.Name))
+        {
+          SetValue(column.Name, values[column.Name], isRaw);
+        }
+      }
+      return this;
+    }
+
+    /// <summary>
+    /// カラムにデータをセットする。nullあるいは空文字をセットした場合DbNullが入ります。
+    /// 空文字を保存したいときは`isRaw`にtrueを渡してください。
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <param name="value"></param>
+    /// <param name="isRaw">DbNullへの変換を行うかどうか</param>
+    public Record SetValue(string columnName, object value, bool isRaw = false)
     {
       this.OwnMeta.CheckColumn(columnName);
+
+      if (!isRaw)
+      {
+        if (value == null || value.ToString() == "")
+        {
+          value = DBNull.Value;
+        }
+      }
+
       if (!EqualsToCurrent(columnName, value))
       {
         this.UpdatedValues[columnName] = value;
       }
+
+      return this;
     }
 
     internal void AppendPkeyWhere(Condition where)

@@ -125,10 +125,10 @@ namespace Sdx.Html
       {
         var key = kv.Key;
         var elem = kv.Value;
-        
-        foreach (var value in elem.Value)
+
+        if (!(elem.IsSecret && elem.Value.IsEmpty))
         {
-          if (!(elem.IsSecret && elem.Value.IsEmpty))
+          foreach (var value in elem.Value)
           {
             result.Add(key, value);
           }

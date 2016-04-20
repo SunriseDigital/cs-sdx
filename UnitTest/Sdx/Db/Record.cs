@@ -12,6 +12,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 #endif
 
 using System;
+using System.Collections.Specialized;
 
 namespace UnitTest
 {
@@ -714,11 +715,12 @@ namespace UnitTest
           conn.Rollback();
           throw;
         }
+
+        Assert.Equal("foobar", shop.GetValue("login_id"));
+        Assert.Equal(DBNull.Value, shop.GetValue("password"));
       }
-
-      Assert.Equal("foobar", shop.GetValue("login_id"));
-      Assert.Equal(DBNull.Value, shop.GetValue("password"));
-
+      
+      //DbNullで更新
       using(var conn = db.CreateConnection())
       {
         conn.Open();
@@ -735,6 +737,7 @@ namespace UnitTest
         try
         {
           shop.Save(conn);
+          conn.Commit();
         }
         catch (Exception)
         {
@@ -746,6 +749,120 @@ namespace UnitTest
         shop = conn.FetchRecord(select);
         Assert.Equal(DBNull.Value, shop.GetValue("login_id"));
         Assert.True(shop.IsNull("login_id"));
+      }
+
+
+      //空文字で更新
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var select = db.CreateSelect();
+        select
+          .AddFrom(new Test.Orm.Table.Shop())
+          .WhereCall((where) => where.Add("id", id));
+
+        shop = conn.FetchRecord(select);
+        shop.SetValue("login_id", "");
+        conn.BeginTransaction();
+        try
+        {
+          shop.Save(conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        //再び取得
+        shop = conn.FetchRecord(select);
+        Assert.Equal(DBNull.Value, shop.GetValue("login_id"));
+        Assert.True(shop.IsNull("login_id"));
+
+        //空文字の挿入は
+        shop.SetValue("login_id", "", true);
+        conn.BeginTransaction();
+        try
+        {
+          shop.Save(conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        shop = conn.FetchRecord(select);
+        Assert.Equal("", shop.GetValue("login_id"));
+        Assert.False(shop.IsNull("login_id"));
+      }
+    }
+
+    [Fact]
+    public void TestSetValues()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RutSetValues(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RutSetValues(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      Sdx.Db.Record shop = new Test.Orm.Shop();
+      var values = new NameValueCollection();
+
+      values.Add("name", "TestSetValues");
+      values.Add("area_id", "1");
+      values.Add("login_id", "TestSetValues_login_id");
+      values.Add("foobar", "bazzz");
+
+      shop.SetValues(values);
+
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        conn.BeginTransaction();
+        try
+        {
+          shop.Save(conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        shop = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, shop.GetString("id"));
+        Assert.Equal("TestSetValues_login_id", shop.GetValue("login_id"));
+
+        values = new NameValueCollection();
+        values.Add("name", "TestSetValues");
+        values.Add("area_id", "1");
+        values.Add("login_id", "");
+
+        shop.SetValues(values);
+
+        conn.BeginTransaction();
+        try
+        {
+          shop.Save(conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        shop = (new Test.Orm.Table.Shop()).FetchRecordByPkey(conn, shop.GetString("id"));
+        Assert.Equal(DBNull.Value, shop.GetValue("login_id"));
       }
     }
   }
