@@ -8,13 +8,7 @@ SELECT文を生成します。
 
 ### テーブルとカラム
 
-`Select`は`DbCommand`を生成します。`DbCommand`は`System.Data.Common`名前空間なので参照できるようにします。
-
-```c#
-using System.Data.Common;
-```
-
-`Select`は最終的に`Build`メソッドでSQLを生成しますが、DB毎に識別子のクオートの仕方が違うため`Adapter`のインスタンスが必要です。`Adapter`から生成してください。
+`Select`は`Build`メソッドで`System.Data.Common`を生成します。DB毎に識別子のクオートの仕方が違うため`Adapter`のインスタンスが必要です。`Adapter`から生成してください。
 
 ```c#
 var db = new Sdx.Db.SqlServerAdapter();
@@ -26,7 +20,7 @@ select.AddFrom("shop");
 select.AddColumn("*");
 DbCommand command = select.Build();
 ```
-※以下、全ての例で`ConnectionString`の設定は省略します。
+
 
 `Select.AddFrom()`でテーブル名を指定し、`Select.AddColumn`でカラムを追加します。
 
@@ -193,7 +187,7 @@ SELECT [shop].* FROM, [area].* [shop] INNER JOIN [area] ON [shop].area_id = [are
 
 `InnerJoin`/`LeftJoin`はJOINしたテーブルの`Context`オブジェクトを返します。`Select.Context()`はFROM句、あるいはJOIN句のテーブルの`Context`オブジェクトを取得するメソッドです。
 
-`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Sdx.Db.Sql.Condition`のインスタンスで渡します。`Condition`は`*** = @@@`の様な条件式を生成する汎用的なクラスです。`Condition`にはJOIN条件の条件の他にWhere句やHaving句の生成にも利用されます。JOIN条件でよく使用する`column_name1 = column_name2`の式を生成するには、`Sdx.Db.Sql.Column`のインスタンスを両方の引数に設定してください。
+`InnerJoin`/`LeftJoin`の第二引数にはJOINの条件を`Sdx.Db.Sql.Condition`のインスタンスで渡します。`Condition`は`*** = @@@`の様な条件式を生成する汎用的なクラスです。`Condition`にはJOIN条件の他にWhere句やHaving句の生成にも利用されます。JOIN条件でよく使用する`column_name1 = column_name2`の式を生成するには、`Sdx.Db.Sql.Column`のインスタンスを両方の引数に設定してください。
 
 
 #### 同じテーブルをJOINする
@@ -370,13 +364,13 @@ select.AddFrom("shop")
 `Condition`は`Add`というメソッドを持っていて、これでWhere句をセットしていきます。`Context`から呼んだ時はカラム名にテーブル名が付与されます。
 
 ```c#
-Add(object column, object value, Comparison comparison)
+Add(string|Expr|Column|Condition column, object value, Comparison comparison)
 ```
 
 | 名前 | 説明 |
 | --- | --- |
-| column | カラム名。String \| Expr \| Conditionを受け付けます。 |
-| value | 値。String \| Int \| IEnumerable<> \| Selectなど、Selectはサブクエリ、IEnumerableはINを生成します。 |
+| column | 右辺。一般的にカラム名。 |
+| value | 左辺の値。Selectはサブクエリ、IEnumerableはINを生成します。 |
 | comparison | 比較演算子。`Sdx.Db.Sql.Comparison`enum。省略時は`Sdx.Db.Sql.Comparison.Equal` |
 
 ```c#
@@ -408,7 +402,7 @@ select.Where.Add("id", "1");
 
 ```sql
 SELECT [shop].* FROM [shop] WHERE [id] = @0;
-# DbCommand.Parameters["@0"] = 1
+# DbCommand.Parameters["@0"] = "1"
 ```
 ※プレイスホルダは0から順番に`@数字`がふられます。
 
@@ -423,7 +417,7 @@ select.Context("shop").Where.Add("id", "1");
 
 ```sql
 SELECT [shop].* FROM [shop] WHERE [shop].[id] = @0;
-# DbCommand.Parameters["@0"] = 1
+# DbCommand.Parameters["@0"] = "1"
 ```
 
 #### IEnumerable<>を使ったINの生成
@@ -438,8 +432,8 @@ select.Context("shop").Where.Add("id", new string[] { "1", "2" });
 
 ```sql
 SELECT [shop].* FROM [shop] WHERE [shop].[id] IN (@0, @1);
-# DbCommand.Parameters["@0"] = 1
-# DbCommand.Parameters["@0"] = 2
+# DbCommand.Parameters["@0"] = "1"
+# DbCommand.Parameters["@0"] = "2"
 ```
 
 #### WHERE句にサブクエリ
@@ -476,8 +470,8 @@ AND [shop].[area_id] IN(
             [area].[id] = @1
     )
 
-# DbCommand.Parameters["@0"] = 1
-# DbCommand.Parameters["@1"] = 2
+# DbCommand.Parameters["@0"] = "1"
+# DbCommand.Parameters["@1"] = "2"
 ```
 
 #### ORを含むような複雑なWHERE句
@@ -510,10 +504,10 @@ WHERE
 OR
     ( [id] = @2 OR  [id] = @3 )
 
-# DbCommand.Parameters["@0"] = 3
-# DbCommand.Parameters["@1"] = 4
-# DbCommand.Parameters["@2"] = 1
-# DbCommand.Parameters["@3"] = 2
+# DbCommand.Parameters["@0"] = "3"
+# DbCommand.Parameters["@1"] = "4"
+# DbCommand.Parameters["@2"] = "1"
+# DbCommand.Parameters["@3"] = "2"
 ```
 
 #### Whereのfluent syntaxについて
@@ -607,7 +601,7 @@ select
 ```sql
 SELECT [shop].[id] FROM [shop] GROUP BY [shop].[id] HAVING [shop].[id] >= @0
 
-# DbCommand.Parameters["@0"] = 2
+# DbCommand.Parameters["@0"] = "2"
 ```
 
 <br><br><br>

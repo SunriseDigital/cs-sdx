@@ -33,17 +33,16 @@ namespace Test.Orm.Table
     {
       Meta =  new Sdx.Db.TableMeta(
         "shop",
-        new List<string>()
-        {
-          "id"
-        },
         new List<Column>()
         {
-          new Column("id"),
+          new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("name"),
-          new Column("area_id"),
-          new Column("main_image_id"),
-          new Column("sub_image_id"),
+          new Column("area_id", type: ColumnType.Integer),
+          new Column("main_image_id", isNotNull: false),
+          new Column("sub_image_id", isNotNull: false),
+          new Column("login_id", isNotNull: false),
+          new Column("password", isNotNull: false),
+          new Column("created_at", type: ColumnType.DateTime),
         },
         new Dictionary<string, Relation>()
         {
@@ -65,6 +64,8 @@ namespace Test.Orm.Table
 1. 他テーブルとの関連（`Relation`の辞書）
 1. Recordクラスのタイプ
 1. Tableクラスのタイプ
+
+カラムのリストは`Sdx.Db.Table.Column`のインスタンスです。コンストラクタの数が多くカラム名以外省略可能なので名前付き引数で呼び出してください。型情報`type`を指定すると自動的にValidationを生成する`Column.CreateValidatorList`が利用できます。
 
 #### レコードクラス
 
