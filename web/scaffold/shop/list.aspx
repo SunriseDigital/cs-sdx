@@ -10,8 +10,8 @@
     <Scaffold:head ID="head" runat="server" />
 </head>
 <body>
-    <div>
-      <Scaffold:list ID="list" runat="server" TitleTag="h3" />
-    </div>
+  <div class="container">
+    <Scaffold:list ID="list" runat="server" OutlineRank=3 />
+  </div>
 </body>
 </html>

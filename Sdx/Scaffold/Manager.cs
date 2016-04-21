@@ -62,6 +62,7 @@ namespace Sdx.Scaffold
       DisplayList = new Config.List();
       FormList = new Config.List();
       SortingOrder = new Config.Item();
+      OutlineRank = 1;
     }
 
     internal Db.TableMeta TableMeta { get; set; }
@@ -516,6 +517,13 @@ namespace Sdx.Scaffold
       }
 
       form.Bind(bindValues);
+    }
+
+    public int OutlineRank { get; set; }
+
+    public string Heading(int rank)
+    {
+      return "h" + (OutlineRank + rank - 1).ToString();
     }
   }
 }
