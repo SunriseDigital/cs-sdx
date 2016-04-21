@@ -36,21 +36,27 @@ namespace Sdx.Db.Sql
 
     internal string ContextName { private get; set; }
 
-    public Condition AddOr(Condition condition)
+    /// <summary>
+    /// 引数一個のAddは自由文をWhere句に足します。クオートやサニタイズは一切されないので注意してください。
+    /// また、AND・ORは付与されません。
+    /// </summary>
+    /// <param name="expression"></param>
+    /// <returns></returns>
+    public Condition Add(string expression)
     {
-      this.AddWithCondition(condition, Logical.Or, Type.Free);
+      this.AddWithColumn(new Column(expression, this.ContextName), null, null, null, Type.Free);
       return this;
     }
 
-    public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
+    public Condition Add(Column left, object right, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.Or, comparison, Type.Comparison);
+      this.AddWithColumn(left, right, Logical.And, comparison, Type.Comparison);
       return this;
     }
 
-    public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
+    public Condition AddOr(Column left, object right, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.Or, comparison, Type.Comparison);
+      this.AddWithColumn(left, right, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
@@ -60,9 +66,21 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Condition AddOr(Condition condition)
+    {
+      this.AddWithCondition(condition, Logical.Or, Type.Free);
+      return this;
+    }
+
     public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
     {
       this.AddWithColumn(new Column(column, this.ContextName), value, Logical.And, comparison, Type.Comparison);
+      return this;
+    }
+
+    public Condition AddOr(string column, Object value, Comparison comparison = Comparison.Equal)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
@@ -72,15 +90,16 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Condition AddIsNull(string column)
+    public Condition AddOr(Expr column, Object value, Comparison comparison = Comparison.Equal)
     {
-      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.And, Comparison.Equal, Type.NullCompare);
+      this.AddWithColumn(new Column(column, this.ContextName), value, Logical.Or, comparison, Type.Comparison);
       return this;
     }
 
-    public Condition AddIsNotNullOr(string column)
+
+    public Condition AddIsNull(string column)
     {
-      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.Or, Comparison.NotEqual, Type.NullCompare);
+      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.And, Comparison.Equal, Type.NullCompare);
       return this;
     }
 
@@ -90,9 +109,63 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Condition AddIsNotNullOr(string column)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), null, Logical.Or, Comparison.NotEqual, Type.NullCompare);
+      return this;
+    }
+
     public Condition AddIsNotNull(string column)
     {
       this.AddWithColumn(new Column(column, this.ContextName), null, Logical.And, Comparison.NotEqual, Type.NullCompare);
+      return this;
+    }
+
+    public Condition AddBetween(string column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddBetweenOr(string column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddBetween(Expr column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddBetweenOr(Expr column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetween(string column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetweenOr(string column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetween(Expr column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
+      return this;
+    }
+
+    public Condition AddNotBetweenOr(Expr column, string min, string max)
+    {
+      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
       return this;
     }
 
@@ -308,18 +381,6 @@ namespace Sdx.Db.Sql
       throw new InvalidOperationException("Illeagal Type is specified.");
     }
 
-    public Condition Add(Column left, object right, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(left, right, Logical.And, comparison, Type.Comparison);
-      return this;
-    }
-
-    public Condition AddOr(Column left, object right, Comparison comparison = Comparison.Equal)
-    {
-      this.AddWithColumn(left, right, Logical.Or, comparison, Type.Comparison);
-      return this;
-    }
-
     public object Clone()
     {
       var cloned = (Condition)this.MemberwiseClone();
@@ -336,66 +397,6 @@ namespace Sdx.Db.Sql
       cloned.ContextName = null;
 
       return cloned;
-    }
-
-    public Condition AddBetween(string column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
-      return this;
-    }
-
-    public Condition AddBetween(Expr column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.Equal, Type.Between);
-      return this;
-    }
-
-    public Condition AddBetweenOr(string column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
-      return this;
-    }
-
-    public Condition AddBetweenOr(Expr column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.Equal, Type.Between);
-      return this;
-    }
-
-    public Condition AddNotBetween(string column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
-      return this;
-    }
-
-    public Condition AddNotBetween(Expr column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.And, Comparison.NotEqual, Type.Between);
-      return this;
-    }
-
-    public Condition AddNotBetweenOr(string column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
-      return this;
-    }
-
-    public Condition AddNotBetweenOr(Expr column, string min, string max)
-    {
-      this.AddWithColumn(new Column(column, this.ContextName), new String[] { min, max }, Logical.Or, Comparison.NotEqual, Type.Between);
-      return this;
-    }
-
-    /// <summary>
-    /// 引数一個のAddは自由文をWhere句に足します。クオートやサニタイズは一切されないので注意してください。
-    /// また、AND・ORは付与されません。
-    /// </summary>
-    /// <param name="expression"></param>
-    /// <returns></returns>
-    public Condition Add(string expression)
-    {
-      this.AddWithColumn(new Column(expression, this.ContextName), null, null, null, Type.Free);
-      return this;
     }
   }
 }
