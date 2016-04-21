@@ -16,6 +16,7 @@ using System.Web;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace UnitTest
 {
@@ -1245,6 +1246,75 @@ namespace UnitTest
         Assert.Equal(scaffold.PerPage, recordSet.Count);
         Assert.Equal(1, recordSet[0].GetValue("id"));
         Assert.Equal(2, recordSet[1].GetValue("id"));
+      }
+    }
+
+    [Fact]
+    public void TestAutoCurrent()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAutoCurrent(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAutoCurrent(TestDb db)
+    {
+      InitHttpContextMock("");
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+        var record = scaffold.LoadRecord(HttpContext.Current.Request.Params, conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        Assert.IsType<Sdx.Html.CheckableGroup>(form["auto_created_at"]);
+
+        Assert.True(record.IsNew);
+        Assert.Equal(
+          HtmlLiner(@"
+<span>
+  <label><input type=""checkbox"" value=""1"" name=""auto_created_at"" checked>現在日時で更新</label>
+</span>"),
+          form["auto_created_at"].Tag.Render()
+        );
+
+        var values = new NameValueCollection();
+        
+        scaffold.BindToForm(form, values);
+        Assert.Equal("", form["created_at"].Value.ToString());
+
+        values.Add("auto_created_at", "1");
+        scaffold.BindToForm(form, values);
+        Assert.NotEqual("", form["created_at"].Value.ToString());
+      }
+
+      InitHttpContextMock("id=1");
+      scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+        var record = scaffold.LoadRecord(HttpContext.Current.Request.Params, conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        Assert.False(record.IsNew);
+        Assert.Equal(
+          HtmlLiner(@"
+<span>
+  <label><input type=""checkbox"" value=""1"" name=""auto_created_at"">現在日時で更新</label>
+</span>"),
+          form["auto_created_at"].Tag.Render()
+        );
+
+        var values = new NameValueCollection();
+
+        scaffold.BindToForm(form, values);
+        Assert.Equal("", form["created_at"].Value.ToString());
+
+        values.Add("auto_created_at", "1");
+        scaffold.BindToForm(form, values);
+        Assert.NotEqual("", form["created_at"].Value.ToString());
       }
     }
   }

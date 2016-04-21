@@ -95,7 +95,7 @@ namespace Sdx.Scaffold
     /// </summary>
     public Config.Item SortingOrder { get; private set; }
 
-    private Html.FormElement CreateFormElement(Config.Item config, Db.Record record, Db.Connection conn)
+    private Html.FormElement CreateFormElement(Sdx.Html.Form form, Config.Item config, Db.Record record, Db.Connection conn)
     {
       Html.FormElement elem;
 
@@ -141,6 +141,17 @@ namespace Sdx.Scaffold
 
       elem.Label = config["label"].ToString();
 
+      form.SetElement(elem);
+
+      if (config.ContainsKey("autoCurrentCheckbox"))
+      {
+        var group = new Sdx.Html.CheckableGroup(config["autoCurrentCheckbox"].ToString());
+        var checkbox = new Sdx.Html.CheckBox();
+        checkbox.Tag.Attr.Set("value", "1");
+        group.AddCheckable(checkbox, Sdx.I18n.GetString("現在日時で更新"));
+        form.SetElement(group);
+      }
+
       return elem;
     }
 
@@ -152,9 +163,7 @@ namespace Sdx.Scaffold
       //var hasGetters = new List<Config.Item>();
       foreach (var config in FormList)
       {
-        var elem = CreateFormElement(config, record, conn);
-
-        form.SetElement(elem);
+        var elem = CreateFormElement(form, config, record, conn);
 
         //Validator
         MethodInfo method = null;
@@ -210,6 +219,7 @@ namespace Sdx.Scaffold
           elem.IsAllowEmpty = true;
         }
 
+        //FormにDBから戻す値を生成
         if (config.ContainsKey("getter"))
         {
           bind.Set(
@@ -233,6 +243,14 @@ namespace Sdx.Scaffold
           if (record.HasValue(columnName))
           {
             bind.Set(columnName, record.GetString(columnName));
+          }
+        }
+
+        if(config.ContainsKey("autoCurrentCheckbox"))
+        {
+          if(bind[config["column"].ToString()] == "")
+          {
+            bind.Set(config["autoCurrentCheckbox"].ToString(), "1");
           }
         }
       }
@@ -479,6 +497,25 @@ namespace Sdx.Scaffold
       {
         this.perPage = value;
       }
+    }
+
+    /// <summary>
+    /// サブミットされた値をフォームにバインドする
+    /// </summary>
+    /// <param name="form"></param>
+    /// <param name="values"></param>
+    public void BindToForm(Html.Form form, NameValueCollection values)
+    {
+      var bindValues = new NameValueCollection(values);
+      foreach(var config in FormList.Where(c => c.ContainsKey("autoCurrentCheckbox")))
+      {
+        if(bindValues[config["autoCurrentCheckbox"].ToString()] == "1")
+        {
+          bindValues.Set(config["column"].ToString(), DateTime.Now.ToString());
+        }
+      }
+
+      form.Bind(bindValues);
     }
   }
 }

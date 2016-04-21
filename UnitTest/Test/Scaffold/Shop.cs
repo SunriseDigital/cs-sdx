@@ -70,6 +70,7 @@ namespace Test.Scaffold
         ).Add(Config.Item.Create()
           .Set("column", new Config.Value("created_at"))
           .Set("label", new Config.Value("登録日時"))
+          .Set("autoCurrentCheckbox", new Config.Value("auto_created_at"))
         );
 
       return scaffold;
