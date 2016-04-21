@@ -1676,7 +1676,7 @@ namespace UnitTest
         .AddFrom("shop")
         .AddColumn("id");
 
-      select.Where.Add("id = 1");
+      select.Where.Add(Sdx.Db.Sql.Expr.Wrap("id = 1"));
 
       db.Command = select.Build();
       Assert.Equal(
@@ -1684,7 +1684,7 @@ namespace UnitTest
         db.Command.CommandText
       );
 
-      select.Where.Add(" /* foo bar */");
+      select.Where.Add(Sdx.Db.Sql.Expr.Wrap(" /* foo bar */"));
       db.Command = select.Build();
       Assert.Equal(
         db.Sql("SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE id = 1 /* foo bar */"),
