@@ -112,6 +112,11 @@ namespace Sdx.Html
       return (T)this[name];
     }
 
+    /// <summary>
+    /// Recordにセットする用のNameValueCollectionを生成する。
+    /// IsSecretの処理はここでやってます。
+    /// </summary>
+    /// <returns></returns>
     public NameValueCollection ToNameValueCollection()
     {
       if(isValidCache != true)
