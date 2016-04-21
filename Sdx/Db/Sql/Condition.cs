@@ -42,7 +42,7 @@ namespace Sdx.Db.Sql
     /// </summary>
     /// <param name="expression"></param>
     /// <returns></returns>
-    public Condition Add(string expression)
+    public Condition Add(Expr expression)
     {
       this.AddWithColumn(new Column(expression, this.ContextName), null, null, null, Type.Free);
       return this;
