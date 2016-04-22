@@ -189,5 +189,10 @@ namespace Sdx.Db
     {
       return ToStringArray<Record>(func);
     }
+
+    public T Get<T>(int index) where T:Sdx.Db.Record
+    {
+      return (T)this[index];
+    }
   }
 }

@@ -865,5 +865,60 @@ namespace UnitTest
         Assert.Equal(DBNull.Value, shop.GetValue("login_id"));
       }
     }
+
+    /// <summary>
+    /// このテストは特にアサートしてませんがドキュメント代わりにもなるしとっておきます。
+    /// </summary>
+    [Fact]
+    public void TestCastMethods()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunCastMethods(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunCastMethods(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
+         ;
+
+      select.Context("shop")
+         .InnerJoin(new Test.Orm.Table.Menu())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC)
+         ;
+
+      select.Context("shop")
+          .Where.Add("name", "天府舫");
+
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shops = conn.FetchRecordSet(select);
+
+        //foreachはキャストの必要がありません。
+        foreach(Test.Orm.Shop shop in shops)
+        {
+          
+        }
+
+        //ForEachメソッドにはキャストメソッドがります。
+        shops.ForEach<Test.Orm.Shop>(shop => {
+          
+        });
+
+        //RecordSetはIEnumerableを実装しています。
+        shops.Cast<Test.Orm.Shop>().Where(shop => shop.IsUpdated);
+
+        //indexを指定して取得するジェネリックメソッド
+        Assert.Equal("天府舫", shops.Get<Test.Orm.Shop>(0).GetString("name"));
+      }
+    }
   }
 }
