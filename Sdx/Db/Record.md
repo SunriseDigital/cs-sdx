@@ -103,17 +103,16 @@ namespace Test.Orm.Table
     {
       Meta =  new Sdx.Db.TableMeta(
         "shop",
-        new List<string>()
-        {
-          "id"
-        },
         new List<Column>()
         {
-          new Column("id"),
+          new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("name"),
-          new Column("area_id"),
-          new Column("main_image_id"),
-          new Column("sub_image_id"),
+          new Column("area_id", type: ColumnType.Integer),
+          new Column("main_image_id", isNotNull: false),
+          new Column("sub_image_id", isNotNull: false),
+          new Column("login_id", isNotNull: false),
+          new Column("password", isNotNull: false),
+          new Column("created_at", type: ColumnType.DateTime),
         },
         new Dictionary<string, Relation>()
         {
@@ -159,16 +158,16 @@ select.AddFrom(new Test.Orm.Table.Shop());
 using(var conn = db.CreateConnection())
 {
   conn.Open();
-  var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+  var shops = conn.FetchRecordSet(select);
 }
 ```
 
 `Select.AddFrom`にTableのインスタンスをセットすると、カラムはTableMetaに設定したカラムが自動で全て追加されます。
 
-`Connection.FetchRecordSet<T>(select)`/`Connection.FetchRecord<T>(select)`はジェネリックメソッドでタイプには取得したいRecordクラスの型を渡します。通常はFROM句にしていしたテーブルのRecordを渡します。
+`Connection.FetchRecordSet(select)`で`Record`のリストを、`Connection.FetchRecord(select)`で`Record`単体を取得します。問い合わせ結果が無い場合`FetchRecordSet`は空の`RecordSet`を、`FetchRecord`は`null`を返します。
 
 
-カラムを変更したい場合はSetColumns`Table.SetColumn()`/`Table.ClearColumn()`/`Table.AddColumn()`などのTableのカラム操作系メソッドを使用してください。
+カラムを変更したい場合は`Context.SetColumns()`/`Context.ClearColumn()`/`Context.AddColumn()`などのTableのカラム操作系メソッドを使用してください。
 
 ```c#
 select
@@ -192,12 +191,12 @@ INSERT INTO menu (name, shop_id) VALUES ('牛肉の激辛水煮', (SELECT id FRO
 var select = db.CreateSelect();
 select
    .AddFrom(new Test.Orm.Table.Shop())
-   .AddOrder("id", Sdx.Db.Query.Order.ASC)
+   .AddOrder("id", Sdx.Db.Sql.Order.ASC)
    ;
 
 select.Context("shop")
    .InnerJoin(new Test.Orm.Table.Menu())
-   .AddOrder("id", Sdx.Db.Query.Order.ASC)
+   .AddOrder("id", Sdx.Db.Sql.Order.ASC)
    ;
 
 select.Context("shop")
@@ -206,18 +205,46 @@ select.Context("shop")
 using(var conn = db.CreateConnection())
 {
   conn.Open();
-  var shops = conn.FetchRecordSet<Test.Orm.Shop>(select);
+  var shops = conn.FetchRecordSet(select);
 
   Assert.Equal(1, shops.Count);
   Assert.Equal("天府舫", shops[0].GetString("name"));
 
-  //メニューを取得
-  var menuList = shops[0].GetRecordSet<Test.Orm.Menu>("menu");
-  Assert.Equal(1, db.Profiler.Queries.Count);//新たに問い合わせはしていない
+  //メニューを取得。JOINしているのでここでDBへの問い合わせは発生しません。
+  var menuList = shops[0].GetRecordSet("menu");
   Assert.Equal(3, menuList.Count);
   Assert.Equal("干し豆腐のサラダ", menuList[0].GetString("name"));
   Assert.Equal("麻婆豆腐", menuList[1].GetString("name"));
   Assert.Equal("牛肉の激辛水煮", menuList[2].GetString("name"));
 }
 
+```
+
+#### 取得後の扱い
+
+`RecordSet`が返すのは`Reocrd`のインスタンスです。`Test.Orm.Shop`のメソッドを呼び出したい場合はキャストが必要です。キャストして返すジェネリックメソッドも幾つか用意されています。具体的なクラスでオブジェクトを扱う方法を幾つか示します。
+
+```c#
+using(var conn = db.CreateConnection())
+{
+  conn.Open();
+  var shops = conn.FetchRecordSet(select);
+
+  //foreachはキャストの必要がありません。
+  foreach(Test.Orm.Shop shop in shops)
+  {
+
+  }
+
+  //ForEachメソッドにはキャストメソッドがります。
+  shops.ForEach<Test.Orm.Shop>(shop => {
+
+  });
+
+  //RecordSetはIEnumerableを実装しています。
+  shops.Cast<Test.Orm.Shop>().Where(shop => true);
+
+  //indexを指定して取得するジェネリックメソッド
+  Assert.Equal("天府舫", shops.Get<Test.Orm.Shop>(0).GetString("name"));
+}
 ```
