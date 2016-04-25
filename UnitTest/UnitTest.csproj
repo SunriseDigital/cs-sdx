@@ -115,6 +115,7 @@
     <Compile Include="Test\Config\Dir.cs" />
     <Compile Include="Test\Config\Dir2.cs" />
     <Compile Include="Sdx\Validation\Validator.cs" />
+    <Compile Include="TreeJsonTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
