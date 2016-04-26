@@ -399,7 +399,7 @@ namespace Sdx.Db
 
     public T Get<T>(string path, Connection conn = null)
     {
-      return (T)Get(path, conn);
+      return (T)GetDynamic(path, conn);
     }
 
 
@@ -412,7 +412,7 @@ namespace Sdx.Db
     /// <param name="path"></param>
     /// <param name="conn"></param>
     /// <returns></returns>
-    public dynamic Get(string path, Connection conn = null)
+    public dynamic GetDynamic(string path, Connection conn = null)
     {
       dynamic result = this;
       var chunk = path.Split('.');
