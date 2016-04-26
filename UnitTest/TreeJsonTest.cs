@@ -1,6 +1,7 @@
 ﻿using Xunit;
 using UnitTest.DummyClasses;
 
+
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
 using TestClassAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute;
@@ -10,62 +11,47 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 #endif
 
 using System;
+using System.Diagnostics;
+using Sdx;
+using System.Collections;
+using Sdx.Scaffold.Config;
+using System.Collections.Generic;
+using Sdx.Data;
 
 namespace UnitTest
 {
   [TestClass]
   public class TreeJsonTest : BaseTest
   {
-    [ClassInitialize]
-    public static void InitilizeClass(TestContext context)
-    {
-      Console.WriteLine("FixtureSetUp");
-      //最初のテストメソッドを実行する前に一回だけ実行したい処理はここ
-    }
-
-    [ClassCleanup]
-    public static void CleanupClass()
-    {
-      Console.WriteLine("FixtureTearDown");
-      //全てのテストメソッドが実行された後一回だけ実行する処理はここ
-    }
-
-    override protected void SetUp()
-    {
-      Console.WriteLine("SetUp");
-      //各テストメソッドの前に実行する処理はここ
-    }
-
-    override protected void TearDown()
-    {
-      Console.WriteLine("TearDown");
-      //各テストメソッドの後に実行する処理はここ
-    }
-
-    override public void FixtureSetUp()
-    {
-      TreeJsonTest.InitilizeClass(null);
-      //ここのクラス名は適宜書き換えてください。
-      //MSTestのFixtureSetUpがstaticじゃないとだめだったのでこのような構造になってます。
-    }
-
-    override public void FixtureTearDown()
-    {
-      TreeJsonTest.CleanupClass();
-      //@see FixtureSetUp
-    }
-
-
     [Fact]
-    public void TestMethod1()
+    public void TestTreeJson()
     {
-      Console.WriteLine("TestMethod1");
+      JsonTest data = new JsonTest();
+      data.FooString = "bar";
+
+      List<string> jsonList = new List<string>();
+      jsonList.Add("aaa");
+      jsonList.Add("bbb");
+      jsonList.Add("ccc");
+      data.FooList = jsonList;
+
+      Dictionary<string, string> dic = new Dictionary<string, string>();
+      dic.Add("name", "hoge");
+      dic.Add("ddd", "eee");
+      data.FooDic = dic;
+
+      Sdx.Data.Json json = new Sdx.Data.Json(Sdx.Util.Json.Encoder(data));
+
+      Assert.Equal(json.ToValue("Foo"), "bar");
+      List<string> list = json.ToList("FooList");
+      Assert.Equal(list[0], "aaa");
     }
 
-    [Fact]
-    public void TestMethod2()
-    {
-      Console.WriteLine("TestMethod2");
-    }
+  }
+  public class JsonTest
+  {
+    public string FooString { get; set; }
+    public List<string> FooList { get; set; }
+    public Dictionary<string, string> FooDic { get; set; }
   }
 }
