@@ -31,7 +31,6 @@ namespace UnitTest
 
     protected override void TearDown()
     {
-      Sdx.Scaffold.Manager.ClearContextCache();
       HttpContext.Current = null;
     }
 
@@ -580,8 +579,8 @@ namespace UnitTest
         var records = scaffold.FetchRecordSet(conn);
         Assert.Equal("東京", scaffold.DisplayList[0].Display(records[0], conn));
         Assert.Equal("tokyo", scaffold.DisplayList[1].Display(records[0], conn));
-        Assert.Equal("愛知", scaffold.DisplayList[0].Display(records.First(r => r.Get("large_area_id") == 2), conn));
-        Assert.Equal("aichi", scaffold.DisplayList[1].Display(records.First(r => r.Get("large_area_id") == 2), conn));
+        Assert.Equal("愛知", scaffold.DisplayList[0].Display(records.First(r => r.GetDynamic("large_area_id") == 2), conn));
+        Assert.Equal("aichi", scaffold.DisplayList[1].Display(records.First(r => r.GetDynamic("large_area_id") == 2), conn));
       }
     }
 

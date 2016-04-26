@@ -131,7 +131,7 @@ namespace Sdx.Scaffold.Config
         if (!replaced.ContainsKey(search))
         {
           replaced[search] = true;
-          html = html.Replace(search, record.Get(path).ToString());
+          html = html.Replace(search, record.GetDynamic(path).ToString());
         }
         
         match = match.NextMatch();

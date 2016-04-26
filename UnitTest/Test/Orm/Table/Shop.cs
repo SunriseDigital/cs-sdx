@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Shop : Test.Db.Table
+  public class Shop : Test.Db.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 
@@ -76,7 +76,7 @@ namespace Test.Orm.Table
       elem.Name = "category_id";
 
       var select = conn.Adapter.CreateSelect();
-      select.AddFrom(new Test.Orm.Table.Category()).Table.SelectDefaultOrder(select);
+      select.AddFrom(new Test.Orm.Table.Category()).Table.SelectDefaultOrder(select, conn);
       select.ClearColumns().AddColumns("id", "name");
 
       conn.FetchKeyValuePairList<string, string>(select).ForEach(pair =>
@@ -92,7 +92,7 @@ namespace Test.Orm.Table
       var elem = new Sdx.Html.Select("area_id");
 
       var select = conn.Adapter.CreateSelect();
-      select.AddFrom(new Test.Orm.Table.Area()).Table.SelectDefaultOrder(select);
+      select.AddFrom(new Test.Orm.Table.Area()).Table.SelectDefaultOrder(select, conn);
       select.ClearColumns().AddColumns("id", "name");
 
       elem.AddOption("", "場所を選択してください");

@@ -17,24 +17,15 @@ namespace Sdx.Scaffold
     private int? perPage;
 
     /// <summary>
-    /// 生成したMagegerはUserControlで参照するために<see cref="Name"/>をキーにContext.Currentにキャッシュされます。そのキャッシュを強制的にクリアします。通常の使用では必要ありません。ユニットテストで使いまいした。
+    /// Sdx.Context.Currentに結び付けます。UserContorl側でインスタンスを特定するのに必要です。
     /// </summary>
-    public static void ClearContextCache()
-    {
-      if(Context.Current.Vars.ContainsKey(CONTEXT_KEY))
-      {
-        Dictionary<string, Manager> instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
-        instances.Clear();
-      }
-    }
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="tableMeta"></param>
-    /// <param name="db"></param>
-    /// <param name="name">UserControl側で参照するための名前。基本デフォルトでOK。一ページに複数のScaffoldを使用する場合必要（テストしてません）。</param>
-    public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db, string name = Manager.DEFAULT_NAME)
+    /// <param name="name">
+    ///   一つのContextで二つのScaffold.Managerを生成する場合、名前を任意に渡す必要があります。
+    ///   インクルードタグにつけた名前を渡してください。
+    ///   <Scaffold:edit ID="edit" runat="server" Name="someName" />
+    ///   作っては見たものの必要に駆られなかったのでテストしていません。
+    /// </param>
+    public void BindToCurrentContext(string name = Manager.DEFAULT_NAME)
     {
       this.Name = name;
       Dictionary<string, Manager> instances = null;
@@ -53,12 +44,19 @@ namespace Sdx.Scaffold
         throw new InvalidOperationException("Already exists " + this.Name + " Manager");
       }
 
-      this.TableMeta = tableMeta;
-
       instances[name] = this;
+    }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="tableMeta"></param>
+    /// <param name="db"></param>
+    /// <param name="name">UserControl側で参照するための名前。基本デフォルトでOK。一ページに複数のScaffoldを使用する場合必要（テストしてません）。</param>
+    public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db, string name = Manager.DEFAULT_NAME)
+    {
       Db = db;
-
+      TableMeta = tableMeta;
       DisplayList = new Config.List();
       FormList = new Config.List();
       SortingOrder = new Config.Item();
@@ -271,7 +269,14 @@ namespace Sdx.Scaffold
       {
         key = Manager.DEFAULT_NAME;
       }
+
       var instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
+
+      if (!instances.ContainsKey(key))
+      {
+        throw new InvalidOperationException("You must call BindToCurrentContext to use in UserControl.");
+      }
+
       return instances[key];
     }
 
@@ -351,7 +356,7 @@ namespace Sdx.Scaffold
         var context = select.ContextList.First(kv => kv.Value.JoinType == Sdx.Db.Sql.JoinType.From).Value;
         if (ListSelectHook != null)
         {
-          ListSelectHook.Invoke(TableMeta.TableType, context.Table, new object[] { select });
+          ListSelectHook.Invoke(TableMeta.TableType, context.Table, new object[] { select, conn });
         }
         
         if (Group != null)

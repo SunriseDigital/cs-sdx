@@ -36,11 +36,24 @@ namespace Sdx.Scaffold.Config
       value = methodInfo;
     }
 
+    public Value(Action<Db.Sql.Select, Db.Connection> action)
+    {
+      value = action;
+    }
+
     internal object Invoke(Type type, object target, object[] args)
     {
       if(value is MethodInfo)
       {
         return ((MethodInfo)value).Invoke(target, args);
+      }
+      else if (value is Action<Db.Sql.Select, Db.Connection>)
+      {
+        var ac = (Action<Db.Sql.Select, Db.Connection>)value;
+        var select = (Db.Sql.Select)args[0];
+        var conn = (Db.Connection)args[1];
+        ac(select, conn);
+        return args;
       }
       else
       {

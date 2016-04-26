@@ -9,6 +9,7 @@ public partial class scaffold_area_edit : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-      Test.Scaffold.Shop.Create(Sdx.Db.Adapter.Manager.Get("main").Write);
+      var scaffold = Test.Scaffold.Shop.Create(Sdx.Db.Adapter.Manager.Get("main").Write);
+      scaffold.BindToCurrentContext();
     }
 }
