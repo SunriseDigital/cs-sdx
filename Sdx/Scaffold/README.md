@@ -306,7 +306,7 @@ scaffold.FormList
 
 #### バリデータのカスタマイズ
 
-[TableMeta生成時](../Db/Record.md)にColumnにTypeを設定すると自動的にバリデータが生成され付与されます。どのようなバリデータが付与されるかは[Sdx.Db.Table](../Db/Table.cs)の`CreateValidatorList`メソッドを参照ください。
+[TableMeta生成時](../Db/Record.md#table%E3%82%AF%E3%83%A9%E3%82%B9)にColumnにTypeを設定すると自動的にバリデータが生成され付与されます。どのようなバリデータが付与されるかは[Sdx.Db.Table](../Db/Table.cs)の`CreateValidatorList`メソッドを参照ください。
 
 フォーム要素同様、バリデータも変更可能です。`Test.Orm.Table.Shop`に`Createキャメルケースカラム名Validators`を作成すると、自動バリデータは無視されそちらのメソッドが呼ばれます。
 
