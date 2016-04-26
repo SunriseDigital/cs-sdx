@@ -128,7 +128,7 @@ public partial class scaffold_shop_edit : System.Web.UI.Page
 
 `Sdx.Scaffold.Manager`に設定情報を付与していきます。`Sdx.Scaffold.Manager`の初期化には、対象のテーブルの`Sdx.Db.TableMeta`と保存先の`Sdx.Db.Adapter`のインスタンスが必要です。
 
-リストはレスポンシブを想定しているため[resplist](https://github.com/SunriseDigital/sdxweb/blob/master/_private/sass/resplist.scss)を使用しています。幅を指定しないと縦の列がきれいに揃いませんので注意してください。
+リストはレスポンシブを想定しているため[resplist](https://github.com/SunriseDigital/sdxweb/blob/master/_private/sass/resplist.scss)を使用しています。各項目の幅はデフォルトで`resplist-item-md`クラスが付与されます。変更したい場合は`style`属性あるいは`class`属性で変更してください。
 
 `Test.Scaffold.Shop`
 ```c#
@@ -165,33 +165,28 @@ namespace Test.Scaffold
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("名前"))
           .Set("column", new Sdx.Scaffold.Config.Value("name"))
-          .Set("style", new Sdx.Scaffold.Config.Value("width: 120px;"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("エリア"))
           //`dynamic`はReocrd.GetDynamic()が呼ばれます。
           //`@area.name` = `shop.GetRecord('area').GetString("name")`
           .Set("dynamic", new Sdx.Scaffold.Config.Value("@area.name"))
-          .Set("style", new Sdx.Scaffold.Config.Value("width: 80px;"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("業種"))
           //`#GetCategoryNames` = `shop.GetCategoryNames(conn)`
           //Shopのレコードに`public string GetCategoryNames(Sdx.Db.Connection conn = null)`メソッドが実装されています。
           .Set("dynamic", new Sdx.Scaffold.Config.Value("#GetCategoryNames"))
-          .Set("style", new Sdx.Scaffold.Config.Value("width: 150px;"))
           //`class`は追加でclass属性を付与します。柔軟にスタイルを利かせたい場合に使用します。
           .Set("class", new Sdx.Scaffold.Config.Value("category"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("ログインID"))
           .Set("column", new Sdx.Scaffold.Config.Value("login_id"))
-          .Set("style", new Sdx.Scaffold.Config.Value("width: 100px;"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("登録日時"))
           .Set("column", new Sdx.Scaffold.Config.Value("created_at"))
-          .Set("style", new Sdx.Scaffold.Config.Value("width: 170px;"))
         );
 
       //一ページ１０件のページネーションが付与される。省略すると全件表示されます。
