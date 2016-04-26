@@ -9,6 +9,7 @@ public partial class scaffold_area_list : System.Web.UI.Page
 {
   protected void Page_Load(object sender, EventArgs e)
   {
-    Test.Scaffold.LargeArea.Create();
+    var scaffold = Test.Scaffold.LargeArea.Create();
+    scaffold.BindToCurrentContext();
   }
 }

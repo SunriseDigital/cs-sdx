@@ -80,14 +80,13 @@ public partial class scaffold_shop_list : System.Web.UI.Page
 {
   protected void Page_Load(object sender, EventArgs e)
   {
-    Test.Scaffold.Shop.Create();
+    var scaffold = Test.Scaffold.Shop.Create();
+    scaffold.BindToCurrentContext();
   }
 }
 ```
 
-このサンプルでは`Test.Scaffold.Shop`という生成用のScaffoldファクトリクラスを作りました。`Create()`は後ほど示しますが、`Sdx.Scaffold.Manager`を組み立ててるだけです。
-
-`Sdx.Scaffold.Manager`のインスタンスは生成するだけで`HttpContext`に保持されUserControlに関連付けられますので、とくにメンバー変数に代入する必要はありません。
+このサンプルでは`Test.Scaffold.Shop`という生成用のScaffoldファクトリクラスを作りました。`Create()`は後ほど示しますが、`Sdx.Scaffold.Manager`を組み立ててるだけです。`Sdx.Scaffold.Manager.BindToCurrentContext`メソッドを呼ぶと`Sdx.Context.Current`に関連付けられUserControl側で参照することが可能になります。
 
 
 #### 編集ページ
@@ -119,7 +118,8 @@ public partial class scaffold_shop_edit : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-      Test.Scaffold.Shop.Create();
+      var scaffold = Test.Scaffold.Shop.Create();
+      scaffold.BindToCurrentContext();
     }
 }
 ```

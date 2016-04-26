@@ -107,10 +107,6 @@ namespace UnitTest
 
     protected void InitHttpContextMock(string queryString)
     {
-      //Sdx.Scaffold.ManagerのキャッシュはContextにしているのでクリアする
-      //本来複数作られることはないものだがテスト時はモックを作るのでこの措置が必要
-      Sdx.Scaffold.Manager.ClearContextCache();
-
       HttpContext.Current = new HttpContext(
         new HttpRequest("", "http://wwww.example.com", queryString),
         new HttpResponse(new StringWriter())

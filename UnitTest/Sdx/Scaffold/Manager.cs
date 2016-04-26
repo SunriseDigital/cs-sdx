@@ -31,7 +31,6 @@ namespace UnitTest
 
     protected override void TearDown()
     {
-      Sdx.Scaffold.Manager.ClearContextCache();
       HttpContext.Current = null;
     }
 
