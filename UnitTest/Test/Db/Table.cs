@@ -7,7 +7,7 @@ namespace Test.Db
 {
   public class Table : Sdx.Db.Table
   {
-    public override Sdx.Db.Table SelectDefaultOrder(Sdx.Db.Sql.Select select)
+    public override Sdx.Db.Table SelectDefaultOrder(Sdx.Db.Sql.Select select, Sdx.Db.Connection conn = null)
     {
       var context = FindSelfContext(select);
       

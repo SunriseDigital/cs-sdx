@@ -315,7 +315,7 @@ namespace Sdx.Db
       return this.MemberwiseClone();
     }
 
-    public virtual Table SelectDefaultOrder(Sql.Select select)
+    public virtual Table SelectDefaultOrder(Sql.Select select, Connection conn = null)
     {
       return this;
     }
@@ -330,7 +330,7 @@ namespace Sdx.Db
       var select = conn.Adapter.CreateSelect();
       select.AddFrom(this);
 
-      this.SelectDefaultOrder(select);
+      this.SelectDefaultOrder(select, conn);
 
       return conn.FetchRecordSet(select);
     }

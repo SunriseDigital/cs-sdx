@@ -351,7 +351,7 @@ namespace Sdx.Scaffold
         var context = select.ContextList.First(kv => kv.Value.JoinType == Sdx.Db.Sql.JoinType.From).Value;
         if (ListSelectHook != null)
         {
-          ListSelectHook.Invoke(TableMeta.TableType, context.Table, new object[] { select });
+          ListSelectHook.Invoke(TableMeta.TableType, context.Table, new object[] { select, conn });
         }
         
         if (Group != null)
