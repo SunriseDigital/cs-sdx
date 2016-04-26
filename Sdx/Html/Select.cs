@@ -103,5 +103,18 @@ namespace Sdx.Html
         }
       });
     }
+
+    public void AddOption(string key, string value)
+    {
+      var option = new Sdx.Html.Option();
+      option.Tag.Attr["value"] = key;
+      option.Text = value;
+      AddOption(option);
+    }
+
+    public void AddOption(KeyValuePair<string, string> pair)
+    {
+      AddOption(pair.Key, pair.Value);
+    }
   }
 }

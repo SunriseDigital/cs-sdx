@@ -4,6 +4,8 @@
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,
+  login_id varchar(190),
+  password varchar(190),
   created_at datetime NOT NULL,
   PRIMARY KEY (id)
 );
@@ -13,6 +15,7 @@ CREATE TABLE area (
   name varchar(50),
   large_area_id int,
   code varchar(50) NOT NULL,
+  sequence int NOT NULL DEFAULT 0,
   PRIMARY KEY (id),
   UNIQUE INDEX large_area_code (code ASC)
 );
@@ -63,5 +66,5 @@ CREATE TABLE shop_category (
   PRIMARY KEY (shop_id, category_id)
 );
 
-ALTER TABLE shop_category ADD FOREIGN KEY (shop_id) REFERENCES shop(id);
+ALTER TABLE shop_category ADD FOREIGN KEY (shop_id) REFERENCES shop(id) ON DELETE CASCADE;
 ALTER TABLE shop_category ADD FOREIGN KEY (category_id) REFERENCES category(id);

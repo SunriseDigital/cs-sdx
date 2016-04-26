@@ -6,9 +6,14 @@ namespace Sdx.Html
   {
     public string Text { get; private set; }
 
-    public RawText(string text):base(null)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="htmlEncode">HTMLエンティティにエンコードするかどうか。デフォルトtrue</param>
+    public RawText(string text, bool htmlEncode = true):base(null)
     {
-      this.Text = HttpUtility.HtmlEncode(text);
+      this.Text = htmlEncode ? HttpUtility.HtmlEncode(text) : text;
     }
 
     public override string Render(Attr attribute = null)

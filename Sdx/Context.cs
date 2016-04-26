@@ -4,6 +4,7 @@ using System.Linq;
 using System;
 using System.Diagnostics;
 using System.Collections;
+using System.Globalization;
 
 namespace Sdx
 {
@@ -17,7 +18,8 @@ namespace Sdx
     {
       this.Timer = new Stopwatch();
       this.isDebugMode = false;
-      this.Lang = "ja";
+      this.Culture = new CultureInfo("ja");
+      this.HttpErrorHandler = new Web.HttpErrorHandler();
     }
 
     public static Context Current
@@ -61,6 +63,9 @@ namespace Sdx
 
     private bool isDebugMode;
 
+    /// <summary>
+    /// <seealso cref="Sdx.Diagnostics.DebugHttpModule.Application_BeginRequest"/>
+    /// </summary>
     public bool IsDebugMode
     {
       get
@@ -90,10 +95,9 @@ namespace Sdx
       }
     }
 
-    /// <summary>
-    /// ISO 638-1 言語コード
-    /// https://ja.wikipedia.org/wiki/ISO_639-1%E3%82%B3%E3%83%BC%E3%83%89%E4%B8%80%E8%A6%A7
-    /// </summary>
-    public string Lang { get; set; }
+
+    public CultureInfo Culture { get; set; }
+
+    public Web.HttpErrorHandler HttpErrorHandler { get; private set; }
   }
 }

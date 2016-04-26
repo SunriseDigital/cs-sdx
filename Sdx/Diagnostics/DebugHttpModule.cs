@@ -25,7 +25,7 @@ namespace Sdx.Diagnostics
         <span style=""color: gray; font-size: 11px; float: right;"">{2}</span>
   </div>
   <div style=""margin-bottom: 5px;"">{3}</div>
-  <div>{4}</div>
+  <pre style=""background: none; border: none; padding: 0;"">{4}</pre>
 </div>
 ";
 
@@ -75,9 +75,30 @@ namespace Sdx.Diagnostics
       debugString.Append("<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both;\">");
       this.AppendDebugLogs(debugString);
       this.AppendDbQueryLogs(debugString);
+      this.AppendPostData(debugString);
       debugString.Append("</div>");
 
       context.Response.Write(debugString.ToString());
+    }
+
+    private void AppendPostData(StringBuilder debugString)
+    {
+      var postLog = new StringBuilder();
+      foreach (var key in HttpContext.Current.Request.Form.AllKeys)
+      {
+        var values = HttpContext.Current.Request.Form.GetValues(key);
+        postLog
+          .Append(key)
+          .Append(Environment.NewLine)
+          .Append(Debug.Export(values))
+          .Append(Environment.NewLine)
+          .Append(Environment.NewLine);
+      }
+      debugString.Append(String.Format(
+        LogBlockFormat,
+        "Post",
+        "<pre>" + postLog.ToString() + "</pre>"
+      ));
     }
 
     private void AppendDbQueryLogs(StringBuilder debugString)
@@ -133,11 +154,12 @@ namespace Sdx.Diagnostics
 
     private string buildQueryString(Sdx.Db.Sql.Log query)
     {
+      if (query.CommandText == null) throw new Exception("aaaaaa");
       return String.Format(
         QueryBlockFormat,
         query.FormatedElapsedTime,
-        query.Comment,
-        query.Adapter.ToString(),
+        query.Comment != null ? query.Comment : "",
+        query.Adapter != null ? query.Adapter.ToString() : "",
         query.CommandText,
         query.FormatedParameters
       );

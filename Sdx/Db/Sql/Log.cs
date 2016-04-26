@@ -45,7 +45,7 @@ namespace Sdx.Db.Sql
       this.commandText = commandText;
     }
 
-    public Adapter Adapter { get; internal set; }
+    public Adapter.Base Adapter { get; internal set; }
 
     internal void Begin()
     {
@@ -97,7 +97,7 @@ namespace Sdx.Db.Sql
           }
 
           result += string.Format(
-            "{0, "+this.maxParameterKeyLength.ToString()+"} : {1}",
+            "{0, "+this.maxParameterKeyLength.ToString()+"} = {1}",
             param.Key,
             param.Value
           );

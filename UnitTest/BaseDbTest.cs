@@ -33,7 +33,7 @@ namespace UnitTest
     {
       private DbCommand command;
       private List<DbCommand> commands = new List<DbCommand>();
-      public Sdx.Db.Adapter Adapter { get; set; }
+      public Sdx.Db.Adapter.Base Adapter { get; set; }
       public String LeftQuoteChar { get; set; }
       public String RightQupteChar { get; set; }
       public DbCommand Command
@@ -45,7 +45,7 @@ namespace UnitTest
       public String Sql(String sql)
       {
         //改行を取り除く
-        sql = sql.Replace(Environment.NewLine, "");
+        sql = sql.Replace("\r", "").Replace("\n", "");
 
         //連続したスペースを一個のスペースに置き換える
         Regex re = new Regex(" +", RegexOptions.Singleline);
@@ -62,16 +62,16 @@ namespace UnitTest
 
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.SqlServerAdapter();
-      testDb.Adapter.ConnectionString = DbSelectTest.SqlServerConnectionString;
+      testDb.Adapter = new Sdx.Db.Adapter.SqlServer();
+      testDb.Adapter.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
 #endif
 
       testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.MySqlAdapter();
-      testDb.Adapter.ConnectionString = DbSelectTest.MySqlConnectionString;
+      testDb.Adapter = new Sdx.Db.Adapter.MySql();
+      testDb.Adapter.ConnectionString = Test.Db.Adapter.MySqlConnectionString;
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);
@@ -90,19 +90,9 @@ namespace UnitTest
       BaseDbTest.InitilizeClass(null);
     }
 
-    protected static String MySqlConnectionString
-    {
-      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963;"; }
-    }
-
-    protected static String SqlServerConnectionString
-    {
-      get { return "Server=.\\SQLEXPRESS;Database=sdxtest;User Id=sdxuser;Password=sdx5963;"; }
-    }
-
     private static void ResetMySqlDatabase()
     {
-      Sdx.Db.Adapter factory = new Sdx.Db.MySqlAdapter();
+      Sdx.Db.Adapter.Base factory = new Sdx.Db.Adapter.MySql();
 
       var masterCon = factory.CreateConnection();
       String pwd = "";
@@ -132,7 +122,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         }
       }
 
-      factory.ConnectionString = BaseDbTest.MySqlConnectionString;
+      factory.ConnectionString = Test.Db.Adapter.MySqlConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {
@@ -148,7 +138,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
     private static void ResetSqlServerDatabase()
     {
       //SdxTestデータベースをDROPします
-      Sdx.Db.Adapter factory = new Sdx.Db.SqlServerAdapter();
+      Sdx.Db.Adapter.Base factory = new Sdx.Db.Adapter.SqlServer();
       var masterCon = factory.CreateConnection();
       String pwd = ConfigurationManager.AppSettings["SqlServerSaPwd"];
       masterCon.ConnectionString = "Server=.\\SQLEXPRESS;Database=master;User Id=sa;Password=" + pwd;
@@ -199,7 +189,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         createUserSql.ExecuteNonQuery();
       }
 
-      factory.ConnectionString = BaseDbTest.SqlServerConnectionString;
+      factory.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
       var con = factory.CreateConnection();
       using (con)
       {
@@ -252,7 +242,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
       });
     }
 
-    protected void ExecCommand(DbCommand command, Sdx.Db.Adapter adapter)
+    protected void ExecCommand(DbCommand command, Sdx.Db.Adapter.Base adapter)
     {
       using (var con = adapter.CreateConnection())
       {

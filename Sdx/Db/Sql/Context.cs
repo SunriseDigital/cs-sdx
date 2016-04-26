@@ -156,29 +156,60 @@ namespace Sdx.Db.Sql
     /// <see cref="Sql.Select"/>にこのテーブルのテーブル名付きカラムを複数追加します。
     /// エイリアスの付与はできません。
     /// </summary>
-    /// <param name="columns">Sdx.Adapter.Query.Expr[]|String[] 配列の中にExprを混ぜられるようにobjectなってます。</param>
+    /// <param name="columns">Expr|String|Select 配列の中に混ぜられるようにobjectなってます。</param>
     /// <returns></returns>
     public Context AddColumns(params object[] columns)
     {
       foreach (var column in columns)
       {
-        this.AddColumn(column);
+        this.Select.ColumnList.Add(new Column((dynamic)column, this.Name));
       }
       return this;
     }
 
-    /// <summary>
-    /// <see cref="Sql.Select"/>にこのテーブルのカラムを一つ追加します。
-    /// </summary>
-    /// <param name="columnName"></param>
-    /// <param name="alias"></param>
-    /// <returns></returns>
-    public Context AddColumn(object columnName, string alias = null)
+    public Context AddColumn(Select select, string alias = null)
     {
-      var column = new Column(columnName);
-      column.Alias = alias;
-      column.ContextName = this.Name;
-      this.Select.ColumnList.Add(column);
+      this.Select.ColumnList.Add(new Column(select, this.Name, alias));
+      return this;
+    }
+
+    public Context AddColumn(Expr expr, string alias = null)
+    {
+      this.Select.ColumnList.Add(new Column(expr, this.Name, alias));
+      return this;
+    }
+
+    public Context AddColumn(string columnName, string alias = null)
+    {
+      this.Select.ColumnList.Add(new Column(columnName, this.Name, alias));
+      return this;
+    }
+
+    public Context SetColumns(params object[] columns)
+    {
+      this.ClearColumns();
+      this.AddColumns(columns);
+      return this;
+    }
+
+    public Context SetColumn(Select subquery, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(subquery, alias);
+      return this;
+    }
+
+    public Context SetColumn(Expr expr, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(expr, alias);
+      return this;
+    }
+
+    public Context SetColumn(string columnName, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(columnName, alias);
       return this;
     }
 
@@ -218,6 +249,12 @@ namespace Sdx.Db.Sql
       }
     }
 
+    public Context WhereCall(Action<Condition> callback)
+    {
+      callback.Invoke(Where);
+      return this;
+    }
+
     /// <summary>
     /// <see cref="Sql.Select"/>にHAVING句を付与します。
     /// このプロパティー経由で付与されるHAVING句はカラム名にこの<see cref="Context"/>の名前が付与されます。
@@ -235,12 +272,25 @@ namespace Sdx.Db.Sql
     /// <summary>
     /// GROUP句を付与します。カラム名にこの<see cref="Context"/>の名前が付与されます。
     /// </summary>
-    /// <param name="columnName"></param>
+    /// <param name="expr"></param>
     /// <returns></returns>
-    public Context AddGroup(object columnName)
+    public Context AddGroup(Expr expr)
     {
-      var column = new Column(columnName);
-      column.ContextName = this.Name;
+      var column = new Column(expr, this.Name);
+      this.Select.GroupList.Add(column);
+      return this;
+    }
+
+    public Context AddGroup(string columnName)
+    {
+      var column = new Column(columnName, this.Name);
+      this.Select.GroupList.Add(column);
+      return this;
+    }
+
+    public Context AddGroup(Select select)
+    {
+      var column = new Column(select, this.Name);
       this.Select.GroupList.Add(column);
       return this;
     }
@@ -248,13 +298,30 @@ namespace Sdx.Db.Sql
     /// <summary>
     /// ORDER句を付与します。カラム名にこの<see cref="Context"/>の名前が付与されます。
     /// </summary>
-    /// <param name="columnName"></param>
+    /// <param name="expr"></param>
     /// <param name="order"></param>
     /// <returns></returns>
-    public Context AddOrder(object columnName, Order order)
+    public Context AddOrder(Expr expr, Order order)
     {
-      var column = new Column(columnName);
-      column.ContextName = this.Name;
+      var column = new Column(expr, this.Name);
+      column.Order = order;
+      this.Select.OrderList.Add(column);
+
+      return this;
+    }
+
+    public Context AddOrder(Select select, Order order)
+    {
+      var column = new Column(select, this.Name);
+      column.Order = order;
+      this.Select.OrderList.Add(column);
+
+      return this;
+    }
+
+    public Context AddOrder(string columnName, Order order)
+    {
+      var column = new Column(columnName, this.Name);
       column.Order = order;
       this.Select.OrderList.Add(column);
 

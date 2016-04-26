@@ -10,4 +10,4 @@
 
 ## Classes
 
-* [Record](Record.md)
+* [Record](Record.md) - ORMです。

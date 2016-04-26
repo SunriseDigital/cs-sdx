@@ -11,6 +11,8 @@ namespace Sdx.Html
 
     private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
 
+    private List<FormValue> bindedValues = new List<FormValue>();
+
     public Validation.Errors Errors { get; private set; }
 
     public FormElement(string name):this()
@@ -26,6 +28,17 @@ namespace Sdx.Html
     internal protected abstract FormValue CreateFormValue();
 
     internal protected abstract Tag CreateTag();
+
+    public IEnumerable<Validation.Validator> Validators
+    {
+      get
+      {
+        foreach(var dic in validators)
+        {
+          yield return (Validation.Validator)dic["validator"];
+        }
+      }
+    }
 
     public virtual string Name
     {
@@ -56,6 +69,7 @@ namespace Sdx.Html
       this.Value = this.CreateFormValue();
       this.Errors = new Validation.Errors();
       this.IsAllowEmpty = false;
+      this.IsSecret = false;
     }
 
     public FormValue Value { get; private set; }
@@ -72,8 +86,8 @@ namespace Sdx.Html
       {
         throw new InvalidOperationException("This element must have multiple value.");
       }
-      this.Value.Set(value);
-      this.BindValueToTag();
+
+      Bind<string>(value);
     }
 
     public void Bind(string[] value)
@@ -82,14 +96,36 @@ namespace Sdx.Html
       {
         throw new InvalidOperationException("This element must have single value.");
       }
-      this.Value.Set(value);
-      this.BindValueToTag();
+
+      Bind<string[]>(value);
+    }
+
+    //TODOこのジェネリックの使い方変じゃないか？
+    private void Bind<T>(T value)
+    {
+      Value.Set(value);
+      bindedValues.Add((FormValue)Value.Clone());
+
+      if (!IsSecret)
+      {
+        BindValueToTag();
+      }
+      else if (bindedValues.Count > 1 && !bindedValues[0].IsEmpty)
+      {
+        this.BindValueToTag();
+      }
     }
 
     public bool ExecValidators()
     {
       var result = true;
       this.Errors.Clear();
+
+      //bindされてtrue
+      if(bindedValues.Count == 0)
+      {
+        return true;
+      }
 
       if(this.IsAllowEmpty && this.Value.IsEmpty)
       {
@@ -103,7 +139,11 @@ namespace Sdx.Html
 
         validator.Errors = this.Errors;
         bool isValid;
-        if (this.Value.IsMultiple)
+        if(IsSecret && !bindedValues[0].IsEmpty && Value.IsEmpty)
+        {
+          isValid = true;
+        }
+        else if (this.Value.IsMultiple)
         {
           isValid = validator.IsValid(this.Value.ToArray());
         }
@@ -135,5 +175,11 @@ namespace Sdx.Html
 
       return this;
     }
+
+    public string Label { get; set; }
+
+    public bool IsSecret { get; set; }
+
+    public bool HasError { get { return Errors.Count > 0; } }
   }
 }

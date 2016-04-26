@@ -335,5 +335,15 @@ namespace Sdx.Html
 
       return newDictionary;
     }
+
+    public bool HasClass(string className)
+    {
+      if (!this.attrDictionary.ContainsKey("class"))
+      {
+        return false;
+      }
+
+      return this["class"].Contains(className);
+    }
   }
 }

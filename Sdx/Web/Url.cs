@@ -6,21 +6,26 @@ using System.Text.RegularExpressions;
 
 namespace Sdx.Web
 {
-  public class Url
+  public class Url : ICloneable
   {
     //コンストラクタ
     public Url(string urlStr)
     {
       Uri uri;
-      if(!urlStr.StartsWith("http"))
-      {
-        uri = new Uri("http://sdx.com" + urlStr);
-      }
-      else
+      if(urlStr.StartsWith("http"))
       {
         uri = new Uri(urlStr);
         this.Scheme = uri.Scheme;
         this.Domain = uri.Host;
+      }
+      else if(urlStr.StartsWith("//"))
+      {
+        uri = new Uri("http:" + urlStr);
+        this.Domain = uri.Host;
+      }
+      else
+      {
+        uri = new Uri("http://sdx.com" + urlStr);
       }
       
       this.ParamList = new List<Tuple<string,string>>();
@@ -212,6 +217,16 @@ namespace Sdx.Web
       {
         this.ParamCount[key] = 1;
       }
+    }
+
+    public object Clone()
+    {
+      var cloned = (Url)this.MemberwiseClone();
+
+      cloned.ParamList = new List<Tuple<string, string>>(this.ParamList);
+      cloned.ParamCount = new Dictionary<string, int>(this.ParamCount);
+
+      return cloned;
     }
   }
 }

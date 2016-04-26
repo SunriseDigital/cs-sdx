@@ -12,7 +12,7 @@ namespace Sdx.Db
   {
     private bool disposed = false;
 
-    public Adapter Adapter { get; private set; }
+    public Adapter.Base Adapter { get; private set; }
 
     private DbConnection DbConnection { get; set; }
 
@@ -39,7 +39,7 @@ namespace Sdx.Db
       }
     }
 
-    public Connection(Adapter adapter)
+    public Connection(Adapter.Base adapter)
     {
       this.Adapter = adapter;
       this.DbConnection = this.Adapter.Factory.CreateConnection();
@@ -283,6 +283,11 @@ namespace Sdx.Db
       }
     }
 
+    public List<Dictionary<string, object>> FetchDictionaryList(DbCommand command)
+    {
+      return FetchDictionaryList<object>(command);
+    }
+
     public List<Dictionary<string, T>> FetchDictionaryList<T>(DbCommand command)
     {
       return this.Fetch<List<Dictionary<string, T>>>(command, (reader) => {
@@ -303,6 +308,11 @@ namespace Sdx.Db
       });
     }
 
+    public List<KeyValuePair<object, object>> FetchKeyValuePairList(DbCommand command)
+    {
+      return FetchKeyValuePairList<object, object>(command);
+    }
+
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(DbCommand command)
     {
       return this.Fetch<List<KeyValuePair<TKey, TValue>>>(command, (reader) => {
@@ -320,6 +330,11 @@ namespace Sdx.Db
       });
     }
 
+    public List<object> FetchList(DbCommand command)
+    {
+      return FetchList<object>(command);
+    }
+
     public List<T> FetchList<T>(DbCommand command)
     {
       return this.Fetch<List<T>>(command, (reader) => {
@@ -332,6 +347,11 @@ namespace Sdx.Db
       });
     }
 
+    public object FetchOne(DbCommand command)
+    {
+      return FetchOne<object>(command);
+    }
+
     public T FetchOne<T>(DbCommand command)
     {
       return this.Fetch<T>(command, (reader) => {
@@ -342,6 +362,11 @@ namespace Sdx.Db
 
         return default(T);
       });
+    }
+
+    public Dictionary<string, object> FetchDictionary(DbCommand command)
+    {
+      return FetchDictionary<object>(command);
     }
 
     public Dictionary<string, T> FetchDictionary<T>(DbCommand command)
@@ -367,6 +392,11 @@ namespace Sdx.Db
       return command.Connection == this.DbConnection && command.Transaction == this.DbTransaction;
     }
 
+    public Dictionary<string, object> FetchDictionary(Sql.Select select)
+    {
+      return FetchDictionary<object>(select);
+    }
+
     public Dictionary<string, T> FetchDictionary<T>(Sql.Select select)
     {
       Dictionary<string, T> result;
@@ -376,6 +406,11 @@ namespace Sdx.Db
       }
 
       return result;
+    }
+
+    public object FetchOne(Sql.Select select)
+    {
+      return FetchOne<object>(select);
     }
 
     public T FetchOne<T>(Sql.Select select)
@@ -389,6 +424,11 @@ namespace Sdx.Db
       return result;
     }
 
+    public List<object> FetchList(Sql.Select select)
+    {
+      return FetchList<object>(select);
+    }
+
     public List<T> FetchList<T>(Sql.Select select)
     {
       List<T> result = null;
@@ -398,6 +438,11 @@ namespace Sdx.Db
       }
 
       return result;
+    }
+
+    public List<KeyValuePair<object, object>> FetchKeyValuePairList(Sql.Select select)
+    {
+      return FetchKeyValuePairList<object, object>(select);
     }
 
     public List<KeyValuePair<TKey, TValue>> FetchKeyValuePairList<TKey, TValue>(Sql.Select select)
@@ -411,6 +456,11 @@ namespace Sdx.Db
       return result;
     }
 
+    public List<Dictionary<string, object>> FetchDictionaryList(Sql.Select select)
+    {
+      return FetchDictionaryList<object>(select);
+    }
+
     public List<Dictionary<string, T>> FetchDictionaryList<T>(Sql.Select select)
     {
       List<Dictionary<string, T>> result = null;
@@ -422,19 +472,12 @@ namespace Sdx.Db
       return result;
     }
 
-    public T FetchRecord<T>(Sql.Select select) where T : Record, new()
+    public Record FetchRecord(Sql.Select select)
     {
-      var resultSet = this.FetchRecordSet<T>(select);
-
-      if (resultSet.Count == 0)
-      {
-        return null;
-      }
-
-      return resultSet[0];
+      return FetchRecord<Record>(select);
     }
 
-    public Record FetchRecord(Sql.Select select)
+    public T FetchRecord<T>(Sql.Select select) where T : Sdx.Db.Record
     {
       var resultSet = this.FetchRecordSet(select);
 
@@ -443,10 +486,15 @@ namespace Sdx.Db
         return null;
       }
 
-      return resultSet[0];
+      return (T)resultSet[0];
     }
 
     public Record FetchRecord(Sql.Select select, string contextName)
+    {
+      return FetchRecord<Record>(select, contextName);
+    }
+
+    public T FetchRecord<T>(Sql.Select select, string contextName) where T : Sdx.Db.Record
     {
       var resultSet = this.FetchRecordSet(select, contextName);
 
@@ -455,60 +503,33 @@ namespace Sdx.Db
         return null;
       }
 
-      return resultSet[0];
+      return (T)resultSet[0];
     }
 
     /// <summary>
     /// SQLを実行しRecordSetを生成して返します。
     /// </summary>
     /// <typeparam name="T">Recordのクラスを指定</typeparam>
+    /// TODO ↓このコメントは古い？ただ、このオプションが無いと同じテーブルを二つJOINした時にまとめられないのでは？調査する。
     /// <param name="contextName">
     /// １対多のJOINを行うと行数が「多」の行数になるが、指定したテーブル（エイリアス）名の主キーの値に基づいて一つのレコードにまとめます。
     /// 省略した場合、指定したRecordクラスのMetaからテーブル名を使用します。
     /// </param>
     /// <returns></returns>
-    public RecordSet<T> FetchRecordSet<T>(Sql.Select select) where T : Record, new()
-    {
-      var prop = typeof(T).GetProperty("Meta");
-      if (prop == null)
-      {
-        throw new NotImplementedException("Missing Meta property in " + typeof(T));
-      }
-
-      var meta = prop.GetValue(null, null) as TableMeta;
-      if (meta == null)
-      {
-        throw new NotImplementedException("Initialize TableMeta for " + typeof(T));
-      }
-
-      return FetchRecordSet<T>(select, meta.Name);
-    }
-
-    /// <summary>
-    /// RecordSetの基点となるテーブルは最初にAddFromされた<see cref="Context"/>です。
-    /// </summary>
-    /// <param name="select"></param>
-    /// <returns></returns>
-    public RecordSet<Record> FetchRecordSet(Select select)
+    public RecordSet FetchRecordSet(Sql.Select select)
     {
       var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
-
-      return FetchRecordSet<Record>(select, firstFrom.Name);
+      return FetchRecordSet(select, firstFrom.Name);
     }
 
-    public RecordSet<Record> FetchRecordSet(Select select, string contextName)
+    public RecordSet FetchRecordSet(Select select, string contextName)
     {
-      return FetchRecordSet<Record>(select, contextName);
-    }
-
-    private RecordSet<T> FetchRecordSet<T>(Select select, string contextName) where T : Record, new()
-    {
-      RecordSet<T> recordSet = null;
+      RecordSet recordSet = null;
       using (var command = select.Build())
       {
-        recordSet = this.Fetch<RecordSet<T>>(command, (reader) =>
+        recordSet = this.Fetch<RecordSet>(command, (reader) =>
         {
-          var resultSet = new RecordSet<T>();
+          var resultSet = new RecordSet();
           resultSet.Build(reader, select, contextName);
           return resultSet;
         });
@@ -529,91 +550,28 @@ namespace Sdx.Db
       }
     }
 
-    public void Save(Record record)
+    public int CountRow(Select select)
     {
-      if (record.IsDeleted)
+      Select clonedSel = null;
+
+      if (select.GroupList.Any())
       {
-        throw new InvalidOperationException("This record is already deleted.");
-      }
-
-      if (record.UpdatedValues.Count == 0)
-      {
-        return;
-      }
-
-      if (record.IsNew)
-      {
-        var insert = this.Adapter.CreateInsert();
-        insert.SetInto(record.OwnMeta.Name);
-
-        foreach (var columnValue in record.UpdatedValues)
-        {
-          insert.AddColumnValue(columnValue.Key, columnValue.Value);
-        }
-
-        this.Execute(insert);
-
-        //値を保存後も取得できるようにする
-        var newValues = new Dictionary<string, object>();
-        foreach (var columnValue in record.UpdatedValues)
-        {
-          var key = Record.BuildColumnAliasWithContextName(columnValue.Key, record.ContextName);
-          newValues[key] = columnValue.Value;
-        }
-
-        //保存に成功し、PkeyがNullだったらAutoincrementのはず。
-        //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
-        var pkey = record.OwnMeta.Pkeys[0];
-        var pkeyValue = record.GetValue(pkey);
-        if (pkeyValue == null)
-        {
-          var key = Record.BuildColumnAliasWithContextName(pkey, record.ContextName);
-          newValues[key] = this.FetchLastInsertId();
-        }
-
-        record.ValuesList.Add(newValues);
+        clonedSel = select.Adapter.CreateSelect();
+        clonedSel.AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
+        clonedSel.AddFrom(select, "_t");
       }
       else
       {
-        var update = this.Adapter.CreateUpdate();
-        update.SetTable(record.OwnMeta.Name);
-        foreach (var columnValue in record.UpdatedValues)
-        {
-          update.AddColumnValue(columnValue.Key, columnValue.Value);
-        }
-
-        record.AppendPkeyWhere(update.Where);
-
-        this.Execute(update);
-
-        //値を保存後も取得できるようにする
-        foreach (var row in record.ValuesList)
-        {
-          foreach (var columnValue in record.UpdatedValues)
-          {
-            var key = Record.BuildColumnAliasWithContextName(columnValue.Key, record.ContextName);
-            row[key] = columnValue.Value;
-          }
-        }
+        clonedSel = (Select)select.Clone();
+        clonedSel.ClearColumns().AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
+        clonedSel.OrderList.Clear();
       }
 
-      record.UpdatedValues.Clear();
-    }
+      //DBベンダーによって帰ってくる型がintだったりlongだったりします。
+      //いちいち型を識別してキャストするの面倒だったのでこんな感じに。
+      var count = FetchOne<string>(clonedSel);
 
-    public void Delete(Record record)
-    {
-      if (record.IsNew)
-      {
-        return;
-      }
-
-      var delete = this.Adapter.CreateDelete();
-      delete.From = record.OwnMeta.Name;
-      record.AppendPkeyWhere(delete.Where);
-
-      this.Execute(delete);
-
-      record.IsDeleted = true;
+      return Int32.Parse(count);
     }
   }
 }

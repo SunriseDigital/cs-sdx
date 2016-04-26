@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sdx.Util
 {
@@ -25,13 +26,42 @@ namespace Sdx.Util
     /// <summary>
     /// 文字列を指定した数(インデックス)から最後まで削除し末尾に代替テキストを挿入します
     /// </summary>
-    /// <param name="text">対象の文字列</param>
+    /// <param name="value">対象の文字列</param>
     /// <param name="max">文字数</param>
     /// <param name="substitute">最後に付ける文字列(デフォルトは「…」)</param>
     /// <returns>string カットされた文字列</returns>
-    public static string Truncate(string text, int max, string substitute = "…")
+    public static string Truncate(string value, int max, string substitute = "…")
     {
-      return text.Length <= max ? text : text.Substring(0, max) + substitute;
+      return value.Length <= max ? value : value.Substring(0, max) + substitute;
+    }
+
+    public static string ToCamelCase(string value)
+    {
+      if (string.IsNullOrEmpty(value))
+      {
+        return value;
+      }
+
+      return value
+          .Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
+          .Select(s => char.ToUpperInvariant(s[0]) + s.Substring(1, s.Length - 1))
+          .Aggregate(string.Empty, (s1, s2) => s1 + s2);
+    }
+
+    public static string RemoveFirstLines(string value, int linesCount)
+    {
+      var lines = Regex.Split(value, "\r\n|\r|\n").Skip(linesCount);
+      return string.Join(Environment.NewLine, lines.ToArray());
+    }
+
+    public static bool IsEmpty(string value)
+    {
+      return value == null || value == "";
+    }
+
+    public static string StandardizeLineBreak(string value)
+    {
+      return value.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine);
     }
   }
 }

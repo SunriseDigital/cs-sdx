@@ -17,7 +17,6 @@ namespace Sdx
 
     public string BaseDir { get; set; }
 
-
     public virtual Tree Get(string fileName)
     {
       return this.CreateTree(fileName, null, Encoding.GetEncoding("utf-8"));

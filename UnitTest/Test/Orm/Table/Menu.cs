@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Menu : Sdx.Db.Table
+  class Menu : Test.Db.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 
@@ -11,13 +11,9 @@ namespace Test.Orm.Table
     {
       Meta = new Sdx.Db.TableMeta(
         "menu",
-        new List<string>()
-        {
-          "id"
-        },
         new List<Column>()
         {
-          new Column("id"),
+          new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("name"),
           new Column("shop_id"),
         },

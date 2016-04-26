@@ -4,6 +4,8 @@
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,
+  login_id nvarchar(190),
+  password nvarchar(190),
   created_at datetime NOT NULL,
   CONSTRAINT pk_shop PRIMARY KEY CLUSTERED (id)
 );
@@ -13,6 +15,7 @@ CREATE TABLE area (
   name nvarchar(50),
   large_area_id int,
   code nvarchar(50) NOT NULL,
+  sequence int NOT NULL DEFAULT 0,
   CONSTRAINT pk_area PRIMARY KEY CLUSTERED (id),
   CONSTRAINT key_area_code UNIQUE NONCLUSTERED (code)
 );
@@ -78,7 +81,8 @@ CREATE TABLE shop_category (
 
 ALTER TABLE shop_category ADD CONSTRAINT fk_shop_category_shop_id
 　FOREIGN KEY (shop_id)
-　REFERENCES shop(id);
+　REFERENCES shop(id)
+  ON DELETE CASCADE;
 
 ALTER TABLE shop_category ADD CONSTRAINT fk_shop_category_category_id
 　FOREIGN KEY (category_id)

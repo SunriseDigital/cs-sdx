@@ -39,41 +39,72 @@ namespace Sdx.Html
       return this.elements.Values.GetEnumerator();
     }
 
-    public void Bind(NameValueCollection values)
+    public void Bind(params NameValueCollection[] collections)
     {
-      foreach(var name in values.AllKeys)
+      foreach (var values in collections)
       {
-        if(this.elements.ContainsKey(name))
+        foreach (var kv in elements)
         {
-          if (this.elements[name].Value.IsMultiple)
+          var elem = kv.Value;
+          var name = kv.Key;
+          var vals = values.GetValues(name);
+          if (elem.Value.IsMultiple)
           {
-            this.elements[name].Bind(values.GetValues(name));
+            if (vals == null)
+            {
+              elem.Bind(new string[] { });
+            }
+            else
+            {
+              elem.Bind(vals);
+            }
           }
           else
           {
-            var vals = values.GetValues(name);
-            if (vals.Length > 1)
+            if (vals == null)
             {
-              throw new InvalidOperationException(name + "element must have single value.");
+              elem.Bind("");
             }
-            this.elements[name].Bind(vals[0]);
+            else
+            {
+              if (vals.Length > 1)
+              {
+                throw new InvalidOperationException(name + "element must have single value.");
+              }
+              elem.Bind(vals[0]);
+            }
           }
         }
       }
     }
 
+    private bool? isValidCache = null;
+
     public bool ExecValidators()
     {
-      var result = true;
+      isValidCache = true;
       foreach(var kv in elements)
       {
         if(!kv.Value.ExecValidators())
         {
-          result = false;
+          isValidCache = false;
         }
       }
 
-      return result;
+      return (bool)isValidCache;
+    }
+
+    public bool IsValid
+    {
+      get
+      {
+        if(isValidCache == null)
+        {
+          throw new InvalidOperationException("Call ExecValidators before this.");
+        }
+
+        return (bool)isValidCache;
+      }
     }
 
     public T As<T>(string name) where T : FormElement
@@ -81,5 +112,46 @@ namespace Sdx.Html
       return (T)this[name];
     }
 
+    /// <summary>
+    /// Recordにセットする用のNameValueCollectionを生成する。
+    /// IsSecretの処理はここでやってます。
+    /// </summary>
+    /// <returns></returns>
+    public NameValueCollection ToNameValueCollection()
+    {
+      if(isValidCache != true)
+      {
+        throw new InvalidOperationException("Not pass validation yet.");
+      }
+
+      var result = new NameValueCollection();
+
+      foreach (var kv in elements)
+      {
+        var key = kv.Key;
+        var elem = kv.Value;
+
+        if (!(elem.IsSecret && elem.Value.IsEmpty))
+        {
+          foreach (var value in elem.Value)
+          {
+            result.Add(key, value);
+          }
+        }
+      }
+
+      return result;
+    }
+
+    public Collection.OrderedDictionary<string, Validation.Errors> Errors()
+    {
+      var result = new Collection.OrderedDictionary<string, Validation.Errors>();
+      foreach(var kv in elements)
+      {
+        result[kv.Key] = kv.Value.Errors;
+      }
+
+      return result;
+    }
   }
 }

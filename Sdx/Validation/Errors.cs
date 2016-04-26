@@ -27,26 +27,24 @@ namespace Sdx.Validation
       }
     }
 
-    public Html.HtmlBase Html
+    public Html.HtmlBase Html()
     {
-      get
+      if (this.errors.Count == 0)
       {
-        if(this.errors.Count == 0)
+        return new Html.RawText("");
+      }
+      else
+      {
+        var ul = new Html.Tag("ul");
+        ul.Attr.AddClass("sdx-has-error");
+        this.errors.ForEach(error =>
         {
-          return new Html.RawText("");
-        }
-        else
-        {
-          var ul = new Html.Tag("ul");
-          ul.Attr.AddClass("sdx-has-error");
-          this.errors.ForEach(error => {
-            var li = new Html.Tag("li");
-            li.AddHtml(new Html.RawText(error.Message));
-            ul.AddHtml(li);
-          });
+          var li = new Html.Tag("li");
+          li.AddHtml(new Html.RawText(error.Message));
+          ul.AddHtml(li);
+        });
 
-          return ul;
-        }
+        return ul;
       }
     }
 

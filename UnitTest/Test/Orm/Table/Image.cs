@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Image : Sdx.Db.Table
+  class Image : Test.Db.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 
@@ -11,13 +11,9 @@ namespace Test.Orm.Table
     {
       Meta = new Sdx.Db.TableMeta(
         "image",
-        new List<string>()
-        {
-          "id"
-        },
         new List<Column>()
         {
-          new Column("id"),
+          new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("path"),
         },
         new Dictionary<string, Relation>()

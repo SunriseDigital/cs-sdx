@@ -191,5 +191,30 @@ namespace Sdx.Collection
     {
       return this.dictionary.TryGetValue(key, out value);
     }
+
+    public TValue ItemAt(int index)
+    {
+      var key = list[index];
+      return dictionary[key];
+    }
+
+    public int FindIndex(Predicate<KeyValuePair<TKey, TValue>> match)
+    {
+      return list.FindIndex((key) => match(new KeyValuePair<TKey, TValue>(key, dictionary[key])));
+    }
+
+    public bool RemoveAt(int index)
+    {
+      if(list.Count <= index)
+      {
+        return false;
+      }
+
+      var key = list[index];
+      list.RemoveAt(index);
+      dictionary.Remove(key);
+
+      return true;
+    }
   }
 }

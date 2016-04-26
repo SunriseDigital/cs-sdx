@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Category : Sdx.Db.Table
+  class Category : Test.Db.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 
@@ -11,20 +11,16 @@ namespace Test.Orm.Table
     {
       Meta = new Sdx.Db.TableMeta(
         "category",
-        new List<string>()
-        {
-          "id"
-        },
         new List<Column>()
         {
-          new Column("id"),
+          new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("name"),
           new Column("code"),
         },
         new Dictionary<string, Relation>()
         {
           {
-            "shop_category",
+            "shop",
             new Relation(
               typeof(Test.Orm.Table.ShopCategory),
               "id",

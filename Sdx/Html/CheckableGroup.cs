@@ -52,6 +52,18 @@ namespace Sdx.Html
       }
     }
 
+    public void AddCheckable<T>(string key, string labelString = null) where T : Checkable, new()
+    {
+      var checkable = new T();
+      checkable.Tag.Attr["value"] = key;
+      AddCheckable(checkable, labelString);
+    }
+
+    public void AddCheckable<T>(KeyValuePair<string, string> pair) where T: Checkable, new()
+    {
+      AddCheckable<T>(pair.Key, pair.Value);
+    }
+
     public void AddCheckable(Checkable checkable, string labelString = null)
     {
       elements.Add(checkable);

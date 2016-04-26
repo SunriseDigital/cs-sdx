@@ -1,0 +1,8 @@
+﻿model:        Test.Orm.LargeArea
+
+page_name:    大エリア
+
+list:
+  display:
+    - label:     ID
+      column:    id

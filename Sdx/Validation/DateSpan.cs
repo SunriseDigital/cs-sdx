@@ -11,10 +11,27 @@ namespace Sdx.Validation
     public const string ErrorIsEarlier = "ErrorIsEarlier";
     public const string ErrorIsLater = "ErrorIsLater";
 
-    private DateTime? minDate;
-    private DateTime? maxDate;
 
-    public DateTime? Min
+    protected override string GetDefaultMessage(string errorType)
+    {
+      switch (errorType)
+      {
+        case ErrorInvalid:
+          return Sdx.I18n.GetString("日付を入力してください。");
+        case ErrorIsEarlier:
+          return Sdx.I18n.GetString("{0}以降の日付を入力してください。", ((System.DateTime)Min).ToString(DateFormat));
+        case ErrorIsLater:
+          return Sdx.I18n.GetString("{0}以前の日付を入力してください。", ((System.DateTime)Max).ToString(DateFormat));
+        default:
+          return null;
+      }
+    }
+
+
+    private System.DateTime? minDate;
+    private System.DateTime? maxDate;
+
+    public System.DateTime? Min
     {
       get
       {
@@ -27,7 +44,7 @@ namespace Sdx.Validation
       }
     }
 
-    public DateTime? Max
+    public System.DateTime? Max
     {
       get
       {
@@ -42,17 +59,17 @@ namespace Sdx.Validation
 
     public string DateFormat { get; private set; }
 
-    private DateTime? TruncateTime(DateTime? dateTime)
+    private System.DateTime? TruncateTime(System.DateTime? dateTime)
     {
       if(dateTime != null)
       {
-        dateTime = ((DateTime)dateTime).Date;
+        dateTime = ((System.DateTime)dateTime).Date;
       }
 
       return dateTime;
     }
 
-    public DateSpan(DateTime? min = null, DateTime? max = null, string dateFormat = null, string message = null): base(message)
+    public DateSpan(System.DateTime? min = null, System.DateTime? max = null, string dateFormat = null)
     {
       if (min == null && max == null)
       {
@@ -70,8 +87,8 @@ namespace Sdx.Validation
 
     protected override bool IsValidString(string value)
     {
-      DateTime targetDate;
-      if (!DateTime.TryParse(value, out targetDate))
+      System.DateTime targetDate;
+      if (!System.DateTime.TryParse(value, out targetDate))
       {
         this.AddError(ErrorInvalid);
         return false;
@@ -81,8 +98,7 @@ namespace Sdx.Validation
 
       if(this.Min != null)
       {
-        var min = (DateTime)this.Min;
-        this.SetPlaceholder("min", min.ToString(this.DateFormat));
+        var min = (System.DateTime)this.Min;
         if (min.CompareTo(targetDate) > 0)
         {
           this.AddError(ErrorIsEarlier);
@@ -92,8 +108,7 @@ namespace Sdx.Validation
 
       if(this.Max != null)
       {
-        var max = (DateTime)this.Max;
-        this.SetPlaceholder("max", max.ToString(this.DateFormat));
+        var max = (System.DateTime)this.Max;
         if (max.CompareTo(targetDate) < 0)
         {
           this.AddError(ErrorIsLater);

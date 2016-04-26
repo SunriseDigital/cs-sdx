@@ -9,8 +9,15 @@ namespace Sdx.Validation
   {
     public const string ErrorIsEmpty = "ErrorIsEmpty";
 
-    public NotEmpty(string message = null) : base(message)
+    protected override string GetDefaultMessage(string errorType)
     {
+      switch (errorType)
+      {
+        case ErrorIsEmpty:
+          return Sdx.I18n.GetString("必須項目です。");
+        default:
+          return null;
+      }
     }
 
     public override bool IsValid(IEnumerable<string> values)

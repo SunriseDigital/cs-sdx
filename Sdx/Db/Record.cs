@@ -5,11 +5,22 @@ using System.Text;
 using System.Data;
 
 using Sdx.Db.Sql;
+using System.Collections.Specialized;
+using System.Web.Script.Serialization;
 
 namespace Sdx.Db
 {
-  public class Record
+  public abstract class Record
   {
+    public static string AutoCreateDateColumn { get; set; }
+    public static string AutoUpdateDateColumn { get; set; }
+
+    static Record()
+    {
+      AutoCreateDateColumn = "created_at";
+      AutoUpdateDateColumn = "updated_at";
+    }
+
     private Dictionary<string, object> recordCache = new Dictionary<string, object>();
 
     internal string ContextName { get; set; }
@@ -82,20 +93,15 @@ namespace Sdx.Db
 
       if (IsNew)
       {
-        return null;
+        return DBNull.Value;
       }
 
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if(!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        return null;
+        return DBNull.Value;
       }
       var value = this.ValuesList[0][keyWithContext];
-
-      if(value is DBNull)
-      {
-        return null;
-      }
 
       return value;
     }
@@ -127,28 +133,38 @@ namespace Sdx.Db
       return this;
     }
 
-    public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Sdx.Db.Record
     {
       return this.GetRecord<T>(contextName, null, selectHook);
     }
 
-    public T GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    public T GetRecord<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Sdx.Db.Record
     {
-      var records = this.GetRecordSet<T>(contextName, connection, selectHook);
+      var records = this.GetRecordSet(contextName, connection, selectHook);
       if (records.Count == 0)
       {
         return null;
       }
 
-      return records[0];
+      return (T)records[0];
     }
 
-    public RecordSet<T> GetRecordSet<T>(string contextName, Action<Select> selectHook = null) where T : Record, new()
+    public Record GetRecord(string contextName, Action<Select> selectHook = null)
     {
-      return this.GetRecordSet<T>(contextName, null, selectHook);
+      return this.GetRecord<Record>(contextName, null);
     }
 
-    public RecordSet<T> GetRecordSet<T>(string contextName, Connection connection, Action<Select> selectHook = null) where T : Record, new()
+    public Record GetRecord(string contextName, Connection connection, Action<Select> selectHook = null)
+    {
+      return this.GetRecord<Record>(contextName, connection, selectHook);
+    }
+
+    public RecordSet GetRecordSet(string contextName, Action<Select> selectHook = null)
+    {
+      return this.GetRecordSet(contextName, null, selectHook);
+    }
+
+    public RecordSet GetRecordSet(string contextName, Connection connection, Action<Select> selectHook = null)
     {
       if (this.recordCache.ContainsKey(contextName))
       {
@@ -157,17 +173,17 @@ namespace Sdx.Db
           throw new ArgumentException("You must clear record cache, before use selectHook.");
         }
 
-        return (RecordSet<T>)this.recordCache[contextName];
+        return (RecordSet)this.recordCache[contextName];
       }
 
-      if (this.Select.HasContext(contextName)) //already joined
+      if (this.Select != null && this.Select.HasContext(contextName)) //already joined
       {
         if (selectHook != null)
         {
           throw new ArgumentException("You can't use selectHook, because already joined " + contextName + " context.");
         }
 
-        var resultSet = new RecordSet<T>();
+        var resultSet = new RecordSet();
         resultSet.Build(this.ValuesList, this.Select, contextName);
         //キャッシュする
         this.recordCache[contextName] = resultSet;
@@ -180,14 +196,13 @@ namespace Sdx.Db
           throw new ArgumentNullException("connection");
         }
 
-        var table = this.Select.Context(this.ContextName).Table;
-        if (table.OwnMeta.Relations.ContainsKey(contextName))
+        if (OwnMeta.Relations.ContainsKey(contextName))
         {
-          var relations = table.OwnMeta.Relations[contextName];
+          var relations = OwnMeta.Relations[contextName];
 
-          var sel = new Select(this.Select.Adapter);
+          var sel = connection.Adapter.CreateSelect();
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
-          sel.AddFrom((Table)Activator.CreateInstance(relations.TableType))
+          sel.AddFrom(relations.TableMeta.CreateTable())
             .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
 
           if (selectHook != null)
@@ -195,7 +210,7 @@ namespace Sdx.Db
             selectHook.Invoke(sel);
           }
 
-          RecordSet<T> resultSet = connection.FetchRecordSet<T>(sel);
+          RecordSet resultSet = connection.FetchRecordSet(sel);
 
           //キャッシュする
           this.recordCache[contextName] = resultSet;
@@ -234,31 +249,98 @@ namespace Sdx.Db
 
     public bool IsDeleted { get; internal set; }
 
-    public void SetValue(string columnName, object value)
+    private bool EqualsToCurrent(string columnName, object value)
+    {
+      var current = GetValue(columnName);
+      if(value == null)
+      {
+        return current == null;
+      }
+
+      if(current == null)
+      {
+        return value == null;
+      }
+
+      //DateTimeはミリ秒まで持っていてEquals更新していなくてもFalseを返し必ず更新されてしまうので秒までで比較します。
+      if(current is DateTime)
+      {
+        return current.ToString().Equals(value.ToString());
+      }
+
+      if(current is DBNull || value is DBNull)
+      {
+        return current == value;
+      }
+      
+      value = Convert.ChangeType(value, current.GetType());
+      return current.Equals(value);
+    }
+
+    /// <summary>
+    /// テーブルに存在しないカラムは無視されます。
+    /// NameValueCollectionにキーが存在しない場合は無視します。
+    /// </summary>
+    /// <param name="values"></param>
+    /// <param name="isRaw"><see cref="SetValue"/></param>
+    /// <returns></returns>
+    public Record SetValues(NameValueCollection values, bool isRaw = false)
+    {
+      var allKeys = values.AllKeys;
+      foreach (var column in OwnMeta.Columns)
+      {
+        if (allKeys.Contains(column.Name))
+        {
+          SetValue(column.Name, values[column.Name], isRaw);
+        }
+      }
+      return this;
+    }
+
+    /// <summary>
+    /// カラムにデータをセットする。nullあるいは空文字をセットした場合DbNullが入ります。
+    /// 空文字を保存したいときは`isRaw`にtrueを渡してください。
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <param name="value"></param>
+    /// <param name="isRaw">DbNullへの変換を行うかどうか</param>
+    public Record SetValue(string columnName, object value, bool isRaw = false)
     {
       this.OwnMeta.CheckColumn(columnName);
-      if(!value.Equals(this.GetValue(columnName)))
+
+      if (!isRaw)
+      {
+        if (value == null || value.ToString() == "")
+        {
+          value = DBNull.Value;
+        }
+      }
+
+      if (!EqualsToCurrent(columnName, value))
       {
         this.UpdatedValues[columnName] = value;
       }
+
+      return this;
     }
 
     internal void AppendPkeyWhere(Condition where)
     {
-      if (this.OwnMeta.Pkeys.Count == 0)
+      //pkeyがなかったら例外
+      if (!OwnMeta.Pkeys.Any())
       {
         throw new InvalidOperationException("Missing Pkey data in " + this.OwnMeta.Name + " table");
       }
 
-      this.OwnMeta.Pkeys.ForEach(column =>
+      foreach(var column in OwnMeta.Pkeys)
       {
-        var value = this.GetValue(column);
+        var value = this.GetValue(column.Name);
         if (value == null)
         {
           throw new InvalidOperationException("Primary key " + column + " is null.");
         }
-        where.Add(column, value);
-      });
+        where.Add(column.Name, value);
+      }
     }
 
     public override string ToString()
@@ -284,6 +366,256 @@ namespace Sdx.Db
         .Append("}");
 
       return builder.ToString();
+    }
+
+    public void Bind(NameValueCollection collection)
+    {
+      this.OwnMeta.Columns.ForEach((column) => {
+        if(column.IsAutoIncrement)
+        {
+          return;
+        }
+        var value = collection[column.Name];
+        if (value != null)
+        {
+          this.SetValue(column.Name, value);
+        }
+      });
+    }
+
+    public NameValueCollection ToNameValueCollection()
+    {
+      var col = new NameValueCollection();
+      OwnMeta.Columns.ForEach((column) => {
+        var value = this.GetValue(column.Name);
+        if(value != null)
+        {
+          col.Add(column.Name, this.GetString(column.Name));
+        }
+      });
+
+      return col;
+    }
+
+    public T Get<T>(string path, Connection conn = null)
+    {
+      return (T)GetDynamic(path, conn);
+    }
+
+
+    /// <summary>
+    /// `.`で区切って深い階層のデータを取得可能。`@`はGetRecord、`#`はメソッドを検索、それ以外はカラムの取得を実行します。
+    /// メソッドに引数は渡せません。
+    /// e.g.
+    /// record.GetDynamic("@some_record.#GetSomeMethod.name"); = record.GetRecord("some_record").GetSomeMethod().GetValue("name");
+    /// </summary>
+    /// <param name="path"></param>
+    /// <param name="conn"></param>
+    /// <returns></returns>
+    public dynamic GetDynamic(string path, Connection conn = null)
+    {
+      dynamic result = this;
+      var chunk = path.Split('.');
+      foreach(var key in chunk)
+      {
+        //record
+        if (key.StartsWith("@"))
+        {
+          result = result.GetRecord(key.Substring(1), conn);
+        }
+        else if(key.StartsWith("#"))
+        {
+          var method = key.Substring(1);
+          System.Type type = result.GetType();
+          var methodInfo = type.GetMethods().FirstOrDefault(m => m.Name == method && !m.IsStatic);
+          if (methodInfo == null)
+          {
+            throw new NotImplementedException("Missing " + method + " method in " + GetType());
+          }
+
+          var paramsCount = methodInfo.GetParameters().Count();
+          if (paramsCount == 0)
+          {
+            result = methodInfo.Invoke(result, null);
+          }
+          else if (paramsCount == 1)
+          {
+            result = methodInfo.Invoke(result, new object[] { conn });
+          }
+          else
+          {
+            throw new NotSupportedException(method + "'s parameter must be nothing or Sdx.Db.Connection.");
+          }
+        }
+        else
+        {
+          result = result.GetValue(key);
+        }
+
+        if (result == null)
+        {
+          break;
+        }
+        
+      }
+      return result;
+    }
+
+    public Dictionary<string, object> GetPkeyValues()
+    {
+      var dic = new Dictionary<string, object>();
+      foreach (var column in OwnMeta.Pkeys)
+      {
+        dic[column.Name] = GetValue(column.Name);
+      }
+
+      return dic;
+    }
+
+    public bool IsNull(string columnName)
+    {
+      return GetValue(columnName) == DBNull.Value;
+    }
+
+    private bool NeedsAutoUpdate(string columnName)
+    {
+      if (columnName == null)
+      {
+        return false;
+      }
+
+      if (!OwnMeta.HasColumn(columnName))
+      {
+        return false;
+      }
+
+      var first = UpdatedValues.FirstOrDefault(kv => kv.Key == columnName);
+      if (first.Value == null)
+      {
+        return true;
+      }
+
+      if (first.Value.ToString() == "")
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    public void Save(Db.Connection conn)
+    {
+      if (IsDeleted)
+      {
+        throw new InvalidOperationException("This record is already deleted.");
+      }
+
+      if (IsNew)
+      {
+        var insert = conn.Adapter.CreateInsert();
+        insert.SetInto(OwnMeta.Name);
+
+        //自動登録日時更新
+        if (NeedsAutoUpdate(AutoCreateDateColumn))
+        {
+          SetValue(AutoCreateDateColumn, DateTime.Now);
+        }
+
+        //自動更新日時更新
+        if (NeedsAutoUpdate(AutoUpdateDateColumn))
+        {
+          SetValue(AutoUpdateDateColumn, DateTime.Now);
+        }
+
+        foreach (var columnValue in UpdatedValues)
+        {
+          insert.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        conn.Execute(insert);
+
+        //値を保存後も取得できるようにする
+        var newValues = new Dictionary<string, object>();
+        foreach (var columnValue in UpdatedValues)
+        {
+          var key = Record.BuildColumnAliasWithContextName(columnValue.Key, ContextName);
+          newValues[key] = columnValue.Value;
+        }
+
+        //AutoincrementのPkeyを取得できるようにしておく。
+        //Autoincrementは通常テーブルに１つしか作れないはず（MySQLとSQLServerはそうだった）
+        var firstPkey = OwnMeta.Pkeys.FirstOrDefault();
+        if (firstPkey != null)
+        {
+          var pkeyValue = GetValue(firstPkey.Name);
+          //保存に成功し、PkeyがNullだったらAutoincrementのはず。
+          //IsAutoincrementを見ると強引に挿入していることもあるので。
+          if (pkeyValue == DBNull.Value)
+          {
+            var key = Record.BuildColumnAliasWithContextName(firstPkey.Name, ContextName);
+            newValues[key] = conn.FetchLastInsertId();
+          }
+        }
+
+
+        ValuesList.Add(newValues);
+      }
+      else
+      {
+        if (UpdatedValues.Count == 0)
+        {
+          return;
+        }
+
+        var update = conn.Adapter.CreateUpdate();
+        update.SetTable(OwnMeta.Name);
+        foreach (var columnValue in UpdatedValues)
+        {
+          update.AddColumnValue(columnValue.Key, columnValue.Value);
+        }
+
+        AppendPkeyWhere(update.Where);
+
+        //自動更新日時更新
+        if (
+          UpdatedValues.Count > 0
+          &&
+          NeedsAutoUpdate(AutoUpdateDateColumn)
+        )
+        {
+          SetValue(AutoUpdateDateColumn, DateTime.Now);
+        }
+
+        conn.Execute(update);
+
+        //値を保存後も取得できるようにする
+        foreach (var row in ValuesList)
+        {
+          foreach (var columnValue in UpdatedValues)
+          {
+            var key = Record.BuildColumnAliasWithContextName(columnValue.Key, ContextName);
+            row[key] = columnValue.Value;
+          }
+        }
+      }
+
+      UpdatedValues.Clear();
+    }
+
+    public void Delete(Db.Connection conn)
+    {
+      if (IsNew)
+      {
+        return;
+      }
+
+      var delete = conn.Adapter.CreateDelete();
+      delete.From = OwnMeta.Name;
+      AppendPkeyWhere(delete.Where);
+
+      conn.Execute(delete);
+
+      IsDeleted = true;
     }
   }
 }

@@ -31,9 +31,22 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.8\lib\net40\MySql.Data.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NGettext, Version=0.5.0.0, Culture=neutral, PublicKeyToken=08d3d1c89dfd2985, processorArchitecture=MSIL">
+      <HintPath>..\packages\NGettext.0.5.0\lib\net40\NGettext.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -52,11 +65,12 @@
     <Compile Include="Data\Tree.cs" />
     <Compile Include="Data\TreeYaml.cs" />
     <Compile Include="Context.cs" />
-    <Compile Include="Db\Adapter.cs" />
+    <Compile Include="Db\Adapter\Base.cs" />
+    <Compile Include="Db\Adapter\Manager.cs" />
     <Compile Include="Db\Connection.cs" />
     <Compile Include="Db\DbException.cs" />
     <Compile Include="Db\Sql\INonQueryBuilder.cs" />
-    <Compile Include="Db\MySqlAdapter.cs" />
+    <Compile Include="Db\Adapter\MySql.cs" />
     <Compile Include="Db\Sql\Column.cs" />
     <Compile Include="Db\Sql\Condition.cs" />
     <Compile Include="Db\Sql\Context.cs" />
@@ -70,10 +84,11 @@
     <Compile Include="Db\Sql\Select.cs" />
     <Compile Include="Db\Record.cs" />
     <Compile Include="Db\RecordSet.cs" />
-    <Compile Include="Db\SqlServerAdapter.cs" />
+    <Compile Include="Db\Adapter\SqlServer.cs" />
     <Compile Include="Db\Sql\Update.cs" />
     <Compile Include="Db\Table.cs" />
     <Compile Include="Db\TableMeta.cs" />
+    <Compile Include="Diagnostics\Bench.cs" />
     <Compile Include="Diagnostics\Debug.cs" />
     <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
     <Compile Include="Diagnostics\DebugHttpModule.cs" />
@@ -86,6 +101,19 @@
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
     <Compile Include="Html\InputPassword.cs" />
+    <Compile Include="Html\PagerLink.cs" />
+    <Compile Include="I18n.cs" />
+    <Compile Include="Pager.cs" />
+    <Compile Include="Scaffold\Config\Value.cs" />
+    <Compile Include="Scaffold\Group\Base.cs" />
+    <Compile Include="Scaffold\Group\StaticClass.cs" />
+    <Compile Include="Scaffold\Group\TableMeta.cs" />
+    <Compile Include="Scaffold\Config\Item.cs" />
+    <Compile Include="Scaffold\Config\List.cs" />
+    <Compile Include="Util\Json.cs" />
+    <Compile Include="Util\Path.cs" />
+    <Compile Include="Validation\Date.cs" />
+    <Compile Include="Validation\DateTime.cs" />
     <Compile Include="Validation\DateTimeSpan.cs" />
     <Compile Include="Validation\DateSpan.cs" />
     <Compile Include="Validation\Email.cs" />
@@ -111,6 +139,8 @@
     <Compile Include="Validation\StringLength.cs" />
     <Compile Include="Validation\Validator.cs" />
     <Compile Include="Validation\Whitelist.cs" />
+    <Compile Include="Scaffold\Manager.cs" />
+    <Compile Include="Web\HttpErrorHandler.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />
     <Compile Include="Util\Datetime.cs" />
@@ -118,10 +148,10 @@
     <Compile Include="Util\String.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <EmbeddedResource Include="_locale\en\message.mo" />
     <None Include="packages.config" />
-    <EmbeddedResource Include="_resources\validation\messages\ja.yml" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

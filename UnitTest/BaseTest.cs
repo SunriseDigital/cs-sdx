@@ -9,6 +9,11 @@ using TestInitializeAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.Tes
 using TestCleanupAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute;
 #endif
 
+using System.Threading;
+using System.Globalization;
+using System.Web;
+using System.IO;
+
 namespace UnitTest
 {
   public class Fixture : IDisposable
@@ -40,7 +45,9 @@ namespace UnitTest
   {
     public BaseTest()
     {
+      Sdx.Context.Current.Timer.Start();
       Sdx.Context.Current.Debug.Out = Console.Out;
+      Test.Db.Adapter.SetupManager();
     }
 
     public void SetFixture(Fixture fixture)
@@ -68,7 +75,7 @@ namespace UnitTest
     
     virtual protected void SetUp()
     {
-
+      Thread.CurrentThread.CurrentCulture = new CultureInfo("ja-JP");
     }
 
     virtual protected void TearDown()
@@ -90,12 +97,23 @@ namespace UnitTest
 
     protected string HtmlLiner(string html)
     {
-      html = html.Replace(Environment.NewLine, "");
+      html = html.Replace("\r", "").Replace("\n", "");
 
       Regex re = new Regex("> +<", RegexOptions.Singleline);
       html = re.Replace(html, "><");
 
       return html.Trim();
+    }
+
+    protected void InitHttpContextMock(string queryString)
+    {
+      HttpContext.Current = new HttpContext(
+        new HttpRequest("", "http://wwww.example.com", queryString),
+        new HttpResponse(new StringWriter())
+      );
+
+      Sdx.Context.Current.Timer.Start();
+      Sdx.Context.Current.Debug.Out = Console.Out;
     }
   }
 }

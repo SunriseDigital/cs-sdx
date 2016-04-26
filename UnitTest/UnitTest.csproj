@@ -50,9 +50,9 @@
       <HintPath>..\packages\Moq.4.2.1510.2205\lib\net40\Moq.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="MySql.Data, Version=6.9.6.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+    <Reference Include="MySql.Data, Version=6.9.8.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
+      <HintPath>..\packages\MySql.Data.6.9.8\lib\net40\MySql.Data.dll</HintPath>
       <Private>True</Private>
-      <HintPath>..\packages\MySql.Data.6.9.6\lib\net40\MySql.Data.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -69,23 +69,35 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
-    <Compile Include="CollectionTest.cs" />
-    <Compile Include="ContextTest.cs" />
-    <Compile Include="DbConnectionTest.cs" />
-    <Compile Include="ConfigTest.cs" />
-    <Compile Include="DbSelectTest.cs" />
-    <Compile Include="DbRecordTest.cs" />
-    <Compile Include="DbSelectCloneTest.cs" />
-    <Compile Include="DbTableTest.cs" />
-    <Compile Include="DbUpdateTest.cs" />
-    <Compile Include="DiagnosticsTest.cs" />
+    <Compile Include="Sdx\Collection\OrderedDictionary.cs" />
+    <Compile Include="Sdx\Context.cs" />
+    <Compile Include="Sdx\Db\Adapter.cs" />
+    <Compile Include="Sdx\Db\Connection.cs" />
+    <Compile Include="Sdx\Config.cs" />
+    <Compile Include="Sdx\Db\Sql\Delete.cs" />
+    <Compile Include="Sdx\Db\Sql\Update.cs" />
+    <Compile Include="Sdx\Db\Sql\Select.cs" />
+    <Compile Include="Sdx\Db\Record.cs" />
+    <Compile Include="Sdx\Db\Table.cs" />
+    <Compile Include="Sdx\Db\Sql\Insert.cs" />
+    <Compile Include="Sdx\Diagnostics\Debug.cs" />
     <Compile Include="DummyClasses.cs" />
-    <Compile Include="HtmlTest.cs" />
+    <Compile Include="Sdx\Html\Tag.cs" />
+    <Compile Include="Sdx\Html\Attr.cs" />
+    <Compile Include="Sdx\Html\Form.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="BaseTest.cs" />
+    <Compile Include="Sdx\Pager.cs" />
+    <Compile Include="Sdx\Scaffold\Manager.cs" />
     <Compile Include="TestTemplate.cs" />
-    <Compile Include="Test\Validation\Numeric.cs" />
-    <Compile Include="UrlTest.cs" />
+    <Compile Include="Test\Data\LargeArea.cs" />
+    <Compile Include="Test\Db\Adapter.cs" />
+    <Compile Include="Test\Db\Table.cs" />
+    <Compile Include="Test\Route\LangRouteHandler.cs" />
+    <Compile Include="Test\Scaffold\Area.cs" />
+    <Compile Include="Test\Scaffold\LargeArea.cs" />
+    <Compile Include="Test\Scaffold\Shop.cs" />
+    <Compile Include="Sdx\Web\Url.cs" />
     <Compile Include="Test\Orm\LargeArea.cs" />
     <Compile Include="Test\Orm\Category.cs" />
     <Compile Include="Test\Orm\Image.cs" />
@@ -102,7 +114,7 @@
     <Compile Include="Test\Orm\Shop.cs" />
     <Compile Include="Test\Config\Dir.cs" />
     <Compile Include="Test\Config\Dir2.cs" />
-    <Compile Include="ValidationTest.cs" />
+    <Compile Include="Sdx\Validation\Validator.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -147,6 +159,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

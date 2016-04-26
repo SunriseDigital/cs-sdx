@@ -47,7 +47,7 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    internal Select(Adapter adapter)
+    internal Select(Adapter.Base adapter)
     {
       this.JoinOrder = JoinOrder.InnerFront;
       this.where = new Condition();
@@ -59,9 +59,9 @@ namespace Sdx.Db.Sql
       this.Adapter = adapter;
     }
 
-    private Adapter adapter;
+    private Adapter.Base adapter;
 
-    public Adapter Adapter
+    public Adapter.Base Adapter
     {
       get
       {
@@ -395,40 +395,55 @@ namespace Sdx.Db.Sql
     {
       foreach (var column in columns)
       {
-        this.AddColumnObject(column, null);
+        this.columns.Add(new Column((dynamic)column));
       }
       return this;
     }
 
-    public Select AddColumn(Select subquery, string alias = null)
+    public Select AddColumn(Select select, string alias = null)
     {
-      this.AddColumnObject(subquery, alias);
+      this.columns.Add(new Column(select, null, alias));
       return this;
     }
 
     public Select AddColumn(Expr expr, string alias = null)
     {
-      this.AddColumnObject(expr, alias);
+      this.columns.Add(new Column(expr, null, alias));
       return this;
     }
 
     public Select AddColumn(string columnName, string alias = null)
     {
-      this.AddColumnObject(columnName, alias);
+      this.columns.Add(new Column(columnName, null, alias));
       return this;
     }
 
-    /// <summary>
-    /// カラムを一つ追加します。
-    /// </summary>
-    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
-    /// <param contextName="alias"></param>
-    /// <returns></returns>
-    private void AddColumnObject(object columnName, string alias)
+    public Select SetColumns(params object[] columns)
     {
-      var column = new Column(columnName);
-      column.Alias = alias;
-      this.columns.Add(column);
+      this.ClearColumns();
+      this.AddColumns(columns);
+      return this;
+    }
+
+    public Select SetColumn(Select subquery, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(subquery, alias);
+      return this;
+    }
+
+    public Select SetColumn(Expr expr, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(expr, alias);
+      return this;
+    }
+
+    public Select SetColumn(string columnName, string alias = null)
+    {
+      this.ClearColumns();
+      this.AddColumn(columnName, alias);
+      return this;
     }
 
     internal bool AppendColumnString(StringBuilder builder, DbParameterCollection parameters, Counter condCount)
@@ -479,12 +494,32 @@ namespace Sdx.Db.Sql
       }
     }
 
+    public Select WhereCall(Action<Condition> callback)
+    {
+      callback.Invoke(Where);
+      return this;
+    }
+
     /// <summary>
     /// GROUP句を追加します。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
+    /// <param contextName="expr">Sdx.Adapter.Query.Expr|String</param>
     /// <returns></returns>
-    public Select AddGroup(object columnName)
+    public Select AddGroup(Expr expr)
+    {
+      var column = new Column(expr);
+      this.groups.Add(column);
+      return this;
+    }
+
+    public Select AddGroup(Select select)
+    {
+      var column = new Column(select);
+      this.groups.Add(column);
+      return this;
+    }
+
+    public Select AddGroup(string columnName)
     {
       var column = new Column(columnName);
       this.groups.Add(column);
@@ -524,10 +559,28 @@ namespace Sdx.Db.Sql
     /// <summary>
     /// ORDER句を追加します。繰り返しコールすると繰り返し追加します。
     /// </summary>
-    /// <param contextName="columnName">Sdx.Adapter.Query.Expr|String</param>
+    /// <param contextName="expr">Sdx.Adapter.Query.Expr|String</param>
     /// <param contextName="order"></param>
     /// <returns></returns>
-    public Select AddOrder(object columnName, Order order)
+    public Select AddOrder(Expr expr, Order order)
+    {
+      var column = new Column(expr);
+      column.Order = order;
+      orders.Add(column);
+
+      return this;
+    }
+
+    public Select AddOrder(Select select, Order order)
+    {
+      var column = new Column(select);
+      column.Order = order;
+      orders.Add(column);
+
+      return this;
+    }
+
+    public Select AddOrder(string columnName, Order order)
     {
       var column = new Column(columnName);
       column.Order = order;
@@ -569,5 +622,17 @@ namespace Sdx.Db.Sql
     }
 
     public bool ForUpdate { get; set; }
+
+
+    public void LimitPage(int page, int perPage)
+    {
+      Offset = perPage * (page - 1);
+      Limit = perPage;
+    }
+
+    public void LimitPager(Pager Pager)
+    {
+      LimitPage(Pager.Page, Pager.PerPage);
+    }
   }
 }

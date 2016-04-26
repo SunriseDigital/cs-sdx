@@ -13,5 +13,17 @@ namespace Test.Orm
     {
       Meta = Test.Orm.Table.Area.Meta;
     }
+
+    public void SetNameWithCode(string nameWithCode)
+    {
+      var chunk = nameWithCode.Split(',');
+      SetValue("name", chunk[0]);
+      SetValue("code", chunk[1]);
+    }
+
+    public string GetNameWithCode()
+    {
+      return GetString("name") + "," + GetString("code");
+    }
   }
 }
