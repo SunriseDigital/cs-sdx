@@ -16,7 +16,8 @@ using Sdx;
 using System.Collections;
 using Sdx.Scaffold.Config;
 using System.Collections.Generic;
-using Sdx.Data;
+using System.IO;
+using System.Text;
 
 namespace UnitTest
 {
@@ -26,32 +27,15 @@ namespace UnitTest
     [Fact]
     public void TestTreeJson()
     {
-      JsonTest data = new JsonTest();
-      data.FooString = "bar";
+      var fs = new FileStream("../../config/test.json", FileMode.Open);
+      var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
+      //Sdx.Data.Tree tree = new Sdx.Data.TreeJson();
+      //tree.Load(input);
 
-      List<string> jsonList = new List<string>();
-      jsonList.Add("aaa");
-      jsonList.Add("bbb");
-      jsonList.Add("ccc");
-      data.FooList = jsonList;
 
-      Dictionary<string, string> dic = new Dictionary<string, string>();
-      dic.Add("name", "hoge");
-      dic.Add("ddd", "eee");
-      data.FooDic = dic;
+      //Assert.Equal("hoge", tree.Get("hoge"));
 
-      Sdx.Data.Json json = new Sdx.Data.Json(Sdx.Util.Json.Encoder(data));
-
-      Assert.Equal(json.ToValue("Foo"), "bar");
-      List<string> list = json.ToList("FooList");
-      Assert.Equal(list[0], "aaa");
+      //Assert.Equal("hoge", tree.Get("hoge"));
     }
-
-  }
-  public class JsonTest
-  {
-    public string FooString { get; set; }
-    public List<string> FooList { get; set; }
-    public Dictionary<string, string> FooDic { get; set; }
   }
 }

@@ -128,6 +128,7 @@
     <None Include="config\sjis.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="config\test.json" />
     <None Include="config\test.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
