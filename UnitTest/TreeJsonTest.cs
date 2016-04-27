@@ -29,13 +29,12 @@ namespace UnitTest
     {
       var fs = new FileStream("../../config/test.json", FileMode.Open);
       var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
-      //Sdx.Data.Tree tree = new Sdx.Data.TreeJson();
-      //tree.Load(input);
+      Sdx.Data.Tree tree = new Sdx.Data.TreeJson();
+      tree.Load(input);
 
 
-      //Assert.Equal("hoge", tree.Get("hoge"));
-
-      //Assert.Equal("hoge", tree.Get("hoge"));
+      Assert.Equal("hoge", tree.Get("hoge").Value);
+      Assert.Equal("orange", tree.Get("level1").Get("level2.apple").Value);
     }
   }
 }
