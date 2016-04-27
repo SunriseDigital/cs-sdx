@@ -29,7 +29,6 @@ namespace UnitTest
     {
       var fs = new FileStream("../../config/test.json", FileMode.Open);
       var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
-      Console.WriteLine(input);
       Sdx.Data.Tree tree = new Sdx.Data.TreeJson();
       tree.Load(input);
 

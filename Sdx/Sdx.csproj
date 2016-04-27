@@ -63,6 +63,7 @@
     <Compile Include="Collection\OrderedDictionary.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Data\Tree.cs" />
+    <Compile Include="Data\TreeJson.cs" />
     <Compile Include="Data\TreeYaml.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Db\Adapter\Base.cs" />
