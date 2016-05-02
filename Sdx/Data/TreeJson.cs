@@ -64,22 +64,22 @@ namespace Sdx.Data
         {
           this.BaseJson = JArray.Parse(Json.BaseJson.ToString());
 
-        }       
+        }
       }
-      
+
       return Json;
     }
 
     protected override bool Exsits(List<string> paths)
     {
+      var jobject = JObject.Parse(this.BaseJson.ToString());
+
       foreach (var item in paths)
       {
-        var jobject = JObject.Parse(this.BaseJson.ToString());
-
-        //if ()
-        //{
-        //  return false;
-        //}
+        if (jobject.GetValue(item) == null)
+        {
+          return false;
+        }
       }
 
       return true;

@@ -31,10 +31,10 @@ namespace UnitTest
       var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
       Sdx.Data.Tree tree = new Sdx.Data.TreeJson();
       tree.Load(input);
-      
+
       Assert.Equal("hoge", tree.Get("hoge").Value);
       Assert.Equal("orange", tree.Get("level1").Get("level2").Get("apple").Value);
-      
+
       var list = tree.Get("level1").Get("array");
       Assert.Equal("12", list[0].Value);
 
