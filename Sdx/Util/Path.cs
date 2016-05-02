@@ -63,5 +63,10 @@ namespace Sdx.Util
         return path;
       }
     }
+
+    public static string MapWebPath(string fullFilePath)
+    {
+      return fullFilePath.Replace(HttpContext.Current.Server.MapPath("~/"), @"\").Replace(@"\", "/");
+    }
   }
 }

@@ -202,5 +202,6 @@ FakesAssemblies/
 ### sdx original
 
 UnitTest/xunit/*
+web/tmp/*
 
 !.gitkeep
