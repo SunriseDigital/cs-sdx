@@ -40,6 +40,9 @@ namespace UnitTest
 
       var jobs = tree.Get("jobs");
       Assert.Equal("0", jobs[0].Get("id").Value);
+
+      Assert.False(tree.Get("level1").Get("level2").Exsits("orange"));
+      Assert.True(tree.Get("level1").Exsits("level2"));
     }
   }
 }
