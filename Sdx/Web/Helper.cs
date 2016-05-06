@@ -12,8 +12,16 @@ namespace Sdx.Web
   {
     public static void JsonResponse(object values)
     {
-      //TODO IEの対応
-      Response.ContentType = "application/json; charset=utf-8";
+      //IEがapplication/jsonに対応していないので
+      if (Request.Headers["Accept"].Contains("application/json"))
+      {
+        Response.ContentType = "application/json; charset=utf-8";
+      }
+      else
+      {
+        Response.ContentType = "text/plain; charset=utf-8";
+      }
+
       Response.Write(Sdx.Util.Json.Encoder(values));
     }
 

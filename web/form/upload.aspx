@@ -14,13 +14,14 @@
 <body>
     <form id="form1" runat="server">
     <div>
-    <input id="fileupload" type="file" name="files" data-url="upload-point.aspx?foo=bar" multiple>
+    <input id="fileupload" type="file" name="files" data-url="upload-point.aspx" multiple>
     <script>
       $(function () {
         $('#fileupload').fileupload({
           dataType: 'json',
           singleFileUploads: false,
-          sequentialUploads: true
+          sequentialUploads: true,
+          limitMultiFileUploadSize: 4096 * 1024
         }).bind("fileuploaddone", function (e, data) {
           $.each(data.result.files, function (index, file) {
             $('<img style="width: 100px;"/>').attr("src", file.name).appendTo(document.body);
@@ -36,6 +37,12 @@
           } catch (e) {
             alert("サーバーエラーです。")
           }
+        }).bind('fileuploadprogress', function (e, data) {
+          var progress = parseInt(data.loaded / data.total * 100, 10);
+          //console.log('fileuploadprogress', progress);
+        }).bind('fileuploadprogressall', function (e, data) {
+          var progress = parseInt(data.loaded / data.total * 100, 10);
+          //console.log('fileuploadprogressall', progress);
         })
       });
     </script>
