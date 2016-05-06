@@ -22,7 +22,12 @@ namespace Sdx.Data
     {
       if (this.BaseJson == null)
       {
-        throw new InvalidCastException("This is root node.");
+        throw new InvalidCastException("Load before this.");
+      }
+
+      if (this.BaseJson.Type == JTokenType.Object)
+      {
+        throw new InvalidCastException("This is not String");
       }
 
       return this.BaseJson.ToString();
@@ -46,7 +51,6 @@ namespace Sdx.Data
         var row = new TreeJson();
         row.BaseJson = item;
         list.Add(row);
-
       }
 
       return list;
@@ -54,35 +58,32 @@ namespace Sdx.Data
 
     protected override Tree BuildTree(List<string> paths)
     {
-      var Json = new Sdx.Data.TreeJson();
-      var jobject = JObject.Parse(this.BaseJson.ToString());
+      var TreeJson = new Sdx.Data.TreeJson();
+      var target = JObject.Parse(this.BaseJson.ToString());
 
       foreach (var item in paths)
       {
-        Json.BaseJson = jobject.GetValue(item);
-        if (Json.BaseJson.Type == JTokenType.Array)
-        {
-          this.BaseJson = JArray.Parse(Json.BaseJson.ToString());
-
-        }
+        TreeJson.BaseJson = target.GetValue(item);
       }
 
-      return Json;
+      return TreeJson;
     }
 
     protected override bool Exsits(List<string> paths)
     {
-      var jobject = JObject.Parse(this.BaseJson.ToString());
+      JObject jobject = JObject.Parse(this.BaseJson.ToString());
+
+      var target = jobject.ToObject<Dictionary<string, object>>();
 
       foreach (var item in paths)
       {
-        if (jobject.GetValue(item) == null)
+        if (target.ContainsKey(item))
         {
-          return false;
+          return true;
         }
       }
 
-      return true;
+      return false;
     }
   }
 }
