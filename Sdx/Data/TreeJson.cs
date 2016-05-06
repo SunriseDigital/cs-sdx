@@ -22,7 +22,7 @@ namespace Sdx.Data
     {
       if (this.BaseJson == null)
       {
-        throw new InvalidCastException("Load before this.");
+        throw new InvalidOperationException("Load before this.");
       }
 
       if (this.BaseJson.Type == JTokenType.Object)
