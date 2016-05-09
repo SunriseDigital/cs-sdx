@@ -59,31 +59,34 @@ namespace Sdx.Data
     protected override Tree BuildTree(List<string> paths)
     {
       var TreeJson = new Sdx.Data.TreeJson();
-      var target = JObject.Parse(this.BaseJson.ToString());
+      var target = this.BaseJson;            
 
       foreach (var item in paths)
       {
-        TreeJson.BaseJson = target.GetValue(item);
+        target = target.SelectToken(item);
       }
 
+      TreeJson.BaseJson = target;
       return TreeJson;
     }
 
     protected override bool Exsits(List<string> paths)
     {
-      JObject jobject = JObject.Parse(this.BaseJson.ToString());
-
-      var target = jobject.ToObject<Dictionary<string, object>>();
+      var target = this.BaseJson;
 
       foreach (var item in paths)
       {
-        if (target.ContainsKey(item))
+        if (target.SelectToken(item) == null)
         {
-          return true;
+          return false;
+        }
+        else
+        {
+          target = target.SelectToken(item);
         }
       }
-
-      return false;
+      
+      return true;
     }
   }
 }

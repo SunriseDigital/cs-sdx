@@ -43,6 +43,19 @@ namespace UnitTest
 
       Assert.False(tree.Get("level1").Get("level2").Exsits("orange"));
       Assert.True(tree.Get("level1").Exsits("level2"));
+
+      Assert.Equal("日本語", tree.Get("level1.level2").Get("japanese").Value);
+      Assert.Equal("日本語", tree.Get("level1.level2.japanese").Value);
+
+      Assert.False(tree.Exsits("level1.level2.english"));
+
+      Assert.False(tree.Exsits("level1.level3.japanese"));
+
+      Assert.True(tree.Get("level1").Exsits("level2.japanese"));
+
+      Assert.True(tree.Exsits("fuga.file"));
+
+      Assert.False(tree.Exsits("level1.level2.japanese.aaa"));
     }
   }
 }
