@@ -110,7 +110,7 @@ namespace Sdx.Scaffold
       else
       {
         method = TableMeta.TableType.GetMethod(
-          "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Element"
+          "Create" + Sdx.Util.String.ToCamelCase(config.Name) + "Element"
         );
       }
 
@@ -159,7 +159,6 @@ namespace Sdx.Scaffold
       var form = new Html.Form();
 
       var bind = new NameValueCollection();
-      //var hasGetters = new List<Config.Item>();
       foreach (var config in FormList)
       {
         var elem = CreateFormElement(form, config, record, conn);
@@ -177,7 +176,7 @@ namespace Sdx.Scaffold
         else
         {
           method = TableMeta.TableType.GetMethod(
-            "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Validators"
+            "Create" + Sdx.Util.String.ToCamelCase(config.Name) + "Validators"
           );
         }
 
@@ -202,10 +201,10 @@ namespace Sdx.Scaffold
             throw new InvalidOperationException("Illegal parameter count for " + method);
           }
         }
-        else if (config.ContainsKey("column"))
+        else
         {
-          var columnName = config["column"].ToString();
-          var column = TableMeta.Columns.Find(c => c.Name == columnName);
+          //Auto validator
+          var column = TableMeta.Columns.Find(c => c.Name == config.Name);
           if (column != null)
           {
             column.AppendValidators(elem, record);
@@ -221,10 +220,25 @@ namespace Sdx.Scaffold
         //FormにDBから戻す値を生成
         if (config.ContainsKey("getter"))
         {
-          bind.Set(
-            config["column"].ToString(),
-            (string)config["getter"].Invoke(record.GetType(), record, null)
-          );
+          var value = config["getter"].Invoke(record.GetType(), record, null);
+          if (value is string)
+          {
+            bind.Set(
+              config["column"].ToString(),
+              (string)value
+            );
+          }
+          else
+          {
+            foreach(var val in (string[]) value)
+            {
+              bind.Add(
+                config["column"].ToString(),
+                (string)value                
+              );
+            }
+          }
+
         }
         else if(config.ContainsKey("relation"))
         {
@@ -382,7 +396,7 @@ namespace Sdx.Scaffold
       var relationList = new Config.List();
       foreach (var config in FormList)
       {
-        var columnName = config["column"].ToString();
+        var columnName = config.Name;
         if (config.ContainsKey("relation"))
         {
           relationList.Add(config);
@@ -391,13 +405,25 @@ namespace Sdx.Scaffold
         {
           if (values[columnName] != null)
           {
+            List<object> args = new List<object>();
             if (config.ContainsKey("setter"))
             {
-              config["setter"].Invoke(
-                record.GetType(),
-                record,
-                new object[] { values[columnName] }
-              );
+              if (config.ContainsKey("multiple") && config["multiple"].ToBool())
+              {
+                args.Add(values.GetValues(columnName));
+              }
+              else
+              {
+                args.Add(values[columnName]);
+              }
+
+              var methodInfo = config["setter"].ToMethodInfo(record.GetType());
+              if (methodInfo.GetParameters().Count() == 2)
+              {
+                args.Add(values);
+              }
+
+              methodInfo.Invoke(record, args.ToArray());
             }
             else
             {

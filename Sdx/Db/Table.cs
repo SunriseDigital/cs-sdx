@@ -106,7 +106,7 @@ namespace Sdx.Db
       public List<Validation.Validator> CreateValidatorList(Record record)
       {
         var list = new List<Validation.Validator>();
-        if(IsNotNull)
+        if (IsNotNull)
         {
           //AutoFillでも編集時はNotEmptyをつける
           if (IsAutoFill && !record.IsNew)

@@ -93,6 +93,10 @@
     <Compile Include="Test\Data\LargeArea.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
     <Compile Include="Test\Db\Table.cs" />
+    <Compile Include="Test\Orm\ShopImage.cs" />
+    <Compile Include="Test\Orm\ShopImageType.cs" />
+    <Compile Include="Test\Orm\Table\ShopImage.cs" />
+    <Compile Include="Test\Orm\Table\ShopImageType.cs" />
     <Compile Include="Test\Route\LangRouteHandler.cs" />
     <Compile Include="Test\Scaffold\Area.cs" />
     <Compile Include="Test\Scaffold\LargeArea.cs" />
@@ -115,6 +119,7 @@
     <Compile Include="Test\Config\Dir.cs" />
     <Compile Include="Test\Config\Dir2.cs" />
     <Compile Include="Sdx\Validation\Validator.cs" />
+    <Compile Include="Test\Scaffold\ShopImage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

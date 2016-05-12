@@ -10,6 +10,23 @@
   PRIMARY KEY (id)
 );
 
+CREATE TABLE shop_image (
+  shop_id int,
+  shop_image_type_id int,
+  path varchar(255) NOT NULL,
+  created_at datetime NOT NULL,
+  PRIMARY KEY(shop_id, shop_image_type_id)
+);
+
+CREATE TABLE shop_image_type (
+  id int NOT NULL AUTO_INCREMENT,
+  name varchar(50),
+  PRIMARY KEY (id)
+);
+
+ALTER TABLE shop_image ADD FOREIGN KEY (shop_id) REFERENCES shop(id);
+ALTER TABLE shop_image ADD FOREIGN KEY (shop_image_type_id) REFERENCES shop_image_type(id);
+
 CREATE TABLE area (
   id int NOT NULL AUTO_INCREMENT,
   name varchar(50),

@@ -430,7 +430,7 @@ namespace Sdx.Db
           var methodInfo = type.GetMethods().FirstOrDefault(m => m.Name == method && !m.IsStatic);
           if (methodInfo == null)
           {
-            throw new NotImplementedException("Missing " + method + " method in " + GetType());
+            throw new NotImplementedException("Missing " + method + " method in " + result.GetType());
           }
 
           var paramsCount = methodInfo.GetParameters().Count();
@@ -488,7 +488,7 @@ namespace Sdx.Db
       {
         return false;
       }
-
+      
       var first = UpdatedValues.FirstOrDefault(kv => kv.Key == columnName);
       if (first.Value == null)
       {

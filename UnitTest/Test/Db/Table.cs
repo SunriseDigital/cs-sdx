@@ -15,7 +15,7 @@ namespace Test.Db
       {
         context.AddOrder("sequence", Sdx.Db.Sql.Order.DESC);
       }
-      else
+      else if(OwnMeta.HasColumn("id"))
       {
         context.AddOrder("id", Sdx.Db.Sql.Order.ASC);
       }

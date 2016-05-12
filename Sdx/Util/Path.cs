@@ -66,6 +66,7 @@ namespace Sdx.Util
 
     public static string MapWebPath(string fullFilePath)
     {
+      //TODO WebPathが含まれていなかったら例外。
       return fullFilePath.Replace(HttpContext.Current.Server.MapPath("~/"), @"\").Replace(@"\", "/");
     }
   }
