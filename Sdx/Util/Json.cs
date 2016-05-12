@@ -10,12 +10,15 @@ namespace Sdx.Util
   {
     public static string Encoder(object obj)
     {
-      return JsonConvert.SerializeObject(obj);
+      return "aa";
+      //return JsonConvert.SerializeObject(obj);
     }
 
     public static T Decode<T>(string json)
     {
-      return JsonConvert.DeserializeObject<T>(json);
+      Object o = new Object();
+      return (T)o;
+      //return JsonConvert.DeserializeObject<T>(json);
     }
   }
 }
