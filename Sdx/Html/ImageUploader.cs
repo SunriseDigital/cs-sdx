@@ -7,19 +7,27 @@ namespace Sdx.Html
 {
   public class ImageUploader : FormElement
   {
+    private Html.Tag wrapper;
     private Html.Tag listHtml;
     private Html.Tag buttonLabel;
     private Html.VoidTag inputFile;
 
     public ImageUploader():base()
     {
-      MaxCount = 1;
+      this.Init();    
     }
 
     public ImageUploader(string name)
       : base(name)
     {
+      this.Init();
+    }
 
+    private void Init()
+    {
+      Sdx.Context.Current.Debug.Log(this.wrapper);
+      MaxCount = 1;
+      MaxCountMessage = Sdx.I18n.GetString("%MaxCount%までアップロード可能です。以下の画像はアップロードされませんでした。");
     }
 
     protected internal override FormValue CreateFormValue()
@@ -29,25 +37,28 @@ namespace Sdx.Html
 
     protected internal override Tag CreateTag()
     {
-      var wrapper = new Sdx.Html.Tag("div");
-      wrapper.Attr.AddClass("sdx-image-uploader");
+      wrapper = new Sdx.Html.Tag("div", "sdx-image-uploader");
 
-      var button = new Sdx.Html.Tag("span");
+      var button = new Sdx.Html.Tag("span", "fileinput-button", "btn");
       wrapper.AddHtml(button);
-      button.Attr.AddClass("fileinput-button", "btn");
 
-      buttonLabel = new Sdx.Html.Tag("span");
+      buttonLabel = new Sdx.Html.Tag("span", "btn-label");
       button.AddHtml(buttonLabel);
-      buttonLabel.Attr.AddClass("btn-label");
 
-      inputFile = new Sdx.Html.VoidTag("input");
+      inputFile = new Sdx.Html.VoidTag("input", "input");
       button.AddHtml(inputFile);
-      inputFile.Attr.AddClass("input");
       inputFile.Attr["type"] = "file";
 
-      listHtml = new Sdx.Html.Tag("ul");
+      var progress = new Sdx.Html.Tag("div", "progress");
+      wrapper.AddHtml(progress);
+      var progressBar = new Sdx.Html.Tag("div", attr => {
+        attr.AddClass("progress-bar");
+        attr.SetStyle("width", "0%");
+      });
+      progress.AddHtml(progressBar);
+
+      listHtml = new Sdx.Html.Tag("ul", "list-inline", "images", "clearfix");
       wrapper.AddHtml(listHtml);
-      listHtml.Attr.AddClass("list-inline", "images", "clearfix");
 
       return wrapper;
     }
@@ -98,11 +109,11 @@ namespace Sdx.Html
     {
       get
       {
-        return inputFile.Attr["data-submit-name"];
+        return wrapper.Attr["data-submit-name"];
       }
       set
       {
-        inputFile.Attr["data-submit-name"] = value;
+        wrapper.Attr["data-submit-name"] = value;
         inputFile.Attr["name"] = value + "--file-input";
       }
     }
@@ -111,12 +122,12 @@ namespace Sdx.Html
     {
       get 
       {
-        return Int32.Parse(inputFile.Attr["data-max-count"]);
+        return Int32.Parse(wrapper.Attr["data-max-count"]);
       }
 
       set 
       {
-        inputFile.Attr["data-max-count"] = value.ToString();
+        wrapper.Attr["data-max-count"] = value.ToString();
         if(value > 1)
         {
           inputFile.Attr.Set("multiple");
@@ -132,11 +143,11 @@ namespace Sdx.Html
     {
       get
       {
-        return Int32.Parse(inputFile.Attr["data-thumb-width"]);
+        return Int32.Parse(wrapper.Attr["data-thumb-width"]);
       }
       set
       {
-        inputFile.Attr["data-thumb-width"] = value.ToString();
+        wrapper.Attr["data-thumb-width"] = value.ToString();
       }
     }
 
@@ -144,12 +155,25 @@ namespace Sdx.Html
     {
       set
       {
-        inputFile.Attr["data-delete-label"] = value;
+        wrapper.Attr["data-delete-label"] = value;
       }
 
       get
       {
-        return inputFile.Attr["data-delete-label"];
+        return wrapper.Attr["data-delete-label"];
+      }
+    }
+
+    public string MaxCountMessage
+    {
+      set
+      {
+        wrapper.Attr["data-max-count-message"] = value;
+      }
+
+      get
+      {
+        return wrapper.Attr["data-max-count-message"];
       }
     }
   }

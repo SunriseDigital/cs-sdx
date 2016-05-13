@@ -12,6 +12,20 @@ namespace Sdx.Html
       this.Attr = new Attr();
     }
 
+    public Tag(string tagName, params string[] classes)
+      : this(tagName)
+    {
+      this.Attr = new Attr();
+      this.Attr.AddClass(classes);
+    }
+
+    public Tag(string tagName, Action<Attr> callback)
+      : this(tagName)
+    {
+      this.Attr = new Attr();
+      this.AttrCall(callback);
+    }
+
     public Tag AddHtml(HtmlBase html)
     {
       this.children.Add(html);

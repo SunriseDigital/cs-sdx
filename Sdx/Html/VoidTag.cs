@@ -12,6 +12,20 @@ namespace Sdx.Html
       this.Attr = new Attr();
     }
 
+    public VoidTag(string tagName, params string[] classes)
+      : this(tagName)
+    {
+      this.Attr = new Attr();
+      this.Attr.AddClass(classes);
+    }
+
+    public VoidTag(string tagName, Action<Attr> callback)
+      : this(tagName)
+    {
+      this.Attr = new Attr();
+      this.AttrCall(callback);
+    }
+
     public override string Render(Attr attribute = null)
     {
       var builder = new StringBuilder();
