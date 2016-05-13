@@ -224,7 +224,7 @@ namespace Sdx.Scaffold
           if (value is string)
           {
             bind.Set(
-              config["column"].ToString(),
+              config.Name,
               (string)value
             );
           }
@@ -233,8 +233,8 @@ namespace Sdx.Scaffold
             foreach(var val in (string[]) value)
             {
               bind.Add(
-                config["column"].ToString(),
-                (string)value                
+                config.Name,
+                (string)val                
               );
             }
           }

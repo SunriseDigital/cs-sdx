@@ -24,7 +24,7 @@ namespace Test.Orm
 
     public string[] GetImages()
     {
-      return new string[0];
+      return new string[1]{"/tmp/hogehoge.jpg"};
     }
   }
 }
