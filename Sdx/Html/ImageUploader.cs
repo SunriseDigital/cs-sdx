@@ -14,18 +14,17 @@ namespace Sdx.Html
 
     public ImageUploader():base()
     {
-      this.Init();    
+      this.InitDefaultValues();    
     }
 
     public ImageUploader(string name)
       : base(name)
     {
-      this.Init();
+      this.InitDefaultValues();
     }
 
-    private void Init()
+    private void InitDefaultValues()
     {
-      Sdx.Context.Current.Debug.Log(this.wrapper);
       MaxCount = 1;
       MaxCountMessage = Sdx.I18n.GetString("%MaxCount%までアップロード可能です。以下の画像はアップロードされませんでした。");
     }
