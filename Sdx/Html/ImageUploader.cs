@@ -11,6 +11,7 @@ namespace Sdx.Html
     private Html.Tag listHtml;
     private Html.Tag buttonLabel;
     private Html.VoidTag inputFile;
+    private Html.Tag serverImageWrapper;
 
     public ImageUploader():base()
     {
@@ -59,11 +60,15 @@ namespace Sdx.Html
       listHtml = new Sdx.Html.Tag("ul", "list-inline", "images", "clearfix");
       wrapper.AddHtml(listHtml);
 
+      serverImageWrapper = new Html.Tag("div");
+      wrapper.AddHtml(serverImageWrapper);
+
       return wrapper;
     }
 
     protected internal override void BindValueToTag()
     {
+      serverImageWrapper.Children.RemoveAll(tag => true);
       foreach (var val in Value)
       {
         if(val == "")
@@ -73,7 +78,7 @@ namespace Sdx.Html
         var hidden = new Sdx.Html.InputHidden();
         hidden.Tag.Attr["value"] = val;
         hidden.Tag.Attr.AddClass("server-images");
-        Tag.AddHtml(hidden.Tag);
+        serverImageWrapper.AddHtml(hidden.Tag);
       }
     }
 
@@ -81,13 +86,13 @@ namespace Sdx.Html
     {
       set
       {
-        buttonLabel.children.RemoveRange(0, buttonLabel.children.Count);
+        buttonLabel.Children.RemoveRange(0, buttonLabel.Children.Count);
         buttonLabel.AddChild(value);
       }
 
       get
       {
-        return buttonLabel.children[0];
+        return buttonLabel.Children[0];
       }
     }
 

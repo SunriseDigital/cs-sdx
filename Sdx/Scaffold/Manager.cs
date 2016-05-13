@@ -221,24 +221,23 @@ namespace Sdx.Scaffold
         if (config.ContainsKey("getter"))
         {
           var value = config["getter"].Invoke(record.GetType(), record, null);
-          if (value is string)
+          if (config.ContainsKey("multiple") && config["multiple"].ToBool())
+          {
+            foreach (var val in (string[])value)
+            {
+              bind.Add(
+                config.Name,
+                (string)val
+              );
+            }
+          }
+          else
           {
             bind.Set(
               config.Name,
               (string)value
             );
           }
-          else
-          {
-            foreach(var val in (string[]) value)
-            {
-              bind.Add(
-                config.Name,
-                (string)val                
-              );
-            }
-          }
-
         }
         else if(config.ContainsKey("relation"))
         {
@@ -546,7 +545,7 @@ namespace Sdx.Scaffold
           bindValues.Set(config["column"].ToString(), DateTime.Now.ToString());
         }
       }
-
+      
       form.Bind(bindValues);
     }
 

@@ -89,7 +89,7 @@ namespace Sdx.Html
       this.children.ForEach(action);
     }
 
-    public IEnumerable<HtmlBase> Children
+    public List<HtmlBase> Children
     {
       get
       {
