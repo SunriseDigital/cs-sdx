@@ -35,11 +35,11 @@ namespace UnitTest
       Assert.Equal("hoge", tree.Get("hoge").Value);
       Assert.Equal("orange", tree.Get("level1").Get("level2").Get("apple").Value);
 
-      var list = tree.Get("level1").Get("array");
-      Assert.Equal("12", list[0].Value);
+      //var list = tree.Get("level1").Get("array");
+      //Assert.Equal("12", list[0].Value);
 
-      var jobs = tree.Get("jobs");
-      Assert.Equal("0", jobs[0].Get("id").Value);
+      //var jobs = tree.Get("jobs");
+      //Assert.Equal("0", jobs[0].Get("id").Value);
 
       Assert.False(tree.Get("level1").Get("level2").Exsits("orange"));
       Assert.True(tree.Get("level1").Exsits("level2"));

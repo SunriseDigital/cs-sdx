@@ -41,7 +41,7 @@ namespace Sdx.Data
         throw new InvalidOperationException("Load before this.");
       }
 
-      if (BaseJson.GetType() != typeof(object[]))
+      if (!BaseJson.GetType().IsArray)
       {
         throw new InvalidCastException("Target is not List.");
       }
