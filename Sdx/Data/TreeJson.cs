@@ -41,11 +41,11 @@ namespace Sdx.Data
         throw new InvalidOperationException("Load before this.");
       }
 
-      if (!BaseJson.GetType().IsArray)
+      if (BaseJson.GetType() != typeof(object[]))
       {
         throw new InvalidCastException("Target is not List.");
       }
-
+      
       var list = new List<Tree>();
       foreach (var item in BaseJson)
       {
