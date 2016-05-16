@@ -48,6 +48,7 @@ namespace UnitTest
       Assert.Equal("日本語", tree.Get("level1.level2.japanese").Value);
 
       Assert.False(tree.Exsits("level1.level2.english"));
+      Assert.False(tree.Get("level1").Get("level2").Exsits("english"));
 
       Assert.False(tree.Exsits("level1.level3.japanese"));
 

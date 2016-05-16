@@ -41,10 +41,10 @@ namespace Sdx.Data
         throw new InvalidOperationException("Load before this.");
       }
 
-      //if (!BaseJson.GetType())
-      //{
-      //  throw new InvalidCastException("Target is not List.");
-      //}
+      if (!BaseJson.GetType().IsArray)
+      {
+        throw new InvalidCastException("Target is not List.");
+      }
 
       var list = new List<Tree>();
       foreach (var item in BaseJson)
@@ -65,13 +65,7 @@ namespace Sdx.Data
 
       foreach (var item in paths)
       {
-        if (TreeJson.BaseJson[item].GetType() != typeof(Dictionary<string, object>))
-        {
-          TreeJson.BaseJson = TreeJson.BaseJson[item];
-          break;
-        }
-
-        TreeJson.BaseJson = serializer.Deserialize<Dictionary<string, object>>(serializer.Serialize(TreeJson.BaseJson[item]));
+        TreeJson.BaseJson = serializer.Deserialize<dynamic>(serializer.Serialize(TreeJson.BaseJson[item]));
       }
 
       return TreeJson;
@@ -79,13 +73,18 @@ namespace Sdx.Data
 
     protected override bool Exsits(List<string> paths)
     {
+      var serializer = new JavaScriptSerializer();
       var target = BaseJson;
 
       foreach (var item in paths)
       {
+        if(target.GetType() == typeof(string)){
+          return false;
+        }
+
         if (target.ContainsKey(item))
         {
-          target = (Dictionary<string,object>)target[item];
+          target = target[item];
         }
         else
         {
