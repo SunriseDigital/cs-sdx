@@ -65,7 +65,8 @@ namespace Sdx.Data
 
       foreach (var item in paths)
       {
-        TreeJson.BaseJson = serializer.Deserialize<dynamic>(serializer.Serialize(TreeJson.BaseJson[item]));
+        var json = serializer.Serialize(TreeJson.BaseJson[item]);
+        TreeJson.BaseJson = serializer.Deserialize<dynamic>(json);
       }
 
       return TreeJson;
