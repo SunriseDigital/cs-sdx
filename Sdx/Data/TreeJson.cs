@@ -41,7 +41,7 @@ namespace Sdx.Data
         throw new InvalidOperationException("Load before this.");
       }
 
-      if (!BaseJson.GetType().IsArray)
+      if (BaseJson.GetType() != typeof(ArrayList))
       {
         throw new InvalidCastException("Target is not List.");
       }
@@ -65,8 +65,7 @@ namespace Sdx.Data
 
       foreach (var item in paths)
       {
-        var json = serializer.Serialize(TreeJson.BaseJson[item]);
-        TreeJson.BaseJson = serializer.Deserialize<dynamic>(json);
+        TreeJson.BaseJson = TreeJson.BaseJson[item];
       }
 
       return TreeJson;
