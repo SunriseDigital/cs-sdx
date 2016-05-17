@@ -143,6 +143,18 @@ namespace Sdx.Html
       }
     }
 
+    public int ThumbHeight
+    {
+      get
+      {
+        return Int32.Parse(wrapper.Attr["data-thumb-height"]);
+      }
+      set
+      {
+        wrapper.Attr["data-thumb-height"] = value.ToString();
+      }
+    }
+
     public int ThumbWidth
     {
       get
