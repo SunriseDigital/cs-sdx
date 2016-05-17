@@ -37,6 +37,26 @@ namespace Sdx.Db
       Init();
     }
 
+    /// <summary>
+    /// カラムが更新される直前に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueWillUpdate["someColumn"] = (prevValue, nextValue, isRaw) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object, bool>> ValueWillUpdate { get; private set; }
+
+    /// <summary>
+    /// カラムが更新された直後に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueDidUpdate["someColumn"] = (prevValue, nextValue) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object>> ValueDidUpdate { get; private set; }
+
+    /// <summary>
+    /// Save/Deleteのフック
+    /// </summary>
+    protected virtual void RecordWillSave(Connection conn) { }
+    protected virtual void RecordDidSave(Connection conn) { }
+    protected virtual void RecordWillDelete(Connection conn) { }
+    protected virtual void RecordDidDelete(Connection conn) { }
+
     protected virtual void Init()
     {
 
@@ -304,18 +324,6 @@ namespace Sdx.Db
       }
       return this;
     }
-
-    /// <summary>
-    /// カラムが更新される直前に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
-    /// ValueWillUpdate["someColumn"] = (prevValue, nextValue, isRaw) => {}
-    /// </summary>
-    protected Dictionary<string, Action<object, object, bool>> ValueWillUpdate { get; private set; }
-
-    /// <summary>
-    /// カラムが更新された直後に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
-    /// ValueDidUpdate["someColumn"] = (prevValue, nextValue) => {}
-    /// </summary>
-    protected Dictionary<string, Action<object, object>> ValueDidUpdate { get; private set; }
     
     /// <summary>
     /// カラムにデータをセットする。nullあるいは空文字をセットした場合DbNullが入ります。
@@ -541,6 +549,8 @@ namespace Sdx.Db
         throw new InvalidOperationException("This record is already deleted.");
       }
 
+      RecordWillSave(conn);
+
       if (IsNew)
       {
         var insert = conn.Adapter.CreateInsert();
@@ -631,6 +641,8 @@ namespace Sdx.Db
       }
 
       UpdatedValues.Clear();
+
+      RecordDidSave(conn);
     }
 
     public void Delete(Db.Connection conn)
@@ -640,6 +652,8 @@ namespace Sdx.Db
         return;
       }
 
+      RecordWillDelete(conn);
+
       var delete = conn.Adapter.CreateDelete();
       delete.From = OwnMeta.Name;
       AppendPkeyWhere(delete.Where);
@@ -647,6 +661,8 @@ namespace Sdx.Db
       conn.Execute(delete);
 
       IsDeleted = true;
+
+      RecordDidDelete(conn);
     }
 
     /// <summary>

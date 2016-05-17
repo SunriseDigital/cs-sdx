@@ -51,5 +51,21 @@ namespace Test.Orm
         //pathの画像はゴミになるので削除しておく。
       }
     }
+
+    protected override void RecordDidSave(Sdx.Db.Connection conn)
+    {
+      if(prevPath != null)
+      {
+        //差し替え画像なので削除
+      }
+    }
+
+    protected override void RecordDidDelete(Sdx.Db.Connection conn)
+    {
+      if(HasValue("path"))
+      {
+        //レコード削除なので画像も消す。
+      }
+    }
   }
 }
