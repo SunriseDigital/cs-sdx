@@ -32,6 +32,14 @@ namespace Sdx.Db
     {
       this.UpdatedValues = new Dictionary<string, object>();
       this.ValuesList = new List<Dictionary<string, object>>();
+      ValueWillUpdate = new Dictionary<string, Action<object, object, bool>>();
+      ValueDidUpdate = new Dictionary<string, Action<object, object>>();
+      Init();
+    }
+
+    protected virtual void Init()
+    {
+
     }
 
     public TableMeta OwnMeta
@@ -298,6 +306,18 @@ namespace Sdx.Db
     }
 
     /// <summary>
+    /// カラムが更新される直前に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueWillUpdate["someColumn"] = (prevValue, nextValue, isRaw) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object, bool>> ValueWillUpdate { get; private set; }
+
+    /// <summary>
+    /// カラムが更新された直後に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueDidUpdate["someColumn"] = (prevValue, nextValue) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object>> ValueDidUpdate { get; private set; }
+    
+    /// <summary>
     /// カラムにデータをセットする。nullあるいは空文字をセットした場合DbNullが入ります。
     /// 空文字を保存したいときは`isRaw`にtrueを渡してください。
     /// </summary>
@@ -306,6 +326,12 @@ namespace Sdx.Db
     /// <param name="isRaw">DbNullへの変換を行うかどうか</param>
     public Record SetValue(string columnName, object value, bool isRaw = false)
     {
+      var prevValue = GetValue(columnName);
+      if (ValueWillUpdate.ContainsKey(columnName))
+      {
+        ValueWillUpdate[columnName](prevValue, value, isRaw);
+      }
+
       this.OwnMeta.CheckColumn(columnName);
 
       if (!isRaw)
@@ -319,6 +345,11 @@ namespace Sdx.Db
       if (!EqualsToCurrent(columnName, value))
       {
         this.UpdatedValues[columnName] = value;
+      }
+
+      if (ValueDidUpdate.ContainsKey(columnName))
+      {
+        ValueDidUpdate[columnName](prevValue, GetValue(columnName));
       }
 
       return this;
@@ -616,6 +647,15 @@ namespace Sdx.Db
       conn.Execute(delete);
 
       IsDeleted = true;
+    }
+
+    /// <summary>
+    /// データベースがロールバックしたときにDB以外に元に戻したいものがある場合はオーバーライドしてください。
+    /// Scaffoldでは自動で呼ばれますが、独自の実装ではロールバック時に個別に呼び出す必要があります。
+    /// </summary>
+    public virtual void DisposeOnRollback()
+    {
+      
     }
   }
 }

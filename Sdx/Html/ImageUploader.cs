@@ -71,7 +71,7 @@ namespace Sdx.Html
       serverImageWrapper.Children.RemoveAll(tag => true);
       foreach (var val in Value)
       {
-        if(val == "")
+        if(val == "" || val == null)
         {
           continue;
         }

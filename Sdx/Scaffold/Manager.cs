@@ -296,15 +296,17 @@ namespace Sdx.Scaffold
     public Db.Record LoadRecord(NameValueCollection parameters, Sdx.Db.Connection conn)
     {
       var recordSet = FetchRecordSet(conn, (select) => {
-        var exists = false;
+        var exists = true;
         foreach (var column in TableMeta.Pkeys)
         {
           var values = parameters.GetValues(column.Name);
           if (values != null && values.Length > 0 && values[0].Length > 0)
           {
-            //TODO これはどっちか片っぽがあっただけでもtrueになるが問題ないのか？
-            exists = true;
             select.Where.Add(column.Name, values[0]);
+          }
+          else
+          {
+            exists = false;
           }
         }
 
@@ -554,6 +556,16 @@ namespace Sdx.Scaffold
     public string Heading(int rank)
     {
       return "h" + (OutlineRank + rank - 1).ToString();
+    }
+
+    public object GetEditPagePath(Sdx.Db.Record record)
+    {
+      //pkeyの一部でブルーピングされていたら、既にURLについているので取り除く。
+      return EditPageUrl.Build(
+        record.GetPkeyValues()
+          .Where(kv => kv.Key != Group.TargetColumnName)
+          .ToDictionary(kv => kv.Key, kv => kv.Value.ToString())
+      );
     }
   }
 }
