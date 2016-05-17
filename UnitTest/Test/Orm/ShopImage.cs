@@ -15,16 +15,15 @@ namespace Test.Orm
       Meta = Test.Orm.Table.ShopImage.Meta;
     }
 
-    public void SetTempPath(string[] values, NameValueCollection form)
+    public void SetTempPath(string value)
     {
-      Sdx.Context.Current.Debug.Log(values);
-      Sdx.Context.Current.Debug.Log(form);
-      this.SetValue("path", "", true);
+      this.SetValue("path", value + ".hoge");
     }
 
-    public string[] GetImages()
+    public string GetImageWebPath()
     {
-      return new string[0];
+      var path = GetString("path");
+      return path.Substring(0, path.Length - 5);
     }
   }
 }

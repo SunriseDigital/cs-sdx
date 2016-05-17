@@ -28,7 +28,7 @@ namespace Test.Scaffold
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("画像"))
-          .Set("html", new Sdx.Scaffold.Config.Value(@"<img src=""{#GetImageWebPath}"" />"))
+          .Set("html", new Sdx.Scaffold.Config.Value(@"<img src=""{#GetImageWebPath}"" width=""200px"" />"))
         )
         ;
 
@@ -42,12 +42,10 @@ namespace Test.Scaffold
           .Set("label", new Sdx.Scaffold.Config.Value("タイプ"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
-          //.Set("column", new Sdx.Scaffold.Config.Value("path"))
+          .Set("column", new Sdx.Scaffold.Config.Value("path"))
           .Set("label", new Sdx.Scaffold.Config.Value("画像"))
           .Set("setter", new Sdx.Scaffold.Config.Value("SetTempPath"))
-          .Set("getter", new Sdx.Scaffold.Config.Value("GetImages"))
-          .Set("name", new Sdx.Scaffold.Config.Value("path"))
-          .Set("multiple", new Sdx.Scaffold.Config.Value("on"))
+          .Set("getter", new Sdx.Scaffold.Config.Value("GetImageWebPath"))
         )
         
         ;
