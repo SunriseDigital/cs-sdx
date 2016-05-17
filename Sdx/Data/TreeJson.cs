@@ -11,7 +11,7 @@ namespace Sdx.Data
 {
   public class TreeJson : Tree
   {
-    public dynamic BaseJson { get; set; }
+    private dynamic BaseJson { get; set; }
 
     public override void Load(TextReader input)
     {
@@ -21,12 +21,12 @@ namespace Sdx.Data
 
     public override string ToValue()
     {
-      if (BaseJson.GetType() == null)
+      if (BaseJson == null)
       {
         throw new InvalidOperationException("Load before this.");
       }
 
-      if (BaseJson.GetType() == typeof(Dictionary<string, object>))
+      if (BaseJson is Dictionary<string, object>)
       {
         throw new InvalidCastException("This is not String");
       }
@@ -36,12 +36,12 @@ namespace Sdx.Data
 
     protected override List<Tree> ToList()
     {
-      if (BaseJson.GetType() == null)
+      if (BaseJson == null)
       {
         throw new InvalidOperationException("Load before this.");
       }
 
-      if (BaseJson.GetType() != typeof(ArrayList))
+      if (!(BaseJson is ArrayList))
       {
         throw new InvalidCastException("Target is not List.");
       }
@@ -78,7 +78,7 @@ namespace Sdx.Data
 
       foreach (var item in paths)
       {
-        if(target.GetType() == typeof(string)){
+        if(target is string){
           return false;
         }
 
