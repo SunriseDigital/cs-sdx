@@ -563,7 +563,7 @@ namespace Sdx.Scaffold
       //pkeyの一部でブルーピングされていたら、既にURLについているので取り除く。
       return EditPageUrl.Build(
         record.GetPkeyValues()
-          .Where(kv => kv.Key != Group.TargetColumnName)
+          .Where(kv => Group == null || kv.Key != Group.TargetColumnName)
           .ToDictionary(kv => kv.Key, kv => kv.Value.ToString())
       );
     }
