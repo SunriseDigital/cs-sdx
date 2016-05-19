@@ -1,6 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="edit.aspx.cs" Inherits="scaffold_area_edit" %>
-<%@ Register TagPrefix="Scaffold" TagName="edit" Src="~\sdx\_private\csharp\scaffold\edit.ascx" %>
-<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\csharp\scaffold\head.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="edit" Src="~\sdx\_private\cs\scaffold\edit.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\cs\scaffold\head.ascx" %>
 <!DOCTYPE html>
 
 <html>

@@ -55,8 +55,8 @@ docroot/
 `/scaffold/shop/list.aspx`
 ```asp.net
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="list.aspx.cs" Inherits="scaffold_shop_list" %>
-<%@ Register TagPrefix="Scaffold" TagName="list" Src="~\sdx\_private\csharp\scaffold\list.ascx" %>
-<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\csharp\scaffold\head.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="list" Src="~\sdx\_private\cs\scaffold\list.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\cs\scaffold\head.ascx" %>
 <!DOCTYPE html>
 <html>
   <head>
@@ -94,8 +94,8 @@ public partial class scaffold_shop_list : System.Web.UI.Page
 `/scaffold/shop/edit.aspx`
 ```asp.net
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="edit.aspx.cs" Inherits="scaffold_shop_edit" %>
-<%@ Register TagPrefix="Scaffold" TagName="edit" Src="~\sdx\_private\csharp\scaffold\edit.ascx" %>
-<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\csharp\scaffold\head.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="edit" Src="~\sdx\_private\cs\scaffold\edit.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\cs\scaffold\head.ascx" %>
 <!DOCTYPE html>
 
 <html>
