@@ -112,6 +112,21 @@ namespace Sdx.Db
       return Convert.ToInt64(this.GetValue(key));
     }
 
+    private object GetOriginValue(string key)
+    {
+      if (IsNew)
+      {
+        throw new InvalidOperationException("No origin values. This is new record.");
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
+      if (!this.ValuesList[0].ContainsKey(keyWithContext))
+      {
+        return DBNull.Value;
+      }
+      return this.ValuesList[0][keyWithContext];
+    }
+
     public object GetValue(string key)
     {
       if (this.UpdatedValues.ContainsKey(key))
@@ -124,14 +139,7 @@ namespace Sdx.Db
         return DBNull.Value;
       }
 
-      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
-      if(!this.ValuesList[0].ContainsKey(keyWithContext))
-      {
-        return DBNull.Value;
-      }
-      var value = this.ValuesList[0][keyWithContext];
-
-      return value;
+      return GetOriginValue(key);
     }
 
     public string GetString(string key)
@@ -373,7 +381,7 @@ namespace Sdx.Db
 
       foreach(var column in OwnMeta.Pkeys)
       {
-        var value = this.GetValue(column.Name);
+        var value = this.GetOriginValue(column.Name);
         if (value == null)
         {
           throw new InvalidOperationException("Primary key " + column + " is null.");
