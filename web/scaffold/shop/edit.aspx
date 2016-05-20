@@ -11,7 +11,7 @@
   </head>
   <body>
     <div class="container">
-      <Scaffold:edit ID="edit" runat="server" OutlineRank=3 />
+      <Scaffold:edit ID="edit" runat="server" OutlineRank="3" />
     </div>
   </body>
 </html>

@@ -10,50 +10,14 @@ namespace Sdx.Scaffold
 {
   public class Manager
   {
-    private const string CONTEXT_KEY = "SDX.SCAFFOLD.MANAGER.INSTANCES";
-    private const string DEFAULT_NAME = "SDX.SCAFFOLD.MANAGER.DEFAULT_NAME";
-    public String Name { get; private set; }
-
     private int? perPage;
-
-    /// <summary>
-    /// Sdx.Context.Currentに結び付けます。UserContorl側でインスタンスを特定するのに必要です。
-    /// </summary>
-    /// <param name="name">
-    ///   一つのContextで二つのScaffold.Managerを生成する場合、名前を任意に渡す必要があります。
-    ///   インクルードタグにつけた名前を渡してください。
-    ///   <Scaffold:edit ID="edit" runat="server" Name="someName" />
-    ///   作っては見たものの必要に駆られなかったのでテストしていません。
-    /// </param>
-    public void BindToCurrentContext(string name = Manager.DEFAULT_NAME)
-    {
-      this.Name = name;
-      Dictionary<string, Manager> instances = null;
-      if (!Context.Current.Vars.ContainsKey(Manager.CONTEXT_KEY))
-      {
-        instances = new Dictionary<string, Manager>();
-        Context.Current.Vars[Manager.CONTEXT_KEY] = instances;
-      }
-      else
-      {
-        instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
-      }
-
-      if (instances.ContainsKey(this.Name))
-      {
-        throw new InvalidOperationException("Already exists " + this.Name + " Manager");
-      }
-
-      instances[name] = this;
-    }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="tableMeta"></param>
     /// <param name="db"></param>
-    /// <param name="name">UserControl側で参照するための名前。基本デフォルトでOK。一ページに複数のScaffoldを使用する場合必要（テストしてません）。</param>
-    public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db, string name = Manager.DEFAULT_NAME)
+    public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db)
     {
       Db = db;
       TableMeta = tableMeta;
@@ -275,23 +239,6 @@ namespace Sdx.Scaffold
 
     public Web.Url ListPageUrl { get; set; }
     public Web.Url EditPageUrl { get; set; }
-
-    public static Manager CurrentInstance(string key)
-    {
-      if(key == null)
-      {
-        key = Manager.DEFAULT_NAME;
-      }
-
-      var instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
-
-      if (!instances.ContainsKey(key))
-      {
-        throw new InvalidOperationException("You must call BindToCurrentContext to use in UserControl.");
-      }
-
-      return instances[key];
-    }
 
     public Db.Record LoadRecord(NameValueCollection parameters, Sdx.Db.Connection conn)
     {

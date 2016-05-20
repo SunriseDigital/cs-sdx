@@ -9,7 +9,6 @@ public partial class scaffold_area_edit : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-      var scaffold = Test.Scaffold.LargeArea.Create();
-      scaffold.BindToCurrentContext();
+      (edit as dynamic).Scaffold = Test.Scaffold.LargeArea.Create();
     }
 }

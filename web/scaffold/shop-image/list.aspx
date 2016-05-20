@@ -10,7 +10,7 @@
   </head>
   <body>
     <div class="container">
-      <Scaffold:list ID="list1" runat="server" OutlineRank=3 />
+      <Scaffold:list ID="list" runat="server" OutlineRank=3 />
     </div>
   </body>
 </html>

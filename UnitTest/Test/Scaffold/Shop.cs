@@ -7,17 +7,10 @@ namespace Test.Scaffold
 {
   public class Shop
   {
-    public static Sdx.Scaffold.Manager Create(Sdx.Db.Adapter.Base db, string scaffoldName = null)
+    public static Sdx.Scaffold.Manager Create(Sdx.Db.Adapter.Base db)
     {
       Sdx.Scaffold.Manager scaffold;
-      if(scaffoldName == null)
-      {
-        scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db);
-      }
-      else
-      {
-        scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db, scaffoldName);
-      }
+      scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db);
 
       scaffold.Title = "店舗";
 

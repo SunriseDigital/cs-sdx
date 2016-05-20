@@ -11,7 +11,7 @@
 </head>
 <body>
   <div class="container">
-    <Scaffold:list ID="list" runat="server" />
+    <Scaffold:list ID="edit" runat="server" />
   </div>
 </body>
 </html>
