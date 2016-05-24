@@ -35,7 +35,7 @@ namespace UnitTest
       Assert.Equal("hoge", tree.Get("hoge").Value);
       Assert.Equal("orange", tree.Get("level1").Get("level2").Get("apple").Value);
 
-      var list = tree.Get("level1").Get("array");
+      var list = tree.Get("level1.array");
       Assert.Equal("12", list[0].Value);
 
       var jobs = tree.Get("jobs");
@@ -48,14 +48,18 @@ namespace UnitTest
       Assert.Equal("日本語", tree.Get("level1.level2.japanese").Value);
 
       Assert.False(tree.Exsits("level1.level2.english"));
+      Assert.False(tree.Get("level1").Get("level2").Exsits("english"));
 
       Assert.False(tree.Exsits("level1.level3.japanese"));
 
       Assert.True(tree.Get("level1").Exsits("level2.japanese"));
 
-      Assert.True(tree.Exsits("fuga.file"));
-
       Assert.False(tree.Exsits("level1.level2.japanese.aaa"));
+
+      Assert.Null(tree.Get("fuga.file").Value);
+      Assert.Null(tree.Get("fuga").Get("file").Value);
+
+      Assert.True(tree.Exsits("fuga.file"));
     }
   }
 }

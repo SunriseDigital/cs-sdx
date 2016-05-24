@@ -3,86 +3,103 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Web.Script.Serialization;
+using System.Collections;
 
 namespace Sdx.Data
 {
   public class TreeJson : Tree
   {
-    private JToken BaseJson { get; set; }
+    private dynamic baseJson;
+    private dynamic BaseJson { get { return baseJson; } set { initialize = true; baseJson = value; } }
+    private bool initialize = false;
 
     public override void Load(TextReader input)
     {
-      this.BaseJson = JObject.Parse(input.ReadToEnd());
+      var serializer = new JavaScriptSerializer();
+      BaseJson = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
     }
 
     public override string ToValue()
     {
-      if (this.BaseJson == null)
+      if (initialize == false)
       {
         throw new InvalidOperationException("Load before this.");
       }
 
-      if (this.BaseJson.Type == JTokenType.Object)
+      if (BaseJson == null)
+      {
+        return null;
+      }
+
+      if (BaseJson is Dictionary<string, object>)
       {
         throw new InvalidCastException("This is not String");
       }
 
-      return this.BaseJson.ToString();
+      return BaseJson.ToString();
     }
 
     protected override List<Tree> ToList()
     {
-      if (this.BaseJson == null)
+      if (initialize == false)
       {
         throw new InvalidOperationException("Load before this.");
       }
 
-      if (this.BaseJson.Type != JTokenType.Array)
+      if (!(BaseJson is ArrayList))
       {
         throw new InvalidCastException("Target is not List.");
       }
-
+      
       var list = new List<Tree>();
-      foreach (var item in this.BaseJson)
+      foreach (var item in BaseJson)
       {
         var row = new TreeJson();
         row.BaseJson = item;
         list.Add(row);
       }
-
+      
       return list;
     }
 
     protected override Tree BuildTree(List<string> paths)
     {
       var TreeJson = new Sdx.Data.TreeJson();
-      var target = this.BaseJson;            
+      TreeJson.BaseJson = BaseJson;
+      var serializer = new JavaScriptSerializer();
 
       foreach (var item in paths)
       {
-        target = target.SelectToken(item);
+        TreeJson.BaseJson = TreeJson.BaseJson[item];
       }
 
-      TreeJson.BaseJson = target;
       return TreeJson;
     }
 
     protected override bool Exsits(List<string> paths)
     {
-      var target = this.BaseJson;
+      var serializer = new JavaScriptSerializer();
+      var target = BaseJson;
 
       foreach (var item in paths)
       {
-        if (target.SelectToken(item) == null)
-        {
+        if(target is string){
           return false;
+        }
+
+        if(target == null){
+          return false;
+        }
+
+        if (target.ContainsKey(item))
+        {
+          target = target[item];
         }
         else
         {
-          target = target.SelectToken(item);
+          return false;
         }
       }
       

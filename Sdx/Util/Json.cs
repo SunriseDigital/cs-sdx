@@ -1,7 +1,6 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Web.Script.Serialization;
 
 
 namespace Sdx.Util
@@ -10,12 +9,14 @@ namespace Sdx.Util
   {
     public static string Encoder(object obj)
     {
-      return JsonConvert.SerializeObject(obj);
+      var serializer = new JavaScriptSerializer();
+      return serializer.Serialize(obj);
     }
 
     public static T Decode<T>(string json)
     {
-      return JsonConvert.DeserializeObject<T>(json);
+      var serializer = new JavaScriptSerializer();
+      return serializer.Deserialize<T>(json);
     }
   }
 }

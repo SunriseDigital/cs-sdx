@@ -5,7 +5,7 @@
         "test": "aaa"
     },
     "fuga": {
-        "file": "",
+        "file": null,
         "dddd": "dddd"
     },
     "level1": {
