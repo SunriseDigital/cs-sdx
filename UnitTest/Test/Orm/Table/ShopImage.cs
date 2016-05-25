@@ -65,7 +65,7 @@ namespace Test.Orm.Table
       var elem = new Sdx.Html.ImageUploader("path");
 
       elem.ButtonLabel = new Sdx.Html.RawText("画像をアップロード");
-      elem.UploadPath = "/sdx/cs/upload-image.aspx";
+      elem.UploadPath = "/form/upload-point.aspx";
       elem.ThumbWidth = 200;
       elem.ThumbHeight = 100;
       elem.DeleteLabel = @"<i class=""fa fa-times"" aria-hidden=""true""></i>";

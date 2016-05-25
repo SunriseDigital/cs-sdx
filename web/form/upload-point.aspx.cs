@@ -10,6 +10,10 @@ public partial class form_upload_point : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-
+      dynamic imageUploader = uploader;
+      imageUploader.MinWidth = 3000;
+      imageUploader.MinHeight = 3000;
+      imageUploader.ScaleUp = true;
+      imageUploader.UploadWebPath = "~/tmp/";
     }
 }

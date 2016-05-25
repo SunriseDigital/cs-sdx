@@ -27,7 +27,7 @@ namespace Sdx.Html
     private void InitDefaultValues()
     {
       MaxCount = 1;
-      MaxCountMessage = Sdx.I18n.GetString("%MaxCount%までアップロード可能です。以下の画像はアップロードされませんでした。");
+      MaxCountMessage = Sdx.I18n.GetString("%MaxCount%枚まで登録可能です。以下の画像はアップロードされませんでした。");
     }
 
     protected internal override FormValue CreateFormValue()
@@ -59,6 +59,12 @@ namespace Sdx.Html
 
       listHtml = new Sdx.Html.Tag("ul", "list-inline", "images", "clearfix");
       wrapper.AddHtml(listHtml);
+
+      var countErrors = new Sdx.Html.Tag("ul", "sdx-has-error", "count-errors");
+      wrapper.AddHtml(countErrors);
+
+      var errors = new Sdx.Html.Tag("ul", "sdx-has-error", "errors");
+      wrapper.AddHtml(errors);
 
       serverImageWrapper = new Html.Tag("div");
       wrapper.AddHtml(serverImageWrapper);

@@ -46,6 +46,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
@@ -115,6 +116,7 @@
     <Compile Include="Scaffold\Group\TableMeta.cs" />
     <Compile Include="Scaffold\Config\Item.cs" />
     <Compile Include="Scaffold\Config\List.cs" />
+    <Compile Include="Util\Image.cs" />
     <Compile Include="Util\Json.cs" />
     <Compile Include="Util\Path.cs" />
     <Compile Include="Validation\Date.cs" />
