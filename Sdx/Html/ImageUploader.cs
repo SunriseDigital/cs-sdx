@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
+using System.Web.Configuration;
 
 namespace Sdx.Html
 {
@@ -26,8 +28,15 @@ namespace Sdx.Html
 
     private void InitDefaultValues()
     {
+      HttpRuntimeSection section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
+      //ヘッダー長を引く。IISの最大ヘッダー長は16KB
+      //http://stackoverflow.com/questions/686217/maximum-on-http-header-values
+      MaxRequestLength = (section.MaxRequestLength - 16 * 1024).ToString();
+
       MaxCount = 1;
       MaxCountMessage = Sdx.I18n.GetString("%MaxCount%枚まで登録可能です。以下の画像はアップロードされませんでした。");
+      MaxRequestLengthMessage = Sdx.I18n.GetString("一度に{0}KB以上はアップロードできません。", MaxRequestLength);
+      UnknownErrorMessage = Sdx.I18n.GetString("サーバーでエラーが発生しました。しばらくしてからもう一度お試しください。");
     }
 
     protected internal override FormValue CreateFormValue()
@@ -196,6 +205,45 @@ namespace Sdx.Html
       get
       {
         return wrapper.Attr["data-max-count-message"];
+      }
+    }
+
+    public string MaxRequestLength
+    {
+      set
+      {
+        wrapper.Attr["data-max-request-length"] = value;
+      }
+
+      get
+      {
+        return wrapper.Attr["data-max-request-length"];
+      }
+    }
+
+    public string MaxRequestLengthMessage
+    {
+      set
+      {
+        wrapper.Attr["data-max-request-length-message"] = value;
+      }
+
+      get
+      {
+        return wrapper.Attr["data-max-request-length-message"];
+      }
+    }
+
+    public string UnknownErrorMessage
+    {
+      set
+      {
+        wrapper.Attr["data-unknown-error-message"] = value;
+      }
+
+      get
+      {
+        return wrapper.Attr["data-unknown-error-message"];
       }
     }
   }
