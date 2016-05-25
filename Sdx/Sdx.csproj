@@ -40,7 +40,9 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
@@ -58,6 +60,9 @@
     <Compile Include="Collection\Holder.cs" />
     <Compile Include="Collection\OrderedDictionary.cs" />
     <Compile Include="Config.cs" />
+    <Compile Include="Configuration\DictionaryListSection.cs" />
+    <Compile Include="Configuration\DictionaryElement.cs" />
+    <Compile Include="Configuration\ElementCollection.cs" />
     <Compile Include="Data\Tree.cs" />
     <Compile Include="Data\TreeJson.cs" />
     <Compile Include="Data\TreeYaml.cs" />
@@ -94,6 +99,7 @@
     <Compile Include="Html\CheckBox.cs" />
     <Compile Include="Html\FormElement.cs" />
     <Compile Include="Html\CheckableGroup.cs" />
+    <Compile Include="Html\ImageUploader.cs" />
     <Compile Include="Html\Input.cs" />
     <Compile Include="Html\InputDate.cs" />
     <Compile Include="Html\InputHidden.cs" />
@@ -107,6 +113,7 @@
     <Compile Include="Scaffold\Group\TableMeta.cs" />
     <Compile Include="Scaffold\Config\Item.cs" />
     <Compile Include="Scaffold\Config\List.cs" />
+    <Compile Include="Util\Image.cs" />
     <Compile Include="Util\Json.cs" />
     <Compile Include="Util\Path.cs" />
     <Compile Include="Validation\Date.cs" />
@@ -137,6 +144,7 @@
     <Compile Include="Validation\Validator.cs" />
     <Compile Include="Validation\Whitelist.cs" />
     <Compile Include="Scaffold\Manager.cs" />
+    <Compile Include="Web\Helper.cs" />
     <Compile Include="Web\HttpErrorHandler.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\View.cs" />

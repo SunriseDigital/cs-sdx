@@ -10,6 +10,28 @@
   CONSTRAINT pk_shop PRIMARY KEY CLUSTERED (id)
 );
 
+CREATE TABLE shop_image (
+  shop_id int,
+  shop_image_type_id int,
+  path nvarchar(255) NOT NULL,
+  created_at datetime NOT NULL,
+  CONSTRAINT pk_shop_image PRIMARY KEY (shop_id, shop_image_type_id)
+);
+
+CREATE TABLE shop_image_type (
+  id int IDENTITY ,
+  name nvarchar(50),
+  CONSTRAINT pk_shop_image_type PRIMARY KEY CLUSTERED (id)
+);
+
+ALTER TABLE shop_image ADD CONSTRAINT fk_shop_image_shop_id
+　FOREIGN KEY (shop_id)
+　REFERENCES shop(id);
+
+ALTER TABLE shop_image ADD CONSTRAINT fk_shop_image_shop_image_type_id
+　FOREIGN KEY (shop_image_type_id)
+　REFERENCES shop_image_type(id);
+
 CREATE TABLE area (
   id int IDENTITY ,
   name nvarchar(50),

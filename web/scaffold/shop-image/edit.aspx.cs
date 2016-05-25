@@ -9,6 +9,6 @@ public partial class scaffold_area_edit : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-      (edit as dynamic).Scaffold = Test.Scaffold.LargeArea.Create();
+      (edit as dynamic).Scaffold = Test.Scaffold.ShopImage.Create(Sdx.Db.Adapter.Manager.Get("main").Write);
     }
 }

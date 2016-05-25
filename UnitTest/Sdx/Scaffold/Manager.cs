@@ -46,7 +46,7 @@ namespace UnitTest
 
     private void RunSimpleList(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter);
       scaffold.DisplayList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("column", new Sdx.Scaffold.Config.Value("name"))
@@ -93,7 +93,7 @@ namespace UnitTest
 
     private void RunSimpleForm(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter);
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("column", new Sdx.Scaffold.Config.Value("name"))
@@ -138,7 +138,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -172,7 +172,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -207,7 +207,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -248,7 +248,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -272,7 +272,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -294,7 +294,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -332,7 +332,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -366,7 +366,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -398,7 +398,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -450,7 +450,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -481,7 +481,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -512,7 +512,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -534,7 +534,7 @@ namespace UnitTest
 
       ((Action)(() =>
       {
-        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+        var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
         scaffold.EditPageUrl = new Sdx.Web.Url("/scaffold/area/edit.aspx");
         scaffold.ListPageUrl = new Sdx.Web.Url("/scaffold/area/list.aspx");
 
@@ -562,7 +562,7 @@ namespace UnitTest
 
     private void RunDynamicGetter(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
       scaffold.DisplayList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("大エリア名"))
@@ -596,7 +596,7 @@ namespace UnitTest
 
     private void RunHtmlParams(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter, db.Adapter.ToString());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter);
       scaffold.DisplayList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("エリア編集"))
@@ -632,7 +632,7 @@ namespace UnitTest
 
     private void RunManyManySave(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db.Adapter, db.Adapter.ToString());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db.Adapter);
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("名前"))
@@ -774,7 +774,7 @@ namespace UnitTest
 
     private void RunSwapRecordSetterMethod(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
@@ -827,7 +827,7 @@ namespace UnitTest
 
     private void RunSwapRecordAccessorUsingMethodInfo(TestDb db)
     {
-      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter, db.Adapter.ToString());
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
@@ -901,7 +901,7 @@ namespace UnitTest
 
     private void RunSecretSave(TestDb db)
     {
-      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter);
 
       var query = new NameValueCollection();
 
@@ -992,7 +992,7 @@ namespace UnitTest
 
     private void RunAutoValidate(TestDb db)
     {
-      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter);
 
       using (var conn = scaffold.Db.CreateConnection())
       {
@@ -1064,8 +1064,8 @@ namespace UnitTest
           Assert.True(checkbox.Value.IsEmpty);
         }
       };
-      
-      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter);
       using (var conn = db.Adapter.CreateConnection())
       {
         conn.Open();
@@ -1112,7 +1112,7 @@ namespace UnitTest
 
     private void RunDelete(TestDb db)
     {
-      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter);
 
       var query = new NameValueCollection();
 
@@ -1196,7 +1196,7 @@ namespace UnitTest
     private void RunPerPage(TestDb db)
     {
       InitHttpContextMock("pid=1");
-      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter);
       scaffold.PerPage = 2;
       using (var conn = scaffold.Db.CreateConnection())
       {
@@ -1213,7 +1213,7 @@ namespace UnitTest
       }
 
       InitHttpContextMock("pid=2");
-      scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      scaffold = Test.Scaffold.Shop.Create(db.Adapter);
       scaffold.PerPage = 2;
       using (var conn = scaffold.Db.CreateConnection())
       {
@@ -1231,7 +1231,7 @@ namespace UnitTest
 
       //クエリーなし
       InitHttpContextMock("");
-      scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      scaffold = Test.Scaffold.Shop.Create(db.Adapter);
       scaffold.PerPage = 2;
       using (var conn = scaffold.Db.CreateConnection())
       {
@@ -1261,7 +1261,7 @@ namespace UnitTest
     private void RunAutoCurrent(TestDb db)
     {
       InitHttpContextMock("");
-      var scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      var scaffold = Test.Scaffold.Shop.Create(db.Adapter);
       using (var conn = scaffold.Db.CreateConnection())
       {
         conn.Open();
@@ -1280,7 +1280,7 @@ namespace UnitTest
         );
 
         var values = new NameValueCollection();
-        
+
         scaffold.BindToForm(form, values);
         Assert.Equal("", form["created_at"].Value.ToString());
 
@@ -1290,7 +1290,7 @@ namespace UnitTest
       }
 
       InitHttpContextMock("id=1");
-      scaffold = Test.Scaffold.Shop.Create(db.Adapter, db.Adapter.ToString());
+      scaffold = Test.Scaffold.Shop.Create(db.Adapter);
       using (var conn = scaffold.Db.CreateConnection())
       {
         conn.Open();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Web;
 
 namespace Sdx.Html
 {
@@ -259,7 +260,7 @@ namespace Sdx.Html
         builder
           .Append(styleKey)
           .Append(": ")
-          .Append(styleValue)
+          .Append(HttpUtility.HtmlEncode(styleValue))
           .Append("; ");
       });
 
@@ -277,7 +278,7 @@ namespace Sdx.Html
           builder.Append("class=\"");
           var classes = (List<string>)value;
           classes.ForEach(val => {
-            builder.Append(val).Append(' ');
+            builder.Append(HttpUtility.HtmlEncode(val)).Append(' ');
           });
           if (classes.Count > 0)
           {
@@ -300,7 +301,7 @@ namespace Sdx.Html
           {
             builder
               .Append("=\"")
-              .Append(value)
+              .Append(HttpUtility.HtmlEncode(value))
               .Append("\"");
           }
 

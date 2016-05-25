@@ -7,17 +7,10 @@ namespace Test.Scaffold
 {
   public class Shop
   {
-    public static Sdx.Scaffold.Manager Create(Sdx.Db.Adapter.Base db, string scaffoldName = null)
+    public static Sdx.Scaffold.Manager Create(Sdx.Db.Adapter.Base db)
     {
       Sdx.Scaffold.Manager scaffold;
-      if(scaffoldName == null)
-      {
-        scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db);
-      }
-      else
-      {
-        scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db, scaffoldName);
-      }
+      scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Shop.Meta, db);
 
       scaffold.Title = "店舗";
 
@@ -54,6 +47,11 @@ namespace Test.Scaffold
           .Set("class", new Sdx.Scaffold.Config.Value("category"))
         )
         .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("画像"))
+          .Set("html", new Sdx.Scaffold.Config.Value("<a href=\"/scaffold/shop-image/list.aspx?shop_id={id}\">{@area.#GetNameWithCode}</a>"))
+          .Set("style", new Sdx.Scaffold.Config.Value("width: 100px;"))
+        )
+        .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("ログインID"))
           .Set("column", new Sdx.Scaffold.Config.Value("login_id"))
         )
@@ -66,10 +64,7 @@ namespace Test.Scaffold
       scaffold.PerPage = 10;
 
       //リストの並び順は`ListSelectHook`で指定。
-      scaffold.ListSelectHook = new Sdx.Scaffold.Config.Value((select, conn) =>
-      {
-        select.Context("shop").AddOrder("id", Sdx.Db.Sql.Order.ASC);
-      });
+      scaffold.ListSelectHook = new Sdx.Scaffold.Config.Value("SelectDefaultOrder");
 
       //下記のように文字列で指定するとTest.Orm.Table.Shop.SelectDefaultOrderが呼ばれます。
       //scaffold.ListSelectHook = new Sdx.Scaffold.Config.Value("SelectDefaultOrder");

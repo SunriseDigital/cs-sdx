@@ -55,8 +55,8 @@ docroot/
 `/scaffold/shop/list.aspx`
 ```asp.net
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="list.aspx.cs" Inherits="scaffold_shop_list" %>
-<%@ Register TagPrefix="Scaffold" TagName="list" Src="~\sdx\_private\csharp\scaffold\list.ascx" %>
-<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\csharp\scaffold\head.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="list" Src="~\sdx\_private\cs\scaffold\list.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\cs\scaffold\head.ascx" %>
 <!DOCTYPE html>
 <html>
   <head>
@@ -80,22 +80,20 @@ public partial class scaffold_shop_list : System.Web.UI.Page
 {
   protected void Page_Load(object sender, EventArgs e)
   {
-    var scaffold = Test.Scaffold.Shop.Create();
-    scaffold.BindToCurrentContext();
+    (list as dynamic).Scaffold = Test.Scaffold.Shop.Create(Sdx.Db.Adapter.Manager.Get("main").Write);
   }
 }
 ```
 
-このサンプルでは`Test.Scaffold.Shop`という生成用のScaffoldファクトリクラスを作りました。`Create()`は後ほど示しますが、`Sdx.Scaffold.Manager`を組み立ててるだけです。`Sdx.Scaffold.Manager.BindToCurrentContext`メソッドを呼ぶと`Sdx.Context.Current`に関連付けられUserControl側で参照することが可能になります。
-
+このサンプルでは`Test.Scaffold.Shop`という生成用のScaffoldファクトリクラスを作りました。`Create()`は後ほど示しますが、`Sdx.Scaffold.Manager`を組み立ててるだけです。`UserControl`にScaffoldをセットしています。`UserControl`はHTML側で付与した`ID`で参照可能ですが、コンパイラから型が見えないので`dynamic`にキャストして注入します。
 
 #### 編集ページ
 
 `/scaffold/shop/edit.aspx`
 ```asp.net
 <%@ Page Language="C#" AutoEventWireup="true" CodeFile="edit.aspx.cs" Inherits="scaffold_shop_edit" %>
-<%@ Register TagPrefix="Scaffold" TagName="edit" Src="~\sdx\_private\csharp\scaffold\edit.ascx" %>
-<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\csharp\scaffold\head.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="edit" Src="~\sdx\_private\cs\scaffold\edit.ascx" %>
+<%@ Register TagPrefix="Scaffold" TagName="head" Src="~\sdx\_private\cs\scaffold\head.ascx" %>
 <!DOCTYPE html>
 
 <html>
@@ -118,8 +116,7 @@ public partial class scaffold_shop_edit : System.Web.UI.Page
 {
     protected void Page_Load(object sender, EventArgs e)
     {
-      var scaffold = Test.Scaffold.Shop.Create();
-      scaffold.BindToCurrentContext();
+      (edit as dynamic).Scaffold = Test.Scaffold.Shop.Create(Sdx.Db.Adapter.Manager.Get("main").Write);
     }
 }
 ```
@@ -334,4 +331,124 @@ scaffold.FormList
     .Set("label", new Sdx.Scaffold.Config.Value("店名"))
     .Set("validators", new Sdx.Scaffold.Config.Value("CreateFooBarValidators"))
   )
+```
+
+### 画像のアップロードについて
+
+`Sdx.Html.ImageUploader`を利用すると簡単に画像のアップロードを実装可能です。
+
+
+#### 一時画像アップロードエンドポイントの準備
+アップロードは[jQueryFileUpload](https://blueimp.github.io/jQuery-File-Upload/)で即座にアップロードされプレビューを見ることが可能です。プレビューはサーバー側に一時保存されます。[sdxweb](https://github.com/SunriseDigital/sdxweb)の`private\cs\uploader\image.ascx`にアップロードのエンドポイントが準備されていますのでそちらを利用すると簡単に一時アップロードを実装可能です。
+
+`/form/upload-point.aspx`を作成してください。
+
+`/form/upload-point.aspx`
+```c#
+<%@ Page Language="C#" AutoEventWireup="true" CodeFile="upload-point.aspx.cs" Inherits="form_upload_point" %>
+<%@ Register TagPrefix="Upload" TagName="image" Src="~\sdx\_private\cs\uploader\image.ascx" %>
+<Upload:image ID="uploader" runat="server" />
+```
+
+`/form/upload-point.aspx.cs`
+```c#
+using System;
+
+public partial class form_upload_point : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+      dynamic imageUploader = uploader;
+
+      //最大サイズ。ScaleDownをfalseにすると縮小せず、エラーを返します。デフォルトはtrue。
+      imageUploader.ScaleDown = true;
+      imageUploader.MaxWidth = 640;
+      imageUploader.MaxHeight = 480;
+
+      //最小サイズ。ScaleUpをfalseにすると拡大せず、エラーを返します。デフォルトはfalse。
+      imageUploader.MaxWidth = 640;
+      imageUploader.MaxHeight = 480;
+      imageUploader.ScaleUp = true;
+
+      //一時保存用のディレクトリ
+      imageUploader.UploadWebPath = "~/tmp/";
+    }
+}
+```
+
+#### Sdx.Html.ImageUploaderの生成
+
+Table.Shopにフォーム生成用のメソッドを作成します。
+
+```c#
+    public static Sdx.Html.FormElement CreatePathElement(Sdx.Db.Connection conn)
+    {
+      var elem = new Sdx.Html.ImageUploader("path");
+
+      //画像アップロードボタンのテキスト
+      elem.ButtonLabel = new Sdx.Html.RawText("画像をアップロード");
+      //アップロードエンドポイントのURL
+      elem.UploadPath = "/form/upload-point.aspx";
+      //サムネイルのサイズ
+      elem.ThumbWidth = 200;
+      elem.ThumbHeight = 100;
+      //削除ボタンのラベル
+      elem.DeleteLabel = @"<i class=""fa fa-times"" aria-hidden=""true""></i>";
+
+      return elem;
+    }
+```
+
+#### 画像の保存とDBデータからの復帰
+
+Scaffoldでは`getter`/`setter`をそれぞれ自由に設定できますので、そこで一時ディレクトリから正しい場所への移動や、Webから参照できるパスへの変換などを行ってください。
+
+```c#
+.Add(Sdx.Scaffold.Config.Item.Create()
+  .Set("column", new Sdx.Scaffold.Config.Value("path"))
+  .Set("label", new Sdx.Scaffold.Config.Value("画像"))
+  .Set("setter", new Sdx.Scaffold.Config.Value("SetTempPath"))
+  .Set("getter", new Sdx.Scaffold.Config.Value("GetImageWebPath"))
+)
+```
+
+#### 例外時の復帰について
+
+DB周りの例外でDBがロールバックする時に、既に保存してしまった画像の掃除は`Sdx.Db.Record.DisposeOnRollback`をオーバーライドして実装してください。
+
+```c#
+    /// <summary>
+    /// データベースがロールバックしたときにDB以外に元に戻したいものがある場合はオーバーライドしてください。
+    /// Scaffoldでは自動で呼ばれますが、独自の実装ではロールバック時に個別に呼び出す必要があります。
+    /// </summary>
+    public virtual void DisposeOnRollback()
+    {
+
+    }
+```
+
+### 削除時、画像差し替え時の古い画像の掃除
+
+`Sdx.Db.Record`のイベントメソッドで行います。Recordには下記のようなイベントが用意されています。
+
+```c#
+    /// <summary>
+    /// カラムが更新される直前に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueWillUpdate["someColumn"] = (prevValue, nextValue, isRaw) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object, bool>> ValueWillUpdate { get; private set; }
+
+    /// <summary>
+    /// カラムが更新された直後に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueDidUpdate["someColumn"] = (prevValue, nextValue) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object>> ValueDidUpdate { get; private set; }
+
+    /// <summary>
+    /// Save/Deleteのフック
+    /// </summary>
+    protected virtual void RecordWillSave(Connection conn) { }
+    protected virtual void RecordDidSave(Connection conn) { }
+    protected virtual void RecordWillDelete(Connection conn) { }
+    protected virtual void RecordDidDelete(Connection conn) { }
 ```

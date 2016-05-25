@@ -160,5 +160,24 @@ namespace Sdx.Scaffold.Config
 
       return this[key].ToBool();
     }
+
+    public string Name
+    {
+      get
+      {
+        if(ContainsKey("column"))
+        {
+          return this["column"].ToString();
+        }
+        else if(ContainsKey("name"))
+        {
+          return this["name"].ToString();
+        }
+        else
+        {
+          throw new KeyNotFoundException("Require `column` or `name` key");
+        }
+      }
+    }
   }
 }
