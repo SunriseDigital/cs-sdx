@@ -104,16 +104,12 @@ namespace Sdx
 
     private bool isTestServer;
 
+    // TODO とりあえずでreturn Trueのみです。実装してください
     public bool IsTestServer
     {
       get
       {
         return true;
-      }
-
-      set
-      {
-        isTestServer = value;
       }
     }
   }
