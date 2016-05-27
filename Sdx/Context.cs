@@ -101,5 +101,20 @@ namespace Sdx
     public Web.HttpErrorHandler HttpErrorHandler { get; private set; }
 
     public bool PreventDebugDisplay { get; set; }
+
+    private bool isTestServer;
+
+    public bool IsTestServer
+    {
+      get
+      {
+        return true;
+      }
+
+      set
+      {
+        isTestServer = value;
+      }
+    }
   }
 }
