@@ -37,3 +37,6 @@ INSERT INTO image (path) VALUES ('/freeve/sub.jpq');
 
 UPDATE shop SET main_image_id = (SELECT id FROM image WHERE path = '/freeve/main.jpq') WHERE shop.name = 'Freeve';
 UPDATE shop SET sub_image_id = (SELECT id FROM image WHERE path = '/freeve/sub.jpq') WHERE shop.name = 'Freeve';
+
+INSERT INTO shop_image_type (name) VALUES ('main'); 
+INSERT INTO shop_image_type (name) VALUES ('sub'); 

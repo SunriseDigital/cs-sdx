@@ -32,6 +32,34 @@ namespace Sdx.Db
     {
       this.UpdatedValues = new Dictionary<string, object>();
       this.ValuesList = new List<Dictionary<string, object>>();
+      ValueWillUpdate = new Dictionary<string, Action<object, object, bool>>();
+      ValueDidUpdate = new Dictionary<string, Action<object, object>>();
+      Init();
+    }
+
+    /// <summary>
+    /// カラムが更新される直前に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueWillUpdate["someColumn"] = (prevValue, nextValue, isRaw) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object, bool>> ValueWillUpdate { get; private set; }
+
+    /// <summary>
+    /// カラムが更新された直後に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
+    /// ValueDidUpdate["someColumn"] = (prevValue, nextValue) => {}
+    /// </summary>
+    protected Dictionary<string, Action<object, object>> ValueDidUpdate { get; private set; }
+
+    /// <summary>
+    /// Save/Deleteのフック
+    /// </summary>
+    protected virtual void RecordWillSave(Connection conn) { }
+    protected virtual void RecordDidSave(Connection conn) { }
+    protected virtual void RecordWillDelete(Connection conn) { }
+    protected virtual void RecordDidDelete(Connection conn) { }
+
+    protected virtual void Init()
+    {
+
     }
 
     public TableMeta OwnMeta
@@ -84,6 +112,21 @@ namespace Sdx.Db
       return Convert.ToInt64(this.GetValue(key));
     }
 
+    private object GetOriginValue(string key)
+    {
+      if (IsNew)
+      {
+        throw new InvalidOperationException("No origin values. This is new record.");
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
+      if (!this.ValuesList[0].ContainsKey(keyWithContext))
+      {
+        return DBNull.Value;
+      }
+      return this.ValuesList[0][keyWithContext];
+    }
+
     public object GetValue(string key)
     {
       if (this.UpdatedValues.ContainsKey(key))
@@ -96,14 +139,7 @@ namespace Sdx.Db
         return DBNull.Value;
       }
 
-      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
-      if(!this.ValuesList[0].ContainsKey(keyWithContext))
-      {
-        return DBNull.Value;
-      }
-      var value = this.ValuesList[0][keyWithContext];
-
-      return value;
+      return GetOriginValue(key);
     }
 
     public string GetString(string key)
@@ -296,7 +332,7 @@ namespace Sdx.Db
       }
       return this;
     }
-
+    
     /// <summary>
     /// カラムにデータをセットする。nullあるいは空文字をセットした場合DbNullが入ります。
     /// 空文字を保存したいときは`isRaw`にtrueを渡してください。
@@ -306,6 +342,12 @@ namespace Sdx.Db
     /// <param name="isRaw">DbNullへの変換を行うかどうか</param>
     public Record SetValue(string columnName, object value, bool isRaw = false)
     {
+      var prevValue = GetValue(columnName);
+      if (ValueWillUpdate.ContainsKey(columnName))
+      {
+        ValueWillUpdate[columnName](prevValue, value, isRaw);
+      }
+
       this.OwnMeta.CheckColumn(columnName);
 
       if (!isRaw)
@@ -321,6 +363,11 @@ namespace Sdx.Db
         this.UpdatedValues[columnName] = value;
       }
 
+      if (ValueDidUpdate.ContainsKey(columnName))
+      {
+        ValueDidUpdate[columnName](prevValue, GetValue(columnName));
+      }
+
       return this;
     }
 
@@ -334,7 +381,7 @@ namespace Sdx.Db
 
       foreach(var column in OwnMeta.Pkeys)
       {
-        var value = this.GetValue(column.Name);
+        var value = this.GetOriginValue(column.Name);
         if (value == null)
         {
           throw new InvalidOperationException("Primary key " + column + " is null.");
@@ -430,7 +477,7 @@ namespace Sdx.Db
           var methodInfo = type.GetMethods().FirstOrDefault(m => m.Name == method && !m.IsStatic);
           if (methodInfo == null)
           {
-            throw new NotImplementedException("Missing " + method + " method in " + GetType());
+            throw new NotImplementedException("Missing " + method + " method in " + result.GetType());
           }
 
           var paramsCount = methodInfo.GetParameters().Count();
@@ -488,7 +535,7 @@ namespace Sdx.Db
       {
         return false;
       }
-
+      
       var first = UpdatedValues.FirstOrDefault(kv => kv.Key == columnName);
       if (first.Value == null)
       {
@@ -509,6 +556,8 @@ namespace Sdx.Db
       {
         throw new InvalidOperationException("This record is already deleted.");
       }
+
+      RecordWillSave(conn);
 
       if (IsNew)
       {
@@ -600,6 +649,8 @@ namespace Sdx.Db
       }
 
       UpdatedValues.Clear();
+
+      RecordDidSave(conn);
     }
 
     public void Delete(Db.Connection conn)
@@ -609,6 +660,8 @@ namespace Sdx.Db
         return;
       }
 
+      RecordWillDelete(conn);
+
       var delete = conn.Adapter.CreateDelete();
       delete.From = OwnMeta.Name;
       AppendPkeyWhere(delete.Where);
@@ -616,6 +669,17 @@ namespace Sdx.Db
       conn.Execute(delete);
 
       IsDeleted = true;
+
+      RecordDidDelete(conn);
+    }
+
+    /// <summary>
+    /// データベースがロールバックしたときにDB以外に元に戻したいものがある場合はオーバーライドしてください。
+    /// Scaffoldでは自動で呼ばれますが、独自の実装ではロールバック時に個別に呼び出す必要があります。
+    /// </summary>
+    public virtual void DisposeOnRollback()
+    {
+      
     }
   }
 }

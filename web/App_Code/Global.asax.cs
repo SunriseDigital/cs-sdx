@@ -1,6 +1,11 @@
 ﻿using System;
+using System.Globalization;
+using System.Threading;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Routing;
+using System.Linq;
+using System.Collections.Generic;
 
 public class Global : System.Web.HttpApplication
 {
@@ -26,18 +31,29 @@ public class Global : System.Web.HttpApplication
     });
   }
 
-  //protected void Application_Error(object sender, EventArgs e)
-  //{
-  //  var serverError = Server.GetLastError() as HttpException;
+  protected void Application_Error(object sender, EventArgs e)
+  {
+    Sdx.Web.Helper.HandleMaxRequestLengthWithJson();
 
-  //  if (null != serverError)
-  //  {
-  //    int errorCode = serverError.GetHttpCode();
-  //    if (404 == errorCode)
-  //    {
-  //      Server.ClearError();
-  //      Server.Transfer("/_error/404.aspx");
-  //    }
-  //  }
-  //}
+    //var serverError = Server.GetLastError() as HttpException;
+
+    //if (null != serverError)
+    //{
+    //  int errorCode = serverError.GetHttpCode();
+    //  if (404 == errorCode)
+    //  {
+    //    Server.ClearError();
+    //    Server.Transfer("/_error/404.aspx");
+    //  }
+    //}
+  }
+
+  private Dictionary<string, string> BuildDictionaryFromException(Exception exception)
+  {
+    var dic = new Dictionary<string, string>();
+    dic["type"] = exception.GetType().ToString();
+    dic["message"] = exception.Message;
+    dic["source"] = exception.Source;
+    return dic;
+  }
 }

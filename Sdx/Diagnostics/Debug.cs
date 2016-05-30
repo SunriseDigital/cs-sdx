@@ -34,11 +34,22 @@ namespace Sdx.Diagnostics
       {
         delta = currentTicks - prevTimerElapsedTicks;
       }
+
+      var fileName = "";
+      var lineNumber = 0;
+#if DEBUG
+      var stack = new System.Diagnostics.StackFrame(1, true);
+      fileName = stack.GetFileName();
+      lineNumber = stack.GetFileLineNumber();
+#endif
+      
       Out.WriteLine(String.Format(
-        "[{0}/{1} sec] {2}",
+        "[{0}/{1} sec] {2} {3} - {4}",
         FormatStopwatchTicks(delta),
         FormatStopwatchTicks(currentTicks),
-        title
+        title,
+        fileName,
+        lineNumber
       ));
       prevTimerElapsedTicks = currentTicks;
       Out.WriteLine(Dump(value));

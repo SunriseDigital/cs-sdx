@@ -58,7 +58,7 @@ namespace Sdx.Diagnostics
 
     private void Application_EndRequest(object source, EventArgs a)
     {
-      if (Sdx.Context.Current.IsDebugMode)
+      if (Sdx.Context.Current.IsDebugMode && !Sdx.Context.Current.PreventDebugDisplay)
       {
         //Debug.Log
         HttpApplication application = (HttpApplication)source;

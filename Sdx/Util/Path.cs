@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Web;
@@ -62,6 +63,46 @@ namespace Sdx.Util
       {
         return path;
       }
+    }
+
+    public static string MapWebPath(string fullFilePath)
+    {
+      //TODO WebPathが含まれていなかったら例外。
+      return fullFilePath.Replace(HttpContext.Current.Server.MapPath("~/"), @"\").Replace(@"\", "/");
+    }
+
+    /// <summary>
+    /// 24文字のランダムなファイル名を生成しFileStreamを生成して返します。フォルダを指定して、確実に生成できたものを返すので安全です。
+    /// 100回リトライし、それでも生成できないときは<see cref="IOException"/>が発生します。
+    /// </summary>
+    /// <param name="folder"></param>
+    /// <param name="ext"></param>
+    /// <returns></returns>
+    public static FileStream CreateRandomNameStream(string folder, string ext)
+    {
+      var retryCount = 100;
+      for (int i = 0; i < retryCount; i++)
+      {
+        var name = System.String.Format("{0}.{1}", String.GenRandom(24), ext);
+        var path = System.IO.Path.Combine(folder, name);
+        if(System.IO.File.Exists(path))
+        {
+          continue;
+        }
+
+        try
+        {
+          return new FileStream(path, FileMode.CreateNew, FileAccess.Write);
+        }
+        catch (DirectoryNotFoundException) { throw; }
+        catch (DriveNotFoundException) { throw; }
+        catch (IOException) 
+        {
+          
+        }
+      }
+
+      throw new IOException("Could not create unique filename in " + retryCount + " attempts");
     }
   }
 }

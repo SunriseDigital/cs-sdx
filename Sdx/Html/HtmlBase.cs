@@ -58,6 +58,12 @@ namespace Sdx.Html
       return this.RenderStartTag(attr);
     }
 
+    public HtmlBase ChildrenCall(Action<IEnumerable<HtmlBase>> callback)
+    {
+      callback.Invoke(Children);
+      return this;
+    }
+
     /// <summary>
     /// `プロパティ名`+CallメソッドはFluentSyntaxのためのメソッドです。
     /// </summary>
@@ -83,7 +89,7 @@ namespace Sdx.Html
       this.children.ForEach(action);
     }
 
-    public IEnumerable<HtmlBase> Children
+    public List<HtmlBase> Children
     {
       get
       {

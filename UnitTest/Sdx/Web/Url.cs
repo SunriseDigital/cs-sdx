@@ -472,5 +472,35 @@ namespace UnitTest
       Assert.Equal("/path/to/no-scheme", url.Build(new List<string>() { "baz" }));
       Assert.Equal("/path/to/no-scheme?baz=grr&baz=hoge&hoge=fuga", url.Build(new Dictionary<string, string>() { { "hoge", "fuga" } }));
     }
+
+
+    [Fact]
+    public void TestBuildShortcut()
+    {
+      var url = new Sdx.Web.Url("http://www.example.com/path/to/no-scheme?foo=bar1&foo=bar2&baz=qux");
+
+      //Except
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme?baz=qux",
+        url.BuildExcept("foo")
+      );
+
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme",
+        url.BuildExcept("foo", "baz")
+      );
+
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme?foo=bar1&foo=bar2&baz=qux",
+        url.Build()
+      );
+
+      //With
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme?foo=bar1&foo=bar2&baz=qux&bar=&piyo=hogera&bar=bazzzz",
+        url.BuildWith("bar", "", "piyo", "hogera", "bar", "bazzzz")
+      );
+      
+    }
   }
 }

@@ -10,50 +10,14 @@ namespace Sdx.Scaffold
 {
   public class Manager
   {
-    private const string CONTEXT_KEY = "SDX.SCAFFOLD.MANAGER.INSTANCES";
-    private const string DEFAULT_NAME = "SDX.SCAFFOLD.MANAGER.DEFAULT_NAME";
-    public String Name { get; private set; }
-
     private int? perPage;
-
-    /// <summary>
-    /// Sdx.Context.Currentに結び付けます。UserContorl側でインスタンスを特定するのに必要です。
-    /// </summary>
-    /// <param name="name">
-    ///   一つのContextで二つのScaffold.Managerを生成する場合、名前を任意に渡す必要があります。
-    ///   インクルードタグにつけた名前を渡してください。
-    ///   <Scaffold:edit ID="edit" runat="server" Name="someName" />
-    ///   作っては見たものの必要に駆られなかったのでテストしていません。
-    /// </param>
-    public void BindToCurrentContext(string name = Manager.DEFAULT_NAME)
-    {
-      this.Name = name;
-      Dictionary<string, Manager> instances = null;
-      if (!Context.Current.Vars.ContainsKey(Manager.CONTEXT_KEY))
-      {
-        instances = new Dictionary<string, Manager>();
-        Context.Current.Vars[Manager.CONTEXT_KEY] = instances;
-      }
-      else
-      {
-        instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
-      }
-
-      if (instances.ContainsKey(this.Name))
-      {
-        throw new InvalidOperationException("Already exists " + this.Name + " Manager");
-      }
-
-      instances[name] = this;
-    }
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="tableMeta"></param>
     /// <param name="db"></param>
-    /// <param name="name">UserControl側で参照するための名前。基本デフォルトでOK。一ページに複数のScaffoldを使用する場合必要（テストしてません）。</param>
-    public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db, string name = Manager.DEFAULT_NAME)
+    public Manager(Db.TableMeta tableMeta, Db.Adapter.Base db)
     {
       Db = db;
       TableMeta = tableMeta;
@@ -110,7 +74,7 @@ namespace Sdx.Scaffold
       else
       {
         method = TableMeta.TableType.GetMethod(
-          "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Element"
+          "Create" + Sdx.Util.String.ToCamelCase(config.Name) + "Element"
         );
       }
 
@@ -159,7 +123,6 @@ namespace Sdx.Scaffold
       var form = new Html.Form();
 
       var bind = new NameValueCollection();
-      //var hasGetters = new List<Config.Item>();
       foreach (var config in FormList)
       {
         var elem = CreateFormElement(form, config, record, conn);
@@ -177,7 +140,7 @@ namespace Sdx.Scaffold
         else
         {
           method = TableMeta.TableType.GetMethod(
-            "Create" + Sdx.Util.String.ToCamelCase(config["column"].ToString()) + "Validators"
+            "Create" + Sdx.Util.String.ToCamelCase(config.Name) + "Validators"
           );
         }
 
@@ -202,10 +165,10 @@ namespace Sdx.Scaffold
             throw new InvalidOperationException("Illegal parameter count for " + method);
           }
         }
-        else if (config.ContainsKey("column"))
+        else
         {
-          var columnName = config["column"].ToString();
-          var column = TableMeta.Columns.Find(c => c.Name == columnName);
+          //Auto validator
+          var column = TableMeta.Columns.Find(c => c.Name == config.Name);
           if (column != null)
           {
             column.AppendValidators(elem, record);
@@ -221,10 +184,24 @@ namespace Sdx.Scaffold
         //FormにDBから戻す値を生成
         if (config.ContainsKey("getter"))
         {
-          bind.Set(
-            config["column"].ToString(),
-            (string)config["getter"].Invoke(record.GetType(), record, null)
-          );
+          var value = config["getter"].Invoke(record.GetType(), record, null);
+          if (config.ContainsKey("multiple") && config["multiple"].ToBool())
+          {
+            foreach (var val in (string[])value)
+            {
+              bind.Add(
+                config.Name,
+                (string)val
+              );
+            }
+          }
+          else
+          {
+            bind.Set(
+              config.Name,
+              (string)value
+            );
+          }
         }
         else if(config.ContainsKey("relation"))
         {
@@ -263,35 +240,20 @@ namespace Sdx.Scaffold
     public Web.Url ListPageUrl { get; set; }
     public Web.Url EditPageUrl { get; set; }
 
-    public static Manager CurrentInstance(string key)
-    {
-      if(key == null)
-      {
-        key = Manager.DEFAULT_NAME;
-      }
-
-      var instances = Context.Current.Vars.As<Dictionary<string, Manager>>(Manager.CONTEXT_KEY);
-
-      if (!instances.ContainsKey(key))
-      {
-        throw new InvalidOperationException("You must call BindToCurrentContext to use in UserControl.");
-      }
-
-      return instances[key];
-    }
-
     public Db.Record LoadRecord(NameValueCollection parameters, Sdx.Db.Connection conn)
     {
       var recordSet = FetchRecordSet(conn, (select) => {
-        var exists = false;
+        var exists = true;
         foreach (var column in TableMeta.Pkeys)
         {
           var values = parameters.GetValues(column.Name);
           if (values != null && values.Length > 0 && values[0].Length > 0)
           {
-            //TODO これはどっちか片っぽがあっただけでもtrueになるが問題ないのか？
-            exists = true;
             select.Where.Add(column.Name, values[0]);
+          }
+          else
+          {
+            exists = false;
           }
         }
 
@@ -382,7 +344,7 @@ namespace Sdx.Scaffold
       var relationList = new Config.List();
       foreach (var config in FormList)
       {
-        var columnName = config["column"].ToString();
+        var columnName = config.Name;
         if (config.ContainsKey("relation"))
         {
           relationList.Add(config);
@@ -391,13 +353,25 @@ namespace Sdx.Scaffold
         {
           if (values[columnName] != null)
           {
+            List<object> args = new List<object>();
             if (config.ContainsKey("setter"))
             {
-              config["setter"].Invoke(
-                record.GetType(),
-                record,
-                new object[] { values[columnName] }
-              );
+              if (config.ContainsKey("multiple") && config["multiple"].ToBool())
+              {
+                args.Add(values.GetValues(columnName));
+              }
+              else
+              {
+                args.Add(values[columnName]);
+              }
+
+              var methodInfo = config["setter"].ToMethodInfo(record.GetType());
+              if (methodInfo.GetParameters().Count() == 2)
+              {
+                args.Add(values);
+              }
+
+              methodInfo.Invoke(record, args.ToArray());
             }
             else
             {
@@ -520,7 +494,7 @@ namespace Sdx.Scaffold
           bindValues.Set(config["column"].ToString(), DateTime.Now.ToString());
         }
       }
-
+      
       form.Bind(bindValues);
     }
 
@@ -529,6 +503,16 @@ namespace Sdx.Scaffold
     public string Heading(int rank)
     {
       return "h" + (OutlineRank + rank - 1).ToString();
+    }
+
+    public object GetEditPagePath(Sdx.Db.Record record)
+    {
+      //pkeyの一部でブルーピングされていたら、既にURLについているので取り除く。
+      return EditPageUrl.Build(
+        record.GetPkeyValues()
+          .Where(kv => Group == null || kv.Key != Group.TargetColumnName)
+          .ToDictionary(kv => kv.Key, kv => kv.Value.ToString())
+      );
     }
   }
 }

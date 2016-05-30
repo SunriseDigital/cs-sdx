@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -88,13 +89,38 @@ namespace Sdx.Web
       }
 
       var tpList = add.Select(kv => Tuple.Create(kv.Key, kv.Value)).ToList();
+      return Build(tpList);
+    }
+
+    public string Build(List<Tuple<string, string>> add)
+    {
       string path = this.BuildPath();
       string query = this.BuildQueryString(
         this.ParamList
-          .Concat(tpList)
+          .Concat(add)
           .ToList()
       );
       return path + query;
+    }
+
+    public string Build(NameValueCollection add)
+    {
+      if (add.Count == 0)
+      {
+        return this.Build();
+      }
+
+      var tpList = new List<Tuple<string, string>>();
+      foreach (string key in add)
+      {
+        var values = add.GetValues(key);
+        foreach (var value in values)
+        {
+          tpList.Add(Tuple.Create(key, value));
+        }
+      }
+
+      return Build(tpList);
     }
 
     public string Build(IEnumerable<string> exclude)
@@ -227,6 +253,36 @@ namespace Sdx.Web
       cloned.ParamCount = new Dictionary<string, int>(this.ParamCount);
 
       return cloned;
+    }
+
+    public string BuildExcept(params string[] exclude)
+    {
+      if (exclude.Count() == 0)
+      {
+        return Build();
+      }
+      return Build(exclude);
+    }
+
+    public string BuildWith(params string[] add)
+    {
+      if(add.Length % 2 != 0)
+      {
+        throw new ArgumentException("Illegal key value pair count.");
+      }
+
+      if(add.Count() == 0)
+      {
+        return Build();
+      }
+
+      var tpList = new List<Tuple<string, string>>();
+      for (int i = 0; i < add.Length; i+=2)
+      {
+        tpList.Add(Tuple.Create(add[i], add[i + 1]));
+      }
+
+      return Build(tpList);
     }
   }
 }

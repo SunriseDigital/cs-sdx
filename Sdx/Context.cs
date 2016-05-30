@@ -99,5 +99,18 @@ namespace Sdx
     public CultureInfo Culture { get; set; }
 
     public Web.HttpErrorHandler HttpErrorHandler { get; private set; }
+
+    public bool PreventDebugDisplay { get; set; }
+
+    private bool isTestServer;
+
+    // TODO とりあえずでreturn Trueのみです。実装してください
+    public bool IsTestServer
+    {
+      get
+      {
+        return true;
+      }
+    }
   }
 }
