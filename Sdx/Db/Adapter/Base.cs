@@ -35,7 +35,12 @@ namespace Sdx.Db.Adapter
       return con;
     }
 
-    public Connection WrapConnection(DbConnection conn)
+    /// <summary>
+    /// 既に生成されているDbConnectionを使用してSdx.Db.Connectionを生成します。
+    /// </summary>
+    /// <param name="conn"></param>
+    /// <returns></returns>
+    public Connection CreateConnection(DbConnection conn)
     {
       if(conn.ConnectionString != ConnectionString)
       {
