@@ -35,6 +35,16 @@ namespace Sdx.Db.Adapter
       return con;
     }
 
+    public Connection WrapConnection(DbConnection conn)
+    {
+      if(conn.ConnectionString != ConnectionString)
+      {
+        throw new InvalidOperationException("Not match connection string " + conn.ConnectionString + " and " + ConnectionString);
+      }
+
+      return new Connection(this, conn);
+    }
+
     public DbParameter CreateParameter(string key, object value)
     {
       DbParameter param = this.Factory.CreateParameter();
