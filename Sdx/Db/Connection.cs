@@ -45,6 +45,12 @@ namespace Sdx.Db
       this.DbConnection = this.Adapter.Factory.CreateConnection();
     }
 
+    public Connection(Adapter.Base adapter, DbConnection conn)
+    {
+      this.Adapter = adapter;
+      this.DbConnection = conn;
+    }
+
     private void ThrowExceptionIfDisposed()
     {
       if (this.disposed)

@@ -35,6 +35,21 @@ namespace Sdx.Db.Adapter
       return con;
     }
 
+    /// <summary>
+    /// 既に生成されているDbConnectionを使用してSdx.Db.Connectionを生成します。
+    /// </summary>
+    /// <param name="conn"></param>
+    /// <returns></returns>
+    public Connection CreateConnection(DbConnection conn)
+    {
+      if(conn.ConnectionString != ConnectionString)
+      {
+        throw new InvalidOperationException("Not match connection string " + conn.ConnectionString + " and " + ConnectionString);
+      }
+
+      return new Connection(this, conn);
+    }
+
     public DbParameter CreateParameter(string key, object value)
     {
       DbParameter param = this.Factory.CreateParameter();
