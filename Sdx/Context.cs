@@ -112,5 +112,20 @@ namespace Sdx
         return true;
       }
     }
+
+    /// <summary>
+    /// <see cref="Sdx.Db.Adapter.Base.SharedConnection"/>で生成された共有接続をすべて開放する。
+    /// <see cref="Sdx.Web.HttpModule"/>を登録すると呼ばれます。
+    /// </summary>
+    internal void DisposeSharedConnections()
+    {
+      if (Sdx.Context.Current.Vars.ContainsKey(Db.Adapter.Base.SharedConnectionKey))
+      {
+        foreach (var kv in Sdx.Context.Current.Vars.As<Dictionary<string, Db.Connection>>(Db.Adapter.Base.SharedConnectionKey))
+        {
+          kv.Value.Dispose();
+        }
+      }
+    }
   }
 }
