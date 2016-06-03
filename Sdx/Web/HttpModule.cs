@@ -5,9 +5,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace Sdx.Diagnostics
+namespace Sdx.Web
 {
-  public class DebugHttpModule : IHttpModule
+  public class HttpModule : IHttpModule
   {
     private const string LogBlockFormat = @"
 <div style=""background-color: #ebebeb; border-radius: 5px; padding: 0;margin-bottom: 20px;"">
@@ -34,7 +34,8 @@ namespace Sdx.Diagnostics
     public void Init(HttpApplication application)
     {
       application.BeginRequest += new EventHandler(Application_BeginRequest);
-      application.EndRequest += new EventHandler(this.Application_EndRequest);
+      application.EndRequest += new EventHandler(Application_EndRequest);
+      application.Error += new EventHandler(Application_ErrorRequest);
     }
 
     public void Dispose() { }
@@ -58,6 +59,7 @@ namespace Sdx.Diagnostics
 
     private void Application_EndRequest(object source, EventArgs a)
     {
+      Sdx.Context.Current.DisposeSharedConnections();
       if (Sdx.Context.Current.IsDebugMode && !Sdx.Context.Current.PreventDebugDisplay)
       {
         //Debug.Log
@@ -66,6 +68,13 @@ namespace Sdx.Diagnostics
 
         WriteLogs(context);
       }
+
+      
+    }
+
+    private void Application_ErrorRequest(object source, EventArgs a)
+    {
+      Sdx.Context.Current.DisposeSharedConnections();
     }
 
     private void WriteLogs(HttpContext context)
@@ -90,7 +99,7 @@ namespace Sdx.Diagnostics
         postLog
           .Append(key)
           .Append(Environment.NewLine)
-          .Append(Debug.Export(values))
+          .Append(Diagnostics.Debug.Export(values))
           .Append(Environment.NewLine)
           .Append(Environment.NewLine);
       }
@@ -167,12 +176,12 @@ namespace Sdx.Diagnostics
 
     private void AppendDebugLogs(StringBuilder debugString)
     {
-      if(!(Sdx.Context.Current.Debug.Out is DebugHtmlWriter))
+      if(!(Sdx.Context.Current.Debug.Out is Diagnostics.DebugHtmlWriter))
       {
         return;
       }
 
-      var writer = (DebugHtmlWriter)Sdx.Context.Current.Debug.Out;
+      var writer = (Diagnostics.DebugHtmlWriter)Sdx.Context.Current.Debug.Out;
       if(writer.Builder.Length == 0)
       {
         return;

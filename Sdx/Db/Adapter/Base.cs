@@ -11,6 +11,7 @@ namespace Sdx.Db.Adapter
     internal DbProviderFactory Factory { get; private set; }
     private DbCommandBuilder builder;
     protected const string PasswordForSecureConnectionString = "******";
+    internal const string SharedConnectionKey = "Sdx.Db.Adapter.Base.SharedConnectionKey";
 
     protected abstract DbProviderFactory GetFactory();
 
@@ -26,6 +27,35 @@ namespace Sdx.Db.Adapter
     {
       this.Factory = this.GetFactory();
       this.builder = this.Factory.CreateCommandBuilder();
+    }
+
+    private string UniqueDbString
+    {
+      get
+      {
+        return  ConnectionString + "@" + GetType().FullName;
+      }
+    }
+
+    public Connection SharedConnection
+    {
+      get
+      {
+        if(!Sdx.Context.Current.Vars.ContainsKey(SharedConnectionKey))
+        {
+          Sdx.Context.Current.Vars[SharedConnectionKey] = new Dictionary<string, Connection>();
+        }
+
+        var dic = Sdx.Context.Current.Vars.As<Dictionary<string, Connection>>(SharedConnectionKey);
+
+        if(!dic.ContainsKey(UniqueDbString))
+        {
+          dic[UniqueDbString] = CreateConnection();
+          dic[UniqueDbString].Open();
+        }
+
+        return dic[UniqueDbString];
+      }
     }
 
     public Connection CreateConnection()
