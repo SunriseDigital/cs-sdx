@@ -181,5 +181,20 @@ namespace Sdx.Html
     public bool IsSecret { get; set; }
 
     public bool HasError { get { return Errors.Count > 0; } }
+
+    public Tag HiddenTag()
+    {
+      var span = new Tag("span");
+      foreach (var val in Value)
+      {
+        var input = new VoidTag("input");
+        input.Attr["type"] = "hidden";
+        input.Attr["value"] = val;
+        input.Attr["name"] = Name;
+        span.AddHtml(input);
+      }
+
+      return span;
+    }
   }
 }
