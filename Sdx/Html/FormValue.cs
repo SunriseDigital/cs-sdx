@@ -89,5 +89,14 @@ namespace Sdx.Html
     {
       return this.MemberwiseClone();
     }
+
+    public int ToInt()
+    {
+      if(IsMultiple)
+      {
+        throw new InvalidOperationException("This value has multilple value: " + Sdx.Diagnostics.Debug.Dump(values));
+      }
+      return Int32.Parse(values.First());
+    }
   }
 }
