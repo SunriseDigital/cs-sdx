@@ -108,7 +108,7 @@ English
     [Fact]
     public void TestFormCheckableGroupCheckbox()
     {
-      var group = new Sdx.Html.CheckableGroup();
+      var group = new Sdx.Html.CheckBoxGroup();
       group.Name = "checkboxies";
 
       Sdx.Html.CheckBox checkbox;
@@ -229,12 +229,38 @@ English
 "),
   group[2].Tag.Render()
 );
+
+      var radios = new Sdx.Html.RadioGroup();
+      radios.AddCheckable("1", "options 1");
+      radios.AddCheckable("2", "options 2");
+      radios.AddCheckable("3", "options 3");
+
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <label><input type=""radio"" value=""1"">options 1</label>
+  <label><input type=""radio"" value=""2"">options 2</label>
+  <label><input type=""radio"" value=""3"">options 3</label>
+</span>
+"), radios.Tag.Render());
+
+      Assert.False(radios.Value.IsMultiple);
+
+      radios.Bind("2");
+      Assert.Equal(HtmlLiner(@"
+<span>
+  <label><input type=""radio"" value=""1"">options 1</label>
+  <label><input type=""radio"" value=""2"" checked>options 2</label>
+  <label><input type=""radio"" value=""3"">options 3</label>
+</span>
+"), radios.Tag.Render());
+
+      Assert.Equal("2", radios.Value.ToString());
     }
 
     [Fact]
     public void TestFormElementGroupCheckboxWithLabel()
     {
-      var group = new Sdx.Html.CheckableGroup();
+      var group = new Sdx.Html.CheckBoxGroup();
       group.Name = "checkboxies";
 
       Sdx.Html.CheckBox checkbox;
@@ -261,7 +287,7 @@ English
   group.Tag.Render()
       );
 
-      group = new Sdx.Html.CheckableGroup();
+      group = new Sdx.Html.CheckBoxGroup();
       group.Name = "checkboxies";
 
       checkbox = new Sdx.Html.CheckBox();
@@ -696,7 +722,7 @@ English
 
 
       //Checkbox
-      var checkList = new Sdx.Html.CheckableGroup();
+      var checkList = new Sdx.Html.CheckBoxGroup();
       checkList.Name = "check_list";
       checkList.AddValidator(new Sdx.Validation.NotEmpty());
       form.SetElement(checkList);
@@ -719,7 +745,7 @@ English
       checkList.AddCheckable(checkbox, "さん");
 
       //Radio
-      var radios = new Sdx.Html.CheckableGroup();
+      var radios = new Sdx.Html.RadioGroup();
       radios.Name = "radios";
       radios.AddValidator(new Sdx.Validation.NotEmpty());
       form.SetElement(radios);

@@ -665,7 +665,7 @@ namespace UnitTest
         Assert.True(record.IsNew);
 
         var form = scaffold.BuildForm(record, conn);
-        Assert.IsType<Sdx.Html.CheckableGroup>(form["category_id"]);
+        Assert.IsType<Sdx.Html.CheckBoxGroup>(form["category_id"]);
 
         conn.BeginTransaction();
         try
@@ -1268,7 +1268,7 @@ namespace UnitTest
         var record = scaffold.LoadRecord(HttpContext.Current.Request.Params, conn);
         var form = scaffold.BuildForm(record, conn);
 
-        Assert.IsType<Sdx.Html.CheckableGroup>(form["auto_created_at"]);
+        Assert.IsType<Sdx.Html.CheckBoxGroup>(form["auto_created_at"]);
 
         Assert.True(record.IsNew);
         Assert.Equal(
