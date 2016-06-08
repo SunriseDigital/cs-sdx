@@ -63,10 +63,6 @@ namespace Sdx.Html
 
     public void AddCheckable(Checkable checkable, string labelString = null)
     {
-      if(checkable is Radio)
-      {
-        Value.IsMultiple = false;
-      }
       elements.Add(checkable);
 
       var tag = this.tag;
