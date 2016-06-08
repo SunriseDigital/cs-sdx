@@ -681,5 +681,18 @@ namespace Sdx.Db
     {
       
     }
+
+    public bool IsAnyColumnUpdated(params string[] columns)
+    {
+      foreach(var column in columns)
+      {
+        if(UpdatedValues.ContainsKey(column))
+        {
+          return true;
+        }
+      }
+
+      return false;
+    }
   }
 }

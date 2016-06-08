@@ -63,5 +63,10 @@ namespace Sdx.Util
     {
       return value.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", Environment.NewLine);
     }
+
+    public static string ReplaceLineBreak(string value, string replaceTo)
+    {
+      return value.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", replaceTo);
+    }
   }
 }
