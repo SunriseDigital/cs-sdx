@@ -62,7 +62,13 @@ namespace Sdx.Db
       var exists = true;
       foreach(var column in pkeys)
       {
-        if (row[Record.BuildColumnAliasWithContextName(column.Name, contextName)] is DBNull)
+        var rowKey = Record.BuildColumnAliasWithContextName(column.Name, contextName);
+        if (!row.ContainsKey(rowKey))
+        {
+          throw new InvalidOperationException("Missing " + rowKey + " in " + Sdx.Diagnostics.Debug.Dump(row));
+        }
+
+        if (row[rowKey] is DBNull)
         {
           exists = false;
           break;
