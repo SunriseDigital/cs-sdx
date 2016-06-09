@@ -155,19 +155,7 @@ namespace Sdx.Db
 
     public string GetString(string key)
     {
-      var column = OwnMeta.GetColumn(key);
-
-      string result;
-      if (column.Type == Table.ColumnType.Date)
-      {
-        result = GetDateTime(key).ToString("yyyy-MM-dd");
-      }
-      else
-      {
-        result = Convert.ToString(this.GetValue(key));
-      }
-
-      return result;
+      return Convert.ToString(this.GetValue(key));
     }
 
     public bool HasValue(string key)
@@ -454,14 +442,28 @@ namespace Sdx.Db
       });
     }
 
+    /// <summary>
+    /// FormにBindするためのNameValueCollectionを生成する。
+    /// </summary>
+    /// <returns></returns>
     public NameValueCollection ToNameValueCollection()
     {
       var col = new NameValueCollection();
       OwnMeta.Columns.ForEach((column) => {
-        var value = this.GetValue(column.Name);
-        if(value != null)
+        if (HasValue(column.Name))
         {
-          col.Add(column.Name, this.GetString(column.Name));
+          string value;
+          if(column.Type == Table.ColumnType.Date)
+          {
+            value = GetDateTime(column.Name).ToString("yyyy-MM-dd");
+          }
+          else
+          {
+            value = GetString(column.Name);
+          }
+
+          col.Add(column.Name, value);
+   
         }
       });
 
