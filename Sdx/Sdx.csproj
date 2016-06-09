@@ -93,6 +93,8 @@
     <Compile Include="Diagnostics\Bench.cs" />
     <Compile Include="Diagnostics\Debug.cs" />
     <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
+    <Compile Include="Html\CheckBoxGroup.cs" />
+    <Compile Include="Html\RadioGroup.cs" />
     <Compile Include="Web\HttpModule.cs" />
     <Compile Include="Html\Attr.cs" />
     <Compile Include="Html\Checkable.cs" />

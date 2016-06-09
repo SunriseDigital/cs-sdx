@@ -108,7 +108,7 @@ namespace Sdx.Scaffold
 
       if (config.ContainsKey("autoCurrentCheckbox"))
       {
-        var group = new Sdx.Html.CheckableGroup(config["autoCurrentCheckbox"].ToString());
+        var group = new Sdx.Html.CheckBoxGroup(config["autoCurrentCheckbox"].ToString());
         var checkbox = new Sdx.Html.CheckBox();
         checkbox.Tag.Attr.Set("value", "1");
         group.AddCheckable(checkbox, Sdx.I18n.GetString("現在日時で更新"));

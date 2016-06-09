@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class CheckableGroup: FormElement
+  public abstract class CheckableGroup: FormElement
   {
     private List<Checkable> elements = new List<Checkable>();
 
@@ -29,11 +29,6 @@ namespace Sdx.Html
 
     }
 
-    protected internal override FormValue CreateFormValue()
-    {
-      return new FormValue(true);
-    }
-
     internal protected override Tag CreateTag()
     {
       return new Tag("span");
@@ -52,24 +47,22 @@ namespace Sdx.Html
       }
     }
 
-    public void AddCheckable<T>(string key, string labelString = null) where T : Checkable, new()
+    public void AddCheckable(string key, string labelString = null)
     {
-      var checkable = new T();
+      var checkable = CreateCheckable();
       checkable.Tag.Attr["value"] = key;
       AddCheckable(checkable, labelString);
     }
 
-    public void AddCheckable<T>(KeyValuePair<string, string> pair) where T: Checkable, new()
+    public void AddCheckable(KeyValuePair<string, string> pair)
     {
-      AddCheckable<T>(pair.Key, pair.Value);
+      AddCheckable(pair.Key, pair.Value);
     }
+
+    protected abstract internal Checkable CreateCheckable();
 
     public void AddCheckable(Checkable checkable, string labelString = null)
     {
-      if(checkable is Radio)
-      {
-        Value.IsMultiple = false;
-      }
       elements.Add(checkable);
 
       var tag = this.tag;
