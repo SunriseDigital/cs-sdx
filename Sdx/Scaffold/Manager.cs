@@ -98,8 +98,7 @@ namespace Sdx.Scaffold
       else
       {
         elem = new Sdx.Html.InputText();
-
-        elem.Name = config["column"].ToString();
+        elem.Name = config.Name;
       }
 
       elem.Label = config["label"].ToString();
@@ -216,10 +215,7 @@ namespace Sdx.Scaffold
         else if (config.ContainsKey("column"))
         {
           var columnName = config["column"].ToString();
-          if (record.HasValue(columnName))
-          {
-            bind.Set(columnName, record.GetString(columnName));
-          }
+          bind.Set(columnName, record.GetString(columnName));
         }
 
         if(config.ContainsKey("autoCurrentCheckbox"))

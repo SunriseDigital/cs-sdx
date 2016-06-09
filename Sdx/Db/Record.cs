@@ -82,6 +82,17 @@ namespace Sdx.Db
       }
     }
 
+    public string GetFormatedDateTime(string key, string format = null)
+    {
+      if(!HasValue(key))
+      {
+        return null;
+      }
+
+      var datetime = Convert.ToDateTime(GetValue(key));
+      return datetime.ToString(format);
+    }
+
     public DateTime GetDateTime(string key)
     {
       return Convert.ToDateTime(this.GetValue(key));
@@ -144,12 +155,25 @@ namespace Sdx.Db
 
     public string GetString(string key)
     {
-      return Convert.ToString(this.GetValue(key));
+      var column = OwnMeta.GetColumn(key);
+
+      string result;
+      if (column.Type == Table.ColumnType.Date)
+      {
+        result = GetDateTime(key).ToString("yyyy-MM-dd");
+      }
+      else
+      {
+        result = Convert.ToString(this.GetValue(key));
+      }
+
+      return result;
     }
 
     public bool HasValue(string key)
     {
-      return this.GetValue(key) != null;
+      var value = GetValue(key);
+      return !(value is DBNull) && value != null;
     }
 
     public Record ClearRecordCache(string contextName = null)

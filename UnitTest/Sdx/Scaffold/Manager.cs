@@ -778,7 +778,7 @@ namespace UnitTest
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
-          .Set("column", new Sdx.Scaffold.Config.Value("name_with_code"))
+          .Set("name", new Sdx.Scaffold.Config.Value("name_with_code"))
           .Set("setter", new Sdx.Scaffold.Config.Value("SetNameWithCode"))//カンマ区切りの[名前,コード]をそれぞれnameとcodeにセットする。
         )
         ;
