@@ -182,5 +182,11 @@ namespace Sdx.Diagnostics
     {
       System.Console.WriteLine(Dump(value));
     }
+
+    public static void DumpToFile(object value, string path)
+    {
+      var now = DateTime.Now;
+      System.IO.File.AppendAllText(path, String.Format("[{0}] {1}{2}", now.ToString("yyyy-MM-dd HH:mm:ss"), Dump(value), Environment.NewLine));
+    }
   }
 }
