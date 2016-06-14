@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Sdx.Db.Sql;
 using System.Data;
-using System.Web.Configuration;
 
 namespace Sdx.Db.Adapter
 {
