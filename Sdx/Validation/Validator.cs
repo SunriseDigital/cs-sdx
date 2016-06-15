@@ -36,12 +36,22 @@ namespace Sdx.Validation
 
     protected void AddError(string errorType)
     {
-      var error = new Error();
+      var error = new Error(errorType);
 
       error.ClassName = this.GetType().FullName;
-      error.ErrorType = errorType;
 
       error.Message = this.DetectMessage(error);
+
+      Errors.Add(error);
+    }
+
+    protected void AddError(Error error)
+    {
+      if (error.Message == null)
+      {
+        throw new InvalidOperationException("Missing error message");
+      }
+      error.ClassName = this.GetType().FullName;
 
       Errors.Add(error);
     }
