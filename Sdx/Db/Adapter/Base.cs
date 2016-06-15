@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Collections.Generic;
 using System.Linq;
 using Sdx.Db.Sql;
+using System.Data;
 
 namespace Sdx.Db.Adapter
 {
@@ -67,6 +68,7 @@ namespace Sdx.Db.Adapter
 
     /// <summary>
     /// 既に生成されているDbConnectionを使用してSdx.Db.Connectionを生成します。
+    /// 渡されたDbConnectionが開いていなかった場合、中でOpenします。
     /// </summary>
     /// <param name="conn"></param>
     /// <returns></returns>
@@ -75,6 +77,11 @@ namespace Sdx.Db.Adapter
       if(conn.ConnectionString != ConnectionString)
       {
         throw new InvalidOperationException("Not match connection string " + conn.ConnectionString + " and " + ConnectionString);
+      }
+
+      if (conn.State != ConnectionState.Open)
+      {				
+        conn.Open();
       }
 
       return new Connection(this, conn);
