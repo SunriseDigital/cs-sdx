@@ -11,7 +11,12 @@ namespace Sdx.Validation
     public string ClassName { get; internal set; }
     public string Message { get; set; }
 
-    public Error(string errorType)
+    public Error()
+    {
+
+    }
+
+    public Error(string errorType):this()
     {
       ErrorType = errorType;
     }
