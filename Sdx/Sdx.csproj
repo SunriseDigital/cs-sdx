@@ -95,6 +95,7 @@
     <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
     <Compile Include="Html\CheckBoxGroup.cs" />
     <Compile Include="Html\RadioGroup.cs" />
+    <Compile Include="Validation\Function.cs" />
     <Compile Include="Web\HttpModule.cs" />
     <Compile Include="Html\Attr.cs" />
     <Compile Include="Html\Checkable.cs" />
