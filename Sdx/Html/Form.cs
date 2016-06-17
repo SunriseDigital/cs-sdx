@@ -10,6 +10,12 @@ namespace Sdx.Html
   public class Form : IEnumerable<FormElement>
   {
     private Dictionary<string, FormElement> elements = new Dictionary<string, FormElement>();
+    public Dictionary<string, Validation.Group.Base> GroupValidators { get; private set; }
+
+    public Form()
+    {
+      GroupValidators = new Dictionary<string, Validation.Group.Base>();
+    }
 
     public FormElement this[string name]
     {
@@ -83,6 +89,15 @@ namespace Sdx.Html
     public bool ExecValidators()
     {
       isValidCache = true;
+
+      foreach (var kv in GroupValidators)
+      {
+        if (!kv.Value.Exec(this))
+        {
+          isValidCache = false;
+        }
+      }
+
       foreach(var kv in elements)
       {
         if(!kv.Value.ExecValidators())
@@ -152,6 +167,11 @@ namespace Sdx.Html
       }
 
       return result;
+    }
+
+    public void AddGroupValidator(string key, Validation.Group.Base groupValidator)
+    {
+      GroupValidators[key] = groupValidator;
     }
   }
 }
