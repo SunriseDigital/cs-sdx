@@ -595,6 +595,15 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Select AddOrderRandom()
+    {
+      var column = new Column(Expr.Wrap(Adapter.RandomOrderKeyword));
+      column.Order = null;
+      orders.Add(column);
+
+      return this;
+    }
+
     public object Clone()
     {
       var cloned = (Select)this.MemberwiseClone();
