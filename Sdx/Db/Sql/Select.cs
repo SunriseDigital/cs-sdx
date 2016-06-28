@@ -247,10 +247,16 @@ namespace Sdx.Db.Sql
           }
 
           builder
-            .Append(column.Build(this.Adapter, parameters, condCount))
-            .Append(" ")
-            .Append(column.Order.SqlString())
-            .Append(", ");
+            .Append(column.Build(this.Adapter, parameters, condCount));
+
+          if(column.Order != null)
+          {
+            builder
+              .Append(" ")
+              .Append(column.Order.SqlString());
+          }
+
+          builder.Append(", ");
         });
 
         builder.Remove(builder.Length - 2, 2);

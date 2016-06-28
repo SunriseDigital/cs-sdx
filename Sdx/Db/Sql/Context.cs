@@ -328,6 +328,16 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Context AddOrderRandom()
+    {
+      var column = new Column(Expr.Wrap("NEWID()"));
+			column.Order = null;
+      Select.OrderList.Add(column);
+
+      return this;
+    }
+
+
     /// <summary>
     /// <see cref="Db.Table"/>を使ってFROM句/JOIN句に追加された<see cref="Context"/>からはこのプロパティーから<see cref="Db.Table"/>が取得できます。
     /// </summary>
