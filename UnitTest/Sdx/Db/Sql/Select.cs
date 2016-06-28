@@ -2040,5 +2040,25 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         Assert.Equal(scSet.GroupBy(sc => sc.GetValue("shop_id")).Count(), count);
       }
     }
+
+    [Fact]
+    public void TestOrderRandom()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunOrderRandom(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunOrderRandom(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .AddOrderRandom();
+      Assert.True(select.Build().CommandText.Contains("ORDER BY"));
+    }
+
   }
 }
