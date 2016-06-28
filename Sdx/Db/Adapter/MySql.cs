@@ -49,5 +49,10 @@ namespace Sdx.Db.Adapter
       command.CommandText = "SELECT LAST_INSERT_ID()";
       return connection.ExecuteScalar(command);
     }
+
+    internal override string RandomOrderKeyword
+    {
+      get { return "RAND()"; }
+    }
   }
 }

@@ -166,5 +166,7 @@ namespace Sdx.Db.Adapter
     {
       return new Sql.Delete(this);
     }
+
+    internal abstract string RandomOrderKeyword { get; }
   }
 }

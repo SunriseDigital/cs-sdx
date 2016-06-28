@@ -330,8 +330,8 @@ namespace Sdx.Db.Sql
 
     public Context AddOrderRandom()
     {
-      var column = new Column(Expr.Wrap("NEWID()"));
-			column.Order = null;
+      var column = new Column(Expr.Wrap(Select.Adapter.RandomOrderKeyword));
+      column.Order = null;
       Select.OrderList.Add(column);
 
       return this;

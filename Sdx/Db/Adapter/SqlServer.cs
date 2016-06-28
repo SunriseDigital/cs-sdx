@@ -52,5 +52,10 @@ namespace Sdx.Db.Adapter
       command.CommandText = "SELECT @@IDENTITY";
       return connection.ExecuteScalar(command);
     }
+
+    internal override string RandomOrderKeyword
+    {
+      get { return "NEWID()"; }
+    }
   }
 }
