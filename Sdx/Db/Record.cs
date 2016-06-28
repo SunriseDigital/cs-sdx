@@ -720,5 +720,15 @@ namespace Sdx.Db
 
       return false;
     }
+
+    private Collection.Holder vars = new Collection.Holder();
+
+    public Collection.Holder Vars
+    {
+      get
+      {
+        return this.vars;
+      }
+    }
   }
 }
