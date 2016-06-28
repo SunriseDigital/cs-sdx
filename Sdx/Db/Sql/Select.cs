@@ -251,9 +251,10 @@ namespace Sdx.Db.Sql
 
           if(column.Order != null)
           {
+            var sqlstr = ((Order)column.Order).SqlString();
             builder
               .Append(" ")
-              .Append(column.Order.SqlString());
+              .Append(sqlstr);
           }
 
           builder.Append(", ");
