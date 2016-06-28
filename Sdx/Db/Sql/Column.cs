@@ -14,7 +14,7 @@ namespace Sdx.Db.Sql
 
     internal string ContextName { get; set; }
 
-    internal Order Order { get; set; }
+    internal Order? Order { get; set; }
 
     internal object Value { get; set; }
 

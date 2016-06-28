@@ -84,7 +84,7 @@ namespace Sdx.Db.Sql
       return strings[(int)gender];
     }
 
-    internal static string SqlString(this Order order)
+    internal static string SqlString(this Order? order)
     {
       string[] strings = { "ASC", "DESC" };
       return strings[(int)order];
