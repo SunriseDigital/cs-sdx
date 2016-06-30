@@ -123,6 +123,32 @@ namespace Sdx.Db
       return Convert.ToInt64(this.GetValue(key));
     }
 
+    /// <summary>
+    /// <see cref="GetValue"/>が例外にならない場合はtrue。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public bool CanGetValue(string key)
+    {
+      if (!OwnMeta.HasColumn(key))
+      {
+        throw new InvalidOperationException("Missing " + key + " column. Check table settings.");
+      }
+
+      if (this.UpdatedValues.ContainsKey(key))
+      {
+        return true;
+      }
+
+      if (IsNew)
+      {
+        return false;
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
+      return this.ValuesList[0].ContainsKey(keyWithContext);
+    }
+
     private object GetOriginValue(string key)
     {
       if (IsNew)
@@ -642,6 +668,14 @@ namespace Sdx.Db
             newValues[key] = conn.FetchLastInsertId();
           }
         }
+
+        OwnMeta.Columns.ForEach(column => { 
+          var key = Record.BuildColumnAliasWithContextName(column.Name, ContextName);
+          if(!newValues.ContainsKey(key))
+          {
+            newValues[key] = DBNull.Value;
+          }
+        });
 
         ValuesList.Add(newValues);
       }

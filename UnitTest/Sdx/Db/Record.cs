@@ -626,6 +626,8 @@ namespace UnitTest
         }));
 
         Assert.IsType<InvalidOperationException>(ex);
+
+        Assert.False(shops[0].CanGetValue("area_id"));
       }
     }
 
@@ -723,14 +725,10 @@ namespace UnitTest
 
         Assert.Equal("foobar", shop.GetValue("login_id"));
 
-        //保存後にSetしていない値を読むと例外になる。
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          shop.GetValue("password");
-        }));
-
-        Assert.IsType<InvalidOperationException>(ex);
-        
+        //保存後にSetしていない値を読むとDBNull.Value。
+        Assert.Equal(DBNull.Value, shop.GetValue("password"));
+        //DBNullでもCanGetValueはtrue
+        Assert.True(shop.CanGetValue("password"));
       }
       
       //DbNullで更新
