@@ -50,7 +50,7 @@ namespace Sdx.Db.Adapter
       return connection.ExecuteScalar(command);
     }
 
-    internal override string RandomOrderKeyword
+    public override string RandomOrderKeyword
     {
       get { return "RAND()"; }
     }
