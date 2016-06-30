@@ -133,16 +133,17 @@ namespace Sdx.Db
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if (!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        return null;
+        throw new InvalidOperationException("No origin values. Not loaded from db.");
       }
       return this.ValuesList[0][keyWithContext];
     }
 
     /// <summary>
     /// カラムの値を取得します。テーブル定義に無いカラム名を指定すると例外になりますので注意してください。
+    /// またDBから読み込まなかったカラムを取得すると例外になります。これはGet系のユーティリティーメソッドで読み込んでいない値を使ってしまうと発見しづらいバグを生むからです。
     /// </summary>
     /// <param name="key"></param>
-    /// <returns>新規レコードで値をsetしていない場合、DBから取得しなかったカラムはNULLが帰ります。DBの値がNULLの時はDBNullが帰ります。</returns>
+    /// <returns>新規レコードで値をsetしていない場合NULLが帰ります。DBの値がNULLの時はDBNullが帰ります。</returns>
     public object GetValue(string key)
     {
       if(!OwnMeta.HasColumn(key))

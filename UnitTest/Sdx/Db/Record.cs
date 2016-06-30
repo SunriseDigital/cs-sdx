@@ -619,8 +619,13 @@ namespace UnitTest
         Assert.Equal("天祥", shops[0].GetString("name"));
         Assert.Equal("エスペリア", shops[1].GetString("name"));
 
-        //取得しなかったキーはNULL
-        Assert.Equal(null, shops[0].GetValue("area_id"));
+        //取得しなかったキーを取得すると例外
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          var areaEx = shops[0].GetValue("area_id");
+        }));
+
+        Assert.IsType<InvalidOperationException>(ex);
       }
     }
 
@@ -717,7 +722,15 @@ namespace UnitTest
         }
 
         Assert.Equal("foobar", shop.GetValue("login_id"));
-        Assert.Null(shop.GetValue("password"));
+
+        //保存後にSetしていない値を読むと例外になる。
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          shop.GetValue("password");
+        }));
+
+        Assert.IsType<InvalidOperationException>(ex);
+        
       }
       
       //DbNullで更新
