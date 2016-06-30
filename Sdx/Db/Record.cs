@@ -133,13 +133,23 @@ namespace Sdx.Db
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if (!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        return DBNull.Value;
+        return null;
       }
       return this.ValuesList[0][keyWithContext];
     }
 
+    /// <summary>
+    /// カラムの値を取得します。テーブル定義に無いカラム名を指定すると例外になりますので注意してください。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>新規レコードで値をsetしていない場合、DBから取得しなかったカラムはNULLが帰ります。DBの値がNULLの時はDBNullが帰ります。</returns>
     public object GetValue(string key)
     {
+      if(!OwnMeta.HasColumn(key))
+      {
+        throw new InvalidOperationException("Missing " + key + " column. Check table settings.");
+      }
+
       if (this.UpdatedValues.ContainsKey(key))
       {
         return this.UpdatedValues[key];
@@ -147,7 +157,7 @@ namespace Sdx.Db
 
       if (IsNew)
       {
-        return DBNull.Value;
+        return null;
       }
 
       return GetOriginValue(key);
@@ -625,13 +635,12 @@ namespace Sdx.Db
           var pkeyValue = GetValue(firstPkey.Name);
           //保存に成功し、PkeyがNullだったらAutoincrementのはず。
           //IsAutoincrementを見ると強引に挿入していることもあるので。
-          if (pkeyValue == DBNull.Value)
+          if (pkeyValue == null)
           {
             var key = Record.BuildColumnAliasWithContextName(firstPkey.Name, ContextName);
             newValues[key] = conn.FetchLastInsertId();
           }
         }
-
 
         ValuesList.Add(newValues);
       }

@@ -620,7 +620,7 @@ namespace UnitTest
         Assert.Equal("エスペリア", shops[1].GetString("name"));
 
         //取得しなかったキーはNULL
-        Assert.Equal(DBNull.Value, shops[0].GetValue("area_id"));
+        Assert.Equal(null, shops[0].GetValue("area_id"));
       }
     }
 
@@ -717,7 +717,7 @@ namespace UnitTest
         }
 
         Assert.Equal("foobar", shop.GetValue("login_id"));
-        Assert.Equal(DBNull.Value, shop.GetValue("password"));
+        Assert.Null(shop.GetValue("password"));
       }
       
       //DbNullで更新
@@ -728,6 +728,8 @@ namespace UnitTest
         select
           .AddFrom(new Test.Orm.Table.Shop())
           .WhereCall((where) => where.Add("id", id));
+
+        select.Context("shop");
 
         shop = conn.FetchRecord(select);
         Assert.Equal(DBNull.Value, shop.GetValue("password"));
