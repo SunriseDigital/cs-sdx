@@ -247,10 +247,17 @@ namespace Sdx.Db.Sql
           }
 
           builder
-            .Append(column.Build(this.Adapter, parameters, condCount))
-            .Append(" ")
-            .Append(column.Order.SqlString())
-            .Append(", ");
+            .Append(column.Build(this.Adapter, parameters, condCount));
+
+          if(column.Order != null)
+          {
+            var sqlstr = ((Order)column.Order).SqlString();
+            builder
+              .Append(" ")
+              .Append(sqlstr);
+          }
+
+          builder.Append(", ");
         });
 
         builder.Remove(builder.Length - 2, 2);
@@ -584,6 +591,15 @@ namespace Sdx.Db.Sql
     {
       var column = new Column(columnName);
       column.Order = order;
+      orders.Add(column);
+
+      return this;
+    }
+
+    public Select AddOrderRandom()
+    {
+      var column = new Column(Expr.Wrap(Adapter.RandomOrderKeyword));
+      column.Order = null;
       orders.Add(column);
 
       return this;

@@ -2071,5 +2071,35 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       Assert.Equal(10, testDb.Command.Parameters["@1"].Value);
       Assert.Equal(15, testDb.Command.Parameters["@2"].Value);
     }
+
+    [Fact]
+    public void TestOrderRandom()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunOrderRandom(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunOrderRandom(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .SetColumn("id")
+        .AddOrderRandom();
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}
+          ORDER BY " + db.Adapter.RandomOrderKeyword
+        ),
+        db.Command.CommandText
+      );
+    }
+
   }
 }
