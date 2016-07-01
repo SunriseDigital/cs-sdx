@@ -2042,6 +2042,37 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
     }
 
     [Fact]
+    public void TestIntegerIn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunIntegerIn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunIntegerIn(TestDb testDb)
+    {
+      var select = testDb.Adapter.CreateSelect();
+
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", new int[]{5,10,15});
+
+      testDb.Command = select.Build();
+      Assert.Equal(testDb.Sql(@"SELECT
+        {0}shop{1}.{0}id{1} AS {0}id@shop{1}, {0}shop{1}.{0}name{1} AS {0}name@shop{1}, {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1}, {0}shop{1}.{0}login_id{1} AS {0}login_id@shop{1}, {0}shop{1}.{0}password{1} AS {0}password@shop{1}, {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1} 
+          FROM {0}shop{1} 
+          WHERE {0}shop{1}.{0}id{1} IN (@0, @1, @2)
+"), testDb.Command.CommandText);
+
+      Assert.Equal(3, testDb.Command.Parameters.Count);
+      Assert.Equal(5, testDb.Command.Parameters["@0"].Value);
+      Assert.Equal(10, testDb.Command.Parameters["@1"].Value);
+      Assert.Equal(15, testDb.Command.Parameters["@2"].Value);
+    }
+
+    [Fact]
     public void TestOrderRandom()
     {
       foreach (TestDb db in this.CreateTestDbList())

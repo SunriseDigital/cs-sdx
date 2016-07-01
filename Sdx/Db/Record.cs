@@ -123,6 +123,32 @@ namespace Sdx.Db
       return Convert.ToInt64(this.GetValue(key));
     }
 
+    /// <summary>
+    /// <see cref="GetValue"/>が例外にならない場合はtrue。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public bool CanGetValue(string key)
+    {
+      if (!OwnMeta.HasColumn(key))
+      {
+        throw new InvalidOperationException("Missing " + key + " column. Check table settings.");
+      }
+
+      if (this.UpdatedValues.ContainsKey(key))
+      {
+        return true;
+      }
+
+      if (IsNew)
+      {
+        return false;
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
+      return this.ValuesList[0].ContainsKey(keyWithContext);
+    }
+
     private object GetOriginValue(string key)
     {
       if (IsNew)
@@ -133,13 +159,24 @@ namespace Sdx.Db
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if (!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        return DBNull.Value;
+        throw new InvalidOperationException("No origin values. Not loaded from db.");
       }
       return this.ValuesList[0][keyWithContext];
     }
 
+    /// <summary>
+    /// カラムの値を取得します。テーブル定義に無いカラム名を指定すると例外になりますので注意してください。
+    /// またDBから読み込まなかったカラムを取得すると例外になります。これはGet系のユーティリティーメソッドで読み込んでいない値を使ってしまうと発見しづらいバグを生むからです。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>新規レコードで値をsetしていない場合NULLが帰ります。DBの値がNULLの時はDBNullが帰ります。</returns>
     public object GetValue(string key)
     {
+      if(!OwnMeta.HasColumn(key))
+      {
+        throw new InvalidOperationException("Missing " + key + " column. Check table settings.");
+      }
+
       if (this.UpdatedValues.ContainsKey(key))
       {
         return this.UpdatedValues[key];
@@ -147,7 +184,7 @@ namespace Sdx.Db
 
       if (IsNew)
       {
-        return DBNull.Value;
+        return null;
       }
 
       return GetOriginValue(key);
@@ -625,13 +662,20 @@ namespace Sdx.Db
           var pkeyValue = GetValue(firstPkey.Name);
           //保存に成功し、PkeyがNullだったらAutoincrementのはず。
           //IsAutoincrementを見ると強引に挿入していることもあるので。
-          if (pkeyValue == DBNull.Value)
+          if (pkeyValue == null)
           {
             var key = Record.BuildColumnAliasWithContextName(firstPkey.Name, ContextName);
             newValues[key] = conn.FetchLastInsertId();
           }
         }
 
+        OwnMeta.Columns.ForEach(column => { 
+          var key = Record.BuildColumnAliasWithContextName(column.Name, ContextName);
+          if(!newValues.ContainsKey(key))
+          {
+            newValues[key] = DBNull.Value;
+          }
+        });
 
         ValuesList.Add(newValues);
       }
@@ -719,6 +763,16 @@ namespace Sdx.Db
       }
 
       return false;
+    }
+
+    private Collection.Holder vars = new Collection.Holder();
+
+    public Collection.Holder Vars
+    {
+      get
+      {
+        return this.vars;
+      }
     }
   }
 }
