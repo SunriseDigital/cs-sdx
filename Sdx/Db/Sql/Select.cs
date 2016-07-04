@@ -344,6 +344,14 @@ namespace Sdx.Db.Sql
       return this.contextList.ContainsKey(contextName);
     }
 
+    public IEnumerable<Context> Contexts
+    {
+      get
+      {
+        return contextList.Values;
+      }
+    }
+
     public IEnumerable<KeyValuePair<string, Context>> ContextList
     {
       get
