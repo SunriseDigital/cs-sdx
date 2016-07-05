@@ -7,6 +7,7 @@ using System.Data;
 using Sdx.Db.Sql;
 using System.Collections.Specialized;
 using System.Web.Script.Serialization;
+using System.Globalization;
 
 namespace Sdx.Db
 {
@@ -482,10 +483,14 @@ namespace Sdx.Db
     /// <summary>
     /// FormにBindするためのNameValueCollectionを生成する。
     /// </summary>
-    /// <param name="dateFormat">ColumnType.Date型のカラムのフォーマット</param>
+    /// <param name="dateFormat">ColumnType.Date型のカラムのフォーマット。省略すると<see cref="CultureInfo.CurrentCulture"/>より取得。</param>
     /// <returns></returns>
-    public NameValueCollection ToNameValueCollection(string dateFormat = "yyyy/MM/dd")
+    public NameValueCollection ToNameValueCollection(string dateFormat = null)
     {
+      if (dateFormat == null)
+      {
+        dateFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+      }
       var col = new NameValueCollection();
       OwnMeta.Columns.ForEach((column) => {
         if (HasValue(column.Name))
