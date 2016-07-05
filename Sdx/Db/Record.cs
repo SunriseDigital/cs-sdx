@@ -482,8 +482,9 @@ namespace Sdx.Db
     /// <summary>
     /// FormにBindするためのNameValueCollectionを生成する。
     /// </summary>
+    /// <param name="dateFormat">ColumnType.Date型のカラムのフォーマット</param>
     /// <returns></returns>
-    public NameValueCollection ToNameValueCollection()
+    public NameValueCollection ToNameValueCollection(string dateFormat = "yyyy/MM/dd")
     {
       var col = new NameValueCollection();
       OwnMeta.Columns.ForEach((column) => {
@@ -492,7 +493,7 @@ namespace Sdx.Db
           string value;
           if(column.Type == Table.ColumnType.Date)
           {
-            value = GetDateTime(column.Name).ToString("yyyy-MM-dd");
+            value = GetDateTime(column.Name).ToString(dateFormat);
           }
           else
           {
