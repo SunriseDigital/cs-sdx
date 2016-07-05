@@ -483,21 +483,29 @@ namespace Sdx.Db
     /// <summary>
     /// FormにBindするためのNameValueCollectionを生成する。
     /// </summary>
-    /// <param name="dateFormat">ColumnType.Date型のカラムのフォーマット。省略すると<see cref="CultureInfo.CurrentCulture"/>より取得。</param>
+    /// <param name="dateFormat">ColumnType.Date|DateTime型のカラムのフォーマット。省略すると<see cref="CultureInfo.CurrentCulture"/>より取得。</param>
     /// <returns></returns>
     public NameValueCollection ToNameValueCollection(string dateFormat = null)
     {
-      if (dateFormat == null)
-      {
-        dateFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
-      }
       var col = new NameValueCollection();
       OwnMeta.Columns.ForEach((column) => {
         if (HasValue(column.Name))
         {
           string value;
-          if(column.Type == Table.ColumnType.Date)
+          if (column.Type == Table.ColumnType.Date)
           {
+            if(dateFormat == null)
+            {
+              dateFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+            }
+            value = GetDateTime(column.Name).ToString(dateFormat);
+          }
+          else if(column.Type == Table.ColumnType.DateTime)
+          {
+            if(dateFormat == null)
+            {
+              dateFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern + " " + CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
+            }
             value = GetDateTime(column.Name).ToString(dateFormat);
           }
           else
