@@ -96,6 +96,18 @@ namespace Sdx.Db.Sql
     /// </summary>
     public JoinOrder JoinOrder { get; set; }
 
+    public Select AddFrom(Sdx.Db.Table target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Sdx.Db.Table target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
