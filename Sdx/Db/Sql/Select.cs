@@ -650,5 +650,7 @@ namespace Sdx.Db.Sql
     {
       LimitPage(Pager.Page, Pager.PerPage);
     }
+
+    public Connection Connection { get; internal set; }
   }
 }

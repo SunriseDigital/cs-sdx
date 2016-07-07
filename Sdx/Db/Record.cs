@@ -37,6 +37,14 @@ namespace Sdx.Db
       Init();
     }
 
+    protected Sdx.Db.Connection Connection
+    {
+      get
+      {
+        return Select.Connection;
+      }
+    }
+
     /// <summary>
     /// カラムが更新される直前に呼ばれるActionをセットする。<seealso cref="Init()"/>でセットしてください。
     /// ValueWillUpdate["someColumn"] = (prevValue, nextValue, isRaw) => {}
@@ -278,7 +286,7 @@ namespace Sdx.Db
       {
         if (connection == null)
         {
-          throw new ArgumentNullException("connection");
+          connection = Select.Connection;
         }
 
         if (OwnMeta.Relations.ContainsKey(contextName))
