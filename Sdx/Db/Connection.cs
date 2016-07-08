@@ -530,6 +530,7 @@ namespace Sdx.Db
 
     public RecordSet FetchRecordSet(Select select, string contextName)
     {
+      select.Connection = this;
       RecordSet recordSet = null;
       using (var command = select.Build())
       {

@@ -538,15 +538,7 @@ namespace UnitTest
 
         shop.ClearRecordCache();
 
-        //キャッシュがクリアされたのでConnectionなしだと例外に
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          var areaEx = shop.GetRecord("area");
-        }));
-
-        Assert.IsType<ArgumentNullException>(ex);
-
-        var area3 = shop.GetRecord("area", conn);
+        var area3 = shop.GetRecord("area");
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.NotEqual(area2, area3);
       }
