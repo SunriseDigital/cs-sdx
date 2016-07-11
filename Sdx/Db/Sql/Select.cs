@@ -120,6 +120,18 @@ namespace Sdx.Db.Sql
       return context;
     }
 
+    public Select AddFrom(Expr target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Expr target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
@@ -128,12 +140,36 @@ namespace Sdx.Db.Sql
       return this.CreateContext(target, alias, JoinType.From);
     }
 
+    public Select AddFrom(String target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(String target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
     public Context AddFrom(String target, string alias = null)
     {
       return this.CreateContext(target, alias, JoinType.From);
+    }
+
+    public Select AddFrom(Sdx.Db.Sql.Select target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Sdx.Db.Sql.Select target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
     }
 
     /// <summary>

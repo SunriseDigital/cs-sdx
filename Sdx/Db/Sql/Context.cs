@@ -99,14 +99,50 @@ namespace Sdx.Db.Sql
       return this.InnerJoin(target, null, alias);
     }
 
+    public Context InnerJoin(Select target, Condition condition, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context InnerJoin(Select target, Condition condition, Action<Context> call)
+    {
+      call(InnerJoin(target, condition));
+      return this;
+    }
+
     public Context InnerJoin(Select target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Inner, condition, alias);
     }
 
+    public Context InnerJoin(Expr target, Condition condition, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context InnerJoin(Expr target, Condition condition, Action<Context> call)
+    {
+      call(InnerJoin(target, condition));
+      return this;
+    }
+
     public Context InnerJoin(Expr target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Inner, condition, alias);
+    }
+
+    public Context InnerJoin(string target, Condition condition, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context InnerJoin(string target, Condition condition, Action<Context> call)
+    {
+      call(InnerJoin(target, condition));
+      return this;
     }
 
     public Context InnerJoin(string target, Condition condition, string alias = null)
@@ -153,14 +189,50 @@ namespace Sdx.Db.Sql
       return this.LeftJoin(target, null, alias);
     }
 
+    public Context LeftJoin(Select target, Condition condition, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context LeftJoin(Select target, Condition condition, Action<Context> call)
+    {
+      call(LeftJoin(target, condition));
+      return this;
+    }
+
     public Context LeftJoin(Select target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Left, condition, alias);
     }
 
+    public Context LeftJoin(Expr target, Condition condition, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context LeftJoin(Expr target, Condition condition, Action<Context> call)
+    {
+      call(LeftJoin(target, condition));
+      return this;
+    }
+
     public Context LeftJoin(Expr target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Left, condition, alias);
+    }
+
+    public Context LeftJoin(string target, Condition condition, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context LeftJoin(string target, Condition condition, Action<Context> call)
+    {
+      call(LeftJoin(target, condition));
+      return this;
     }
 
     public Context LeftJoin(string target, Condition condition, string alias = null)
