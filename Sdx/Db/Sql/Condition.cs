@@ -289,7 +289,8 @@ namespace Sdx.Db.Sql
       {
         cond.Comparison = Comparison.In;
         string inCond = "";
-        var list = cond.Value as IEnumerable<object>;
+        //プリミティブ型の配列を受け付けるためあえてジェネリックを使ってません。
+        var list = cond.Value as System.Collections.IEnumerable;
         foreach (var value in list)
         {
           if (inCond != "")

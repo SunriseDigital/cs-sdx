@@ -96,6 +96,18 @@ namespace Sdx.Db.Sql
     /// </summary>
     public JoinOrder JoinOrder { get; set; }
 
+    public Select AddFrom(Sdx.Db.Table target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Sdx.Db.Table target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
@@ -108,6 +120,18 @@ namespace Sdx.Db.Sql
       return context;
     }
 
+    public Select AddFrom(Expr target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Expr target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
@@ -116,12 +140,36 @@ namespace Sdx.Db.Sql
       return this.CreateContext(target, alias, JoinType.From);
     }
 
+    public Select AddFrom(String target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(String target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
     public Context AddFrom(String target, string alias = null)
     {
       return this.CreateContext(target, alias, JoinType.From);
+    }
+
+    public Select AddFrom(Sdx.Db.Sql.Select target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Sdx.Db.Sql.Select target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
     }
 
     /// <summary>
@@ -247,10 +295,17 @@ namespace Sdx.Db.Sql
           }
 
           builder
-            .Append(column.Build(this.Adapter, parameters, condCount))
-            .Append(" ")
-            .Append(column.Order.SqlString())
-            .Append(", ");
+            .Append(column.Build(this.Adapter, parameters, condCount));
+
+          if(column.Order != null)
+          {
+            var sqlstr = ((Order)column.Order).SqlString();
+            builder
+              .Append(" ")
+              .Append(sqlstr);
+          }
+
+          builder.Append(", ");
         });
 
         builder.Remove(builder.Length - 2, 2);
@@ -589,6 +644,15 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Select AddOrderRandom()
+    {
+      var column = new Column(Expr.Wrap(Adapter.RandomOrderKeyword));
+      column.Order = null;
+      orders.Add(column);
+
+      return this;
+    }
+
     public object Clone()
     {
       var cloned = (Select)this.MemberwiseClone();
@@ -634,5 +698,7 @@ namespace Sdx.Db.Sql
     {
       LimitPage(Pager.Page, Pager.PerPage);
     }
+
+    public Connection Connection { get; internal set; }
   }
 }
