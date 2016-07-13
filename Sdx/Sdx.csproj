@@ -57,6 +57,10 @@
       <HintPath>..\packages\YamlDotNet.3.7.0\lib\net35\YamlDotNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="AWSSDK, Version=2.3.11.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.2.3.11.0\lib\net45\AWSSDK.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Collection\Holder.cs" />
