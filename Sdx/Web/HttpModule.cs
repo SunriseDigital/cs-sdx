@@ -163,14 +163,13 @@ namespace Sdx.Web
 
     private string buildQueryString(Sdx.Db.Sql.Log query)
     {
-      if (query.CommandText == null) throw new Exception("aaaaaa");
       return String.Format(
         QueryBlockFormat,
         query.FormatedElapsedTime,
         query.Comment != null ? query.Comment : "",
         query.Adapter != null ? query.Adapter.ToString() : "",
         query.CommandText,
-        query.FormatedParameters
+        HttpUtility.HtmlEncode(query.FormatedParameters) 
       );
     }
 
