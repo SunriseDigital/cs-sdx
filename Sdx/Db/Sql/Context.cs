@@ -60,6 +60,24 @@ namespace Sdx.Db.Sql
       return joinContext;
     }
 
+    public Context InnerJoin(Table target, Condition condition, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context InnerJoin(Table target, Condition condition, Action<Context> call)
+    {
+      call(InnerJoin(target, condition));
+      return this;
+    }
+
+    public Context InnerJoin(Table target, Action<Context> call)
+    {
+      call(InnerJoin(target));
+      return this;
+    }
+
     public Context InnerJoin(Table target, Condition condition = null, string alias = null)
     {
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Inner, condition, alias);
@@ -81,9 +99,33 @@ namespace Sdx.Db.Sql
       return this.InnerJoin(target, null, alias);
     }
 
+    public Context InnerJoin(Select target, Condition condition, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context InnerJoin(Select target, Condition condition, Action<Context> call)
+    {
+      call(InnerJoin(target, condition));
+      return this;
+    }
+
     public Context InnerJoin(Select target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Inner, condition, alias);
+    }
+
+    public Context InnerJoin(Expr target, Condition condition, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context InnerJoin(Expr target, Condition condition, Action<Context> call)
+    {
+      call(InnerJoin(target, condition));
+      return this;
     }
 
     public Context InnerJoin(Expr target, Condition condition, string alias = null)
@@ -91,9 +133,39 @@ namespace Sdx.Db.Sql
       return this.AddJoin(target, JoinType.Inner, condition, alias);
     }
 
+    public Context InnerJoin(string target, Condition condition, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context InnerJoin(string target, Condition condition, Action<Context> call)
+    {
+      call(InnerJoin(target, condition));
+      return this;
+    }
+
     public Context InnerJoin(string target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Inner, condition, alias);
+    }
+
+    public Context LeftJoin(Table target, Condition condition, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context LeftJoin(Table target, Condition condition, Action<Context> call)
+    {
+      call(LeftJoin(target, condition));
+      return this;
+    }
+
+    public Context LeftJoin(Table target, Action<Context> call)
+    {
+      call(LeftJoin(target));
+      return this;
     }
 
     public Context LeftJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
@@ -117,14 +189,50 @@ namespace Sdx.Db.Sql
       return this.LeftJoin(target, null, alias);
     }
 
+    public Context LeftJoin(Select target, Condition condition, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context LeftJoin(Select target, Condition condition, Action<Context> call)
+    {
+      call(LeftJoin(target, condition));
+      return this;
+    }
+
     public Context LeftJoin(Select target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Left, condition, alias);
     }
 
+    public Context LeftJoin(Expr target, Condition condition, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context LeftJoin(Expr target, Condition condition, Action<Context> call)
+    {
+      call(LeftJoin(target, condition));
+      return this;
+    }
+
     public Context LeftJoin(Expr target, Condition condition, string alias = null)
     {
       return this.AddJoin(target, JoinType.Left, condition, alias);
+    }
+
+    public Context LeftJoin(string target, Condition condition, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, condition, alias));
+      return this;
+    }
+
+    public Context LeftJoin(string target, Condition condition, Action<Context> call)
+    {
+      call(LeftJoin(target, condition));
+      return this;
     }
 
     public Context LeftJoin(string target, Condition condition, string alias = null)
@@ -327,6 +435,16 @@ namespace Sdx.Db.Sql
 
       return this;
     }
+
+    public Context AddOrderRandom()
+    {
+      var column = new Column(Expr.Wrap(Select.Adapter.RandomOrderKeyword));
+      column.Order = null;
+      Select.OrderList.Add(column);
+
+      return this;
+    }
+
 
     /// <summary>
     /// <see cref="Db.Table"/>を使ってFROM句/JOIN句に追加された<see cref="Context"/>からはこのプロパティーから<see cref="Db.Table"/>が取得できます。

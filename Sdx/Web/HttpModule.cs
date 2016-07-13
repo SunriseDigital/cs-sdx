@@ -106,7 +106,7 @@ namespace Sdx.Web
       debugString.Append(String.Format(
         LogBlockFormat,
         "Post",
-        "<pre>" + postLog.ToString() + "</pre>"
+        "<pre>" + HttpUtility.HtmlEncode(postLog.ToString()) + "</pre>"
       ));
     }
 
@@ -190,7 +190,7 @@ namespace Sdx.Web
       debugString.Append(String.Format(
         LogBlockFormat,
         "Debug.Log",
-        "<pre style=\"margin: 0;\">" + writer.Builder.ToString() + "</pre>"
+        "<pre style=\"margin: 0;\">" + HttpUtility.HtmlEncode(writer.Builder.ToString()) + "</pre>"
       ));
     }
   }

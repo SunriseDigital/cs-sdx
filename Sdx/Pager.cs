@@ -10,7 +10,7 @@ namespace Sdx
     private int? lastPage;
     private int? perPage;
     private int? totalCount;
-    private int page = 1;
+    private int? page;
     private bool? hasNext;
 
     public Pager()
@@ -21,6 +21,12 @@ namespace Sdx
     public Pager(int perPage)
     {
       PerPage = perPage;
+    }
+
+    public Pager(int perPage, int totalCount)
+    {
+      PerPage = perPage;
+      TotalCount = totalCount;
     }
 
     /// <summary>
@@ -93,6 +99,10 @@ namespace Sdx
     {
       get
       {
+        if(page == null)
+        {
+          throw new InvalidOperationException("page is null. you must initialize Page value.");
+        }
         return (int)page;
       }
 

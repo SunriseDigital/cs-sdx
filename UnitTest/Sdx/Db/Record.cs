@@ -538,15 +538,7 @@ namespace UnitTest
 
         shop.ClearRecordCache();
 
-        //キャッシュがクリアされたのでConnectionなしだと例外に
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          var areaEx = shop.GetRecord("area");
-        }));
-
-        Assert.IsType<ArgumentNullException>(ex);
-
-        var area3 = shop.GetRecord("area", conn);
+        var area3 = shop.GetRecord("area");
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.NotEqual(area2, area3);
       }
@@ -619,8 +611,15 @@ namespace UnitTest
         Assert.Equal("天祥", shops[0].GetString("name"));
         Assert.Equal("エスペリア", shops[1].GetString("name"));
 
-        //取得しなかったキーはNULL
-        Assert.Equal(DBNull.Value, shops[0].GetValue("area_id"));
+        //取得しなかったキーを取得すると例外
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          var areaEx = shops[0].GetValue("area_id");
+        }));
+
+        Assert.IsType<InvalidOperationException>(ex);
+
+        Assert.False(shops[0].CanGetValue("area_id"));
       }
     }
 
@@ -717,7 +716,11 @@ namespace UnitTest
         }
 
         Assert.Equal("foobar", shop.GetValue("login_id"));
+
+        //保存後にSetしていない値を読むとDBNull.Value。
         Assert.Equal(DBNull.Value, shop.GetValue("password"));
+        //DBNullでもCanGetValueはtrue
+        Assert.True(shop.CanGetValue("password"));
       }
       
       //DbNullで更新
@@ -728,6 +731,8 @@ namespace UnitTest
         select
           .AddFrom(new Test.Orm.Table.Shop())
           .WhereCall((where) => where.Add("id", id));
+
+        select.Context("shop");
 
         shop = conn.FetchRecord(select);
         Assert.Equal(DBNull.Value, shop.GetValue("password"));
