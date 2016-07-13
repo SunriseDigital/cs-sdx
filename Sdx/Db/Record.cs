@@ -29,6 +29,8 @@ namespace Sdx.Db
     internal List<Dictionary<string, object>> ValuesList { get; private set; }
     internal Select Select { get; set; }
 
+    private Db.Connection connection;
+
     public Record()
     {
       this.UpdatedValues = new Dictionary<string, object>();
@@ -38,11 +40,23 @@ namespace Sdx.Db
       Init();
     }
 
-    protected Sdx.Db.Connection Connection
+    public Sdx.Db.Connection Connection
     {
+      set
+      {
+        connection = value;
+      }
+
       get
       {
-        return Select.Connection;
+        if (connection != null)
+        {
+          return connection;
+        }
+        else
+        {
+          return Select.Connection;
+        }
       }
     }
 
