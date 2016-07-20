@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Globalization;
 using System.Reflection;
+using System.Collections.Generic;
 
 #if ON_VISUAL_STUDIO
 using FactAttribute = Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute;
@@ -88,6 +89,35 @@ namespace UnitTest
       Assert.Equal(5, pager.Page);
       Assert.False(pager.HasNext);
       Assert.True(pager.HasPrev);
+    }
+
+    [Fact]
+    public void TestPages()
+    {
+      var perPage = 3;
+      var totalCount = 35;
+      var pager = new Sdx.Pager(perPage, totalCount);
+      pager.SetPage("5");
+
+      var numberList = new List<int>(){};
+      var isCurrentList = new List<bool>(){};
+
+      pager.GetPages(5).ForEach(page => {
+        numberList.Add(page.page);
+        isCurrentList.Add(page.is_current);
+      });
+
+      Assert.Equal(3, numberList[0]);
+      Assert.Equal(4, numberList[1]);
+      Assert.Equal(5, numberList[2]);
+      Assert.Equal(6, numberList[3]);
+      Assert.Equal(7, numberList[4]);
+
+      Assert.Equal(false, isCurrentList[0]);
+      Assert.Equal(false, isCurrentList[1]);
+      Assert.Equal(true, isCurrentList[2]);
+      Assert.Equal(false, isCurrentList[3]);
+      Assert.Equal(false, isCurrentList[4]);
     }
   }
 }
