@@ -159,7 +159,7 @@ namespace Sdx
       {
         start = 1;
       }
-      if(start > LastPage - number + 1)
+      else if(start > LastPage - number + 1)
       {
         start = LastPage - number + 1;
       }
