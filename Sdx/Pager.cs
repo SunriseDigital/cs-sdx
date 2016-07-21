@@ -144,5 +144,38 @@ namespace Sdx
         return true;
       }
     }
+
+    public class PageHolder
+    {
+      public bool is_current;
+      public int number;
+    }
+
+    public List<PageHolder> GetPageHolderList(int number)
+    {
+      var tmp = (int)number/2;
+      var start = Page - tmp;
+      if(start < 1)
+      {
+        start = 1;
+      }
+      if(start > LastPage - number + 1)
+      {
+        start = LastPage - number + 1;
+      }
+
+      var pageHolderList = new List<PageHolder>(){};
+      for(var i = start; i < number + start; i++)
+      {
+        var pageHolder = new PageHolder();
+        pageHolder.number = i;
+        pageHolder.is_current = (Page == i) ? true : false;
+        pageHolderList.Add(pageHolder);
+      }
+
+      return pageHolderList;
+    }
+
+
   }
 }
