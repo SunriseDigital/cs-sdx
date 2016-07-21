@@ -18,9 +18,17 @@ namespace UnitTest
   public class Html_PagerLink : BaseTest
   {
     [Fact]
-    public void TestBuildShortcut()
+    public void TestLinksTag()
     {
+      InitHttpContextMock("pid=11");
+      var pager = new Sdx.Pager(10, 200);
+      pager.SetPage("11");
+      var baseUrl = new Sdx.Web.Url("/path/to/target/page");
+      var pagerLink = new Sdx.Html.PagerLink(pager, baseUrl, "pid");
 
+      var links = pagerLink.GetLinksTag(5);
+      Assert.Equal("<span class=\"disabled\">11</span>", links[2].Render());
+      Assert.Equal("<a href=\"/path/to/target/page?pid=12\">12</a>", links[3].Render());
     }
   }
 }
