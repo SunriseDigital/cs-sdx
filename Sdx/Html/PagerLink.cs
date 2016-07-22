@@ -115,5 +115,16 @@ namespace Sdx.Html
     {
       return CrateLinkTag(Pager.Page == Pager.LastPage ? null : Pager.LastPage.ToString());
     }
+
+    public List<Tag> GetLinksTag(int number)
+    {
+      var links = new List<Tag>(){};
+      Pager.GetPageHolderList(number).ForEach(ph => {
+        var linkTag = CrateLinkTag(ph.is_current ? null : ph.number.ToString()).AddText(ph.number.ToString());
+        links.Add(linkTag);
+      });
+
+      return links;
+    }
   }
 }
