@@ -167,13 +167,21 @@ namespace Sdx
       var pageHolderList = new List<PageHolder>(){};
       for(var i = start; i < number + start; i++)
       {
-        var pageHolder = new PageHolder();
-        pageHolder.number = i;
-        pageHolder.is_current = (Page == i) ? true : false;
-        pageHolderList.Add(pageHolder);
+        if (HasPage(i))
+        {
+          var pageHolder = new PageHolder();
+          pageHolder.number = i;
+          pageHolder.is_current = (Page == i) ? true : false;
+          pageHolderList.Add(pageHolder);
+        }
       }
 
       return pageHolderList;
+    }
+
+    public bool HasPage(int page)
+    {
+      return (page >= 1 && page <= LastPage) ? true : false;
     }
 
 
