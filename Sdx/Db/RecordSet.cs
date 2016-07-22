@@ -80,7 +80,7 @@ namespace Sdx.Db
         return;
       }
 
-      var key = this.BuildUniqueKey(row, pkeys, contextName);
+      var key = BuildUniqueKey(pkeys, columnName => row[Record.BuildColumnAliasWithContextName(columnName, contextName)]);
       Record result;
       if (!this.resultDic.ContainsKey(key))
       {
@@ -98,7 +98,7 @@ namespace Sdx.Db
     }
 
 
-    private string BuildUniqueKey(Dictionary<string, object> row, IEnumerable<Table.Column> pkeys, string contextName)
+    private string BuildUniqueKey(IEnumerable<Table.Column> pkeys, Func<string, object> func)
     {
       var key = "";
 
@@ -108,8 +108,7 @@ namespace Sdx.Db
         {
           key += "%%SDX%%";
         }
-
-        key += row[Record.BuildColumnAliasWithContextName(column.Name, contextName)];
+        key += func(column.Name);
       }
 
       return key;
@@ -199,6 +198,12 @@ namespace Sdx.Db
     public T Get<T>(int index) where T:Sdx.Db.Record
     {
       return (T)this[index];
+    }
+
+    public void AddRecord(Record record)
+    {
+      var key = BuildUniqueKey(record.OwnMeta.Pkeys, column => record.GetValue(column));
+      this.resultDic.Add(key, record);
     }
   }
 }
