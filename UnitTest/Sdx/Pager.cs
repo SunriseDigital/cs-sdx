@@ -213,7 +213,7 @@ namespace UnitTest
       Assert.Equal(12, idList[4]);
       Assert.Equal(true, isCurrentList[4]);
 
-      //GetPageHolderList に総ページ数より多い数を渡した場合
+      //GetPageDataList に総ページ数より多い数を渡した場合
       pager.SetPage("12");
       Assert.Equal(12, pager.GetPageDataList(20).Count);
     }
