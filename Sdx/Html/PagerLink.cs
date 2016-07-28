@@ -119,7 +119,7 @@ namespace Sdx.Html
     public List<Tag> GetLinksTag(int number)
     {
       var links = new List<Tag>(){};
-      Pager.GetPageHolderList(number).ForEach(ph => {
+      Pager.GetPageDataList(number).ForEach(ph => {
         var linkTag = CrateLinkTag(ph.is_current ? null : ph.number.ToString()).AddText(ph.number.ToString());
         links.Add(linkTag);
       });

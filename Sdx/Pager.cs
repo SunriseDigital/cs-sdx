@@ -145,13 +145,13 @@ namespace Sdx
       }
     }
 
-    public class PageHolder
+    public class PageData
     {
       public bool is_current;
       public int number;
     }
 
-    public List<PageHolder> GetPageHolderList(int number)
+    public List<PageData> GetPageDataList(int number)
     {
       var tmp = (int)number/2;
       var start = Page - tmp;
@@ -164,19 +164,19 @@ namespace Sdx
         start = LastPage - number + 1;
       }
 
-      var pageHolderList = new List<PageHolder>(){};
+      var pageDataList = new List<PageData>(){};
       for(var i = start; i < number + start; i++)
       {
         if (HasPage(i))
         {
-          var pageHolder = new PageHolder();
-          pageHolder.number = i;
-          pageHolder.is_current = (Page == i) ? true : false;
-          pageHolderList.Add(pageHolder);
+          var pageData = new PageData();
+          pageData.number = i;
+          pageData.is_current = (Page == i) ? true : false;
+          pageDataList.Add(pageData);
         }
       }
 
-      return pageHolderList;
+      return pageDataList;
     }
 
     public bool HasPage(int page)

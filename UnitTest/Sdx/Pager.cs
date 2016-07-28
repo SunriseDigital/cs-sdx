@@ -103,9 +103,9 @@ namespace UnitTest
       var isCurrentList = new List<bool>(){};
 
       //奇数パターン
-      pager.GetPageHolderList(5).ForEach(ph => {
-        numberList.Add(ph.number);
-        isCurrentList.Add(ph.is_current);
+      pager.GetPageDataList(5).ForEach(pd => {
+        numberList.Add(pd.number);
+        isCurrentList.Add(pd.is_current);
       });
 
       Assert.Equal(3, numberList[0]);
@@ -123,10 +123,10 @@ namespace UnitTest
       //偶数パターン
       numberList.Clear();
       isCurrentList.Clear();
-      pager.GetPageHolderList(6).ForEach(ph =>
+      pager.GetPageDataList(6).ForEach(pd =>
       {
-        numberList.Add(ph.number);
-        isCurrentList.Add(ph.is_current);
+        numberList.Add(pd.number);
+        isCurrentList.Add(pd.is_current);
       });
 
       Assert.Equal(2, numberList[0]);
@@ -147,10 +147,10 @@ namespace UnitTest
       numberList.Clear();
       isCurrentList.Clear();
       pager.SetPage("2");
-      pager.GetPageHolderList(5).ForEach(ph =>
+      pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(ph.number);
-        isCurrentList.Add(ph.is_current);
+        numberList.Add(pd.number);
+        isCurrentList.Add(pd.is_current);
       });
 
       Assert.Equal(1, numberList[0]);
@@ -169,10 +169,10 @@ namespace UnitTest
       numberList.Clear();
       isCurrentList.Clear();
       pager.SetPage("11");
-      pager.GetPageHolderList(5).ForEach(ph =>
+      pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(ph.number);
-        isCurrentList.Add(ph.is_current);
+        numberList.Add(pd.number);
+        isCurrentList.Add(pd.is_current);
       });
 
       Assert.Equal(8, numberList[0]);
@@ -191,10 +191,10 @@ namespace UnitTest
       numberList.Clear();
       isCurrentList.Clear();
       pager.SetPage("1");
-      pager.GetPageHolderList(5).ForEach(ph =>
+      pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(ph.number);
-        isCurrentList.Add(ph.is_current);
+        numberList.Add(pd.number);
+        isCurrentList.Add(pd.is_current);
       });
 
       Assert.Equal(1, numberList[0]);
@@ -204,10 +204,10 @@ namespace UnitTest
       numberList.Clear();
       isCurrentList.Clear();
       pager.SetPage("12");
-      pager.GetPageHolderList(5).ForEach(ph =>
+      pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(ph.number);
-        isCurrentList.Add(ph.is_current);
+        numberList.Add(pd.number);
+        isCurrentList.Add(pd.is_current);
       });
 
       Assert.Equal(12, numberList[4]);
@@ -215,7 +215,7 @@ namespace UnitTest
 
       //GetPageHolderList に総ページ数より多い数を渡した場合
       pager.SetPage("12");
-      Assert.Equal(12, pager.GetPageHolderList(20).Count);
+      Assert.Equal(12, pager.GetPageDataList(20).Count);
     }
   }
 }
