@@ -190,7 +190,7 @@ namespace Sdx
 
     public bool HasPage(int page)
     {
-      return (page >= 1 && page <= LastPage) ? true : false;
+      return (page >= 1 && page <= LastPage);
     }
 
 
