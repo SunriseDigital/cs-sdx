@@ -12,6 +12,8 @@ namespace Sdx.Html
 
     private string varName;
 
+    private string classNameForDisabled = "disabled";
+
     public PagerLink(Pager pager, Web.Url baseUrl, string varName)
     {
       Pager = pager;
@@ -89,7 +91,7 @@ namespace Sdx.Html
       else
       {
         tag = new Tag("span");
-        tag.Attr.AddClass("disabled");
+        tag.Attr.AddClass(classNameForDisabled);
       }
 
       return tag;
@@ -118,12 +120,10 @@ namespace Sdx.Html
 
     public List<Tag> GetLinksTag(int number)
     {
+      classNameForDisabled = "current_page";
       var links = new List<Tag>(){};
       Pager.GetPageDataList(number).ForEach(pd => {
         var linkTag = CrateLinkTag(pd.IsCurrent ? null : pd.Id.ToString());
-        if(pd.IsCurrent && linkTag.Attr.HasClass("disable")) {
-          linkTag.Attr.RemoveClass("disable").AddClass("current_page");
-        }
         linkTag.AddText(pd.Id.ToString());
         links.Add(linkTag);
       });
@@ -133,14 +133,10 @@ namespace Sdx.Html
 
     public List<Tag> GetLinksTag(int number, Func<string, string> func)
     {
+      classNameForDisabled = "current_page";
       var links = new List<Tag>() { };
-      Pager.GetPageDataList(number).ForEach(pd =>
-      {
+      Pager.GetPageDataList(number).ForEach(pd => {
         var linkTag = CrateLinkTag(pd.IsCurrent ? null : pd.Id.ToString());
-        if (pd.IsCurrent && linkTag.Attr.HasClass("disable"))
-        {
-          linkTag.Attr.RemoveClass("disable").AddClass("current_page");
-        }
         linkTag.AddText(func(pd.Id.ToString()));
         links.Add(linkTag);
       });
