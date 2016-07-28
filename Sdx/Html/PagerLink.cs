@@ -120,18 +120,9 @@ namespace Sdx.Html
     {
       var links = new List<Tag>(){};
       Pager.GetPageDataList(number).ForEach(pd => {
-        var url = (Web.Url)BaseUrl.Clone();
-        Html.Tag linkTag;
-        if (pd.IsCurrent)
-        {
-          linkTag = new Tag("span");
-          linkTag.Attr.AddClass("current_page");
-        }
-        else
-        {
-          url.SetParam(VarName, pd.Id.ToString());
-          linkTag = new Tag("a");
-          linkTag.Attr.Set("href", url.Build());
+        var linkTag = CrateLinkTag(pd.IsCurrent ? null : pd.Id.ToString());
+        if(pd.IsCurrent && linkTag.Attr.HasClass("disable")) {
+          linkTag.Attr.RemoveClass("disable").AddClass("current_page");
         }
         linkTag.AddText(pd.Id.ToString());
         links.Add(linkTag);
