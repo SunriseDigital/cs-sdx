@@ -147,8 +147,17 @@ namespace Sdx
 
     public class PageData
     {
-      public bool is_current;
-      public int number;
+      public bool IsCurrent
+      {
+        get;
+        set;
+      }
+
+      public int Id
+      {
+        get;
+        set;
+      }
     }
 
     public List<PageData> GetPageDataList(int number)
@@ -170,8 +179,8 @@ namespace Sdx
         if (HasPage(i))
         {
           var pageData = new PageData();
-          pageData.number = i;
-          pageData.is_current = (Page == i) ? true : false;
+          pageData.Id = i;
+          pageData.IsCurrent = (Page == i) ? true : false;
           pageDataList.Add(pageData);
         }
       }

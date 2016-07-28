@@ -99,20 +99,20 @@ namespace UnitTest
       var pager = new Sdx.Pager(perPage, totalCount);
       pager.SetPage("5");
 
-      var numberList = new List<int>(){};
+      var idList = new List<int>(){};
       var isCurrentList = new List<bool>(){};
 
       //奇数パターン
       pager.GetPageDataList(5).ForEach(pd => {
-        numberList.Add(pd.number);
-        isCurrentList.Add(pd.is_current);
+        idList.Add(pd.Id);
+        isCurrentList.Add(pd.IsCurrent);
       });
 
-      Assert.Equal(3, numberList[0]);
-      Assert.Equal(4, numberList[1]);
-      Assert.Equal(5, numberList[2]);
-      Assert.Equal(6, numberList[3]);
-      Assert.Equal(7, numberList[4]);
+      Assert.Equal(3, idList[0]);
+      Assert.Equal(4, idList[1]);
+      Assert.Equal(5, idList[2]);
+      Assert.Equal(6, idList[3]);
+      Assert.Equal(7, idList[4]);
 
       Assert.Equal(false, isCurrentList[0]);
       Assert.Equal(false, isCurrentList[1]);
@@ -121,20 +121,20 @@ namespace UnitTest
       Assert.Equal(false, isCurrentList[4]);
 
       //偶数パターン
-      numberList.Clear();
+      idList.Clear();
       isCurrentList.Clear();
       pager.GetPageDataList(6).ForEach(pd =>
       {
-        numberList.Add(pd.number);
-        isCurrentList.Add(pd.is_current);
+        idList.Add(pd.Id);
+        isCurrentList.Add(pd.IsCurrent);
       });
 
-      Assert.Equal(2, numberList[0]);
-      Assert.Equal(3, numberList[1]);
-      Assert.Equal(4, numberList[2]);
-      Assert.Equal(5, numberList[3]);
-      Assert.Equal(6, numberList[4]);
-      Assert.Equal(7, numberList[5]);
+      Assert.Equal(2, idList[0]);
+      Assert.Equal(3, idList[1]);
+      Assert.Equal(4, idList[2]);
+      Assert.Equal(5, idList[3]);
+      Assert.Equal(6, idList[4]);
+      Assert.Equal(7, idList[5]);
 
       Assert.Equal(false, isCurrentList[0]);
       Assert.Equal(false, isCurrentList[1]);
@@ -144,20 +144,20 @@ namespace UnitTest
       Assert.Equal(false, isCurrentList[5]);
 
       //奇数だが真ん中が現在のページにできないパターン(1)
-      numberList.Clear();
+      idList.Clear();
       isCurrentList.Clear();
       pager.SetPage("2");
       pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(pd.number);
-        isCurrentList.Add(pd.is_current);
+        idList.Add(pd.Id);
+        isCurrentList.Add(pd.IsCurrent);
       });
 
-      Assert.Equal(1, numberList[0]);
-      Assert.Equal(2, numberList[1]);
-      Assert.Equal(3, numberList[2]);
-      Assert.Equal(4, numberList[3]);
-      Assert.Equal(5, numberList[4]);
+      Assert.Equal(1, idList[0]);
+      Assert.Equal(2, idList[1]);
+      Assert.Equal(3, idList[2]);
+      Assert.Equal(4, idList[3]);
+      Assert.Equal(5, idList[4]);
 
       Assert.Equal(false, isCurrentList[0]);
       Assert.Equal(true, isCurrentList[1]);
@@ -166,20 +166,20 @@ namespace UnitTest
       Assert.Equal(false, isCurrentList[4]);
 
       //奇数だが真ん中が現在のページにできないパターン(2)
-      numberList.Clear();
+      idList.Clear();
       isCurrentList.Clear();
       pager.SetPage("11");
       pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(pd.number);
-        isCurrentList.Add(pd.is_current);
+        idList.Add(pd.Id);
+        isCurrentList.Add(pd.IsCurrent);
       });
 
-      Assert.Equal(8, numberList[0]);
-      Assert.Equal(9, numberList[1]);
-      Assert.Equal(10, numberList[2]);
-      Assert.Equal(11, numberList[3]);
-      Assert.Equal(12, numberList[4]);
+      Assert.Equal(8, idList[0]);
+      Assert.Equal(9, idList[1]);
+      Assert.Equal(10, idList[2]);
+      Assert.Equal(11, idList[3]);
+      Assert.Equal(12, idList[4]);
 
       Assert.Equal(false, isCurrentList[0]);
       Assert.Equal(false, isCurrentList[1]);
@@ -188,29 +188,29 @@ namespace UnitTest
       Assert.Equal(false, isCurrentList[4]);
 
       //現在のページが先頭のページ
-      numberList.Clear();
+      idList.Clear();
       isCurrentList.Clear();
       pager.SetPage("1");
       pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(pd.number);
-        isCurrentList.Add(pd.is_current);
+        idList.Add(pd.Id);
+        isCurrentList.Add(pd.IsCurrent);
       });
 
-      Assert.Equal(1, numberList[0]);
+      Assert.Equal(1, idList[0]);
       Assert.Equal(true, isCurrentList[0]);
 
       //現在のページが最後のページ
-      numberList.Clear();
+      idList.Clear();
       isCurrentList.Clear();
       pager.SetPage("12");
       pager.GetPageDataList(5).ForEach(pd =>
       {
-        numberList.Add(pd.number);
-        isCurrentList.Add(pd.is_current);
+        idList.Add(pd.Id);
+        isCurrentList.Add(pd.IsCurrent);
       });
 
-      Assert.Equal(12, numberList[4]);
+      Assert.Equal(12, idList[4]);
       Assert.Equal(true, isCurrentList[4]);
 
       //GetPageHolderList に総ページ数より多い数を渡した場合

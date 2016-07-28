@@ -120,7 +120,7 @@ namespace Sdx.Html
     {
       var links = new List<Tag>(){};
       Pager.GetPageDataList(number).ForEach(ph => {
-        var linkTag = CrateLinkTag(ph.is_current ? null : ph.number.ToString()).AddText(ph.number.ToString());
+        var linkTag = CrateLinkTag(ph.IsCurrent ? null : ph.Id.ToString()).AddText(ph.Id.ToString());
         links.Add(linkTag);
       });
 
