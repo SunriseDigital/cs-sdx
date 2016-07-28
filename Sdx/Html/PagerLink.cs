@@ -130,5 +130,22 @@ namespace Sdx.Html
 
       return links;
     }
+
+    public List<Tag> GetLinksTag(int number, Func<string, string> func)
+    {
+      var links = new List<Tag>() { };
+      Pager.GetPageDataList(number).ForEach(pd =>
+      {
+        var linkTag = CrateLinkTag(pd.IsCurrent ? null : pd.Id.ToString());
+        if (pd.IsCurrent && linkTag.Attr.HasClass("disable"))
+        {
+          linkTag.Attr.RemoveClass("disable").AddClass("current_page");
+        }
+        linkTag.AddText(func(pd.Id.ToString()));
+        links.Add(linkTag);
+      });
+
+      return links;
+    }
   }
 }
