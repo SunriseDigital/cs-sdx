@@ -27,7 +27,7 @@ namespace UnitTest
       var pagerLink = new Sdx.Html.PagerLink(pager, baseUrl, "pid");
 
       var links = pagerLink.GetLinksTag(5);
-      Assert.Equal("<span class=\"current_page\">11</span>", links[2].Render());
+      Assert.Equal("<span class=\"current\">11</span>", links[2].Render());
       Assert.Equal("<a href=\"/path/to/target/page?pid=12\">12</a>", links[3].Render());
     }
 
@@ -41,7 +41,7 @@ namespace UnitTest
       var pagerLink = new Sdx.Html.PagerLink(pager, baseUrl, "pid");
 
       var links = pagerLink.GetLinksTag(5, page => string.Format("<b>{0}</b>", page));
-      Assert.Equal("<span class=\"current_page\"><b>11</b></span>", links[2].Render());
+      Assert.Equal("<span class=\"current\"><b>11</b></span>", links[2].Render());
       Assert.Equal("<a href=\"/path/to/target/page?pid=12\"><b>12</b></a>", links[3].Render());
     }
   }

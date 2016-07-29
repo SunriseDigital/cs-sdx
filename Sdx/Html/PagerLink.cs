@@ -120,7 +120,7 @@ namespace Sdx.Html
 
     public List<Tag> GetLinksTag(int number)
     {
-      classNameForDisabled = "current_page";
+      classNameForDisabled = "current";
       var links = new List<Tag>(){};
       Pager.GetPageDataList(number).ForEach(pd => {
         var linkTag = CrateLinkTag(pd.IsCurrent ? null : pd.Id.ToString());
@@ -133,7 +133,7 @@ namespace Sdx.Html
 
     public List<Tag> GetLinksTag(int number, Func<string, string> func)
     {
-      classNameForDisabled = "current_page";
+      classNameForDisabled = "current";
       var links = new List<Tag>() { };
       Pager.GetPageDataList(number).ForEach(pd => {
         var linkTag = CrateLinkTag(pd.IsCurrent ? null : pd.Id.ToString());
