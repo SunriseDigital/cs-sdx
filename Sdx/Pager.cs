@@ -150,13 +150,13 @@ namespace Sdx
       public bool IsCurrent
       {
         get;
-        set;
+        internal set;
       }
 
       public int Id
       {
         get;
-        set;
+        internal set;
       }
     }
 
