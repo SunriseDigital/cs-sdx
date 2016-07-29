@@ -67,3 +67,15 @@ CSファイル側は前項と同じ記述でOKです。
   </div>
 </div>
 ```
+
+#### aspx記述例(2)
+`GetLinksTag()` の引数にコールバックを渡すこともできます。
+aタグの中身を数字以外にしたい場合などに使えます。
+下記は画像をaタグの中に表示させたい場合の例です。
+```asp
+<div class="link-list">
+  <% foreach(var link in pager_link.GetLinksTag(5, page => {string.Format(@"<img src='/path/to/img/{0}.jpg alt='{0}' />", page)})) { %>
+    <%= link.Render() %>
+  <% } %>
+</div>
+```
