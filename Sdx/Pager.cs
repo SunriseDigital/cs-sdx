@@ -144,5 +144,55 @@ namespace Sdx
         return true;
       }
     }
+
+    public class PageData
+    {
+      public bool IsCurrent
+      {
+        get;
+        internal set;
+      }
+
+      public int Id
+      {
+        get;
+        internal set;
+      }
+    }
+
+    public List<PageData> GetPageDataList(int number)
+    {
+      var tmp = (int)number/2;
+      var start = Page - tmp;
+      if(start < 1)
+      {
+        start = 1;
+      }
+      else if(start > LastPage - number + 1)
+      {
+        start = LastPage - number + 1;
+      }
+
+      var pageDataList = new List<PageData>(){};
+      for(var i = start; i < number + start; i++)
+      {
+        if (HasPage(i))
+        {
+          var pageData = new PageData();
+          pageData.Id = i;
+          pageData.IsCurrent = (Page == i) ? true : false;
+          pageDataList.Add(pageData);
+        }
+      }
+
+      return pageDataList;
+    }
+
+    public bool HasPage(int page)
+    {
+      return (page >= 1 && page <= LastPage);
+    }
+
+
   }
 }
