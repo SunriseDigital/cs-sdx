@@ -12,6 +12,8 @@ namespace Sdx.Html
 
     private string varName;
 
+    private string classNameForDisabled = "disabled";
+
     public PagerLink(Pager pager, Web.Url baseUrl, string varName)
     {
       Pager = pager;
@@ -89,7 +91,7 @@ namespace Sdx.Html
       else
       {
         tag = new Tag("span");
-        tag.Attr.AddClass("disabled");
+        tag.Attr.AddClass(classNameForDisabled);
       }
 
       return tag;
@@ -114,6 +116,24 @@ namespace Sdx.Html
     public Tag GetLast()
     {
       return CrateLinkTag(Pager.Page == Pager.LastPage ? null : Pager.LastPage.ToString());
+    }
+
+    public List<Tag> GetLinksTag(int number)
+    {
+      return GetLinksTag(number, num => num);
+    }
+
+    public List<Tag> GetLinksTag(int number, Func<string, string> func)
+    {
+      classNameForDisabled = "current";
+      var links = new List<Tag>() { };
+      Pager.GetPageDataList(number).ForEach(pd => {
+        var linkTag = CrateLinkTag(pd.IsCurrent ? null : pd.Id.ToString());
+        linkTag.AddText(func(pd.Id.ToString()), false);
+        links.Add(linkTag);
+      });
+
+      return links;
     }
   }
 }
