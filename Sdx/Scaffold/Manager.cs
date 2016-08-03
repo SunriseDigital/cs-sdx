@@ -180,6 +180,11 @@ namespace Sdx.Scaffold
           elem.IsAllowEmpty = true;
         }
 
+        if (config.ContainsKey("attributes"))
+        {
+          elem.Tag.Attr.Add(config["attributes"].ToArray());
+        }
+
         //FormにDBから戻す値を生成
         if (config.ContainsKey("getter"))
         {

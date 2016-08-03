@@ -27,6 +27,16 @@ namespace Sdx.Scaffold.Config
       }
     }
 
+    public Value(params string[] value)
+    {
+      this.value = value;
+    }
+
+    public string[] ToArray()
+    {
+      return (string[])this.value;
+    }
+
     public Value(MethodInfo methodInfo)
     {
       if(methodInfo == null)
