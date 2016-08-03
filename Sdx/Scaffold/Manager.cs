@@ -377,6 +377,36 @@ namespace Sdx.Scaffold
         }
       }
 
+      if(!SortingOrder.IsEmpty)
+      {
+        var column = SortingOrder["column"].ToString();
+        //SQLインジェクション対策
+        if(!TableMeta.HasColumn(column))
+        {
+          throw new InvalidOperationException("Missing " + column + " column in " + TableMeta.Name);
+        }
+
+        if(!record.HasValue(column))
+        {
+          var direction = SortingOrder["direction"].ToString().ToUpper();
+          var select = Db.CreateSelect();
+          select.AddFrom(TableMeta.CreateTable());
+
+          if (direction == "DESC")
+          {
+            select.SetColumn(Sdx.Db.Sql.Expr.Wrap("MAX(" + column + ") + 1"));
+          }
+          else
+          {
+            select.SetColumn(Sdx.Db.Sql.Expr.Wrap("MIN(" + column + ") - 1"));
+          }
+
+          var value = conn.FetchOne(select);
+
+          record.SetValue(column, value == DBNull.Value ? 1 : value);
+        }
+      }
+
       record.Save(conn);
 
       foreach (var config in relationList)
