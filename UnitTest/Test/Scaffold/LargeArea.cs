@@ -30,8 +30,8 @@ namespace Test.Scaffold
         ).Add(Sdx.Scaffold.Config.Item.Create()
           .Set("column", new Sdx.Scaffold.Config.Value("code"))
           .Set("label", new Sdx.Scaffold.Config.Value("コード"))
+          .Set("attributes", new Sdx.Scaffold.Config.Value("data-hoge", "foo"))
         );
-
 
       return scaffold;
     }

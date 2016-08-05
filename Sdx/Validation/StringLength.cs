@@ -68,10 +68,14 @@ namespace Sdx.Validation
       this.Max = max;
     }
 
+    virtual protected int GetLength(string value)
+    {
+      return value.Length;
+    }
 
     protected override bool IsValidString(string value)
     {
-      int length = value.Length;
+      int length = GetLength(value);
 
       if (this.Min != null && length < this.Min)
       {
