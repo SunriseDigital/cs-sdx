@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -67,6 +68,18 @@ namespace Sdx.Util
     public static string ReplaceLineBreak(string value, string replaceTo)
     {
       return value.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", replaceTo);
+    }
+
+    public static string YamlToJson(string yamlString)
+    {
+      object targetObj;
+      using (TextReader sr = new StringReader(yamlString))
+      {
+        var deserializer = new YamlDotNet.Serialization.Deserializer();
+        targetObj = deserializer.Deserialize(sr);
+      }
+
+      return Util.Json.Encoder(targetObj);
     }
   }
 }
