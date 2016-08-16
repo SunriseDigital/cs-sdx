@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Web;
 
 namespace Sdx.Diagnostics
 {
@@ -68,6 +69,18 @@ namespace Sdx.Diagnostics
       {
         return indent;
       }
+    }
+
+    public static void Response()
+    {
+      var response = HttpContext.Current.Response;
+      response.Write(Environment.NewLine);
+    }
+
+    public static void Response(object value)
+    {
+      var response = HttpContext.Current.Response;
+      response.Write(Dump(value) + Environment.NewLine);
     }
 
     public static string Export(object value)
