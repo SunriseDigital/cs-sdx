@@ -337,7 +337,7 @@ namespace Sdx.Db
 
     public Db.Record FetchRecordByPkey(Db.Connection conn, Dictionary<string, object> pkeyValues)
     {
-      var select = this.Adapter.CreateSelect();
+      var select = conn.Adapter.CreateSelect();
       select.AddFrom(this);
 
       foreach (var col in OwnMeta.Pkeys)
