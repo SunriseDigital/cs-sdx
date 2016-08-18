@@ -69,17 +69,5 @@ namespace Sdx.Util
     {
       return value.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", replaceTo);
     }
-
-    public static string YamlToJson(string yamlString)
-    {
-      object targetObj;
-      using (TextReader sr = new StringReader(yamlString))
-      {
-        var deserializer = new YamlDotNet.Serialization.Deserializer();
-        targetObj = deserializer.Deserialize(sr);
-      }
-
-      return Util.Json.Encoder(targetObj);
-    }
   }
 }
