@@ -291,6 +291,11 @@ namespace Sdx.Db
           throw new ArgumentException("You can't use selectHook, because already joined " + contextName + " context.");
         }
 
+        if(Select.Context(contextName).ParentContext.Name != ContextName)
+        {
+          throw new InvalidOperationException("You can get only child, " + Select.Context(contextName).Name + " is not child of " + ContextName);
+        }
+
         var resultSet = new RecordSet();
         resultSet.Build(this.ValuesList, this.Select, contextName);
         //キャッシュする
