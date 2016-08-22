@@ -182,7 +182,7 @@ namespace Sdx.Db
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if (!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        throw new InvalidOperationException("No origin values. Not loaded from db.");
+        throw new InvalidOperationException("No origin values. Not loaded from db " + key + " on " + this.ContextName);
       }
       return this.ValuesList[0][keyWithContext];
     }
@@ -197,7 +197,7 @@ namespace Sdx.Db
     {
       if(!OwnMeta.HasColumn(key))
       {
-        throw new InvalidOperationException("Missing " + key + " column. Check table settings.");
+        throw new InvalidOperationException("Missing " + key + " column in " + this  + OwnMeta.Name + ". Check table settings.");
       }
 
       if (this.UpdatedValues.ContainsKey(key))
