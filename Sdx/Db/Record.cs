@@ -259,7 +259,7 @@ namespace Sdx.Db
 
     public Record GetRecord(string contextName, Action<Select> selectHook = null)
     {
-      return this.GetRecord<Record>(contextName, null);
+      return this.GetRecord<Record>(contextName, null, selectHook);
     }
 
     public Record GetRecord(string contextName, Connection connection, Action<Select> selectHook = null)
