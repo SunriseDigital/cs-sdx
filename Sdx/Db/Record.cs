@@ -218,6 +218,22 @@ namespace Sdx.Db
       return Convert.ToString(this.GetValue(key));
     }
 
+    public bool ContainsColumn(string key)
+    {
+      if(UpdatedValues.ContainsKey(key))
+      {
+        return true;
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, ContextName);
+      if (this.ValuesList.Count > 0 && this.ValuesList[0].ContainsKey(keyWithContext))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
     public bool HasValue(string key)
     {
       var value = GetValue(key);
@@ -474,7 +490,7 @@ namespace Sdx.Db
         .Append(this.OwnMeta.Name)
         .Append(": {")
         ;
-      this.OwnMeta.Columns.ForEach(column => 
+      foreach (var column in OwnMeta.Columns.Where(col => ContainsColumn(col.Name)))
       {
         builder
           .Append(column.Name)
@@ -483,7 +499,7 @@ namespace Sdx.Db
           .Append(this.GetString(column.Name))
           .Append("\", ")
           ;
-      });
+      }
 
       builder
         .Remove(builder.Length - 2, 2)
@@ -515,6 +531,7 @@ namespace Sdx.Db
     public NameValueCollection ToNameValueCollection(string dateFormat = null)
     {
       var col = new NameValueCollection();
+      
       OwnMeta.Columns.ForEach((column) => {
         if (HasValue(column.Name))
         {
