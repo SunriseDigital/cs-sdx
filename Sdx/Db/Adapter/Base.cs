@@ -168,5 +168,14 @@ namespace Sdx.Db.Adapter
     }
 
     public abstract string RandomOrderKeyword { get; }
+
+    public string QuoteColumn(string contextName, string column)
+    {
+      return string.Format(
+        "{0}.{1}",
+        QuoteIdentifier(contextName),
+        QuoteIdentifier(column)
+      );
+    }
   }
 }
