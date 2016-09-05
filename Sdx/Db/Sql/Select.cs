@@ -90,6 +90,12 @@ namespace Sdx.Db.Sql
       get { return this.columns; }
     }
 
+    public Select FilterOrders(Func<Column, bool> filter)
+    {
+      this.orders = OrderList.Where(filter).ToList<Column>();
+      return this;
+    }
+
     /// <summary>
     /// デフォルトではINNER JOINを先に、LEFT JOINを後にします。
     /// <see cref="JoinOrder.Natural"/>をセットするとAddした順番にORDERされます。

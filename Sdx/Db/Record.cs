@@ -300,16 +300,12 @@ namespace Sdx.Db
         return (RecordSet)this.recordCache[contextName];
       }
 
-      if (this.Select != null && this.Select.HasContext(contextName)) //already joined
+      //ParentContext.Nameをチェックして自分にJOINされているかもチェックしています。
+      if (this.Select != null && this.Select.HasContext(contextName) && Select.Context(contextName).ParentContext.Name == ContextName) //already joined
       {
         if (selectHook != null)
         {
           throw new ArgumentException("You can't use selectHook, because already joined " + contextName + " context.");
-        }
-
-        if(Select.Context(contextName).ParentContext.Name != ContextName)
-        {
-          throw new InvalidOperationException("You can get only child, " + Select.Context(contextName).Name + " is not child of " + ContextName);
         }
 
         var resultSet = new RecordSet();
