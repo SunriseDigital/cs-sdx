@@ -182,7 +182,7 @@ namespace Sdx.Db
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if (!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        throw new InvalidOperationException("No origin values. Not loaded from db.");
+        throw new InvalidOperationException("No origin values. Not loaded from db " + key + " on " + this.ContextName);
       }
       return this.ValuesList[0][keyWithContext];
     }
@@ -197,7 +197,7 @@ namespace Sdx.Db
     {
       if(!OwnMeta.HasColumn(key))
       {
-        throw new InvalidOperationException("Missing " + key + " column. Check table settings.");
+        throw new InvalidOperationException("Missing " + key + " column in " + this  + OwnMeta.Name + ". Check table settings.");
       }
 
       if (this.UpdatedValues.ContainsKey(key))
@@ -216,6 +216,22 @@ namespace Sdx.Db
     public string GetString(string key)
     {
       return Convert.ToString(this.GetValue(key));
+    }
+
+    public bool ContainsColumn(string key)
+    {
+      if(UpdatedValues.ContainsKey(key))
+      {
+        return true;
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, ContextName);
+      if (this.ValuesList.Count > 0 && this.ValuesList[0].ContainsKey(keyWithContext))
+      {
+        return true;
+      }
+
+      return false;
     }
 
     public bool HasValue(string key)
@@ -259,7 +275,7 @@ namespace Sdx.Db
 
     public Record GetRecord(string contextName, Action<Select> selectHook = null)
     {
-      return this.GetRecord<Record>(contextName, null);
+      return this.GetRecord<Record>(contextName, null, selectHook);
     }
 
     public Record GetRecord(string contextName, Connection connection, Action<Select> selectHook = null)
@@ -284,7 +300,8 @@ namespace Sdx.Db
         return (RecordSet)this.recordCache[contextName];
       }
 
-      if (this.Select != null && this.Select.HasContext(contextName)) //already joined
+      //ParentContext.Nameをチェックして自分にJOINされているかもチェックしています。
+      if (this.Select != null && this.Select.HasContext(contextName) && Select.Context(contextName).ParentContext.Name == ContextName) //already joined
       {
         if (selectHook != null)
         {
@@ -469,7 +486,7 @@ namespace Sdx.Db
         .Append(this.OwnMeta.Name)
         .Append(": {")
         ;
-      this.OwnMeta.Columns.ForEach(column => 
+      foreach (var column in OwnMeta.Columns.Where(col => ContainsColumn(col.Name)))
       {
         builder
           .Append(column.Name)
@@ -478,7 +495,7 @@ namespace Sdx.Db
           .Append(this.GetString(column.Name))
           .Append("\", ")
           ;
-      });
+      }
 
       builder
         .Remove(builder.Length - 2, 2)
@@ -510,6 +527,7 @@ namespace Sdx.Db
     public NameValueCollection ToNameValueCollection(string dateFormat = null)
     {
       var col = new NameValueCollection();
+      
       OwnMeta.Columns.ForEach((column) => {
         if (HasValue(column.Name))
         {

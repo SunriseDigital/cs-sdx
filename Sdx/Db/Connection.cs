@@ -565,7 +565,10 @@ namespace Sdx.Db
       {
         clonedSel = select.Adapter.CreateSelect();
         clonedSel.AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
-        clonedSel.AddFrom(select, "_t");
+
+        var subsel = (Select)select.Clone();
+        subsel.OrderList.Clear();
+        clonedSel.AddFrom(subsel, "_t");
       }
       else
       {

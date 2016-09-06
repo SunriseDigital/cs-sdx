@@ -194,5 +194,17 @@ namespace Sdx
     }
 
 
+
+    public object ToDictionary()
+    {
+      return new Dictionary<string, object>()
+      {
+        {"page", Page},
+        {"pageCount", TotalCount},
+        {"hasNext", HasNext},
+        {"hasPrev", HasPrev},
+        {"perPage", PerPage},
+      };
+    }
   }
 }
