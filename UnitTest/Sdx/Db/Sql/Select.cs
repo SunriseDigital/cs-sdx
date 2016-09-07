@@ -2101,5 +2101,144 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       );
     }
 
+    [Fact]
+    public void TestAliasInnerJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAliasInnerJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAliasInnerJoin(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop(), cShop => 
+        {
+          cShop.InnerJoin(new Test.Orm.Table.Area(), "area_1", cArea => 
+          {
+            Assert.Equal("area_1", cArea.Name);
+            cArea.Where.Add("name", "area_1_name");
+          });
+
+          cShop.InnerJoin(new Test.Orm.Table.Area(), "area_2", cArea =>
+          {
+            Assert.Equal("area_2", cArea.Name);
+            cArea.Where.Add("name", "area_2_name");
+          });
+        });
+
+      Assert.False(select.HasContext("area"));
+      Assert.True(select.HasContext("area_1"));
+      Assert.True(select.HasContext("area_2"));
+
+      Assert.Equal("area_1", select.Context("area_1").Name);
+      Assert.Equal("area_2", select.Context("area_2").Name);
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, 
+            {0}shop{1}.{0}name{1} AS {0}name@shop{1}, 
+            {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, 
+            {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
+            {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1}, 
+            {0}shop{1}.{0}login_id{1} AS {0}login_id@shop{1}, 
+            {0}shop{1}.{0}password{1} AS {0}password@shop{1}, 
+            {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1}, 
+            {0}area_1{1}.{0}id{1} AS {0}id@area_1{1}, 
+            {0}area_1{1}.{0}name{1} AS {0}name@area_1{1}, 
+            {0}area_1{1}.{0}code{1} AS {0}code@area_1{1}, 
+            {0}area_1{1}.{0}large_area_id{1} AS {0}large_area_id@area_1{1}, 
+            {0}area_1{1}.{0}sequence{1} AS {0}sequence@area_1{1}, 
+            {0}area_2{1}.{0}id{1} AS {0}id@area_2{1}, 
+            {0}area_2{1}.{0}name{1} AS {0}name@area_2{1}, 
+            {0}area_2{1}.{0}code{1} AS {0}code@area_2{1}, 
+            {0}area_2{1}.{0}large_area_id{1} AS {0}large_area_id@area_2{1}, 
+            {0}area_2{1}.{0}sequence{1} AS {0}sequence@area_2{1} 
+              FROM {0}shop{1} 
+              INNER JOIN {0}area{1} AS {0}area_1{1} ON {0}shop{1}.{0}area_id{1} = {0}area_1{1}.{0}id{1} 
+              INNER JOIN {0}area{1} AS {0}area_2{1} ON {0}shop{1}.{0}area_id{1} = {0}area_2{1}.{0}id{1} 
+              WHERE {0}area_1{1}.{0}name{1} = @0 AND {0}area_2{1}.{0}name{1} = @1"
+        ),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("area_1_name", db.Command.Parameters["@0"].Value);
+      Assert.Equal("area_2_name", db.Command.Parameters["@1"].Value);
+    }
+
+    [Fact]
+    public void TestAliasLeftJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAliasLeftJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAliasLeftJoin(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop(), cShop =>
+        {
+          cShop.LeftJoin(new Test.Orm.Table.Area(), "area_1", cArea =>
+          {
+            Assert.Equal("area_1", cArea.Name);
+            cArea.Where.Add("name", "area_1_name");
+          });
+
+          cShop.LeftJoin(new Test.Orm.Table.Area(), "area_2", cArea =>
+          {
+            Assert.Equal("area_2", cArea.Name);
+            cArea.Where.Add("name", "area_2_name");
+          });
+        });
+
+      Assert.False(select.HasContext("area"));
+      Assert.True(select.HasContext("area_1"));
+      Assert.True(select.HasContext("area_2"));
+
+      Assert.Equal("area_1", select.Context("area_1").Name);
+      Assert.Equal("area_2", select.Context("area_2").Name);
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, 
+        {0}shop{1}.{0}name{1} AS {0}name@shop{1}, 
+        {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, 
+        {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
+        {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1}, 
+        {0}shop{1}.{0}login_id{1} AS {0}login_id@shop{1}, 
+        {0}shop{1}.{0}password{1} AS {0}password@shop{1}, 
+        {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1}, 
+        {0}area_1{1}.{0}id{1} AS {0}id@area_1{1}, 
+        {0}area_1{1}.{0}name{1} AS {0}name@area_1{1}, 
+        {0}area_1{1}.{0}code{1} AS {0}code@area_1{1}, 
+        {0}area_1{1}.{0}large_area_id{1} AS {0}large_area_id@area_1{1}, 
+        {0}area_1{1}.{0}sequence{1} AS {0}sequence@area_1{1}, 
+        {0}area_2{1}.{0}id{1} AS {0}id@area_2{1}, 
+        {0}area_2{1}.{0}name{1} AS {0}name@area_2{1}, 
+        {0}area_2{1}.{0}code{1} AS {0}code@area_2{1}, 
+        {0}area_2{1}.{0}large_area_id{1} AS {0}large_area_id@area_2{1}, 
+        {0}area_2{1}.{0}sequence{1} AS {0}sequence@area_2{1} 
+          FROM {0}shop{1} 
+          LEFT JOIN {0}area{1} AS {0}area_1{1} ON {0}shop{1}.{0}area_id{1} = {0}area_1{1}.{0}id{1} 
+          LEFT JOIN {0}area{1} AS {0}area_2{1} ON {0}shop{1}.{0}area_id{1} = {0}area_2{1}.{0}id{1} 
+          WHERE {0}area_1{1}.{0}name{1} = @0 AND {0}area_2{1}.{0}name{1} = @1"
+        ),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("area_1_name", db.Command.Parameters["@0"].Value);
+      Assert.Equal("area_2_name", db.Command.Parameters["@1"].Value);
+    }
   }
 }
