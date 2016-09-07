@@ -108,7 +108,12 @@ namespace Sdx.Db
         {
           key += "%%SDX%%";
         }
-        key += func(column.Name);
+        var pkeyValue = func(column.Name);
+        if(pkeyValue == null)
+        {
+          throw new InvalidOperationException(column.Name + " value is null. Is this new record ?");
+        }
+        key += pkeyValue;
       }
 
       return key;
@@ -204,6 +209,12 @@ namespace Sdx.Db
     {
       var key = BuildUniqueKey(record.OwnMeta.Pkeys, column => record.GetValue(column));
       this.resultDic.Add(key, record);
+    }
+
+    public RecordSet Sort(Comparison<Record> comp)
+    {
+      resultDic.Sort(comp);
+      return this;
     }
   }
 }

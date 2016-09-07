@@ -925,5 +925,65 @@ namespace UnitTest
         Assert.Equal("天府舫", shops.Get<Test.Orm.Shop>(0).GetString("name"));
       }
     }
+
+    [Fact]
+    public void TestSortRecordSet()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSortRecordSet(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSortRecordSet(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+
+      select.SetLimit(6);
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shops = conn.FetchRecordSet(select);
+
+        shops[0].SetValue("area_id", 2);
+        shops[1].SetValue("area_id", 3);
+        shops[2].SetValue("area_id", 1);
+        shops[3].SetValue("area_id", 4);
+        shops[4].SetValue("area_id", 4);
+        shops[5].SetValue("area_id", 5);
+
+        Assert.Equal(2, shops[0].GetInt32("area_id"));
+        Assert.Equal(3, shops[1].GetInt32("area_id"));
+        Assert.Equal(1, shops[2].GetInt32("area_id"));
+        Assert.Equal(4, shops[3].GetInt32("area_id"));
+        Assert.Equal(4, shops[4].GetInt32("area_id"));
+        Assert.Equal(5, shops[5].GetInt32("area_id"));
+
+
+        shops.Sort((rec1, rec2) => rec1.GetInt32("area_id") - rec2.GetInt32("area_id"));
+
+        Assert.Equal(1, shops[0].GetInt32("area_id"));
+        Assert.Equal(2, shops[1].GetInt32("area_id"));
+        Assert.Equal(3, shops[2].GetInt32("area_id"));
+        Assert.Equal(4, shops[3].GetInt32("area_id"));
+        Assert.Equal(4, shops[4].GetInt32("area_id"));
+        Assert.Equal(5, shops[5].GetInt32("area_id"));
+
+        shops.Sort((rec1, rec2) => rec2.GetInt32("area_id") - rec1.GetInt32("area_id"));
+
+        Assert.Equal(5, shops[0].GetInt32("area_id"));
+        Assert.Equal(4, shops[1].GetInt32("area_id"));
+        Assert.Equal(4, shops[2].GetInt32("area_id"));
+        Assert.Equal(3, shops[3].GetInt32("area_id"));
+        Assert.Equal(2, shops[4].GetInt32("area_id"));
+        Assert.Equal(1, shops[5].GetInt32("area_id"));
+      }
+    }
   }
 }
