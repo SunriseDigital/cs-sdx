@@ -709,5 +709,10 @@ namespace Sdx.Db.Sql
     }
 
     public Connection Connection { get; internal set; }
+
+    public ContextActions CreateContextActions()
+    {
+      return new ContextActions(this);
+    }
   }
 }
