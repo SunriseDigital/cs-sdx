@@ -216,5 +216,71 @@ namespace Sdx.Db
       resultDic.Sort(comp);
       return this;
     }
+
+    private Dictionary<string, Dictionary<int, RecordSet>> groupByColumnCacheForInt = new Dictionary<string, Dictionary<int, RecordSet>>();
+    private Dictionary<string, Dictionary<string, RecordSet>> groupByColumnCacheForString = new Dictionary<string, Dictionary<string, RecordSet>>();
+
+    public RecordSet GroupByColumn(string column, int value)
+    {
+      if(!groupByColumnCacheForInt.ContainsKey(column))
+      {
+        var cache = new Dictionary<int, RecordSet>();
+        groupByColumnCacheForInt[column] = cache;
+        ForEach(rec => 
+        {
+          var val = rec.GetInt32(column);
+          if(!cache.ContainsKey(val))
+          {
+            cache[val] = new RecordSet();
+          }
+
+          cache[val].AddRecord(rec);
+        });
+      }
+
+      if(groupByColumnCacheForInt[column].ContainsKey(value))
+      {
+        return groupByColumnCacheForInt[column][value];
+      }
+      else
+      {
+        return new RecordSet();
+      }
+    }
+
+    public RecordSet GroupByColumn(string column, string value)
+    {
+      if (!groupByColumnCacheForString.ContainsKey(column))
+      {
+        var cache = new Dictionary<string, RecordSet>();
+        groupByColumnCacheForString[column] = cache;
+        ForEach(rec =>
+        {
+          var val = rec.GetString(column);
+          if (!cache.ContainsKey(val))
+          {
+            cache[val] = new RecordSet();
+          }
+
+          cache[val].AddRecord(rec);
+        });
+      }
+
+      if (groupByColumnCacheForString[column].ContainsKey(value))
+      {
+        return groupByColumnCacheForString[column][value];
+      }
+      else
+      {
+        return new RecordSet();
+      }
+    }
+
+    public RecordSet ClearGroupByColumnCache(string column)
+    {
+      groupByColumnCacheForString.Remove(column);
+      groupByColumnCacheForInt.Remove(column);
+      return this;
+    }
   }
 }
