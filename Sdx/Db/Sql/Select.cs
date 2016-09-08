@@ -90,12 +90,6 @@ namespace Sdx.Db.Sql
       get { return this.columns; }
     }
 
-    public Select FilterOrders(Func<Column, bool> filter)
-    {
-      this.orders = OrderList.Where(filter).ToList<Column>();
-      return this;
-    }
-
     /// <summary>
     /// デフォルトではINNER JOINを先に、LEFT JOINを後にします。
     /// <see cref="JoinOrder.Natural"/>をセットするとAddした順番にORDERされます。
@@ -380,6 +374,15 @@ namespace Sdx.Db.Sql
       if (this.Adapter == null)
       {
         throw new InvalidOperationException("Missing adapter, Set before Build.");
+      }
+
+      //Group Byに無いカラムは自動的にOrderから取り除かれます。
+      //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
+      if (groups.Count > 0)
+      {
+        orders = orders
+          .Where(orderCol => groups.Any(groupCol => orderCol.SameAs(groupCol)))
+          .ToList<Column>();
       }
 
       DbCommand command = this.Adapter.CreateCommand();

@@ -2240,5 +2240,52 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       Assert.Equal("area_1_name", db.Command.Parameters["@0"].Value);
       Assert.Equal("area_2_name", db.Command.Parameters["@1"].Value);
     }
+
+    [Fact]
+    public void TestGroupAndOrder()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGroupAndOrder(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGroupAndOrder(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop => 
+      {
+        cShop.AddOrder("id", Sdx.Db.Sql.Order.DESC);
+        cShop.AddOrder("created_at", Sdx.Db.Sql.Order.DESC);
+        cShop.Table.SetColumns("id");
+        cShop.AddGroup("id");
+
+        cShop.InnerJoin(new Test.Orm.Table.Area(), cArea =>
+        {
+          cArea.AddOrder("id", Sdx.Db.Sql.Order.DESC);
+          cArea.AddOrder("name", Sdx.Db.Sql.Order.DESC);
+          cArea.Table.SetColumns("id");
+          cArea.AddGroup("id");
+        });
+      });
+
+      testDb.Command = select.Build();
+
+      //Group Byに無いカラムは自動的にOrderから取り除かれます。
+      //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, {0}area{1}.{0}id{1} AS {0}id@area{1} 
+  FROM {0}shop{1} 
+  INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} 
+  GROUP BY {0}shop{1}.{0}id{1}, {0}area{1}.{0}id{1} 
+  ORDER BY {0}shop{1}.{0}id{1} DESC, {0}area{1}.{0}id{1} DESC
+"
+        ),
+        testDb.Command.CommandText
+      );
+    }
   }
 }
