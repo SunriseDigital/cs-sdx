@@ -67,7 +67,7 @@ namespace Sdx.Db
         var rowKey = Record.BuildColumnAliasWithContextName(column.Name, contextName);
         if (!row.ContainsKey(rowKey))
         {
-          throw new InvalidOperationException("Missing " + rowKey + " in " + Sdx.Diagnostics.Debug.Dump(row));
+          throw new InvalidOperationException("Missing " + rowKey + " in " + Sdx.Diagnostics.Debug.Dump(row) + ". Do you call directry context.SetColumn[s]() ? You must call context.Table.SetColumn[s].");
         }
 
         if (row[rowKey] is DBNull)
