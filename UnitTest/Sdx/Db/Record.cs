@@ -1084,5 +1084,116 @@ namespace UnitTest
         Assert.Equal(3, shops3.Count);
       }
     }
+
+    [Fact]
+    public void TestPopByCount()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunPopByCount(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunPopByCount(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+
+      select.SetLimit(6);
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shops = conn.FetchRecordSet(select);
+        Assert.Equal(6, shops.Count);
+        Assert.Equal(1, shops[0].GetInt32("id"));
+        Assert.Equal(2, shops[1].GetInt32("id"));
+        Assert.Equal(3, shops[2].GetInt32("id"));
+        Assert.Equal(4, shops[3].GetInt32("id"));
+        Assert.Equal(5, shops[4].GetInt32("id"));
+        Assert.Equal(6, shops[5].GetInt32("id"));
+
+
+        var pops = shops.PopSet(2);
+        Assert.Equal(2, pops.Count);
+        Assert.Equal(1, pops[0].GetInt32("id"));
+        Assert.Equal(2, pops[1].GetInt32("id"));
+        Assert.Equal(4, shops.Count);
+        Assert.Equal(3, shops[0].GetInt32("id"));
+        Assert.Equal(4, shops[1].GetInt32("id"));
+        Assert.Equal(5, shops[2].GetInt32("id"));
+        Assert.Equal(6, shops[3].GetInt32("id"));
+
+        pops = shops.PopSet(1);
+        Assert.Equal(1, pops.Count);
+        Assert.Equal(3, pops[0].GetInt32("id"));
+        Assert.Equal(3, shops.Count);
+        Assert.Equal(4, shops[0].GetInt32("id"));
+        Assert.Equal(5, shops[1].GetInt32("id"));
+        Assert.Equal(6, shops[2].GetInt32("id"));
+
+        pops = shops.PopSet(0);
+        Assert.Equal(0, pops.Count);
+        Assert.Equal(3, shops.Count);
+        Assert.Equal(4, shops[0].GetInt32("id"));
+        Assert.Equal(5, shops[1].GetInt32("id"));
+        Assert.Equal(6, shops[2].GetInt32("id"));
+
+        pops = shops.PopSet(3);
+        Assert.Equal(3, pops.Count);
+        Assert.Equal(4, pops[0].GetInt32("id"));
+        Assert.Equal(5, pops[1].GetInt32("id"));
+        Assert.Equal(6, pops[2].GetInt32("id"));
+
+        Assert.Equal(0, shops.Count);
+      }
+    }
+
+    [Fact]
+    public void TestShuffle()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunShuffle(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunShuffle(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+
+      select.SetLimit(6);
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var tryCount = 10000;
+        //直前の並び順と同じなった回数を数えて確率でAssertします。
+        var sameCount = 0;
+        var shops = conn.FetchRecordSet(select);
+        string prev = shops.Select(rec => rec.GetString("id")).Aggregate((sum, val) => sum + val);
+        for (int i = 0; i < tryCount; i++)
+        {
+          var shuffled = shops.Shuffle().Select(rec => rec.GetString("id")).Aggregate((sum, val) => sum + val);
+          if(prev == shuffled)
+          {
+            sameCount++;
+          }
+          prev = shuffled;
+        }
+
+        //3~4%は前回と同じ並び順になってしまうので10%でチェックします。
+        Assert.True(tryCount * 0.1 > sameCount);
+      }
+    }
   }
 }

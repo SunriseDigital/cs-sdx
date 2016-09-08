@@ -8,6 +8,8 @@ namespace Sdx.Db
 {
   public class RecordSet : IEnumerable<Record>
   {
+    private static Random random = Util.Number.CreateRandom();
+
     //主キーでユニークなのでOrderedDictionaryを使っています。
     private Collection.OrderedDictionary<string, Record> resultDic = new Collection.OrderedDictionary<string, Record>();
 
@@ -160,6 +162,23 @@ namespace Sdx.Db
       return Pop<Record>(match);
     }
 
+    public Record Pop()
+    {
+      var tmp = resultDic.ItemAt(0);
+      resultDic.RemoveAt(0);
+      return tmp;
+    }
+
+    public RecordSet PopSet(int count)
+    {
+      var results = new RecordSet();
+      for (int i = 0; i < count; i++)
+      {
+        results.AddRecord(Pop());
+      }
+      return results;
+    }
+
     public void ForEach<T>(Action<T> action) where T : Sdx.Db.Record
     {
       this.resultDic.ForEach((key, rec) => action((T) rec));
@@ -280,6 +299,12 @@ namespace Sdx.Db
     {
       groupByColumnCacheForString.Remove(column);
       groupByColumnCacheForInt.Remove(column);
+      return this;
+    }
+
+    public RecordSet Shuffle()
+    {
+      Sort((rec1, rec2) => random.Next(-1, 1));
       return this;
     }
   }
