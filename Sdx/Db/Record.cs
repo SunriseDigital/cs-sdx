@@ -240,6 +240,11 @@ namespace Sdx.Db
       return !(value is DBNull) && value != null;
     }
 
+    public bool HasRecordCache(string contextName)
+    {
+      return recordCache.ContainsKey(contextName);
+    }
+
     public Record ClearRecordCache(string contextName = null)
     {
       if (contextName != null)
