@@ -145,8 +145,19 @@ namespace Sdx.Db
       }
     }
 
-    public T Pop<T>(Predicate<T> match) where T : Sdx.Db.Record
+    /// <summary>
+    /// 最初にmatchがtrueを返したレコードをTにキャストして取り出して返す。対象のレコードは元のRecordSetからはなくなります。
+    /// </summary>
+    /// <param name="match"></param>
+    /// <returns></returns>
+    public T Pop<T>(Predicate<T> match = null) where T : Sdx.Db.Record
     {
+      if(match == null)
+      {
+        //最初のレコードを返す。
+        match = rec => true;
+      }
+
       var find = resultDic.FindIndex((kv) => match((T)kv.Value));
       if (find != -1)
       {
@@ -157,16 +168,14 @@ namespace Sdx.Db
       return null;
     }
 
-    public Record Pop(Predicate<Record> match)
+    /// <summary>
+    /// 最初にmatchがtrueを返したレコードを取り出して返す。対象のレコードは元のRecordSetからはなくなります。
+    /// </summary>
+    /// <param name="match"></param>
+    /// <returns></returns>
+    public Record Pop(Predicate<Record> match = null)
     {
       return Pop<Record>(match);
-    }
-
-    public Record Pop()
-    {
-      var tmp = resultDic.ItemAt(0);
-      resultDic.RemoveAt(0);
-      return tmp;
     }
 
     public RecordSet PopSet(int count)
