@@ -2287,5 +2287,48 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         testDb.Command.CommandText
       );
     }
+
+    [Fact]
+    public void TestAliasRecordCache()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAliasRecordCache(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAliasRecordCache(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.Where.Add("id", 5);
+        cShop.InnerJoin(new Test.Orm.Table.ShopCategory(), "ShopCategory1", cShopCategory => 
+        {
+          cShopCategory.Where.Add("category_id", 4);
+        });
+        cShop.InnerJoin(new Test.Orm.Table.ShopCategory(), "ShopCategory2", cShopCategory =>
+        {
+          cShopCategory.Where.Add("category_id", 5);
+        });
+      });
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord(select);
+
+        var sc1 = shop.GetRecordSet("ShopCategory1");
+        Assert.Equal(1, sc1.Count);
+        Assert.Equal(4, sc1[0].GetInt32("category_id"));
+
+        var sc2 = shop.GetRecordSet("ShopCategory2");
+        Assert.Equal(1, sc2.Count);
+        Assert.Equal(5, sc2[0].GetInt32("category_id"));
+      }
+    }
   }
 }
