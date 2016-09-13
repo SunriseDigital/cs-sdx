@@ -104,11 +104,11 @@ namespace Sdx.Html
       });
     }
 
-    public void AddOption(string key, string value)
+    public void AddOption(string value, string label)
     {
       var option = new Sdx.Html.Option();
-      option.Tag.Attr["value"] = key;
-      option.Text = value;
+      option.Tag.Attr["value"] = value;
+      option.Text = label;
       AddOption(option);
     }
 
