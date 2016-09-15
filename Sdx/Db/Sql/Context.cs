@@ -66,6 +66,12 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Context InnerJoin(Table target, string alias, Action<Context> call)
+    {
+      call(InnerJoin(target, alias));
+      return this;
+    }
+
     public Context InnerJoin(Table target, Condition condition, Action<Context> call)
     {
       call(InnerJoin(target, condition));
@@ -84,8 +90,7 @@ namespace Sdx.Db.Sql
 
       if(condition == null)
       {
-        var contextName = alias == null ? target.OwnMeta.Name : alias;
-        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(contextName);
+        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(target.OwnMeta.Name, alias);
       }
 
       context.Table = target;
@@ -162,6 +167,12 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Context LeftJoin(Table target, string alias, Action<Context> call)
+    {
+      call(LeftJoin(target, alias));
+      return this;
+    }
+
     public Context LeftJoin(Table target, Action<Context> call)
     {
       call(LeftJoin(target));
@@ -174,8 +185,7 @@ namespace Sdx.Db.Sql
 
       if (condition == null)
       {
-        var contextName = alias == null ? target.OwnMeta.Name : alias;
-        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(contextName);
+        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(target.OwnMeta.Name, alias);
       }
 
       context.Table = target;

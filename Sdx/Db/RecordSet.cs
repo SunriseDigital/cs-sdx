@@ -8,6 +8,8 @@ namespace Sdx.Db
 {
   public class RecordSet : IEnumerable<Record>
   {
+    private static Random random = Util.Number.CreateRandom();
+
     //主キーでユニークなのでOrderedDictionaryを使っています。
     private Collection.OrderedDictionary<string, Record> resultDic = new Collection.OrderedDictionary<string, Record>();
 
@@ -65,7 +67,7 @@ namespace Sdx.Db
         var rowKey = Record.BuildColumnAliasWithContextName(column.Name, contextName);
         if (!row.ContainsKey(rowKey))
         {
-          throw new InvalidOperationException("Missing " + rowKey + " in " + Sdx.Diagnostics.Debug.Dump(row));
+          throw new InvalidOperationException("Missing " + rowKey + " in " + Sdx.Diagnostics.Debug.Dump(row) + ". Do you call directry context.SetColumn[s]() ? You must call context.Table.SetColumn[s].");
         }
 
         if (row[rowKey] is DBNull)
@@ -108,7 +110,12 @@ namespace Sdx.Db
         {
           key += "%%SDX%%";
         }
-        key += func(column.Name);
+        var pkeyValue = func(column.Name);
+        if(pkeyValue == null)
+        {
+          throw new InvalidOperationException(column.Name + " value is null. Is this new record ?");
+        }
+        key += pkeyValue;
       }
 
       return key;
@@ -138,8 +145,19 @@ namespace Sdx.Db
       }
     }
 
-    public T Pop<T>(Predicate<T> match) where T : Sdx.Db.Record
+    /// <summary>
+    /// 最初にmatchがtrueを返したレコードをTにキャストして取り出して返す。対象のレコードは元のRecordSetからはなくなります。
+    /// </summary>
+    /// <param name="match"></param>
+    /// <returns></returns>
+    public T Pop<T>(Predicate<T> match = null) where T : Sdx.Db.Record
     {
+      if(match == null)
+      {
+        //最初のレコードを返す。
+        match = rec => true;
+      }
+
       var find = resultDic.FindIndex((kv) => match((T)kv.Value));
       if (find != -1)
       {
@@ -150,9 +168,24 @@ namespace Sdx.Db
       return null;
     }
 
-    public Record Pop(Predicate<Record> match)
+    /// <summary>
+    /// 最初にmatchがtrueを返したレコードを取り出して返す。対象のレコードは元のRecordSetからはなくなります。
+    /// </summary>
+    /// <param name="match"></param>
+    /// <returns></returns>
+    public Record Pop(Predicate<Record> match = null)
     {
       return Pop<Record>(match);
+    }
+
+    public RecordSet PopSet(int count)
+    {
+      var results = new RecordSet();
+      for (int i = 0; i < count; i++)
+      {
+        results.AddRecord(Pop());
+      }
+      return results;
     }
 
     public void ForEach<T>(Action<T> action) where T : Sdx.Db.Record
@@ -204,6 +237,84 @@ namespace Sdx.Db
     {
       var key = BuildUniqueKey(record.OwnMeta.Pkeys, column => record.GetValue(column));
       this.resultDic.Add(key, record);
+    }
+
+    public RecordSet Sort(Comparison<Record> comp)
+    {
+      resultDic.Sort(comp);
+      return this;
+    }
+
+    private Dictionary<string, Dictionary<int, RecordSet>> groupByColumnCacheForInt = new Dictionary<string, Dictionary<int, RecordSet>>();
+    private Dictionary<string, Dictionary<string, RecordSet>> groupByColumnCacheForString = new Dictionary<string, Dictionary<string, RecordSet>>();
+
+    public RecordSet GroupByColumn(string column, int value)
+    {
+      if(!groupByColumnCacheForInt.ContainsKey(column))
+      {
+        var cache = new Dictionary<int, RecordSet>();
+        groupByColumnCacheForInt[column] = cache;
+        ForEach(rec => 
+        {
+          var val = rec.GetInt32(column);
+          if(!cache.ContainsKey(val))
+          {
+            cache[val] = new RecordSet();
+          }
+
+          cache[val].AddRecord(rec);
+        });
+      }
+
+      if(groupByColumnCacheForInt[column].ContainsKey(value))
+      {
+        return groupByColumnCacheForInt[column][value];
+      }
+      else
+      {
+        return new RecordSet();
+      }
+    }
+
+    public RecordSet GroupByColumn(string column, string value)
+    {
+      if (!groupByColumnCacheForString.ContainsKey(column))
+      {
+        var cache = new Dictionary<string, RecordSet>();
+        groupByColumnCacheForString[column] = cache;
+        ForEach(rec =>
+        {
+          var val = rec.GetString(column);
+          if (!cache.ContainsKey(val))
+          {
+            cache[val] = new RecordSet();
+          }
+
+          cache[val].AddRecord(rec);
+        });
+      }
+
+      if (groupByColumnCacheForString[column].ContainsKey(value))
+      {
+        return groupByColumnCacheForString[column][value];
+      }
+      else
+      {
+        return new RecordSet();
+      }
+    }
+
+    public RecordSet ClearGroupByColumnCache(string column)
+    {
+      groupByColumnCacheForString.Remove(column);
+      groupByColumnCacheForInt.Remove(column);
+      return this;
+    }
+
+    public RecordSet Shuffle()
+    {
+      Sort((rec1, rec2) => random.Next(-1, 1));
+      return this;
     }
   }
 }
