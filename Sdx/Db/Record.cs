@@ -830,7 +830,17 @@ namespace Sdx.Db
     {
       get
       {
-        return this.vars;
+        return vars;
+      }
+    }
+
+    private Collection.Holder internalCache = new Collection.Holder();
+
+    protected Collection.Holder InternalCache
+    {
+      get
+      {
+        return internalCache;
       }
     }
   }
