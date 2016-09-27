@@ -13,7 +13,7 @@ namespace Sdx.Web
     public static void JsonResponse(object values)
     {
       //IEがapplication/jsonに対応していないので
-      if (Request.Headers["Accept"].Contains("application/json"))
+      if (Request.Headers["Accept"] != null && Request.Headers["Accept"].Contains("application/json"))
       {
         Response.ContentType = "application/json; charset=utf-8";
       }
