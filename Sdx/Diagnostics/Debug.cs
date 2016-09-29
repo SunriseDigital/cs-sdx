@@ -23,7 +23,7 @@ namespace Sdx.Diagnostics
 
     public TextWriter Out { get; set; }
 
-    public void Log(Object value, String title = "")
+    public void Log(Object value, String title = "", bool dumpPublicProperties = false)
     {
       if(Out == null)
       {
@@ -53,7 +53,7 @@ namespace Sdx.Diagnostics
         lineNumber
       ));
       prevTimerElapsedTicks = currentTicks;
-      Out.WriteLine(Dump(value));
+      Out.WriteLine(Dump(value, dumpPublicProperties));
       Out.WriteLine();
       Out.WriteLine();
     }
@@ -83,17 +83,17 @@ namespace Sdx.Diagnostics
       response.Write(Dump(value) + Environment.NewLine);
     }
 
-    public static string Export(object value)
+    public static string Export(object value, bool dumpPublicProperties = false)
     {
-      return Dump(value, "", false);
+      return Dump(value, "", false, dumpPublicProperties);
     }
 
-    public static string Dump(object value)
+    public static string Dump(object value, bool dumpPublicProperties = false)
     {
-      return Dump(value, "", true);
+      return Dump(value, "", true, dumpPublicProperties);
     }
 
-    private static string Dump(object value, string indent, bool needType)
+    private static string Dump(object value, string indent, bool needType, bool dumpPublicProperties)
     {
       if (value == null)
       {
@@ -121,7 +121,7 @@ namespace Sdx.Diagnostics
         foreach (var key in dic.Keys)
         {
           // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
-          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ", needType) + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ", needType, dumpPublicProperties) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -135,7 +135,7 @@ namespace Sdx.Diagnostics
         var result = GetDumpTitle(value, indent, needType, "(" + nvcol.Count + ")");
         foreach (var key in nvcol.Keys)
         {
-          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ", needType) + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ", needType, dumpPublicProperties) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -145,7 +145,7 @@ namespace Sdx.Diagnostics
       {
         IList list = value as IList;
         var result = GetDumpTitle(value, indent, needType, "(" + list.Count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent, needType);
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicProperties);
       }
       else if (value is IEnumerable)
       {
@@ -156,7 +156,7 @@ namespace Sdx.Diagnostics
           ++count;
         }
         var result = GetDumpTitle(value, indent, needType, "(" + count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent, needType);
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicProperties);
       }
       else
       {
@@ -164,7 +164,25 @@ namespace Sdx.Diagnostics
         if (type.Namespace + "." + type.Name == "System.Collections.Generic.KeyValuePair`2")
         {
           var dynamicValue = (dynamic)value;
-          return indent + dynamicValue.Key.ToString() + " " + Dump(dynamicValue.Value, indent, needType);
+          return indent + dynamicValue.Key.ToString() + " " + Dump(dynamicValue.Value, indent, needType, dumpPublicProperties);
+        }
+        else if (dumpPublicProperties)
+        {
+          var result = GetDumpTitle(value, indent, needType, "( properties )");
+          indent = indent + indent;
+          foreach(var prop in type.GetProperties().Where(prop => prop.CanRead && prop.GetIndexParameters().Length == 0))
+          {
+            var val = prop.GetValue(value);
+            result += indent + prop.Name + " " + Dump(val, indent, needType, needsDumpPublicMember(val)) + Environment.NewLine;
+          }
+
+          foreach (var fd in type.GetFields().Where(fd => fd.IsPublic))
+          {
+            var val = fd.GetValue(value);
+            result += indent + fd.Name + " " + Dump(val, indent, needType, needsDumpPublicMember(val)) + Environment.NewLine;
+          }
+
+          return result;
         }
         else
         {
@@ -173,11 +191,16 @@ namespace Sdx.Diagnostics
       }
     }
 
-    private static String AppendEnumerableDump(String result, IEnumerable values, String indent, bool needType)
+    private static bool needsDumpPublicMember(object value)
+    {
+      return false;
+    }
+
+    private static String AppendEnumerableDump(String result, IEnumerable values, String indent, bool needType, bool dumpPublicProperties)
     { 
       foreach (Object obj in values as IEnumerable)
       {
-        result += Dump(obj, indent + DumpIndent, needType) + Environment.NewLine;
+        result += Dump(obj, indent + DumpIndent, needType, dumpPublicProperties) + Environment.NewLine;
       }
 
       //改行を取り除く
