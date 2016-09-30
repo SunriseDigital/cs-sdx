@@ -23,7 +23,7 @@ namespace Sdx.Diagnostics
 
     public TextWriter Out { get; set; }
 
-    public void Log(Object value, String title = "", bool dumpPublicProperties = false)
+    public void Log(Object value, String title = "", int dumpPublicMemberCount = 0)
     {
       if(Out == null)
       {
@@ -53,7 +53,7 @@ namespace Sdx.Diagnostics
         lineNumber
       ));
       prevTimerElapsedTicks = currentTicks;
-      Out.WriteLine(Dump(value, dumpPublicProperties));
+      Out.WriteLine(Dump(value, dumpPublicMemberCount));
       Out.WriteLine();
       Out.WriteLine();
     }
@@ -83,17 +83,40 @@ namespace Sdx.Diagnostics
       response.Write(Dump(value) + Environment.NewLine);
     }
 
-    public static string Export(object value, bool dumpPublicProperties = false)
+    public static string Export(object value, int dumpPublicMemberCount = 0)
     {
-      return Dump(value, "", false, dumpPublicProperties);
+      return Dump(value, "", false, dumpPublicMemberCount);
     }
 
-    public static string Dump(object value, bool dumpPublicProperties = false)
+    public static string Dump(object value, int dumpPublicMemberCount = 0)
     {
-      return Dump(value, "", true, dumpPublicProperties);
+      return Dump(value, "", true, dumpPublicMemberCount);
     }
 
-    private static string Dump(object value, string indent, bool needType, bool dumpPublicProperties)
+    /// <summary>
+    /// http://stackoverflow.com/questions/2442534/how-to-test-if-type-is-primitive
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    private static bool IsSimpleType(Type type)
+    {
+      return
+          type.IsPrimitive ||
+          new Type[] {
+            typeof(Enum),
+            typeof(String),
+            typeof(Decimal),
+            typeof(DateTime),
+            typeof(DateTimeOffset),
+            typeof(TimeSpan),
+            typeof(Guid)
+        }.Contains(type) ||
+          Convert.GetTypeCode(type) != TypeCode.Object ||
+          (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) && IsSimpleType(type.GetGenericArguments()[0]))
+          ;
+    }
+
+    private static string Dump(object value, string indent, bool needType, int dumpPublicMemberCount)
     {
       if (value == null)
       {
@@ -112,6 +135,10 @@ namespace Sdx.Diagnostics
           return indent + strVal;
         }
       }
+      else if (IsSimpleType(value.GetType()))
+      {
+        return GetDumpTitle(value, indent, needType, " " + value.ToString()).TrimEnd('\r', '\n');
+      }
       else if (value is IDictionary)
       {
         var dic = value as IDictionary;
@@ -121,7 +148,7 @@ namespace Sdx.Diagnostics
         foreach (var key in dic.Keys)
         {
           // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
-          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ", needType, dumpPublicProperties) + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ", needType, dumpPublicMemberCount) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -135,7 +162,7 @@ namespace Sdx.Diagnostics
         var result = GetDumpTitle(value, indent, needType, "(" + nvcol.Count + ")");
         foreach (var key in nvcol.Keys)
         {
-          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ", needType, dumpPublicProperties) + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ", needType, dumpPublicMemberCount) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -145,7 +172,7 @@ namespace Sdx.Diagnostics
       {
         IList list = value as IList;
         var result = GetDumpTitle(value, indent, needType, "(" + list.Count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicProperties);
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicMemberCount);
       }
       else if (value is IEnumerable)
       {
@@ -156,7 +183,7 @@ namespace Sdx.Diagnostics
           ++count;
         }
         var result = GetDumpTitle(value, indent, needType, "(" + count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicProperties);
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicMemberCount);
       }
       else
       {
@@ -164,22 +191,23 @@ namespace Sdx.Diagnostics
         if (type.Namespace + "." + type.Name == "System.Collections.Generic.KeyValuePair`2")
         {
           var dynamicValue = (dynamic)value;
-          return indent + dynamicValue.Key.ToString() + " " + Dump(dynamicValue.Value, indent, needType, dumpPublicProperties);
+          return indent + dynamicValue.Key.ToString() + " " + Dump(dynamicValue.Value, indent, needType, dumpPublicMemberCount);
         }
-        else if (dumpPublicProperties)
+        else if (dumpPublicMemberCount > 0)
         {
+          --dumpPublicMemberCount;
           var result = GetDumpTitle(value, indent, needType, "( properties )");
           indent = indent + indent;
           foreach(var prop in type.GetProperties().Where(prop => prop.CanRead && prop.GetIndexParameters().Length == 0))
           {
             var val = prop.GetValue(value);
-            result += indent + prop.Name + " " + Dump(val, indent, needType, needsDumpPublicMember(val)) + Environment.NewLine;
+            result += indent + prop.Name + " " + Dump(val, indent, needType, dumpPublicMemberCount) + Environment.NewLine;
           }
 
           foreach (var fd in type.GetFields().Where(fd => fd.IsPublic))
           {
             var val = fd.GetValue(value);
-            result += indent + fd.Name + " " + Dump(val, indent, needType, needsDumpPublicMember(val)) + Environment.NewLine;
+            result += indent + fd.Name + " " + Dump(val, indent, needType, dumpPublicMemberCount) + Environment.NewLine;
           }
 
           return result;
@@ -191,16 +219,11 @@ namespace Sdx.Diagnostics
       }
     }
 
-    private static bool needsDumpPublicMember(object value)
-    {
-      return false;
-    }
-
-    private static String AppendEnumerableDump(String result, IEnumerable values, String indent, bool needType, bool dumpPublicProperties)
+    private static String AppendEnumerableDump(String result, IEnumerable values, String indent, bool needType, int dumpPublicMemberCount)
     { 
       foreach (Object obj in values as IEnumerable)
       {
-        result += Dump(obj, indent + DumpIndent, needType, dumpPublicProperties) + Environment.NewLine;
+        result += Dump(obj, indent + DumpIndent, needType, dumpPublicMemberCount) + Environment.NewLine;
       }
 
       //改行を取り除く
