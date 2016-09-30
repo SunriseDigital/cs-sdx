@@ -135,7 +135,7 @@ namespace Sdx.Diagnostics
           return indent + strVal;
         }
       }
-      else if (IsSimpleType(value.GetType()))
+      else if (IsSimpleType(value.GetType()) || value is Db.Record)
       {
         return GetDumpTitle(value, indent, needType, " " + value.ToString()).TrimEnd('\r', '\n');
       }
@@ -196,13 +196,16 @@ namespace Sdx.Diagnostics
         else if (dumpPublicMemberCount > 0)
         {
           --dumpPublicMemberCount;
-          var result = GetDumpTitle(value, indent, needType, "( properties )");
-          indent = indent + indent;
-          foreach(var prop in type.GetProperties().Where(prop => prop.CanRead && prop.GetIndexParameters().Length == 0))
-          {
-            var val = prop.GetValue(value);
-            result += indent + prop.Name + " " + Dump(val, indent, needType, dumpPublicMemberCount) + Environment.NewLine;
-          }
+          var result = GetDumpTitle(value, indent, needType, " (fields and properties)");
+          indent = indent + DumpIndent;
+
+          //TODO プロパティを呼び出すと謎なエラーが出る。詳細にテストしないと原因がわからないのでいったん保留
+          //http://stackoverflow.com/questions/1346238/method-may-only-be-called-on-a-type-for-which-type-isgenericparameter-is-true
+          //foreach(var prop in type.GetProperties().Where(prop => prop.CanRead && prop.GetIndexParameters().Length == 0))
+          //{
+          //  var val = prop.GetValue(value);
+          //  result += indent + prop.Name + " " + Dump(val, indent, needType, dumpPublicMemberCount) + Environment.NewLine;
+          //}
 
           foreach (var fd in type.GetFields().Where(fd => fd.IsPublic))
           {
