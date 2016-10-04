@@ -50,6 +50,14 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public ContextActions Add(Action<Context> action)
+    {
+      var actionData = new ActionData();
+      actionData.Action = action;
+      actions.Add(actionData);
+      return this;
+    }
+
     /// <summary>
     /// Addしたアクションを実行します。
     /// </summary>
@@ -59,8 +67,12 @@ namespace Sdx.Db.Sql
       {
         var context = kv.Value;
         actions.ForEach(action => 
-        { 
-          if(context.Table.OwnMeta.HasColumn(action.ColumnName))
+        {
+          if (action.ColumnName == null)
+          {
+            action.Action(context);
+          }
+          else if(context.Table.OwnMeta.HasColumn(action.ColumnName))
           {
             action.Action(context);
           }
