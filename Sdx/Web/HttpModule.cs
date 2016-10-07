@@ -81,7 +81,7 @@ namespace Sdx.Web
     {
       var debugString = new StringBuilder();
 
-      debugString.Append("<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both; position: relative; z-index: 1000;\">");
+      debugString.Append("<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both; position: relative; z-index: 2147483638; display: block !important; text-align: left; \">");
       this.AppendDebugLogs(debugString);
       this.AppendDbQueryLogs(debugString);
       this.AppendPostData(debugString);
