@@ -49,6 +49,11 @@ namespace Sdx.Util
           .Aggregate(string.Empty, (s1, s2) => s1 + s2);
     }
 
+    public static string ToSnakeCase(string value)
+    {
+      return string.Concat(value.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
+    }
+
     public static string RemoveFirstLines(string value, int linesCount)
     {
       var lines = Regex.Split(value, "\r\n|\r|\n").Skip(linesCount);
