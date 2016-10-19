@@ -49,7 +49,7 @@ namespace Test.Orm.Table
           //他テーブルとの関係を設定します。
         },
         typeof(Test.Orm.Shop),
-        typeof(Test.Orm.Table.Category)
+        typeof(Test.Orm.Table.Shop)
       );
     }
   }
@@ -126,7 +126,7 @@ namespace Test.Orm.Table
           }
         },
         typeof(Test.Orm.Shop),
-        typeof(Test.Orm.Table.Category)
+        typeof(Test.Orm.Table.Shop)
       );
     }
   }
