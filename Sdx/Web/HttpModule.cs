@@ -50,10 +50,13 @@ namespace Sdx.Web
       Sdx.Context.Current.Debug.Out = new Diagnostics.DebugHtmlWriter();
 
       //debug mode
-      var cookie = HttpContext.Current.Request.Cookies["sdx_debug_mode"];
-      if (cookie != null && cookie.Value == "1")
+      if(Sdx.Web.Helper.IsTrustedIPRequest)
       {
-        Sdx.Context.Current.IsDebugMode = true;
+        var cookie = HttpContext.Current.Request.Cookies["sdx_debug_mode"];
+        if (cookie != null && cookie.Value == "1")
+        {
+          Sdx.Context.Current.IsDebugMode = true;
+        }
       }
     }
 

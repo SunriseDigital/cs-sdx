@@ -74,5 +74,50 @@ namespace Sdx.Web
 
       return false;
     }
+
+    private static List<string> trustedIPList;
+
+    public static string ClientIPAddressByString
+    {
+      get
+      {
+        string ipAddress = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+        if (!string.IsNullOrEmpty(ipAddress))
+        {
+          string[] addresses = ipAddress.Split(',');
+          if (addresses.Length != 0)
+          {
+            return addresses[0];
+          }
+        }
+
+        return Request.ServerVariables["REMOTE_ADDR"];
+      }
+    }
+
+
+    public static bool IsTrustedIPRequest
+    {
+      get
+      {
+        if(Request.IsLocal)
+        {
+          return true;
+        }
+
+        if(trustedIPList == null)
+        {
+          trustedIPList = new List<string>();
+          var strList = System.Web.Configuration.WebConfigurationManager.AppSettings["TrustedIPAddressList"];
+          if(strList != null)
+          {
+            trustedIPList.AddRange(strList.Split(',').Select(str => str.Trim()));
+          }
+        }
+
+        return trustedIPList.Contains(ClientIPAddressByString);
+      }
+    }
   }
 }
