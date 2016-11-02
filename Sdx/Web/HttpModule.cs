@@ -33,6 +33,7 @@ namespace Sdx.Web
 
     public void Init(HttpApplication application)
     {
+      Sdx.Context.HasSdxHttpModule = true;
       application.BeginRequest += new EventHandler(Application_BeginRequest);
       application.EndRequest += new EventHandler(Application_EndRequest);
       application.Error += new EventHandler(Application_ErrorRequest);

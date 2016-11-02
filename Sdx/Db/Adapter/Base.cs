@@ -42,6 +42,11 @@ namespace Sdx.Db.Adapter
     {
       get
       {
+        if(!Sdx.Context.HasSdxHttpModule)
+        {
+          throw new Exception("Require Sdx.Web.HttpModule for SharedConnection");
+        }
+
         if(!Sdx.Context.Current.Vars.ContainsKey(SharedConnectionKey))
         {
           Sdx.Context.Current.Vars[SharedConnectionKey] = new Dictionary<string, Connection>();
