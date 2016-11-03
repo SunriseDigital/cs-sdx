@@ -127,5 +127,7 @@ namespace Sdx
         }
       }
     }
+
+    public static bool HasSdxHttpModule { get; internal set; }
   }
 }
