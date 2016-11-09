@@ -119,5 +119,28 @@ namespace Sdx.Web
         return trustedIPList.Contains(ClientIPAddressByString);
       }
     }
+
+    public static void RedirectTemporary(string url)
+    {
+      Redirect(url, "307 Temporary Redirect");
+    }
+
+    public static void RedirectPermanent(string url)
+    {
+      Redirect(url, "308 Permanent Redirect");
+    }
+
+    public static void RedirectSeeOther(string url)
+    {
+      Redirect(url, "303 See Other");
+    }
+
+    private static void Redirect(string url, string code)
+    {
+      HttpContext.Current.Response.Clear();
+      HttpContext.Current.Response.Status = code;
+      HttpContext.Current.Response.AddHeader("Location", url);
+      HttpContext.Current.Response.End();
+    }
   }
 }
