@@ -381,7 +381,7 @@ namespace Sdx.Db.Sql
       if (groups.Count > 0)
       {
         orders = orders
-          .Where(orderCol => groups.Any(groupCol => orderCol.SameAs(groupCol)))
+          .Where(orderCol => columns.Any(col => orderCol.SameAs(col)))
           .ToList<Column>();
       }
 
