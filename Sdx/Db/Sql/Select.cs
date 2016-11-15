@@ -376,7 +376,7 @@ namespace Sdx.Db.Sql
         throw new InvalidOperationException("Missing adapter, Set before Build.");
       }
 
-      //Group Byに無いカラムは自動的にOrderから取り除かれます。
+      //カラムリストに無いカラムは自動的にOrderから取り除かれます。
       //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
       if (groups.Count > 0)
       {
