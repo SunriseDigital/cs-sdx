@@ -376,12 +376,13 @@ namespace Sdx.Db.Sql
         throw new InvalidOperationException("Missing adapter, Set before Build.");
       }
 
-      //カラムリストに無いカラムは自動的にOrderから取り除かれます。
+      //SELECT句またはGROUP BY句に無いカラムは自動的にOrderから取り除かれます。
       //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
       if (groups.Count > 0)
       {
+        var allowList = columns.Union(groups);
         orders = orders
-          .Where(orderCol => columns.Any(col => orderCol.SameAs(col)))
+          .Where(orderCol => allowList.Any(col => orderCol.SameAs(col)))
           .ToList<Column>();
       }
 
