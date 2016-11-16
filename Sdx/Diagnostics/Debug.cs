@@ -6,6 +6,7 @@ using System.IO;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
+using System.Text;
 
 namespace Sdx.Diagnostics
 {
@@ -249,6 +250,47 @@ namespace Sdx.Diagnostics
     {
       var now = DateTime.Now;
       System.IO.File.AppendAllText(path, String.Format("[{0}] {1}{2}", now.ToString("yyyy-MM-dd HH:mm:ss"), Dump(value), Environment.NewLine));
+    }
+
+    public static string BuildLogString(Exception exception)
+    {
+      var stringBuilder = new StringBuilder();
+
+      while (exception != null)
+      {
+        stringBuilder.AppendLine(exception.ToString());
+        stringBuilder.AppendLine();
+
+        exception = exception.InnerException;
+      }
+
+      return stringBuilder.ToString();
+    }
+
+    public static string BuildLogString(HttpContext context)
+    {
+      var message = new StringBuilder();
+      message.Append(context.Request.HttpMethod);
+      message.Append(": ");
+      message.AppendLine(context.Request.Url.ToString());
+      message.AppendLine();
+
+      message.Append("Referer: ");
+      message.AppendLine(context.Request.UrlReferrer != null ? context.Request.UrlReferrer.ToString() : "");
+      message.AppendLine();
+
+      message.Append("IP: ");
+      message.AppendLine(Sdx.Web.Helper.ClientIPAddressByString);
+      message.AppendLine();
+
+      message.Append("UA: ");
+      message.AppendLine(context.Request.UserAgent);
+      message.AppendLine();
+
+      message.AppendLine("COOKIE: ");
+      message.AppendLine(context.Request.ServerVariables["HTTP_COOKIE"]);
+
+      return message.ToString();
     }
   }
 }
