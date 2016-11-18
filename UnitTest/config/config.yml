@@ -1,0 +1,29 @@
+﻿page:
+  -
+    query_match:
+      tag: 1
+    pc:
+      url:/{area: (yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
+    sp:
+      url:/sp/{area: (yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
+    mb:
+      url:/m/{area: (yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
+  -
+    pc:
+      url:/{area: (yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
+    sp:
+      url:/sp/{area: (yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
+    mb:
+      url:/m/{area: (yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
