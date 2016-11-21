@@ -6,16 +6,21 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
+using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace Sdx.Web
 {
   public class DeviceTable
   {
-    private string query { get; set; }
+    private string pcUrl { get; set; }
 
-    private string url { get; set; }
+    private string spUrl { get; set; }
 
-    private string queryMatch { get; set; }
+    private string mbUrl { get; set; }
+
+    private Dictionary<string, object> urlDic = new Dictionary<string, object>();
 
     public enum Device
     {
@@ -24,10 +29,11 @@ namespace Sdx.Web
       Mb
     }
 
-    public DeviceTable(string pageYaml)
+    public DeviceTable(YamlNode pageYaml)
     {
-      foreach(var ){
-
+      foreach (var item in (YamlMappingNode)pageYaml)
+      {
+        urlDic.Add(item.Key.ToString(), item.Value);
       }
     }
 
@@ -51,27 +57,56 @@ namespace Sdx.Web
         
       //}
 
-      //ファイル読み込む
-      var fs = new FileStream(filePath, FileMode.Open);
-      var input = new StreamReader(fs, Encoding.GetEncoding("utf-8"));
-
-      //decode
-      var yamlSettings = Sdx.Util.Yaml.Decode<List<string>>(input.ReadToEnd());
-
-      foreach (var pageYaml in yamlSettings)
+      using (FileStream fs = new FileStream(filePath, FileMode.Open))
       {
-        var deviceTable = new Sdx.Web.DeviceTable(pageYaml);
-        if (deviceTable.IsMatch(Device.Pc, HttpContext.Current.Request.Url.AbsolutePath))
+        using (var input = new StreamReader(fs, Encoding.GetEncoding("utf-8")))
         {
-          return deviceTable;
+          var yaml = new YamlStream();
+          yaml.Load(input);
+          var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+          var yamlSettings = (YamlSequenceNode)mapping.Children[new YamlScalarNode("page")];          
+
+          foreach (YamlMappingNode pageYaml in yamlSettings)
+          {
+            var deviceTable = new Sdx.Web.DeviceTable(pageYaml); 
+
+            if (deviceTable.IsMatch(Device.Pc, HttpContext.Current.Request.Url.AbsolutePath))
+            {
+              return deviceTable;
+            }
+          }
+
+          return null;
         }
       }
-
-      return null;
     }
 
-    private bool IsMatch(Device device, string url)
+    public bool IsMatch(Device device, string url)
     {
+      foreach (var d in urlDic)
+      {
+        Console.WriteLine("Key = {0}, Value = {1}", d.Key, d.Value);
+      }
+      string checkUrl;
+      if (device == Device.Pc)
+      {
+        checkUrl = pcUrl;
+      }
+      else if (device == Device.Sp)
+      {
+        checkUrl = spUrl;
+      }
+      else
+      {
+        checkUrl = mbUrl;
+      }
+
+      if (checkUrl == url)
+      {
+        return true;
+      }
+
       return false;
     }
 

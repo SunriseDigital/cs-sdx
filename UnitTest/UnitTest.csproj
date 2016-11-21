@@ -70,6 +70,10 @@
       <HintPath>..\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="YamlDotNet, Version=3.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\cs-fuzoku\Fzdb\bin\Debug\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
@@ -94,7 +98,7 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="Sdx\Pager.cs" />
     <Compile Include="Sdx\Scaffold\Manager.cs" />
-    <Compile Include="Sdx\Web\DataTable.cs" />
+    <Compile Include="Sdx\Web\DeviceTable.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Data\LargeArea.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
