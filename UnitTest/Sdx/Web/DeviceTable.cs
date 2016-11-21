@@ -15,7 +15,10 @@ using UnitTest.DummyClasses;
 using Xunit;
 using System.IO;
 using System.Collections;
+using YamlDotNet;
 using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace UnitTest
 {
@@ -23,6 +26,8 @@ namespace UnitTest
   public class DeviceTable : BaseTest
   {
     public dynamic yamlNode;
+
+    public dynamic page { get; set; }
 
     [Fact]
     public void TestDeviceTable()
@@ -73,10 +78,10 @@ namespace UnitTest
             }
           }
 
-          foreach (var d in urlDic)
-          {
-            Console.WriteLine("Key = {0}, Value = {1}", d.Key, d.Value);
-          }
+          //foreach (var d in urlDic)
+          //{
+          //  Console.WriteLine("Key = {0}, Value = {1}", d.Key, d.Value);
+          //}
         }
       }
     }

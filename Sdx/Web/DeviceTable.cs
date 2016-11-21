@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
@@ -20,7 +21,9 @@ namespace Sdx.Web
 
     private string mbUrl { get; set; }
 
-    private Dictionary<string, object> urlDic = new Dictionary<string, object>();
+    private Dictionary<string, object> deviceDic = new Dictionary<string, object>();
+
+    private Dictionary<string, object> urlAndQuery = new Dictionary<string, object>();
 
     public enum Device
     {
@@ -33,7 +36,7 @@ namespace Sdx.Web
     {
       foreach (var item in (YamlMappingNode)pageYaml)
       {
-        urlDic.Add(item.Key.ToString(), item.Value);
+        deviceDic.Add(item.Key.ToString(), item.Value);
       }
     }
 
@@ -84,28 +87,42 @@ namespace Sdx.Web
 
     public bool IsMatch(Device device, string url)
     {
-      foreach (var d in urlDic)
+      //url => "/sp/kanagawa/shop/"
+      //query => "tg_prices_high = 1"
+
+      if (deviceDic["pc"] is YamlNode)
       {
-        Console.WriteLine("Key = {0}, Value = {1}", d.Key, d.Value);
-      }
-      string checkUrl;
-      if (device == Device.Pc)
-      {
-        checkUrl = pcUrl;
-      }
-      else if (device == Device.Sp)
-      {
-        checkUrl = spUrl;
-      }
-      else
-      {
-        checkUrl = mbUrl;
+        foreach (var value in (YamlMappingNode)deviceDic["pc"])
+        {
+          if (value.Value is YamlScalarNode)
+          {
+            urlAndQuery.Add(value.Key.ToString(), value.Value.ToString());
+          }
+          else
+          {
+            urlAndQuery.Add(value.Key.ToString(), value.Value);
+          }          
+        }
       }
 
-      if (checkUrl == url)
+      Dictionary<string, string> queries = new Dictionary<string, string>();
+      if (urlAndQuery.ContainsKey("query"))
       {
-        return true;
+        foreach (var query in (YamlMappingNode)urlAndQuery["query"])
+        {
+          queries.Add(query.Key.ToString(), query.Value.ToString());
+        }
       }
+
+      string[] splitUrl = url.Split('?');
+      Regex regex = new Regex(@"(yoshiwara|kanagawa)");
+      Match m = regex.Match(url);
+      
+      if (m.Success)
+      {
+        Console.WriteLine("{0,-10} : {1}", m.Value, m.Result("{area:$0}"));
+      }
+      string[] splitQuery = splitUrl[1].Split('&');
 
       return false;
     }
