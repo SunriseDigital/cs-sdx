@@ -15,11 +15,13 @@ namespace Sdx.Web
 {
   public class DeviceTable
   {
-    private Dictionary<string, object> deviceDic = new Dictionary<string, object>();
+    private Dictionary<string, object> settings = new Dictionary<string, object>();
 
     private Dictionary<string, string> regex = new Dictionary<string, string>();
 
-    Dictionary<string, string> queries = new Dictionary<string, string>();
+    private Dictionary<string, string> queries = new Dictionary<string, string>();
+
+    private Dictionary<string, string> urls = new Dictionary<string, string>();
 
     public enum Device
     {
@@ -34,28 +36,40 @@ namespace Sdx.Web
       {        
         if (item.Value is YamlNode)
         {
-          Dictionary<string, object> deviceUrl = new Dictionary<string, object>();
+          Dictionary<string, object> values = new Dictionary<string, object>();
           foreach (var value in (YamlMappingNode)item.Value)
-          {
-            
+          {            
             if (value.Value is YamlScalarNode)
             {
-              deviceUrl.Add(value.Key.ToString(), value.Value.ToString());
+              values.Add(value.Key.ToString(), value.Value.ToString());
             }
             else
             {
-              deviceUrl.Add(value.Key.ToString(), value.Value);
+              values.Add(value.Key.ToString(), value.Value);
             }            
           }
-          deviceDic.Add(item.Key.ToString(), deviceUrl);        
+          settings.Add(item.Key.ToString(), values);        
         }
       }
 
-      if (deviceDic.ContainsKey("query"))
+      foreach (var item in settings)
       {
-        foreach (var query in (YamlMappingNode)deviceDic["query"])
-        {
-          queries.Add(query.Key.ToString(), query.Value.ToString());
+        foreach (var child in (Dictionary<string, object>)item.Value)
+        {          
+          if (child.Key.ToString() == "query")
+          {
+            foreach (var query in (YamlMappingNode)child.Value)
+            {
+              queries.Add(item.Key.ToString(), query.Value.ToString());
+            }
+          }
+          else if (child.Key.ToString() == "query")
+          {
+            foreach (var url in (YamlMappingNode)child.Value)
+            {
+              urls.Add(item.Key.ToString(), url.Value.ToString());
+            }
+          }
         }
       }
     }
@@ -110,16 +124,15 @@ namespace Sdx.Web
       string[] splitUrl = url.Split('?');
       string[] path = splitUrl[0].Split('/');
 
-      string[] settingPath = splitUrl[0].Split('/');
-      //string[] settingPath = deviceDic["url"].ToString().Split('/');
+      string[] settingPath = urls["pc"].ToString().Split('/');
             
-      Regex reg = new Regex(@"(yoshiwara|kanagawa)");
-      Match m = reg.Match(url);
+      //Regex reg = new Regex(@"(yoshiwara|kanagawa)");
+      //Match m = reg.Match(url);
       
-      if (m.Success)
-      {
-        //Console.WriteLine("{0,-10} : {1}", m.Value, m.Result("{area:$0}"));
-      }
+      //if (m.Success)
+      //{
+      //  Console.WriteLine("{0,-10} : {1}", m.Value, m.Result("{area:$0}"));
+      //}
 
       queryMatch(splitUrl[1].Split('&'));
 
@@ -141,12 +154,6 @@ namespace Sdx.Web
     public string GetUrl(Device device)
     {
       return "";
-    }
-
-    private string ObtainStatus(Device value)
-    {
-      string[] values = { "pc", "sp", "mb" };
-      return values[(int)value];
     }
   }
 }
