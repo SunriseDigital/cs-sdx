@@ -1,8 +1,7 @@
 ﻿page:
   - pc:
       url: /{area:(yoshiwara|kanagawa)}/shop/
-      query:
-          tag:  tg_prices_high
+
     sp:
       url: /sp/{area:(yoshiwara|kanagawa)}/shop/
       query:
@@ -14,16 +13,17 @@
   - 
     query_match:
       tag: 1
+      test: on
   
-    pc:
+    Pc:
       url: /{area:(yoshiwara|kanagawa)}/shop/
       query:
           tag:  tg_prices_high
-    sp:
+          test: button
+    Sp:
       url: /sp/{area:(yoshiwara|kanagawa)}/shop/
-      query:
-          tag:  tg_prices_high
-    mb:
+
+    Mb:
       url: /m/{area:(yoshiwara|kanagawa)}/shop/
       query:
           tag:  tg_prices_high

@@ -15,13 +15,13 @@ namespace Sdx.Web
 {
   public class DeviceTable
   {
-    private Dictionary<string, object> settings = new Dictionary<string, object>();
-
     private Dictionary<string, string> regex = new Dictionary<string, string>();
 
     private Dictionary<string, string> queries = new Dictionary<string, string>();
 
     private Dictionary<string, string> urls = new Dictionary<string, string>();
+
+    private Dictionary<string, object> queryMatchValue = new Dictionary<string, object>();
 
     public enum Device
     {
@@ -31,7 +31,9 @@ namespace Sdx.Web
     }
 
     public DeviceTable(YamlMappingNode pageYaml)
-    {      
+    {
+      Dictionary<string, object> settings = new Dictionary<string, object>();
+
       foreach (var item in pageYaml)
       {        
         if (item.Value is YamlNode)
@@ -52,23 +54,28 @@ namespace Sdx.Web
         }
       }
 
+      if (settings.ContainsKey("query_match"))
+      {
+        queryMatchValue = (Dictionary<string, object>)settings["query_match"];
+      }
+
       foreach (var item in settings)
       {
         foreach (var child in (Dictionary<string, object>)item.Value)
         {          
           if (child.Key.ToString() == "query")
-          {
+          {            
             foreach (var query in (YamlMappingNode)child.Value)
             {
-              queries.Add(item.Key.ToString(), query.Value.ToString());
+              if(!queries.ContainsKey(query.Key.ToString()))
+              {
+                queries.Add(query.Key.ToString(), query.Value.ToString());
+              }
             }
           }
-          else if (child.Key.ToString() == "query")
+          else if (child.Key.ToString() == "url")
           {
-            foreach (var url in (YamlMappingNode)child.Value)
-            {
-              urls.Add(item.Key.ToString(), url.Value.ToString());
-            }
+            urls.Add(item.Key.ToString(), child.Value.ToString());
           }
         }
       }
@@ -122,33 +129,74 @@ namespace Sdx.Web
     public bool IsMatch(Device device, string url)
     {
       string[] splitUrl = url.Split('?');
-      string[] path = splitUrl[0].Split('/');
+      List<string> path = splitUrl[0].Split('/').ToList();
 
-      string[] settingPath = urls["pc"].ToString().Split('/');
-            
-      //Regex reg = new Regex(@"(yoshiwara|kanagawa)");
-      //Match m = reg.Match(url);
-      
-      //if (m.Success)
-      //{
-      //  Console.WriteLine("{0,-10} : {1}", m.Value, m.Result("{area:$0}"));
-      //}
+      List<string> settingPath = urls[device.ToString()].ToString().Split('/').ToList();
 
-      queryMatch(splitUrl[1].Split('&'));
-
-      //Console.WriteLine(settingPath.Any(x => path.Contains(x)));
-
-      return settingPath.All(x => path.Contains(x));
-    }
-
-    private bool queryMatch(string[] splitQuery)
-    {
-      foreach (var query in splitQuery)
-      {
-
+      if(queries.Count > 0 && splitUrl.Length <= 1){
+        return false;
       }
 
-      return false;
+      if(path.Count != settingPath.Count){
+        return false;
+      }
+
+      for (int i = 0; i < path.Count; i++)
+      {
+        Regex reg = new Regex(@"^{([a-zA-Z0-9]+):(.*)}$");
+        Match match = reg.Match(settingPath[i]);
+        if (match.Success)
+        {
+          //置換用の変数確保
+          if (!regex.ContainsKey(match.Result("$1").ToString()))
+          {
+            Regex r = new Regex(match.Result("$2").ToString());
+            Match m = r.Match(path[i]);
+            if (!m.Success)
+            {
+              return false;
+            }
+            regex.Add(match.Result("$1").ToString(), path[i]);
+          }
+        }
+        else
+        {
+          if (path[i] != settingPath[i])
+          {
+            return false;
+          }
+        }
+      }
+
+      if (splitUrl.Length > 1 && !checkQuery(splitUrl[1].Split('&')))
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    private bool checkQuery(string[] splitQuery)
+    {
+      if (queries.Count < 1)
+      {
+        return false;
+      }
+
+      Dictionary<string, string> dic = splitQuery.ToDictionary(n => n.Split('=')[0], n => n.Split('=')[1]);
+      foreach (var query in dic)
+      {
+        foreach (var q in queries)
+        {          
+          if (queries.ContainsValue(query.Key))
+          {
+            var key = queries.First(x => x.Value == query.Key).Key;
+            Console.WriteLine(key);
+          }
+        }        
+      }
+   
+      return true;
     }
 
     public string GetUrl(Device device)
