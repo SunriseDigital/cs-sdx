@@ -22,6 +22,8 @@
           test: button
     Sp:
       url: /sp/{area:(yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_high
 
     Mb:
       url: /m/{area:(yoshiwara|kanagawa)}/shop/

@@ -21,7 +21,7 @@ namespace Sdx.Web
 
     private Dictionary<string, string> urls = new Dictionary<string, string>();
 
-    private Dictionary<string, object> queryMatchValue = new Dictionary<string, object>();
+    private Dictionary<string, object> settings = new Dictionary<string, object>();
 
     public enum Device
     {
@@ -31,53 +31,16 @@ namespace Sdx.Web
     }
 
     public DeviceTable(YamlMappingNode pageYaml)
-    {
-      Dictionary<string, object> settings = new Dictionary<string, object>();
-
+    {      
       foreach (var item in pageYaml)
-      {        
-        if (item.Value is YamlNode)
+      {
+        Dictionary<string, object> tmp = new Dictionary<string, object>();
+        foreach (var child in (YamlMappingNode)item.Value)
         {
-          Dictionary<string, object> values = new Dictionary<string, object>();
-          foreach (var value in (YamlMappingNode)item.Value)
-          {            
-            if (value.Value is YamlScalarNode)
-            {
-              values.Add(value.Key.ToString(), value.Value.ToString());
-            }
-            else
-            {
-              values.Add(value.Key.ToString(), value.Value);
-            }            
-          }
-          settings.Add(item.Key.ToString(), values);        
+          tmp.Add(child.Key.ToString(), child.Value);
         }
-      }
 
-      if (settings.ContainsKey("query_match"))
-      {
-        queryMatchValue = (Dictionary<string, object>)settings["query_match"];
-      }
-
-      foreach (var item in settings)
-      {
-        foreach (var child in (Dictionary<string, object>)item.Value)
-        {          
-          if (child.Key.ToString() == "query")
-          {            
-            foreach (var query in (YamlMappingNode)child.Value)
-            {
-              if(!queries.ContainsKey(query.Key.ToString()))
-              {
-                queries.Add(query.Key.ToString(), query.Value.ToString());
-              }
-            }
-          }
-          else if (child.Key.ToString() == "url")
-          {
-            urls.Add(item.Key.ToString(), child.Value.ToString());
-          }
-        }
+        settings.Add(item.Key.ToString(), tmp);
       }
     }
 
@@ -128,10 +91,31 @@ namespace Sdx.Web
 
     public bool IsMatch(Device device, string url)
     {
+      string settingUrl = null;
+
+      foreach (var item in (Dictionary<string, object>)settings[device.ToString()])
+      {
+        if (item.Key.ToString() == "url")
+        {
+           settingUrl = item.Value.ToString();
+        }
+        
+        if (item.Key.ToString() == "query")
+        {
+          foreach (var query in (YamlMappingNode)item.Value)
+          {
+            if (!queries.ContainsKey(query.Key.ToString()))
+            {
+              queries.Add(query.Key.ToString(), query.Value.ToString());
+            }
+          }
+        }
+      }
+
       string[] splitUrl = url.Split('?');
       List<string> path = splitUrl[0].Split('/').ToList();
 
-      List<string> settingPath = urls[device.ToString()].ToString().Split('/').ToList();
+      List<string> settingPath = settingUrl.Split('/').ToList();
 
       if(queries.Count > 0 && splitUrl.Length <= 1){
         return false;
@@ -178,22 +162,35 @@ namespace Sdx.Web
 
     private bool checkQuery(string[] splitQuery)
     {
+      Dictionary<string, object> queryMatch = new Dictionary<string, object>();
+      if (settings.ContainsKey("query_match"))
+      {
+        queryMatch = (Dictionary<string, object>)settings["query_match"];
+      }
+
       if (queries.Count < 1)
       {
         return false;
       }
-
+      Console.WriteLine(splitQuery[1]);
       Dictionary<string, string> dic = splitQuery.ToDictionary(n => n.Split('=')[0], n => n.Split('=')[1]);
       foreach (var query in dic)
       {
-        foreach (var q in queries)
-        {          
-          if (queries.ContainsValue(query.Key))
+        if (queries.ContainsValue(query.Key))
+        {
+          var key = queries.First(x => x.Value == query.Key).Key;
+
+          //query_matchがある場合値まで比較
+          if (queryMatch.ContainsKey(key) && queryMatch[key].ToString() != query.Value)
           {
-            var key = queries.First(x => x.Value == query.Key).Key;
-            Console.WriteLine(key);
+            return false;
           }
-        }        
+        }
+        else
+        {
+          //queriesにkeyがないということはそもそもURLが違うのでfalse
+          return false;
+        }
       }
    
       return true;
