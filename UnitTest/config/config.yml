@@ -1,12 +1,12 @@
 ﻿page:
-  - pc:
+  - Pc:
       url: /{area:(yoshiwara|kanagawa)}/shop/
 
-    sp:
+    Sp:
       url: /sp/{area:(yoshiwara|kanagawa)}/shop/
       query:
           tag:  tg_prices_high      
-    mb:
+    Mb:
       url: /m/{area:(yoshiwara|kanagawa)}/shop/
       query:
           tag:  tg_prices_high

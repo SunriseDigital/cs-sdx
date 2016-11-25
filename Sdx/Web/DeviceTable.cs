@@ -23,6 +23,8 @@ namespace Sdx.Web
 
     private Dictionary<string, object> settings = new Dictionary<string, object>();
 
+    private Dictionary<string, object> queryMatch = new Dictionary<string, object>();
+
     public enum Device
     {
       Pc,
@@ -57,7 +59,7 @@ namespace Sdx.Web
       }
     }
 
-    private static Sdx.Web.DeviceTable CreateCurrent()
+    public static Sdx.Web.DeviceTable CreateCurrent()
     {
       var filePath = WebConfigurationManager.AppSettings["Sdx.Web.DeviceTable.SettingFilePath"];
       //if(filePath == null){
@@ -76,9 +78,10 @@ namespace Sdx.Web
 
           foreach (YamlMappingNode pageYaml in yamlSettings)
           {
-            var deviceTable = new Sdx.Web.DeviceTable(pageYaml); 
+            var deviceTable = new Sdx.Web.DeviceTable(pageYaml);
 
-            if (deviceTable.IsMatch(Device.Pc, HttpContext.Current.Request.Url.AbsolutePath))
+            Device device = getDevice(HttpContext.Current.Request.Url.AbsolutePath);
+            if (deviceTable.IsMatch(device, HttpContext.Current.Request.Url.AbsolutePath))
             {
               return deviceTable;
             }
@@ -161,8 +164,7 @@ namespace Sdx.Web
     }
 
     private bool checkQuery(string[] splitQuery)
-    {
-      Dictionary<string, object> queryMatch = new Dictionary<string, object>();
+    {      
       if (settings.ContainsKey("query_match"))
       {
         queryMatch = (Dictionary<string, object>)settings["query_match"];
@@ -172,15 +174,13 @@ namespace Sdx.Web
       {
         return false;
       }
-      Console.WriteLine(splitQuery[1]);
+
       Dictionary<string, string> dic = splitQuery.ToDictionary(n => n.Split('=')[0], n => n.Split('=')[1]);
       foreach (var query in dic)
       {
         if (queries.ContainsValue(query.Key))
         {
           var key = queries.First(x => x.Value == query.Key).Key;
-
-          //query_matchがある場合値まで比較
           if (queryMatch.ContainsKey(key) && queryMatch[key].ToString() != query.Value)
           {
             return false;
@@ -188,7 +188,6 @@ namespace Sdx.Web
         }
         else
         {
-          //queriesにkeyがないということはそもそもURLが違うのでfalse
           return false;
         }
       }
@@ -198,7 +197,53 @@ namespace Sdx.Web
 
     public string GetUrl(Device device)
     {
-      return "";
+      string url = "";
+      foreach (var item in (Dictionary<string, object>)settings[device.ToString()])
+      {
+        if (item.Key.ToString() == "url")
+        {
+          url = item.Value.ToString();
+        }
+      }
+
+      string pattern = @"{([a-zA-Z0-9]+):(.*)}";
+      Regex reg = new Regex(pattern);
+      Match match = reg.Match(url);
+
+      if(match.Success){
+        url = Regex.Replace(url, pattern, regex[match.Result("$1").ToString()]);
+      }
+
+      if (queries.Count > 0)
+      {
+        var strings = queries.Select(kvp => string.Format("{0}={1}", kvp.Value, queryMatch[kvp.Key]));
+        string path = string.Join("&", strings);
+        url = url + "?" + path;
+      }      
+
+      return url;
+    }
+
+    private static Device getDevice(string url)
+    {
+      string device = "pc";
+
+      Regex regex = new Regex(@"^/(m|sp|i)/.*?$");
+      Match m = regex.Match(url);
+      if (m.Success)
+      {
+        device = m.Result("$1").ToString();
+      }
+
+      var deviceDic = new Dictionary<string, Device>()
+      {
+        {"pc", Device.Pc},
+        {"sp", Device.Sp},
+        {"m", Device.Mb},
+        {"i", Device.Mb}
+      };
+
+      return deviceDic[device];
     }
   }
 }
