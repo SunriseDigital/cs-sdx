@@ -59,9 +59,9 @@ namespace Sdx.Web
     public static Sdx.Web.DeviceTable CreateCurrent()
     {
       var filePath = WebConfigurationManager.AppSettings["Sdx.Web.DeviceTable.SettingFilePath"];
-      //if(filePath == null){
-        
-      //}
+      if(filePath == null){
+        throw new InvalidOperationException("Not Exists Sdx.Web.DeviceTable.SettingFilePath");
+      }
 
       using (FileStream fs = new FileStream(filePath, FileMode.Open))
       {
