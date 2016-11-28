@@ -95,7 +95,7 @@ namespace Sdx.Web
 
       Dictionary<string, string> queries = new Dictionary<string, string>();
 
-      foreach (var item in (Dictionary<string, object>)settings[device.ToString()])
+      foreach (var item in (Dictionary<string, object>)settings[deviceString(device)])
       {
         if (item.Key.ToString() == "url")
         {
@@ -116,43 +116,56 @@ namespace Sdx.Web
 
       List<string> settingPath = settingUrl.Split('/').ToList();
 
-      if(queries.Count > 0 && splitUrl.Length <= 1){
+      if (queries.Count > 0 && splitUrl.Length <= 1)
+      {
         return false;
       }
 
-      if(path.Count != settingPath.Count){
+      if (path.Count != settingPath.Count)
+      {
         return false;
       }
 
-      for (int i = 0; i < path.Count; i++)
+      var notEqualItmes = 
+        path.Select((item, index) => new { Index = index, Value = item })
+            .Where(item => pathCheck(item.Value, settingPath[item.Index]) == false);
+
+      if (notEqualItmes.Count() > 0)
+      {
+        return false;
+      }
+
+      if (splitUrl.Length > 1 && !checkQuery(splitUrl[1].Split('&'), queries))
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    private bool pathCheck(string path, string setting)
+    {
+      if (path != setting)
       {
         Regex reg = new Regex(@"^{([a-zA-Z0-9]+):(.*)}$");
-        Match match = reg.Match(settingPath[i]);
+        Match match = reg.Match(setting);
         if (match.Success)
         {
           //置換用の変数確保
           if (!regex.ContainsKey(match.Result("$1").ToString()))
           {
             Regex r = new Regex(match.Result("$2").ToString());
-            Match m = r.Match(path[i]);
+            Match m = r.Match(path);
             if (!m.Success)
             {
               return false;
             }
-            regex.Add(match.Result("$1").ToString(), path[i]);
+            regex.Add(match.Result("$1").ToString(), path);
           }
-        }
-        else
-        {
-          if (path[i] != settingPath[i])
-          {
-            return false;
-          }
-        }
-      }
 
-      if (splitUrl.Length > 1 && !checkQuery(splitUrl[1].Split('&'), queries))
-      {
+          return true;
+        }
+
         return false;
       }
 
@@ -195,7 +208,7 @@ namespace Sdx.Web
     {
       string url = "";
 
-      Dictionary<string, object> deviceSettings = (Dictionary<string, object>)settings[device.ToString()];
+      Dictionary<string, object> deviceSettings = (Dictionary<string, object>)settings[deviceString(device)];
 
       foreach (var item in deviceSettings)
       {
@@ -252,6 +265,12 @@ namespace Sdx.Web
       };
 
       return deviceDic[device];
+    }
+
+    private static string deviceString(Device device)
+    {
+      string[] strings = { "pc", "sp", "mb"};
+      return strings[(int)device];
     }
   }
 }
