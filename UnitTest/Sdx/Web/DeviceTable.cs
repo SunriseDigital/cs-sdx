@@ -17,8 +17,6 @@ using System.IO;
 using System.Collections;
 using YamlDotNet;
 using YamlDotNet.RepresentationModel;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace UnitTest
 {

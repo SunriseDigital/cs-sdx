@@ -7,17 +7,14 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Configuration;
+using YamlDotNet;
 using YamlDotNet.RepresentationModel;
-using YamlDotNet.Serialization;
-using YamlDotNet.Serialization.NamingConventions;
 
 namespace Sdx.Web
 {
   public class DeviceTable
   {
     private Dictionary<string, string> regex = new Dictionary<string, string>();
-
-    private Dictionary<string, string> queries;
 
     private Dictionary<string, string> urls = new Dictionary<string, string>();
 
@@ -96,7 +93,7 @@ namespace Sdx.Web
     {
       string settingUrl = null;
 
-      queries = new Dictionary<string, string>();
+      Dictionary<string, string> queries = new Dictionary<string, string>();
 
       foreach (var item in (Dictionary<string, object>)settings[device.ToString()])
       {
@@ -154,7 +151,7 @@ namespace Sdx.Web
         }
       }
 
-      if (splitUrl.Length > 1 && !checkQuery(splitUrl[1].Split('&')))
+      if (splitUrl.Length > 1 && !checkQuery(splitUrl[1].Split('&'), queries))
       {
         return false;
       }
@@ -162,7 +159,7 @@ namespace Sdx.Web
       return true;
     }
 
-    private bool checkQuery(string[] splitQuery)
+    private bool checkQuery(string[] splitQuery, Dictionary<string, string> queries)
     {      
       if (settings.ContainsKey("query_match"))
       {
@@ -216,7 +213,7 @@ namespace Sdx.Web
         url = Regex.Replace(url, pattern, regex[match.Result("$1").ToString()]);
       }
 
-      queries =  new Dictionary<string, string>();
+      Dictionary<string, string> queries = new Dictionary<string, string>();
       foreach (var item in deviceSettings)
       {
         if (item.Key.ToString() == "query")
