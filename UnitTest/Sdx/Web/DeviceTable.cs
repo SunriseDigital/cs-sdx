@@ -57,7 +57,7 @@ namespace UnitTest
 
     private void loadTestYaml()
     {
-      using (FileStream fs = new FileStream("C:\\projects\\cs-sdx\\UnitTest\\config\\config.yml", FileMode.Open))
+      using (FileStream fs = new FileStream("../../config/config.yml", FileMode.Open))
       {
         using (var input = new StreamReader(fs, Encoding.GetEncoding("utf-8")))
         {
