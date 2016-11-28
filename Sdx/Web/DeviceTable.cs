@@ -14,7 +14,7 @@ namespace Sdx.Web
 {
   public class DeviceTable
   {
-    private Dictionary<string, string> regex = new Dictionary<string, string>();
+    private Dictionary<string, string> replaceWords = new Dictionary<string, string>();
 
     private Dictionary<string, string> urls = new Dictionary<string, string>();
 
@@ -126,16 +126,17 @@ namespace Sdx.Web
         return false;
       }
 
-      var notEqualItmes = 
-        path.Select((item, index) => new { Index = index, Value = item })
-            .Where(item => pathCheck(item.Value, settingPath[item.Index]) == false);
+      var notEqualPaths = 
+        path
+          .Select((item, index) => new { Index = index, Value = item })
+          .Where(item => !pathCheck(item.Value, settingPath[item.Index]));
 
-      if (notEqualItmes.Count() > 0)
+      if (notEqualPaths.Count() > 0)
       {
         return false;
       }
 
-      if (splitUrl.Length > 1 && !checkQuery(splitUrl[1].Split('&'), queries))
+      if (splitUrl.Length > 1 && !queryCheck(splitUrl[1].Split('&'), queries))
       {
         return false;
       }
@@ -152,7 +153,7 @@ namespace Sdx.Web
         if (match.Success)
         {
           //置換用の変数確保
-          if (!regex.ContainsKey(match.Result("$1").ToString()))
+          if (!replaceWords.ContainsKey(match.Result("$1").ToString()))
           {
             Regex r = new Regex(match.Result("$2").ToString());
             Match m = r.Match(path);
@@ -160,7 +161,7 @@ namespace Sdx.Web
             {
               return false;
             }
-            regex.Add(match.Result("$1").ToString(), path);
+            replaceWords.Add(match.Result("$1").ToString(), path);
           }
 
           return true;
@@ -172,7 +173,7 @@ namespace Sdx.Web
       return true;
     }
 
-    private bool checkQuery(string[] splitQuery, Dictionary<string, string> queries)
+    private bool queryCheck(string[] splitQuery, Dictionary<string, string> queries)
     {      
       if (settings.ContainsKey("query_match"))
       {
@@ -223,7 +224,7 @@ namespace Sdx.Web
       Match match = reg.Match(url);
 
       if(match.Success){
-        url = Regex.Replace(url, pattern, regex[match.Result("$1").ToString()]);
+        url = Regex.Replace(url, pattern, replaceWords[match.Result("$1").ToString()]);
       }
 
       Dictionary<string, string> queries = new Dictionary<string, string>();
