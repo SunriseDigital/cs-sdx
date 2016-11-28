@@ -27,8 +27,6 @@ namespace UnitTest
   {
     public dynamic yamlNode;
 
-    public dynamic page { get; set; }
-
     [Fact]
     public void TestDeviceTable()
     {
@@ -52,12 +50,8 @@ namespace UnitTest
       Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/"));
       Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on"));
       Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=off"));
-
-      deviceTable = new Sdx.Web.DeviceTable(yamlNode);
       Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_prices_high=1"));
       Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1"));
-
-      deviceTable = new Sdx.Web.DeviceTable(yamlNode);
       Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_prices_high=1"));      
     }
 

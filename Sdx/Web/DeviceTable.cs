@@ -17,7 +17,7 @@ namespace Sdx.Web
   {
     private Dictionary<string, string> regex = new Dictionary<string, string>();
 
-    private Dictionary<string, string> queries = new Dictionary<string, string>();
+    private Dictionary<string, string> queries;
 
     private Dictionary<string, string> urls = new Dictionary<string, string>();
 
@@ -96,6 +96,8 @@ namespace Sdx.Web
     {
       string settingUrl = null;
 
+      queries = new Dictionary<string, string>();
+
       foreach (var item in (Dictionary<string, object>)settings[device.ToString()])
       {
         if (item.Key.ToString() == "url")
@@ -107,10 +109,7 @@ namespace Sdx.Web
         {
           foreach (var query in (YamlMappingNode)item.Value)
           {
-            if (!queries.ContainsKey(query.Key.ToString()))
-            {
-              queries.Add(query.Key.ToString(), query.Value.ToString());
-            }
+            queries.Add(query.Key.ToString(), query.Value.ToString());
           }
         }
       }
@@ -198,7 +197,10 @@ namespace Sdx.Web
     public string GetUrl(Device device)
     {
       string url = "";
-      foreach (var item in (Dictionary<string, object>)settings[device.ToString()])
+
+      Dictionary<string, object> deviceSettings = (Dictionary<string, object>)settings[device.ToString()];
+
+      foreach (var item in deviceSettings)
       {
         if (item.Key.ToString() == "url")
         {
@@ -214,12 +216,21 @@ namespace Sdx.Web
         url = Regex.Replace(url, pattern, regex[match.Result("$1").ToString()]);
       }
 
-      if (queries.Count > 0)
+      queries =  new Dictionary<string, string>();
+      foreach (var item in deviceSettings)
       {
-        var strings = queries.Select(kvp => string.Format("{0}={1}", kvp.Value, queryMatch[kvp.Key]));
-        string path = string.Join("&", strings);
-        url = url + "?" + path;
-      }      
+        if (item.Key.ToString() == "query")
+        {
+          foreach (var query in (YamlMappingNode)item.Value)
+          {
+            queries.Add(query.Key.ToString(), query.Value.ToString());
+          }
+
+          var strings = queries.Select(kvp => string.Format("{0}={1}", kvp.Value, queryMatch[kvp.Key]));
+          string path = string.Join("&", strings);
+          url = url + "?" + path;
+        }
+      }
 
       return url;
     }
