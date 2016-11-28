@@ -78,6 +78,7 @@ namespace Sdx.Web
             var deviceTable = new Sdx.Web.DeviceTable(pageYaml);
 
             Device device = getDevice(HttpContext.Current.Request.Url.AbsolutePath);
+
             if (deviceTable.IsMatch(device, HttpContext.Current.Request.Url.PathAndQuery))
             {
               return deviceTable;
@@ -91,47 +92,39 @@ namespace Sdx.Web
 
     public bool IsMatch(Device device, string currentUrl)
     {
-      string settingUrl = null;
-
-      Dictionary<string, string> queries = new Dictionary<string, string>();
-
-      foreach (var item in (Dictionary<string, object>)settings[deviceString(device)])
-      {
-        if (item.Key.ToString() == "url")
-        {
-           settingUrl = item.Value.ToString();
-        }
-        
-        if (item.Key.ToString() == "query")
-        {
-          foreach (var query in (YamlMappingNode)item.Value)
-          {
-            queries.Add(query.Key.ToString(), query.Value.ToString());
-          }
-        }
-      }
+      Dictionary<string, object> deviceSettings = (Dictionary<string, object>)settings[deviceString(device)];
 
       string[] splitUrl = currentUrl.Split('?');
-      string[] path = splitUrl[0].Split('/');
+      string[] currentPath = splitUrl[0].Split('/');
 
-      string[] settingPath = settingUrl.Split('/');
+      string[] settingPath = deviceSettings["url"].ToString().Split('/');
 
-      if (queries.Count > 0 && splitUrl.Length <= 1)
+      if (currentPath.Length != settingPath.Length)
       {
         return false;
       }
 
-      if (path.Length != settingPath.Length)
-      {
-        return false;
-      }
-
-      var notEqualPaths = 
-        path
+      var notEqualPaths =
+        currentPath
           .Select((item, index) => new { Index = index, Value = item })
           .Where(item => !pathCheck(item.Value, settingPath[item.Index]));
 
       if (notEqualPaths.Count() > 0)
+      {
+        return false;
+      }
+
+      Dictionary<string, string> queries = new Dictionary<string, string>();
+
+      if (deviceSettings.ContainsKey("query"))
+      {
+        foreach (var query in (YamlMappingNode)deviceSettings["query"])
+        {
+          queries.Add(query.Key.ToString(), query.Value.ToString());
+        }
+      }
+
+      if (queries.Count > 0 && splitUrl.Length <= 1)
       {
         return false;
       }

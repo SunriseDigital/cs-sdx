@@ -66,22 +66,12 @@ namespace UnitTest
           var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
 
           var items = (YamlSequenceNode)mapping.Children[new YamlScalarNode("page")];
-          Dictionary<string, object> urlDic = new Dictionary<string, object>();
           foreach (YamlMappingNode item in items)
           {
             yamlNode = item;
-
-            foreach (var child in item)
-            {
-              if (!urlDic.ContainsKey(child.Key.ToString()))
-              {
-                urlDic.Add(child.Key.ToString(), child.Value);
-              }
-            }
           }
         }
       }
     }
-
   }
 }
