@@ -49,7 +49,9 @@ namespace Sdx.Web
       {
         if(!Sdx.Context.Current.Vars.ContainsKey("Sdx.Web.DeviceTable.Current"))
         {
+          Sdx.Context.Current.Debug.Log(Sdx.Context.Current.Vars.ContainsKey("Sdx.Web.DeviceTable.Current"));
           Sdx.Context.Current.Vars["Sdx.Web.DeviceTable.Current"] = CreateCurrent();
+          Sdx.Context.Current.Debug.Log(Sdx.Context.Current.Vars.ContainsKey("Sdx.Web.DeviceTable.Current"));
         }
 
         return (Sdx.Web.DeviceTable)Sdx.Context.Current.Vars["Sdx.Web.DeviceTable.Current"];
@@ -77,9 +79,8 @@ namespace Sdx.Web
           {
             var deviceTable = new Sdx.Web.DeviceTable(pageYaml);
 
-            Device device = getDevice(HttpContext.Current.Request.Url.AbsolutePath);
-
-            if (deviceTable.IsMatch(device, HttpContext.Current.Request.Url.PathAndQuery))
+            Device device = getDevice(HttpContext.Current.Request.RawUrl);
+            if (deviceTable.IsMatch(device, HttpContext.Current.Request.RawUrl))
             {
               return deviceTable;
             }
