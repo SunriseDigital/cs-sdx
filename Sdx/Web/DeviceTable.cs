@@ -78,7 +78,7 @@ namespace Sdx.Web
             var deviceTable = new Sdx.Web.DeviceTable(pageYaml);
 
             Device device = getDevice(HttpContext.Current.Request.Url.AbsolutePath);
-            if (deviceTable.IsMatch(device, HttpContext.Current.Request.Url.AbsolutePath))
+            if (deviceTable.IsMatch(device, HttpContext.Current.Request.Url.PathAndQuery))
             {
               return deviceTable;
             }
@@ -89,7 +89,7 @@ namespace Sdx.Web
       }
     }
 
-    public bool IsMatch(Device device, string url)
+    public bool IsMatch(Device device, string currentUrl)
     {
       string settingUrl = null;
 
@@ -111,17 +111,17 @@ namespace Sdx.Web
         }
       }
 
-      string[] splitUrl = url.Split('?');
-      List<string> path = splitUrl[0].Split('/').ToList();
+      string[] splitUrl = currentUrl.Split('?');
+      string[] path = splitUrl[0].Split('/');
 
-      List<string> settingPath = settingUrl.Split('/').ToList();
+      string[] settingPath = settingUrl.Split('/');
 
       if (queries.Count > 0 && splitUrl.Length <= 1)
       {
         return false;
       }
 
-      if (path.Count != settingPath.Count)
+      if (path.Length != settingPath.Length)
       {
         return false;
       }
@@ -209,30 +209,29 @@ namespace Sdx.Web
     {
       string url = "";
 
-      Dictionary<string, object> deviceSettings = (Dictionary<string, object>)settings[deviceString(device)];
-
-      foreach (var item in deviceSettings)
+      if (settings.ContainsKey(deviceString(device)))
       {
-        if (item.Key.ToString() == "url")
+        Dictionary<string, object> deviceSettings = (Dictionary<string, object>)settings[deviceString(device)];
+        url = deviceSettings["url"].ToString();
+
+        if (replaceWords.Count > 0)
         {
-          url = item.Value.ToString();
+          foreach(var word in replaceWords)
+          {
+            string pattern = @"{([a-zA-Z0-9]+):(.*)}";
+            Regex reg = new Regex(pattern);
+            Match match = reg.Match(url);
+            if (match.Success)
+            {
+              url = Regex.Replace(url, pattern, replaceWords[match.Result("$1").ToString()]);
+            }
+          }
         }
-      }
-
-      string pattern = @"{([a-zA-Z0-9]+):(.*)}";
-      Regex reg = new Regex(pattern);
-      Match match = reg.Match(url);
-
-      if(match.Success){
-        url = Regex.Replace(url, pattern, replaceWords[match.Result("$1").ToString()]);
-      }
-
-      Dictionary<string, string> queries = new Dictionary<string, string>();
-      foreach (var item in deviceSettings)
-      {
-        if (item.Key.ToString() == "query")
+        
+        if (deviceSettings.ContainsKey("query"))
         {
-          foreach (var query in (YamlMappingNode)item.Value)
+          Dictionary<string, string> queries = new Dictionary<string, string>();
+          foreach (var query in (YamlMappingNode)deviceSettings["query"])
           {
             queries.Add(query.Key.ToString(), query.Value.ToString());
           }
@@ -246,12 +245,12 @@ namespace Sdx.Web
       return url;
     }
 
-    private static Device getDevice(string url)
+    private static Device getDevice(string currentUrl)
     {
       string device = "pc";
 
-      Regex regex = new Regex(@"^/(m|sp|i)/.*?$");
-      Match m = regex.Match(url);
+      Regex regex = new Regex(@"/(m|sp|i)/.*?$");
+      Match m = regex.Match(currentUrl);
       if (m.Success)
       {
         device = m.Result("$1").ToString();
