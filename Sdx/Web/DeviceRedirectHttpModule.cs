@@ -18,7 +18,7 @@ namespace Sdx.Web
     {
       var deviceTable = Sdx.Web.DeviceTable.Current;
       string url = "";
-      Sdx.Context.Current.Debug.Log(deviceTable);
+
       if(deviceTable != null)
       {
         string userAgent = HttpContext.Current.Request.UserAgent;

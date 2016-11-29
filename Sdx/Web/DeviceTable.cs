@@ -49,9 +49,7 @@ namespace Sdx.Web
       {
         if(!Sdx.Context.Current.Vars.ContainsKey("Sdx.Web.DeviceTable.Current"))
         {
-          Sdx.Context.Current.Debug.Log(Sdx.Context.Current.Vars.ContainsKey("Sdx.Web.DeviceTable.Current"));
           Sdx.Context.Current.Vars["Sdx.Web.DeviceTable.Current"] = CreateCurrent();
-          Sdx.Context.Current.Debug.Log(Sdx.Context.Current.Vars.ContainsKey("Sdx.Web.DeviceTable.Current"));
         }
 
         return (Sdx.Web.DeviceTable)Sdx.Context.Current.Vars["Sdx.Web.DeviceTable.Current"];
