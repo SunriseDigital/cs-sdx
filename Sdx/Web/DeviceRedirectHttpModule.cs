@@ -24,18 +24,12 @@ namespace Sdx.Web
         string userAgent = HttpContext.Current.Request.UserAgent;
         
         if (Regex.IsMatch(userAgent, smartPhoneUa))
-        {          
-          if (!deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, HttpContext.Current.Request.RawUrl))
-          {
-            url = deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp);
-          }
+        {
+          url = deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp);
         }
         else if (Regex.IsMatch(userAgent, mobileUa))
         {
-          if (!deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, HttpContext.Current.Request.RawUrl))
-          {
-            url = deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb);
-          }
+          url = deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb);
         }
       }
       
