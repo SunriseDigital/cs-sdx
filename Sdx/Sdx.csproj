@@ -168,6 +168,7 @@
     <EmbeddedResource Include="_locale\en\message.mo" />
     <None Include="app.config" />
     <None Include="packages.config" />
+    <None Include="Web\DeviceTable.md" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

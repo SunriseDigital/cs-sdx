@@ -111,37 +111,34 @@ namespace Sdx.Web
       var notEqualPaths =
         currentPaths
           .Select((item, index) => new { Index = index, Value = item })
-          .Where(item => !PathCheck(item.Value, settingPaths[item.Index]));
+          .Any(item => !PathCheck(item.Value, settingPaths[item.Index]));
       
-      if (notEqualPaths.Count() > 0)
+      if (notEqualPaths)
       {
         return false;
       }
 
-      //query_matchがあったときだけ対応表のクエリを見る
+      //query_matchがあったときだけ対応表のqueryを見にいく
       if (settings.ContainsKey("query_match"))
       {
         if (splitUrl.Length <= 1)
-        {          
+        {
           return false;
         }
 
         Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
 
-        if (deviceSettings.ContainsKey("query"))
-        {
-          //ここまで来たらmatchしたのでそのデバイスのQueryの設定を保存しておく
-          settingQuery = (YamlMappingNode)deviceSettings["query"];
-        }
-        return QueryCheck(currentQuery, deviceSettings);
+        if(!QueryCheck(currentQuery, deviceSettings)){
+          return false;
+        }        
       }
-
 
       if (deviceSettings.ContainsKey("query"))
       {
-        //ここまで来たらmatchしたのでそのデバイスのQueryの設定を保存しておく
+        //ここまで来たら対応表にmatchしたのでそのデバイスのクエリを持っておく
         settingQuery = (YamlMappingNode)deviceSettings["query"];
       }
+
       return true;
     }
 
@@ -164,13 +161,10 @@ namespace Sdx.Web
             }
             replaceWords.Add(match.Result("$1").ToString(), currentPath);
           }
-
           return true;
         }
-
         return false;
       }
-
       return true;
     }
 
@@ -191,35 +185,29 @@ namespace Sdx.Web
     private bool QueryCheck(Dictionary<string, string> currentQuery, Dictionary<string, object> deviceSettings)
     {
       Dictionary<string, object> queryMatch = (Dictionary<string, object>)settings["query_match"];
-      YamlMappingNode settingQuery = null;
+      YamlMappingNode queries = new YamlMappingNode();
 
       if (deviceSettings.ContainsKey("query"))
       {
-        settingQuery = (YamlMappingNode)deviceSettings["query"];
-        queryMatch = ReplaceQueryMatchKey(queryMatch, settingQuery);
-      }
+        queries = (YamlMappingNode)deviceSettings["query"];        
+        queryMatch = ReplaceQueryMatchKey(queryMatch, queries);
+      }      
 
       //先にquery_matchの処理
-      foreach (var query in currentQuery)
+      var queryNotMatchCheck = 
+        currentQuery
+          .Where(w => queryMatch.ContainsKey(w.Key))
+          .Where(w => queryMatch[w.Key].ToString() != "")
+          .Any(q => queryMatch[q.Key].ToString() != q.Value);
+
+      if (queryNotMatchCheck)
       {
-        if (queryMatch.ContainsKey(query.Key))
-        {
-          if (queryMatch[query.Key].ToString() != query.Value)
-          {
-            return false;
-          }
-        }
+        return false;
       }
 
-      if (deviceSettings.ContainsKey("query"))
+      if (queries.Children.Any(s => !currentQuery.ContainsKey(s.Value.ToString())))
       {
-        foreach (var item in (YamlMappingNode)deviceSettings["query"])
-        {
-          if (!currentQuery.ContainsKey(item.Value.ToString()))
-          {
-            return false;
-          }
-        }
+        return false;
       }
    
       return true;
@@ -249,66 +237,38 @@ namespace Sdx.Web
           }
         }
 
-        // tag_place=1 → tag=1
-        //そのデバイスのquery
-        if (deviceSettings.ContainsKey("query"))
-        {
-          YamlMappingNode deviceQuery = (YamlMappingNode)deviceSettings["query"];
+//ここテスト用。本来は実際のURLから。
+//string testUrl = "http://www.furonavi.com/yoshiwara/shop/?tg_prices_high=1&button=on";
+//string[] currentRawUrl = testUrl.Split('?');
+        string[] currentRawUrl = HttpContext.Current.Request.RawUrl.Split('?');
 
-          string testQuery = "tg_prices_high=1&button=on";
-          var rawQuery = testQuery.Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
+        if (deviceSettings.ContainsKey("query"))
+        {          
+          var rawQuery = currentRawUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
+          YamlMappingNode deviceQuery = (YamlMappingNode)deviceSettings["query"];
 
           foreach (var q in settingQuery)
           {
-            Console.WriteLine(q.Value);
-            if (deviceQuery.Children.ContainsKey(q.Key))
-            {              
-              Console.WriteLine(deviceQuery.Children[new YamlScalarNode(q.Key.ToString())]); //tag_place
-              //if (queryMatch.ContainsKey(query.Key.ToString()))
-              //{
-              //  queryMatch.Add(query.Value.ToString(), queryMatch[query.Key.ToString()]);
-              //  queryMatch.Remove(query.Key.ToString());
-              //}
+            if (deviceQuery.Children.ContainsKey(q.Key) && !rawQuery.ContainsKey(deviceQuery.Children[new YamlScalarNode(q.Key.ToString())].ToString()))
+            {
+              //keyの置き替え
+              rawQuery.Add(deviceQuery.Children[new YamlScalarNode(q.Key.ToString())].ToString(), rawQuery[q.Value.ToString()]);
+              rawQuery.Remove(q.Value.ToString());
             }
           }
+
+          List<string> tmp = new List<string>();
+          rawQuery.ToList().ForEach(q => tmp.Add(q.Key + "=" + q.Value));
+          query = String.Join("&", tmp);
         }
 
-        //if (settings.ContainsKey("query_match"))
-        //{          
-        //  Dictionary<string, object> queryMatch = (Dictionary<string, object>)settings["query_match"];
-
-        //  //var strings = currentQuery.Split('&').Select(kvp => string.Format("{0}={1}", kvp.Value, queryMatch[kvp.Key.ToString()]));
-        //  //string path = string.Join("&", strings);  
-        //}
-        //else
-        //{
-        //  //query_matchがなかったら現在のクエリをくっつける
-        //  string[] rawQuery = HttpContext.Current.Request.RawUrl.Split('?');
-        //  if(rawQuery.Length > 1)
-        //  {
-        //    query = rawQuery[1];
-        //  }
-        //}
-
-        //if (!string.IsNullOrEmpty(query))
-        //{
-        //  url = url + "?" + query;
-        //}
+        if (!string.IsNullOrEmpty(query))
+        {
+          url = url + "?" + query;
+        }
       }
 
       return url;
-    }
-
-    //urlを生成するデバイス
-    private string buildQuery(string queryKey, Dictionary<string,string> rawQuery)
-    {
-      var list = rawQuery.Where(s => s.Key.ToString() == queryKey).ToList();
-      list.ForEach(l => Console.WriteLine(l.Key));
-      foreach(var l in list){
-        Console.WriteLine(l.Key.ToString());
-      }      
-
-      return queryKey; //tag
     }
 
     private static Device GetDevice(string currentUrl)

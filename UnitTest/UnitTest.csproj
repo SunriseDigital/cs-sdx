@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="config\config2.yml" />
     <None Include="config\config.yml" />
     <None Include="config\dir2\foo.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

@@ -22,7 +22,7 @@ namespace Sdx.Web
       if(deviceTable != null)
       {
         string userAgent = HttpContext.Current.Request.UserAgent;
-        
+        Sdx.Context.Current.Debug.Log(userAgent);        
         if (Regex.IsMatch(userAgent, smartPhoneUa))
         {
           url = deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp);
@@ -32,8 +32,8 @@ namespace Sdx.Web
           url = deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb);
         }
       }
-      
-      if (!string.IsNullOrEmpty(url))
+
+      if (!string.IsNullOrEmpty(url) && url != HttpContext.Current.Request.RawUrl)
       {
         HttpContext.Current.Response.Redirect(url, false);
       }

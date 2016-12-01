@@ -12,8 +12,8 @@
           tag:  button
   - 
     query_match:
-          tag:  1
-          test:  on
+          tag:  
+          test:  
   
     pc:
       url: /{area:(yoshiwara|kanagawa)}/shop/
@@ -25,10 +25,8 @@
       url: /sp/{area:(yoshiwara|kanagawa)}/shop/
       query:
           tag:  tg_high
-          test:  button
 
     mb:
       url: /m/{area:(yoshiwara|kanagawa)}/shop/
       query:
           tag:  tg_price
-          test:  page

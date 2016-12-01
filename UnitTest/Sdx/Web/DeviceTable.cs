@@ -19,6 +19,8 @@ using System.IO;
 using System.Collections;
 using YamlDotNet;
 using YamlDotNet.RepresentationModel;
+using YamlDotNet.Serialization;
+using YamlDotNet.Serialization.NamingConventions;
 
 namespace UnitTest
 {
@@ -30,19 +32,19 @@ namespace UnitTest
     [Fact]
     public void TestDeviceTable()
     {
-      loadTestYaml();
+      loadTestYaml("../../config/config.yml");
 
       var deviceTable = new Sdx.Web.DeviceTable(yamlNode);
       deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on");
       Assert.Equal("/yoshiwara/shop/?tg_prices_high=1&button=on", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Pc));
-      Assert.Equal("/sp/yoshiwara/shop/?tg_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
-      Assert.Equal("/m/yoshiwara/shop/?tg_prices_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
+      Assert.Equal("/sp/yoshiwara/shop/?button=on&tg_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
+      Assert.Equal("/m/yoshiwara/shop/?button=on&tg_price=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
     }
 
     [Fact]
     public void TestIsMatch()
     {
-      loadTestYaml();
+      loadTestYaml("../../config/config.yml");
 
       var deviceTable = new Sdx.Web.DeviceTable(yamlNode);
 
@@ -52,12 +54,29 @@ namespace UnitTest
       Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=off"));
       Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_prices_high=1"));
       Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&button=on"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_prices_high=1&button=on"));      
+      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_price=1&page=on"));      
     }
 
-    private void loadTestYaml()
+    [Fact]
+    public void TestIsMatch2()
     {
-      using (FileStream fs = new FileStream("../../config/config.yml", FileMode.Open))
+      loadTestYaml("../../config/config2.yml");
+
+      var deviceTable = new Sdx.Web.DeviceTable(yamlNode);
+
+      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/tmp/?tg_prices_high=1"));
+      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/"));
+      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on"));
+      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=off"));
+      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1"));
+      //Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&button=on"));
+      //Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&page=on"));
+      //Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_price=1&button=on"));  
+    }
+
+    private void loadTestYaml(string filePath)
+    {
+      using (FileStream fs = new FileStream(filePath, FileMode.Open))
       {
         using (var input = new StreamReader(fs, Encoding.GetEncoding("utf-8")))
         {
