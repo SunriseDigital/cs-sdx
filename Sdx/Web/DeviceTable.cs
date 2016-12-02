@@ -19,7 +19,7 @@ namespace Sdx.Web
 
     private Dictionary<string, object> settings = new Dictionary<string, object>();
 
-    private YamlMappingNode matchDeviceQuery = new YamlMappingNode();
+    private YamlMappingNode currentDeviceQuery = new YamlMappingNode();
 
     public enum Device
     {
@@ -128,13 +128,11 @@ namespace Sdx.Web
 
         Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
 
-        if (!QueryCheck(currentQuery, currentDeviceSettings))
+        currentDeviceQuery = (YamlMappingNode)currentDeviceSettings["query"];
+        if (!QueryCheck(currentQuery, currentDeviceQuery))
         {
           return false;
         }
-
-        //ここまで来たら対応表にmatchしたのでそのデバイスのクエリを持っておく
-        matchDeviceQuery = (YamlMappingNode)currentDeviceSettings["query"];
       }
 
       return true;
@@ -186,15 +184,13 @@ namespace Sdx.Web
       return queryMatch;
     }
 
-    private bool QueryCheck(Dictionary<string, string> currentQuery, Dictionary<string, object> deviceSettings)
+    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode deviceQuerySettings)
     {
-      var queries = (YamlMappingNode)deviceSettings["query"];
-
       //先にquery_matchの処理
       if (settings.ContainsKey("query_match"))
       {
         var queryMatch = (Dictionary<string, object>)settings["query_match"];
-        queryMatch = ReplaceQueryMatchKey(queryMatch, queries);
+        queryMatch = ReplaceQueryMatchKey(queryMatch, deviceQuerySettings);
         
         var queryNotMatchCheck =
           currentQuery
@@ -209,7 +205,7 @@ namespace Sdx.Web
       }
 
       //対応表に書かれたクエリが現在のURLにない
-      if (queries.Children.Any(q => !currentQuery.ContainsKey(q.Value.ToString())))
+      if (deviceQuerySettings.Children.Any(q => !currentQuery.ContainsKey(q.Value.ToString())))
       {
         return false;
       }
@@ -240,9 +236,7 @@ namespace Sdx.Web
         }
 
         string query = "";
-string testUrl = "/yoshiwara/shop/?tg_prices_high=1&button=on";
-string[] currentRawUrl = testUrl.Split('?');
-        //string[] currentRawUrl = HttpContext.Current.Request.RawUrl.Split('?');
+        string[] currentRawUrl = HttpContext.Current.Request.RawUrl.Split('?');
         if (currentRawUrl.Length > 1)
         {
           query = currentRawUrl[1];
@@ -253,14 +247,14 @@ string[] currentRawUrl = testUrl.Split('?');
           var rawQuery = query.Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
           YamlMappingNode targetDeviceQuery = (YamlMappingNode)targetDeviceSettings["query"];
 
-          foreach (var q in matchDeviceQuery)
+          foreach (var matchQuery in currentDeviceQuery)
           {
-            var searchKey = targetDeviceQuery.Children[new YamlScalarNode(q.Key.ToString())].ToString();
-            if (targetDeviceQuery.Children.ContainsKey(q.Key) && !rawQuery.ContainsKey(searchKey))
+            var searchKey = targetDeviceQuery.Children[new YamlScalarNode(matchQuery.Key.ToString())].ToString();
+            if (targetDeviceQuery.Children.ContainsKey(matchQuery.Key) && !rawQuery.ContainsKey(searchKey))
             {
               //keyの置き替え
-              rawQuery.Add(searchKey, rawQuery[q.Value.ToString()]);
-              rawQuery.Remove(q.Value.ToString());
+              rawQuery.Add(searchKey, rawQuery[matchQuery.Value.ToString()]);
+              rawQuery.Remove(matchQuery.Value.ToString());
             }
           }
 
