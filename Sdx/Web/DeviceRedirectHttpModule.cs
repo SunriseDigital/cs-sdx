@@ -22,7 +22,7 @@ namespace Sdx.Web
       if(deviceTable != null)
       {
         string userAgent = HttpContext.Current.Request.UserAgent;
-        Sdx.Context.Current.Debug.Log(userAgent);        
+      
         if (Regex.IsMatch(userAgent, smartPhoneUa))
         {
           url = deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp);

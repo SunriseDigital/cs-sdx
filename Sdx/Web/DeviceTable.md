@@ -47,10 +47,15 @@ query_matchのkeyとqueryのkeyは同じである必要があります。各デ�
 - 使用する際はweb.configに「Sdx.Web.DeviceTable.SettingFilePath」というキーで、用意したyamlファイルのパスを記述してください。
 
 
-
+実際の使用例
+http://○○/tokyo/shop?tg_prices_high=1&button=on
+というURLにいると仮定します。ここからSP版のパスを取得したい場合は下記のように取得します。
 ```c#
 var deviceTable = Sdx.Web.DeviceTable.Current;
 
-
+deviceTable.GetUrl(Device.Sp);
 
 ```
+返ってくるパスは
+/tokyo/shop?tg_high=1&button=on
+です。

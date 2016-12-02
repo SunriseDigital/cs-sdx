@@ -108,17 +108,16 @@ namespace Sdx.Web
         return false;
       }
 
-      var notEqualPaths =
+      var pathNotMatch =
         currentPaths
           .Select((item, index) => new { Index = index, Value = item })
           .Any(item => !PathCheck(item.Value, settingPaths[item.Index]));
-      
-      if (notEqualPaths)
+
+      if (pathNotMatch)
       {
         return false;
       }
 
-      //query_matchがあったときだけ対応表のqueryを見にいく
       if (settings.ContainsKey("query_match"))
       {
         if (splitUrl.Length <= 1)
@@ -191,7 +190,7 @@ namespace Sdx.Web
       {
         queries = (YamlMappingNode)deviceSettings["query"];        
         queryMatch = ReplaceQueryMatchKey(queryMatch, queries);
-      }      
+      }
 
       //先にquery_matchの処理
       var queryNotMatchCheck = 
@@ -237,9 +236,6 @@ namespace Sdx.Web
           }
         }
 
-//ここテスト用。本来は実際のURLから。
-//string testUrl = "http://www.furonavi.com/yoshiwara/shop/?tg_prices_high=1&button=on";
-//string[] currentRawUrl = testUrl.Split('?');
         string[] currentRawUrl = HttpContext.Current.Request.RawUrl.Split('?');
 
         if (deviceSettings.ContainsKey("query"))
@@ -249,10 +245,11 @@ namespace Sdx.Web
 
           foreach (var q in settingQuery)
           {
-            if (deviceQuery.Children.ContainsKey(q.Key) && !rawQuery.ContainsKey(deviceQuery.Children[new YamlScalarNode(q.Key.ToString())].ToString()))
+            var searchKey = deviceQuery.Children[new YamlScalarNode(q.Key.ToString())].ToString();
+            if (deviceQuery.Children.ContainsKey(q.Key) && !rawQuery.ContainsKey(searchKey))
             {
               //keyの置き替え
-              rawQuery.Add(deviceQuery.Children[new YamlScalarNode(q.Key.ToString())].ToString(), rawQuery[q.Value.ToString()]);
+              rawQuery.Add(searchKey, rawQuery[q.Value.ToString()]);
               rawQuery.Remove(q.Value.ToString());
             }
           }
