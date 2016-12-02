@@ -77,19 +77,30 @@ namespace Sdx.Db.Adapter
     /// </summary>
     /// <param name="conn"></param>
     /// <returns></returns>
-    public Connection CreateConnection(DbConnection conn)
+    public Connection UseConnection(DbConnection conn)
     {
-      if(conn.ConnectionString != ConnectionString)
+      if (conn.ConnectionString != ConnectionString)
       {
         throw new InvalidOperationException("Not match connection string " + conn.ConnectionString + " and " + ConnectionString);
       }
 
       if (conn.State != ConnectionState.Open)
-      {				
+      {
         conn.Open();
       }
 
       return new Connection(this, conn);
+    }
+
+    /// <summary>
+    /// これで生成した接続は閉じないので、Dispose忘れじゃないかと勘違いするので名前をuseにしました。
+    /// </summary>
+    /// <param name="conn"></param>
+    /// <returns></returns>
+    [Obsolete("UseConnectionを使用して下さい")]
+    public Connection CreateConnection(DbConnection conn)
+    {
+      return UseConnection(conn);
     }
 
     public DbParameter CreateParameter(string key, object value)
