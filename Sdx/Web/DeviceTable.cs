@@ -21,6 +21,12 @@ namespace Sdx.Web
 
     private YamlMappingNode currentDeviceQuery = new YamlMappingNode();
 
+    private YamlSequenceNode yamlSettings = new YamlSequenceNode();
+
+    public string currentUrl { get; set; }
+
+    private string targetDevice { get; set; }
+
     public enum Device
     {
       Pc,
@@ -42,28 +48,12 @@ namespace Sdx.Web
       }
     }
 
-    public static Sdx.Web.DeviceTable Current 
+    public DeviceTable(Device device, string url, string path)
     {
-      get
-      {
-        if(!Sdx.Context.Current.Vars.ContainsKey("Sdx.Web.DeviceTable.Current"))
-        {
-          Sdx.Context.Current.Vars["Sdx.Web.DeviceTable.Current"] = CreateCurrent();
-        }
+      targetDevice = DeviceString(device);
+      currentUrl = url;
 
-        return (Sdx.Web.DeviceTable)Sdx.Context.Current.Vars["Sdx.Web.DeviceTable.Current"];
-      }
-    }
-
-    private static Sdx.Web.DeviceTable CreateCurrent()
-    {
-      var filePath = WebConfigurationManager.AppSettings["Sdx.Web.DeviceTable.SettingFilePath"];
-
-      if(filePath == null){
-        throw new InvalidOperationException("Not Exists Sdx.Web.DeviceTable.SettingFilePath");
-      }
-
-      using (FileStream fs = new FileStream(filePath, FileMode.Open))
+      using (FileStream fs = new FileStream(path, FileMode.Open))
       {
         using (var input = new StreamReader(fs, Encoding.GetEncoding("utf-8")))
         {
@@ -71,25 +61,31 @@ namespace Sdx.Web
           yaml.Load(input);
           var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
 
-          var yamlSettings = (YamlSequenceNode)mapping.Children[new YamlScalarNode("page")];          
-
-          foreach (YamlMappingNode pageYaml in yamlSettings)
-          {
-            var deviceTable = new Sdx.Web.DeviceTable(pageYaml);
-
-            Device device = GetDevice(HttpContext.Current.Request.RawUrl);
-            if (deviceTable.IsMatch(device, HttpContext.Current.Request.RawUrl))
-            {
-              return deviceTable;
-            }
-          }
-
-          return null;
+          yamlSettings = (YamlSequenceNode)mapping.Children[new YamlScalarNode("page")];
         }
       }
     }
 
-    public bool IsMatch(Device device, string currentUrl)
+    public void loadSettings()
+    {
+      foreach (YamlMappingNode pageYaml in yamlSettings)
+      {
+        foreach (var item in pageYaml)
+        {
+          Dictionary<string, object> tmp = new Dictionary<string, object>();
+          foreach (var child in (YamlMappingNode)item.Value)
+          {
+            tmp.Add(child.Key.ToString(), child.Value);
+          }
+
+          settings.Add(item.Key.ToString(), tmp);
+        }
+      }
+    }
+
+    public static Sdx.Web.DeviceTable Current { get; set; }
+
+    public bool IsMatch(Device device)
     {
       if (!settings.ContainsKey(DeviceString(device)))
       {
@@ -145,14 +141,14 @@ namespace Sdx.Web
         //不要な正規表現チェックを避ける
         if(settingPath.IndexOf("{") == 0)
         {
-          Regex reg = new Regex(@"^{([a-zA-Z0-9]+):(.*)}$");
+          Regex reg = new Regex(@"^{([a-zA-Z0-9]+):(.*)}$", RegexOptions.Compiled);
           Match match = reg.Match(settingPath);
           if (match.Success)
           {
             //URL組み立て時の置換用の変数確保
             if (!replaceWords.ContainsKey(match.Result("$1").ToString()))
             {
-              Regex r = new Regex(match.Result("$2").ToString());
+              Regex r = new Regex(match.Result("$2").ToString(), RegexOptions.Compiled);
               Match m = r.Match(currentPath);
               if (!m.Success)
               {
@@ -215,6 +211,9 @@ namespace Sdx.Web
 
     public string GetUrl(Device device)
     {
+      loadSettings();
+      IsMatch(device);
+
       string url = "";
       if (settings.ContainsKey(DeviceString(device)))
       {
@@ -226,7 +225,7 @@ namespace Sdx.Web
           foreach(var word in replaceWords)
           {
             string pattern = @"{([a-zA-Z0-9]+):(.*)}";
-            Regex reg = new Regex(pattern);
+            Regex reg = new Regex(pattern, RegexOptions.Compiled);
             Match match = reg.Match(url);
             if (match.Success)
             {
