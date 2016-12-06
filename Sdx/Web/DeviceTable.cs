@@ -23,9 +23,11 @@ namespace Sdx.Web
 
     private YamlSequenceNode yamlSettings = new YamlSequenceNode();
 
-    public string currentUrl { get; set; }
+    private string CurrentUrl { get; set; }
 
-    private string targetDevice { get; set; }
+    private Device TargetDevice { get; set; }
+
+    private Dictionary<Device, string> matchUrls = new Dictionary<Device, string>();
 
     public enum Device
     {
@@ -34,24 +36,15 @@ namespace Sdx.Web
       Mb
     }
 
-    public DeviceTable(YamlMappingNode pageYaml)
-    {
-      foreach (var item in pageYaml)
-      {
-        Dictionary<string, object> tmp = new Dictionary<string, object>();
-        foreach (var child in (YamlMappingNode)item.Value)
-        {
-          tmp.Add(child.Key.ToString(), child.Value);
-        }
-
-        settings.Add(item.Key.ToString(), tmp);
-      }
-    }
-
     public DeviceTable(Device device, string url, string path)
     {
-      targetDevice = DeviceString(device);
-      currentUrl = url;
+      TargetDevice = device;
+      CurrentUrl = url;
+
+      if (!File.Exists(path))
+      {
+        throw new InvalidOperationException("Not Exists this FilePath");
+      }
 
       using (FileStream fs = new FileStream(path, FileMode.Open))
       {
@@ -66,11 +59,28 @@ namespace Sdx.Web
       }
     }
 
-    public void loadSettings()
+    public void loadSettings(YamlSequenceNode yamlSettings)
     {
+      YamlMappingNode matchNode = new YamlMappingNode();
+
       foreach (YamlMappingNode pageYaml in yamlSettings)
       {
         foreach (var item in pageYaml)
+        {
+          if (item.Key.ToString() == DeviceString(TargetDevice))
+          {
+            YamlMappingNode value = (YamlMappingNode)item.Value;
+            if (IsMatch(TargetDevice, value))
+            {
+              matchNode = pageYaml;
+            }
+          }
+        }
+      }
+
+      if (matchNode.Children.Count > 0)
+      {
+        foreach (var item in matchNode)
         {
           Dictionary<string, object> tmp = new Dictionary<string, object>();
           foreach (var child in (YamlMappingNode)item.Value)
@@ -85,20 +95,19 @@ namespace Sdx.Web
 
     public static Sdx.Web.DeviceTable Current { get; set; }
 
-    public bool IsMatch(Device device)
+    public bool IsMatch(Device device, YamlMappingNode items)
     {
-      if (!settings.ContainsKey(DeviceString(device)))
-      {
-        return false;
-      }
-      
-      Dictionary<string, object> currentDeviceSettings = (Dictionary<string, object>)settings[DeviceString(device)];
+      Dictionary<string, object> currentDeviceSettings = new Dictionary<string, object>();
 
-      string[] splitUrl = currentUrl.Split('?');
+      foreach (var item in items)
+      {
+        currentDeviceSettings.Add(item.Key.ToString(), item.Value);
+      }
+
+      string[] splitUrl = CurrentUrl.Split('?');
       string[] currentPaths = splitUrl[0].Split('/');
 
       string[] settingPaths = currentDeviceSettings["url"].ToString().Split('/');
-
       if (currentPaths.Length != settingPaths.Length)
       {
         return false;
@@ -211,10 +220,18 @@ namespace Sdx.Web
 
     public string GetUrl(Device device)
     {
-      loadSettings();
-      IsMatch(device);
+      if (matchUrls.ContainsKey(device))
+      {
+        return matchUrls[device];
+      }
 
       string url = "";
+
+      if (settings.Count == 0)
+      {
+        loadSettings(yamlSettings);
+      }
+
       if (settings.ContainsKey(DeviceString(device)))
       {
         Dictionary<string, object> targetDeviceSettings = (Dictionary<string, object>)settings[DeviceString(device)];
@@ -222,7 +239,7 @@ namespace Sdx.Web
 
         if (replaceWords.Count > 0)
         {
-          foreach(var word in replaceWords)
+          foreach (var word in replaceWords)
           {
             string pattern = @"{([a-zA-Z0-9]+):(.*)}";
             Regex reg = new Regex(pattern, RegexOptions.Compiled);
@@ -235,7 +252,7 @@ namespace Sdx.Web
         }
 
         string query = "";
-        string[] currentRawUrl = HttpContext.Current.Request.RawUrl.Split('?');
+        string[] currentRawUrl = CurrentUrl.Split('?');
         if (currentRawUrl.Length > 1)
         {
           query = currentRawUrl[1];
@@ -266,31 +283,11 @@ namespace Sdx.Web
         {
           url = url + "?" + query;
         }
-      }
+
+        matchUrls[device] = url;
+      }        
 
       return url;
-    }
-
-    private static Device GetDevice(string currentUrl)
-    {
-      string device = "pc";
-
-      Regex regex = new Regex(@"/(m|sp|i)/.*?$");
-      Match m = regex.Match(currentUrl);
-      if (m.Success)
-      {
-        device = m.Result("$1").ToString();
-      }
-
-      var deviceDic = new Dictionary<string, Device>()
-      {
-        {"pc", Device.Pc},
-        {"sp", Device.Sp},
-        {"m", Device.Mb},
-        {"i", Device.Mb}
-      };
-
-      return deviceDic[device];
     }
 
     private static string DeviceString(Device device)

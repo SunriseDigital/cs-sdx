@@ -21,6 +21,8 @@ using YamlDotNet;
 using YamlDotNet.RepresentationModel;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.NamingConventions;
+using System.Web;
+using System.Reflection;
 
 namespace UnitTest
 {
@@ -29,68 +31,57 @@ namespace UnitTest
   {
     public dynamic yamlNode;
 
+    [Fact]
+    public void TestDeviceTable()
+    {
+      var deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on", "../../config/config.yml");
+      Assert.Equal("/yoshiwara/shop/?tg_prices_high=1&button=on", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Pc));
+      Assert.Equal("/sp/yoshiwara/shop/?button=on&tg_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
+      Assert.Equal("/m/yoshiwara/shop/?page=on&tg_price=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
+    }
+
+    [Fact]
+    public void TestDeviceTable2()
+    {
+      var deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&page=on&m=5", "../../config/config2.yml");
+      Assert.Equal("/yoshiwara/shop/?button=on&m=5&tg_prices_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Pc));
+      Assert.Equal("/sp/yoshiwara/shop/?tg_high=1&page=on&m=5", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
+      Assert.Equal("/m/yoshiwara/shop/?p=on&m=5&tg_price=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
+    }
+
     //[Fact]
-    //public void TestDeviceTable()
+    //public void TestIsMatch()
     //{
     //  loadTestYaml("../../config/config.yml");
 
     //  var deviceTable = new Sdx.Web.DeviceTable(yamlNode);
-    //  if (deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on"))
-    //  {
-    //    Assert.Equal("/yoshiwara/shop/?tg_prices_high=1&button=on", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Pc));
-    //    Assert.Equal("/sp/yoshiwara/shop/?button=on&tg_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
-    //    Assert.Equal("/m/yoshiwara/shop/?page=on&tg_price=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
-    //  }
+
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/tmp/?tg_prices_high=1"));
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/"));
+    //  Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on"));
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=off"));
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_prices_high=1"));
+    //  Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&button=on"));
+    //  Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_price=1&page=on"));      
     //}
 
     //[Fact]
-    //public void TestDeviceTable2()
+    //public void TestIsMatch2()
     //{
     //  //query_matchが空の時
     //  loadTestYaml("../../config/config2.yml");
 
     //  var deviceTable = new Sdx.Web.DeviceTable(yamlNode);
-    //  if (deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&page=on"))
-    //  {
-    //    Assert.Equal("/yoshiwara/shop/?tg_prices_high=1&b=1&page=1&m=5", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Pc));
-    //    Assert.Equal("/sp/yoshiwara/shop/?button=on&page=1&m=5&tg_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
-    //    Assert.Equal("/m/yoshiwara/shop/?p=on&page=1&m=5&tg_price=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
-    //  }
+
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/tmp/?tg_prices_high=1"));
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/"));
+    //  Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on"));
+    //  Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=off"));
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1"));
+    //  Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&button=on&page=on"));
+    //  Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&page=on"));
+    //  Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_price=1&button=on"));  
     //}
-
-    [Fact]
-    public void TestIsMatch()
-    {
-      loadTestYaml("../../config/config.yml");
-
-      var deviceTable = new Sdx.Web.DeviceTable(yamlNode);
-
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/tmp/?tg_prices_high=1"));
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on"));
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=off"));
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_prices_high=1"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&button=on"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_price=1&page=on"));      
-    }
-
-    [Fact]
-    public void TestIsMatch2()
-    {
-      //query_matchが空の時
-      loadTestYaml("../../config/config2.yml");
-
-      var deviceTable = new Sdx.Web.DeviceTable(yamlNode);
-
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/tmp/?tg_prices_high=1"));
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=on"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?tg_prices_high=1&button=off"));
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&button=on&page=on"));
-      Assert.True(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&page=on"));
-      Assert.False(deviceTable.IsMatch(Sdx.Web.DeviceTable.Device.Mb, "/m/yoshiwara/shop/?tg_price=1&button=on"));  
-    }
 
     private void loadTestYaml(string filePath)
     {

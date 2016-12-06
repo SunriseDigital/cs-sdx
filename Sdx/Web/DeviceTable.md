@@ -1,7 +1,7 @@
 ﻿# Sdx.Web.DeviceTable
 
 ## 概要
-
+デバイス毎にURLが違う場合に、その対応表を管理します。
 URLがyaml形式の対応表に存在するかチェックをし、存在した場合各デバイスに対応したURLを取得できます。
 
 ## 使い方
@@ -44,14 +44,12 @@ URLにクエリーがあるかないかだけ判断したい場合（完全一�
 query_matchのkeyとqueryのkeyは同じである必要があります。各デバイスでクエリーが共通の場合は実際のクエリー名で指定してください。
 
 
-- 使用する際はweb.configに「Sdx.Web.DeviceTable.SettingFilePath」というキーで、用意したyamlファイルのパスを記述してください。
-
-
 実際の使用例
 http://○○/tokyo/shop?tg_prices_high=1&button=on
 というURLにいると仮定します。ここからSP版のパスを取得したい場合は下記のように取得します。
+3つめの引数には設定ファイルのパスを指定してください。
 ```c#
-var deviceTable = Sdx.Web.DeviceTable.Current;
+Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(Device.Pc, Request.RawUrl, "/tmp/path/");
 
 deviceTable.GetUrl(Device.Sp);
 
