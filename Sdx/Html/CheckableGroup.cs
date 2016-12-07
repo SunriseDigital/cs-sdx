@@ -47,21 +47,27 @@ namespace Sdx.Html
       }
     }
 
-    public void AddCheckable(string key, string labelString = null)
+    public Tag AddCheckable(string key, string labelString = null)
     {
       var checkable = CreateCheckable();
       checkable.Tag.Attr["value"] = key;
-      AddCheckable(checkable, labelString);
+      return AddCheckable(checkable, labelString);
     }
 
-    public void AddCheckable(KeyValuePair<string, string> pair)
+    public Tag AddCheckable(KeyValuePair<string, string> pair)
     {
-      AddCheckable(pair.Key, pair.Value);
+      return AddCheckable(pair.Key, pair.Value);
     }
 
     protected abstract internal Checkable CreateCheckable();
 
-    public void AddCheckable(Checkable checkable, string labelString = null)
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="checkable"></param>
+    /// <param name="labelString"></param>
+    /// <returns>返り値のTagはlabelがあるときはlabelが、無いときはinputが変えります。checkable.tagは常にinputなので注意してください。</returns>
+    public Tag AddCheckable(Checkable checkable, string labelString = null)
     {
       elements.Add(checkable);
 
@@ -72,9 +78,15 @@ namespace Sdx.Html
         checkable.Name = this.name;
       }
 
-      if (labelString == null)
+      if(labelString != null)
+      {
+        checkable.Label = labelString;
+      }
+
+      if (checkable.Label == null)
       {
         tag.AddHtml(checkable.tag);
+        return tag;
       }
       else
       {
@@ -86,6 +98,7 @@ namespace Sdx.Html
         }
         label.AddHtml(new RawText(labelString));
         tag.AddHtml(label);
+        return label;
       }
     }
 
