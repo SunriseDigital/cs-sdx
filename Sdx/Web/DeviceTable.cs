@@ -17,15 +17,13 @@ namespace Sdx.Web
   {
     private Dictionary<string, string> replaceWords = new Dictionary<string, string>();
 
-    private Dictionary<string, object> settings = new Dictionary<string, object>();
-
-    private YamlMappingNode currentDeviceQuery = new YamlMappingNode();
+    private Dictionary<string, YamlNode> currentPage = null;
 
     private YamlSequenceNode yamlSettings = new YamlSequenceNode();
 
-    private string CurrentUrl { get; set; }
+    private string currentUrl;
 
-    private Device TargetDevice { get; set; }
+    private Device targetDevice;
 
     private Dictionary<Device, string> matchUrls = new Dictionary<Device, string>();
 
@@ -38,8 +36,8 @@ namespace Sdx.Web
 
     public DeviceTable(Device device, string url, string path)
     {
-      TargetDevice = device;
-      CurrentUrl = url;
+      targetDevice = device;
+      currentUrl = url;
 
       if (!File.Exists(path))
       {
@@ -59,52 +57,47 @@ namespace Sdx.Web
       }
     }
 
-    public void loadSettings(YamlSequenceNode yamlSettings)
+    private Dictionary<string, YamlNode> DetectPage()
     {
-      YamlMappingNode matchNode = new YamlMappingNode();
+      var matchPage = new Dictionary<string, YamlNode>();      
 
       foreach (YamlMappingNode pageYaml in yamlSettings)
       {
-        foreach (var item in pageYaml)
+        var children = pageYaml.Children;
+        YamlMappingNode queryMatch = null;
+
+        if (children.ContainsKey(new YamlScalarNode(DeviceString(targetDevice))))
         {
-          if (item.Key.ToString() == DeviceString(TargetDevice))
+          if (children.ContainsKey(new YamlScalarNode("query_match")))
           {
-            YamlMappingNode value = (YamlMappingNode)item.Value;
-            if (IsMatch(TargetDevice, value))
+            queryMatch = (YamlMappingNode)children[new YamlScalarNode("query_match")];
+          }
+
+          if (IsMatch(targetDevice, children[new YamlScalarNode(DeviceString(targetDevice))], queryMatch))
+          {
+            foreach (var item in pageYaml)
             {
-              matchNode = pageYaml;
+              matchPage.Add(item.Key.ToString(), (YamlMappingNode)item.Value);
             }
           }
         }
       }
 
-      if (matchNode.Children.Count > 0)
-      {
-        foreach (var item in matchNode)
-        {
-          Dictionary<string, object> tmp = new Dictionary<string, object>();
-          foreach (var child in (YamlMappingNode)item.Value)
-          {
-            tmp.Add(child.Key.ToString(), child.Value);
-          }
-
-          settings.Add(item.Key.ToString(), tmp);
-        }
-      }
+      return matchPage;
     }
 
     public static Sdx.Web.DeviceTable Current { get; set; }
 
-    public bool IsMatch(Device device, YamlMappingNode items)
+    private bool IsMatch(Device device, YamlNode items, YamlMappingNode queryMatch)
     {
       Dictionary<string, object> currentDeviceSettings = new Dictionary<string, object>();
 
-      foreach (var item in items)
+      foreach (var item in (YamlMappingNode)items)
       {
         currentDeviceSettings.Add(item.Key.ToString(), item.Value);
       }
 
-      string[] splitUrl = CurrentUrl.Split('?');
+      string[] splitUrl = currentUrl.Split('?');
       string[] currentPaths = splitUrl[0].Split('/');
 
       string[] settingPaths = currentDeviceSettings["url"].ToString().Split('/');
@@ -133,8 +126,7 @@ namespace Sdx.Web
 
         Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
 
-        currentDeviceQuery = (YamlMappingNode)currentDeviceSettings["query"];
-        if (!QueryCheck(currentQuery, currentDeviceQuery))
+        if (!QueryCheck(currentQuery, (YamlMappingNode)currentDeviceSettings["query"], queryMatch))
         {
           return false;
         }
@@ -175,33 +167,35 @@ namespace Sdx.Web
       return true;
     }
 
-    private Dictionary<string, object> ReplaceQueryMatchKey(Dictionary<string, object> queryMatch, YamlMappingNode queries)
+    private YamlMappingNode ReplaceQueryMatchKey(YamlMappingNode queryMatch, YamlMappingNode queries)
     {
       foreach (var query in queries)
       {
-        if (queryMatch.ContainsKey(query.Key.ToString()))
+        var queryKey = new YamlScalarNode(query.Key.ToString());
+        if (queryMatch.Children.ContainsKey(queryKey))
         {
-          queryMatch.Add(query.Value.ToString(), queryMatch[query.Key.ToString()]);
-          queryMatch.Remove(query.Key.ToString());
+          queryMatch.Add(query.Value.ToString(), queryMatch.Children[new YamlScalarNode(query.Key.ToString())]);
+          queryMatch.Children.Remove(new YamlScalarNode(query.Key.ToString()));
         }
       }
 
       return queryMatch;
     }
 
-    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode deviceQuerySettings)
+    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode deviceQuerySettings, YamlMappingNode queryMatch)
     {
       //先にquery_matchの処理
-      if (settings.ContainsKey("query_match"))
+      if (queryMatch != null)
       {
-        var queryMatch = (Dictionary<string, object>)settings["query_match"];
-        queryMatch = ReplaceQueryMatchKey(queryMatch, deviceQuerySettings);
+        queryMatch = ReplaceQueryMatchKey((YamlMappingNode)queryMatch, deviceQuerySettings);
+
+        var searchQuery = queryMatch.Children;
         
         var queryNotMatchCheck =
           currentQuery
-            .Where(w => queryMatch.ContainsKey(w.Key))
-            .Where(w => queryMatch[w.Key].ToString() != "")
-            .Any(q => queryMatch[q.Key].ToString() != q.Value);
+            .Where(w => searchQuery.ContainsKey(new YamlScalarNode(w.Key)))
+            .Where(w => searchQuery[new YamlScalarNode(w.Key)].ToString() != "")
+            .Any(q => searchQuery[new YamlScalarNode(q.Key)].ToString() != q.Value);
 
         if (queryNotMatchCheck)
         {
@@ -227,15 +221,15 @@ namespace Sdx.Web
 
       string url = "";
 
-      if (settings.Count == 0)
+      if (currentPage == null)
       {
-        loadSettings(yamlSettings);
+        currentPage = DetectPage();
       }
 
-      if (settings.ContainsKey(DeviceString(device)))
+      if (currentPage.ContainsKey(DeviceString(device)))
       {
-        Dictionary<string, object> targetDeviceSettings = (Dictionary<string, object>)settings[DeviceString(device)];
-        url = targetDeviceSettings["url"].ToString();
+        YamlMappingNode targetDeviceSettings = (YamlMappingNode)currentPage[DeviceString(device)];
+        url = targetDeviceSettings.Children[new YamlScalarNode("url")].ToString();
 
         if (replaceWords.Count > 0)
         {
@@ -252,18 +246,20 @@ namespace Sdx.Web
         }
 
         string query = "";
-        string[] currentRawUrl = CurrentUrl.Split('?');
+        string[] currentRawUrl = currentUrl.Split('?');
         if (currentRawUrl.Length > 1)
         {
           query = currentRawUrl[1];
         }
 
-        if (targetDeviceSettings.ContainsKey("query"))
+        if (targetDeviceSettings.Children.ContainsKey(new YamlScalarNode("query")))
         {
           var rawQuery = query.Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
-          YamlMappingNode targetDeviceQuery = (YamlMappingNode)targetDeviceSettings["query"];
+          YamlMappingNode targetDeviceQuery = (YamlMappingNode)targetDeviceSettings.Children[new YamlScalarNode("query")];
 
-          foreach (var matchQuery in currentDeviceQuery)
+          YamlMappingNode currentPageQuery = (YamlMappingNode)((YamlMappingNode)currentPage[DeviceString(targetDevice)]).Children[new YamlScalarNode("query")];
+
+          foreach (var matchQuery in currentPageQuery)
           {
             var searchKey = targetDeviceQuery.Children[new YamlScalarNode(matchQuery.Key.ToString())].ToString();
             if (targetDeviceQuery.Children.ContainsKey(matchQuery.Key) && !rawQuery.ContainsKey(searchKey))

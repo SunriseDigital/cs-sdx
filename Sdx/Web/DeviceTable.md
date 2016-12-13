@@ -55,5 +55,5 @@ deviceTable.GetUrl(Device.Sp);
 
 ```
 返ってくるパスは
-/tokyo/shop?tg_high=1&button=on
+/sp/tokyo/shop?tg_high=1&button=on
 です。
