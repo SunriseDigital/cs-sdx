@@ -45,9 +45,9 @@ namespace Sdx.Web
 
     public void Dispose() { }
 
-    public abstract Sdx.Web.DeviceTable.Device DetectUrlDevice(string url);
+    protected abstract Sdx.Web.DeviceTable.Device DetectUrlDevice(string url);
 
-    public Sdx.Web.DeviceTable.Device DetectUserAgentDevice()
+    private Sdx.Web.DeviceTable.Device DetectUserAgentDevice()
     {
       string userAgent = HttpContext.Current.Request.UserAgent;
 
@@ -66,6 +66,6 @@ namespace Sdx.Web
       return DeviceTable.Device.Pc;
     }
 
-    public abstract string GetSettingPath();
+    protected abstract string GetSettingPath();
   }
 }
