@@ -236,14 +236,9 @@ namespace Sdx.Web
           string[] split = url.Split('/');
           foreach (var word in replaceWords)
           {
-            foreach (var s in split.Select((value, index) => new { value, index }))
-            {
-              if (s.value.IndexOf("{" + word.Key + ":") >= 0)
-              {
-                split[s.index] = word.Value;
-              }
-            }
-            url = string.Join("/", split);
+            url = url.Split('/')
+              .Select(val => val.IndexOf("{" + word.Key + ":") >= 0 ? word.Value : val)
+              .Aggregate((current, next) => current + "/" + next);
           }
         }
 
