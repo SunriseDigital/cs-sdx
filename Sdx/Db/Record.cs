@@ -218,6 +218,11 @@ namespace Sdx.Db
       return Convert.ToString(this.GetValue(key));
     }
 
+    public bool GetBool(string key)
+    {
+      return (bool)GetValue(key);
+    }
+
     public bool ContainsColumn(string key)
     {
       if(UpdatedValues.ContainsKey(key))

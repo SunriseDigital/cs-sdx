@@ -24,6 +24,5 @@ namespace Sdx.Html
         this.tag.Attr.Set("checked");
       }
     }
-
   }
 }

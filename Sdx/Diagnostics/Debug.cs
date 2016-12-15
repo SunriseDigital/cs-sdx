@@ -186,6 +186,14 @@ namespace Sdx.Diagnostics
         var result = GetDumpTitle(value, indent, needType, "(" + count + ")");
         return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicMemberCount);
       }
+      else if (value is System.Data.Common.DbParameter)
+      {
+        var param = value as System.Data.Common.DbParameter;
+        return GetDumpTitle(
+          param,
+          indent,
+          needType, "("+ param.DbType.ToString() +") " + param.ParameterName + " " + param.Value.ToString()).TrimEnd('\r', '\n');
+      }
       else
       {
         var type = value.GetType();
