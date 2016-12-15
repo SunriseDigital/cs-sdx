@@ -361,6 +361,11 @@ namespace Sdx.Db
       return conn.FetchRecord(select);
     }
 
+    public Record FetchRecordByColumn(Db.Connection conn, string columnName, object value)
+    {
+      return FetchRecord(conn, select => this.Context.Where.Add(columnName, value));
+    }
+
     public Record FetchRecord(Db.Connection conn, Action<Sql.Select> action = null)
     {
       var select = conn.Adapter.CreateSelect();
