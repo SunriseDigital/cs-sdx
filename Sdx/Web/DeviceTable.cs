@@ -238,7 +238,7 @@ namespace Sdx.Web
           {
             foreach (var s in split.Select((value, index) => new { value, index }))
             {
-              if (s.value.IndexOf("{" + word.Key) >= 0)
+              if (s.value.IndexOf("{" + word.Key + ":") >= 0)
               {
                 split[s.index] = word.Value;
               }
