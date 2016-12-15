@@ -233,15 +233,17 @@ namespace Sdx.Web
 
         if (replaceWords.Count > 0)
         {
+          string[] split = url.Split('/');
           foreach (var word in replaceWords)
           {
-            string pattern = @"{([a-zA-Z0-9]+):(.*)}";
-            Regex reg = new Regex(pattern, RegexOptions.Compiled);
-            Match match = reg.Match(url);
-            if (match.Success)
+            foreach (var s in split.Select((value, index) => new { value, index }))
             {
-              url = Regex.Replace(url, pattern, replaceWords[match.Result("$1").ToString()]);
+              if (s.value.IndexOf("{" + word.Key) >= 0)
+              {
+                split[s.index] = word.Value;
+              }
             }
+            url = string.Join("/", split);
           }
         }
 
