@@ -267,6 +267,18 @@ namespace Sdx.Db
       return this;
     }
 
+    public T GetRecord<T>(Action<Select> selectHook = null) where T : Sdx.Db.Record
+    {
+      var relname = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == typeof(T)).Select(kv => kv.Key).First();
+      return GetRecord<T>(relname, selectHook);
+    }
+
+    public T GetRecord<T>(Connection connection, Action<Select> selectHook = null) where T : Sdx.Db.Record
+    {
+      var relname = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == typeof(T)).Select(kv => kv.Key).First();
+      return GetRecord<T>(relname, connection, selectHook);
+    }
+
     public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Sdx.Db.Record
     {
       return this.GetRecord<T>(contextName, null, selectHook);
