@@ -267,16 +267,31 @@ namespace Sdx.Db
       return this;
     }
 
+    private string GetRelationName<T>()
+    {
+      var recordType = typeof(T);
+      var relations = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == recordType);
+      var count = relations.Count();
+      if (count == 0)
+      {
+        throw new NotImplementedException("Missing relation setting for " + recordType + " in " + OwnMeta.TableType);
+      }
+      else if (count > 1)
+      {
+        throw new NotImplementedException("Too many match relations for " + recordType + " in " + OwnMeta.TableType);
+      }
+
+      return relations.First().Key;
+    }
+
     public T GetRecord<T>(Action<Select> selectHook = null) where T : Sdx.Db.Record
     {
-      var relname = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == typeof(T)).Select(kv => kv.Key).First();
-      return GetRecord<T>(relname, selectHook);
+      return GetRecord<T>(GetRelationName<T>(), selectHook);
     }
 
     public T GetRecord<T>(Connection connection, Action<Select> selectHook = null) where T : Sdx.Db.Record
     {
-      var relname = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == typeof(T)).Select(kv => kv.Key).First();
-      return GetRecord<T>(relname, connection, selectHook);
+      return GetRecord<T>(GetRelationName<T>(), connection, selectHook);
     }
 
     public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Sdx.Db.Record
@@ -364,7 +379,7 @@ namespace Sdx.Db
           return resultSet;
         }
 
-        throw new NotImplementedException("Missing relation setting for " + contextName);
+        throw new NotImplementedException("Missing relation setting for " + contextName + " in " + OwnMeta.TableType);
       }
     }
 
