@@ -101,7 +101,7 @@ namespace Sdx
       {
         if(page == null)
         {
-          throw new InvalidOperationException("page is null. you must initialize Page value.");
+          throw new InvalidOperationException("You must initialize Page value. Have you called `LimitPager()` before instantiate `PagerLink` ?");
         }
         return (int)page;
       }
