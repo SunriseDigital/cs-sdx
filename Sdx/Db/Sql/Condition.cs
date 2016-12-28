@@ -169,6 +169,17 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Condition AddWithOrNull(string column, Object value, Comparison comparison = Comparison.Equal)
+    {
+      Condition condition = new Condition();
+      this.Add(
+        condition
+         .AddIsNull(column)
+         .AddOr(column, value, Sdx.Db.Sql.Comparison.GreaterEqual)
+      );
+      return this;
+    }
+
     /// <summary>
     /// 自分の持っているConditionにContextNameをセット。
     /// </summary>
