@@ -41,11 +41,41 @@ page:
 {name: 正規表現}という書式で記述してください。
 
 #### query_matchとqueryについて
-- query_matchは対象のクエリーを完全一致させたい場合に記述します。<br>
-省略した場合、queryは判定対象にせずに対応表にqueryがあってもなくてもマッチします。
-- URLにクエリーがあるかないかだけ判断したい場合（完全一致させたくない場合）はquery_matchを空にしてください。
-- 各デバイスでクエリーが共通の場合は、query_matchを`実際のクエリー名:マッチさせたい値`で設定してください。
-- 各デバイスでクエリー名が別の場合は、query_match内に`適当なkey名:マッチさせたい値`、query内に`querymatchで設定した適当なkey名:実際のクエリー名`で設定する必要があります。
+- query_matchは対象のクエリーを値まで一致で検索したい場合に記述します。<br>
+省略されたクエリーは検索対象にはならず、あってもなくてもマッチします。（部分一致）
+- URLにクエリーがあるかないかだけ判断したい場合（完全一致させたくない場合）はquery_matchをキーのみの値を空で記述してください。
+- 各デバイスでクエリーが共通の場合は、query_matchを`実際のクエリー名:マッチさせたい値`で記述してください。
+- 各デバイスでクエリー名が別の場合は、query_match内に`適当なkey名:マッチさせたい値`、query内に`querymatchで記述した適当なkey名:実際のクエリー名`で記述する必要があります。
+
+#### perfect_matchについて
+- perfect_matchが指定されていた場合は、クエリーのキーを完全一致で検索します。
+- query_matchとの併用はできません。
+- URLにクエリーがあるかないかだけ判断したい場合は、perfect_matchをキーのみの値を空で記述してください。
+
+#### exclude_build_queryについて
+- GetUrlをした際に、特定のクエリーを除外したURLが欲しい場合に配列で記述します。<br>
+exclude_build_queryはURLの一致判定には影響せず、URLを組み立てる際にクエリの除外を判断するだけのキーになります。
+``` yaml
+page:
+  -
+    query_match:
+      tag: 1
+    exclude_build_query: [foo]
+    pc:
+      url: /{area:(tokyo|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
+      exclude_build_query: [bar]
+    sp:
+      url: /sp/{area:(tokyo|kanagawa)}/shop/
+      query:
+          tag:  tg_high
+    mb:
+      url: /m/{area:(tokyo|kanagawa)}/shop/
+      query:
+          tag:  tg
+```
+上記のような記述の場合は、PCのURLを組み立てる際には「foo,bar」が除外され、その他のデバイスの場合は「foo」のみが除外されます。
 
 
 実際の使用例

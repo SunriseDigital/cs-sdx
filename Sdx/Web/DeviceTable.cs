@@ -285,18 +285,18 @@ namespace Sdx.Web
 
           List<string> exclude_query = new List<string>();
           if (currentPage.ContainsKey("exclude_build_query"))
-          {            
-            foreach (var q in (YamlSequenceNode)currentPage["exclude_build_query"])
+          {
+            foreach (var exclude_build_query in (YamlSequenceNode)currentPage["exclude_build_query"])
             {
-              exclude_query.Add(q.ToString());
+              exclude_query.Add(exclude_build_query.ToString());
             }
           }
 
           if (targetDeviceSettings.Children.ContainsKey(new YamlScalarNode("exclude_build_query")))
           {
-            foreach (var q in (YamlSequenceNode)targetDeviceSettings.Children[new YamlScalarNode("exclude_build_query")])
+            foreach (var exclude_build_query in (YamlSequenceNode)targetDeviceSettings.Children[new YamlScalarNode("exclude_build_query")])
             {
-              exclude_query.Add(q.ToString());
+              exclude_query.Add(exclude_build_query.ToString());
             }
           }
 
