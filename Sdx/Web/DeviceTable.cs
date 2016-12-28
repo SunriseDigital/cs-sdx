@@ -77,6 +77,7 @@ namespace Sdx.Web
         {
           if (children.ContainsKey(new YamlScalarNode("query_match")))
           {
+            perfectCheck = false;
             queryMatch = (YamlMappingNode)children[new YamlScalarNode("query_match")];
           }
 
