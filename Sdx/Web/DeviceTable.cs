@@ -59,7 +59,7 @@ namespace Sdx.Web
 
     private Dictionary<string, YamlNode> DetectPage()
     {
-      var matchPage = new Dictionary<string, YamlNode>();      
+      var matchPage = new Dictionary<string, YamlNode>();
 
       foreach (YamlMappingNode pageYaml in yamlSettings)
       {
@@ -116,9 +116,9 @@ namespace Sdx.Web
         return false;
       }
 
-      if (currentDeviceSettings.ContainsKey("query"))
+      if (queryMatch != null)
       {
-        //対応表にqueryがあるのに現在のURLにクエリがない
+        //対応表にquery_matchの設定があるのに現在のURLにクエリがない
         if (splitUrl.Length <= 1)
         {
           return false;
@@ -126,9 +126,13 @@ namespace Sdx.Web
 
         Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
 
-        if (!QueryCheck(currentQuery, (YamlMappingNode)currentDeviceSettings["query"], queryMatch))
+        if(currentDeviceSettings.ContainsKey("query"))
         {
-          return false;
+          return QueryCheck(currentQuery, queryMatch, (YamlMappingNode)currentDeviceSettings["query"]);
+        }
+        else
+        {
+          return QueryCheck(currentQuery, queryMatch);
         }
       }
 
@@ -182,25 +186,13 @@ namespace Sdx.Web
       return queryMatch;
     }
 
-    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode deviceQuerySettings, YamlMappingNode queryMatch)
+    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode queryMatch, YamlMappingNode deviceQuerySettings)
     {
-      //先にquery_matchの処理
-      if (queryMatch != null)
+      queryMatch = ReplaceQueryMatchKey(queryMatch, deviceQuerySettings);
+
+      if (!QueryCheck(currentQuery, queryMatch))
       {
-        queryMatch = ReplaceQueryMatchKey((YamlMappingNode)queryMatch, deviceQuerySettings);
-
-        var searchQuery = queryMatch.Children;
-        
-        var queryNotMatchCheck =
-          currentQuery
-            .Where(w => searchQuery.ContainsKey(new YamlScalarNode(w.Key)))
-            .Where(w => searchQuery[new YamlScalarNode(w.Key)].ToString() != "")
-            .Any(q => searchQuery[new YamlScalarNode(q.Key)].ToString() != q.Value);
-
-        if (queryNotMatchCheck)
-        {
-          return false;
-        }
+        return false;
       }
 
       //対応表に書かれたクエリが現在のURLにない
@@ -209,6 +201,28 @@ namespace Sdx.Web
         return false;
       }
 
+      return true;
+    }
+
+    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode queryMatch)
+    {
+      var searchQuery = queryMatch.Children;
+
+      if(currentQuery.Any(w => !searchQuery.ContainsKey(new YamlScalarNode(w.Key))))
+      {
+        return false;
+      }
+
+      var queryNotMatchCheck =
+        currentQuery
+          .Where(w => searchQuery[new YamlScalarNode(w.Key)].ToString() != "")
+          .Any(q => searchQuery[new YamlScalarNode(q.Key)].ToString() != q.Value);
+
+      if (queryNotMatchCheck)
+      {
+        return false;
+      }
+      
       return true;
     }
 
