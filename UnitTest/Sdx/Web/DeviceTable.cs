@@ -44,10 +44,10 @@ namespace UnitTest
     [Fact]
     public void TestDeviceTable2()
     {
-      var deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_high=1&page=on&m=5", "../../config/config2.yml");
-      Assert.Equal("/yoshiwara/shop/?button=on&m=5&tg_prices_high=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Pc));
-      Assert.Equal("/sp/yoshiwara/shop/?tg_high=1&page=on&m=5", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
-      Assert.Equal("/m/yoshiwara/shop/?p=on&m=5&tg_price=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
+      var deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Sp, "/sp/yoshiwara/shop/?tg_prices_high=1&button=on&m=5", "../../config/config2.yml");
+      Assert.Equal("/yoshiwara/shop/?tg_prices_high=1&button=on", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Pc));
+      Assert.Equal("/sp/yoshiwara/shop/?tg_prices_high=1&button=on", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
+      Assert.Equal("/m/yoshiwara/shop/?tg_prices_high=1&button=on", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
     }
 
     [Fact]
@@ -56,8 +56,8 @@ namespace UnitTest
       var deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/tmp/?tg_prices_high=1", "../../config/config.yml");
       Assert.Empty(deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp)); //対応表にマッチしないので空になるはず
 
-      //query_matchが空の時
-      deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/tmp/?tg_prices_high=1", "../../config/config2.yml");
+      //query_matchが空の時 
+      deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?prices_high=1&button=on&m=5&p=2", "../../config/config2.yml");
       Assert.Empty(deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp)); //対応表にマッチしないので空になるはず
     }
   }

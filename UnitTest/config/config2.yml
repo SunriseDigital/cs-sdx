@@ -12,23 +12,18 @@
           tag:  button
   - 
     query_match:
-          tag:  
-          test:  
-  
+          tg_prices_high:
+          button:
+
+    exclude_build_query: [m]
+
     pc:
       url: /{area:(yoshiwara|kanagawa)}/shop/
-      query:
-          tag:  tg_prices_high
-          test:  button
+      exclude_build_query: [foo,bar]
 
     sp:
       url: /sp/{area:(yoshiwara|kanagawa)}/shop/
-      query:
-          tag:  tg_high
-          test: page
+      exclude_build_query: [p]
 
     mb:
       url: /m/{area:(yoshiwara|kanagawa)}/shop/
-      query:
-          tag:  tg_price
-          test: p

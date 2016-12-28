@@ -77,7 +77,7 @@ namespace Sdx.Web
           {
             foreach (var item in pageYaml)
             {
-              matchPage.Add(item.Key.ToString(), (YamlMappingNode)item.Value);
+              matchPage.Add(item.Key.ToString(), item.Value);
             }
           }
         }
@@ -188,15 +188,15 @@ namespace Sdx.Web
 
     private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode queryMatch, YamlMappingNode deviceQuerySettings)
     {
-      queryMatch = ReplaceQueryMatchKey(queryMatch, deviceQuerySettings);
-
-      if (!QueryCheck(currentQuery, queryMatch))
+      //対応表に書かれたクエリが現在のURLにない
+      if (deviceQuerySettings.Children.Any(q => !currentQuery.ContainsKey(q.Value.ToString())))
       {
         return false;
       }
 
-      //対応表に書かれたクエリが現在のURLにない
-      if (deviceQuerySettings.Children.Any(q => !currentQuery.ContainsKey(q.Value.ToString())))
+      queryMatch = ReplaceQueryMatchKey(queryMatch, deviceQuerySettings);
+
+      if (!QueryCheck(currentQuery, queryMatch))
       {
         return false;
       }
@@ -208,13 +208,14 @@ namespace Sdx.Web
     {
       var searchQuery = queryMatch.Children;
 
-      if(currentQuery.Any(w => !searchQuery.ContainsKey(new YamlScalarNode(w.Key))))
+      if (queryMatch.Any(w => !currentQuery.ContainsKey(w.Key.ToString())))
       {
         return false;
       }
 
       var queryNotMatchCheck =
         currentQuery
+          .Where(w => searchQuery.ContainsKey(new YamlScalarNode(w.Key)))
           .Where(w => searchQuery[new YamlScalarNode(w.Key)].ToString() != "")
           .Any(q => searchQuery[new YamlScalarNode(q.Key)].ToString() != q.Value);
 
@@ -258,26 +259,52 @@ namespace Sdx.Web
 
         string query = "";
         string[] currentRawUrl = currentUrl.Split('?');
+
         if (currentRawUrl.Length > 1)
         {
           query = currentRawUrl[1];
-        }
-
-        if (targetDeviceSettings.Children.ContainsKey(new YamlScalarNode("query")))
-        {
           var rawQuery = query.Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
-          YamlMappingNode targetDeviceQuery = (YamlMappingNode)targetDeviceSettings.Children[new YamlScalarNode("query")];
 
-          YamlMappingNode currentPageQuery = (YamlMappingNode)((YamlMappingNode)currentPage[DeviceString(targetDevice)]).Children[new YamlScalarNode("query")];
-
-          foreach (var matchQuery in currentPageQuery)
+          if (targetDeviceSettings.Children.ContainsKey(new YamlScalarNode("query")))
           {
-            var searchKey = targetDeviceQuery.Children[new YamlScalarNode(matchQuery.Key.ToString())].ToString();
-            if (targetDeviceQuery.Children.ContainsKey(matchQuery.Key) && !rawQuery.ContainsKey(searchKey))
+            YamlMappingNode targetDeviceQuery = (YamlMappingNode)targetDeviceSettings.Children[new YamlScalarNode("query")];
+
+            YamlMappingNode currentPageQuery = (YamlMappingNode)((YamlMappingNode)currentPage[DeviceString(targetDevice)]).Children[new YamlScalarNode("query")];
+
+            foreach (var matchQuery in currentPageQuery)
             {
-              //keyの置き替え
-              rawQuery.Add(searchKey, rawQuery[matchQuery.Value.ToString()]);
-              rawQuery.Remove(matchQuery.Value.ToString());
+              var searchKey = targetDeviceQuery.Children[new YamlScalarNode(matchQuery.Key.ToString())].ToString();
+              if (targetDeviceQuery.Children.ContainsKey(matchQuery.Key) && !rawQuery.ContainsKey(searchKey))
+              {
+                //keyの置き替え
+                rawQuery.Add(searchKey, rawQuery[matchQuery.Value.ToString()]);
+                rawQuery.Remove(matchQuery.Value.ToString());
+              }
+            }
+          }
+
+          List<string> exclude_query = new List<string>();
+          if (currentPage.ContainsKey("exclude_build_query"))
+          {            
+            foreach (var q in (YamlSequenceNode)currentPage["exclude_build_query"])
+            {
+              exclude_query.Add(q.ToString());
+            }
+          }
+
+          if (targetDeviceSettings.Children.ContainsKey(new YamlScalarNode("exclude_build_query")))
+          {
+            foreach (var q in (YamlSequenceNode)targetDeviceSettings.Children[new YamlScalarNode("exclude_build_query")])
+            {
+              exclude_query.Add(q.ToString());
+            }
+          }
+
+          if (exclude_query != null)
+          {
+            foreach (var exclude in exclude_query)
+            {
+              rawQuery.Remove(exclude);
             }
           }
 
