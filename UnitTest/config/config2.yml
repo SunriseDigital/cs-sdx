@@ -1,15 +1,21 @@
 ﻿page:
-  - pc:
-      url: /{area:(yoshiwara|kanagawa)}/gal/
+  - 
+    perfect_match:
+          flag: 1
+          pa:
 
+    pc:
+      url: /{area:(yoshiwara|kanagawa)}/gal/
+      query:
+          pa:  page
     sp:
       url: /sp/{area:(yoshiwara|kanagawa)}/gal/
       query:
-          tag:  cute
+          pa:  p
     mb:
       url: /m/{area:(yoshiwara|kanagawa)}/gal/
       query:
-          tag:  button
+          pa:  p
   - 
     query_match:
           tg_prices_high:

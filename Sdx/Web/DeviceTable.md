@@ -88,6 +88,6 @@ Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(Device.Pc, Request.RawUrl,
 deviceTable.GetUrl(Device.Sp);
 
 ```
-返ってくるパスは
+指定したyamlファイルに先ほどの設定がかかれていた場合、返ってくるURLは
 /sp/tokyo/shop?tg_high=1&button=on
 です。

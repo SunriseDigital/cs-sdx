@@ -25,6 +25,8 @@ namespace Sdx.Web
 
     private Device targetDevice;
 
+    private bool perfectCheck = false;
+
     private Dictionary<Device, string> matchUrls = new Dictionary<Device, string>();
 
     public enum Device
@@ -41,7 +43,7 @@ namespace Sdx.Web
 
       if (!File.Exists(path))
       {
-        throw new InvalidOperationException("Not Exists this FilePath");
+        throw new FileNotFoundException("Not Exists this FilePath");
       }
 
       using (FileStream fs = new FileStream(path, FileMode.Open))
@@ -66,12 +68,24 @@ namespace Sdx.Web
         var children = pageYaml.Children;
         YamlMappingNode queryMatch = null;
 
+        if (children.ContainsKey(new YamlScalarNode("query_match")) && children.ContainsKey(new YamlScalarNode("perfect_match")))
+        {
+          throw new InvalidOperationException("Only one can be specified query_match or perfect_match");
+        }
+
         if (children.ContainsKey(new YamlScalarNode(DeviceString(targetDevice))))
         {
           if (children.ContainsKey(new YamlScalarNode("query_match")))
           {
             queryMatch = (YamlMappingNode)children[new YamlScalarNode("query_match")];
           }
+
+          if (children.ContainsKey(new YamlScalarNode("perfect_match")))
+          {
+            perfectCheck = true;
+            queryMatch = (YamlMappingNode)children[new YamlScalarNode("perfect_match")];
+          }
+
 
           if (IsMatch(targetDevice, children[new YamlScalarNode(DeviceString(targetDevice))], queryMatch))
           {
@@ -208,7 +222,15 @@ namespace Sdx.Web
     {
       var searchQuery = queryMatch.Children;
 
-      if (queryMatch.Any(w => !currentQuery.ContainsKey(w.Key.ToString())))
+      if(perfectCheck)
+      {
+        if (currentQuery.Any(w => !searchQuery.ContainsKey(new YamlScalarNode(w.Key))))
+        {
+          return false;
+        }
+      }
+
+      if (searchQuery.Any(w => !currentQuery.ContainsKey(w.Key.ToString())))
       {
         return false;
       }
@@ -268,7 +290,6 @@ namespace Sdx.Web
           if (targetDeviceSettings.Children.ContainsKey(new YamlScalarNode("query")))
           {
             YamlMappingNode targetDeviceQuery = (YamlMappingNode)targetDeviceSettings.Children[new YamlScalarNode("query")];
-
             YamlMappingNode currentPageQuery = (YamlMappingNode)((YamlMappingNode)currentPage[DeviceString(targetDevice)]).Children[new YamlScalarNode("query")];
 
             foreach (var matchQuery in currentPageQuery)
@@ -283,12 +304,12 @@ namespace Sdx.Web
             }
           }
 
-          List<string> exclude_query = new List<string>();
+          List<string> exclude_queries = new List<string>();
           if (currentPage.ContainsKey("exclude_build_query"))
           {
             foreach (var exclude_build_query in (YamlSequenceNode)currentPage["exclude_build_query"])
             {
-              exclude_query.Add(exclude_build_query.ToString());
+              exclude_queries.Add(exclude_build_query.ToString());
             }
           }
 
@@ -296,13 +317,13 @@ namespace Sdx.Web
           {
             foreach (var exclude_build_query in (YamlSequenceNode)targetDeviceSettings.Children[new YamlScalarNode("exclude_build_query")])
             {
-              exclude_query.Add(exclude_build_query.ToString());
+              exclude_queries.Add(exclude_build_query.ToString());
             }
           }
 
-          if (exclude_query != null)
+          if (exclude_queries != null)
           {
-            foreach (var exclude in exclude_query)
+            foreach (var exclude in exclude_queries)
             {
               rawQuery.Remove(exclude);
             }
