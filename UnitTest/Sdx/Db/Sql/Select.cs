@@ -2330,5 +2330,36 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         Assert.Equal(5, sc2[0].GetInt32("category_id"));
       }
     }
+
+    [Fact]
+    public void TestNotIn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunNotIn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunNotIn(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.SetColumns("id");
+        cShop.Where.Add("id", new List<int> { 1, 2 }, Sdx.Db.Sql.Comparison.NotIn);
+      });
+
+      testDb.Command = select.Build();
+
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} NOT IN (@0, @1)"
+        ),
+        testDb.Command.CommandText
+      );
+    }
   }
 }

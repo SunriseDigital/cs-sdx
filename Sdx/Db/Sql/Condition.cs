@@ -287,7 +287,12 @@ namespace Sdx.Db.Sql
       //IEnumerable<>かどうかチェック。
       else if (!(cond.Value is string) && cond.Value.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
       {
-        cond.Comparison = Comparison.In;
+        //NotInかInしかありえない。各Addでやったほうが分かりやすいが、IEnumableかどうかチェックが意外に重そうなのでこちらで。
+        if(cond.Comparison != Comparison.NotIn)
+        {
+          cond.Comparison = Comparison.In;
+        }
+        
         string inCond = "";
         //プリミティブ型の配列を受け付けるためあえてジェネリックを使ってません。
         var list = cond.Value as System.Collections.IEnumerable;
