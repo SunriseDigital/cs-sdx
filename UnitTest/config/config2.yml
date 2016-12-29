@@ -1,8 +1,8 @@
 ﻿page:
   - 
-    perfect_match:
-          flag: 1
-          pa:
+    query_match_perfect:
+      flag: 1
+      pa:
 
     pc:
       url: /{area:(yoshiwara|kanagawa)}/gal/
@@ -18,8 +18,8 @@
           pa:  p
   - 
     query_match:
-          tg_prices_high:
-          button:
+      tg_prices_high:
+      button:
 
     exclude_build_query: [m]
 

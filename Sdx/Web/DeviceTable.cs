@@ -68,9 +68,9 @@ namespace Sdx.Web
         var children = pageYaml.Children;
         YamlMappingNode queryMatch = null;
 
-        if (children.ContainsKey(new YamlScalarNode("query_match")) && children.ContainsKey(new YamlScalarNode("perfect_match")))
+        if (children.ContainsKey(new YamlScalarNode("query_match")) && children.ContainsKey(new YamlScalarNode("query_match_perfect")))
         {
-          throw new InvalidOperationException("Only one can be specified query_match or perfect_match");
+          throw new InvalidOperationException("Only one can be specified query_match or query_match_perfect");
         }
 
         if (children.ContainsKey(new YamlScalarNode(DeviceString(targetDevice))))
@@ -81,15 +81,15 @@ namespace Sdx.Web
             queryMatch = (YamlMappingNode)children[new YamlScalarNode("query_match")];
           }
 
-          if (children.ContainsKey(new YamlScalarNode("perfect_match")))
+          if (children.ContainsKey(new YamlScalarNode("query_match_perfect")))
           {
             perfectCheck = true;
-            queryMatch = (YamlMappingNode)children[new YamlScalarNode("perfect_match")];
+            queryMatch = (YamlMappingNode)children[new YamlScalarNode("query_match_perfect")];
           }
-
 
           if (IsMatch(targetDevice, children[new YamlScalarNode(DeviceString(targetDevice))], queryMatch))
           {
+            //YamlNodeだとキーへのアクセスが冗長になるので、マッチしたブロックをDictionaryにして取り出しやすいようにする
             foreach (var item in pageYaml)
             {
               matchPage.Add(item.Key.ToString(), item.Value);
@@ -107,6 +107,7 @@ namespace Sdx.Web
     {
       Dictionary<string, object> currentDeviceSettings = new Dictionary<string, object>();
 
+      //YamlNodeだとキーへのアクセスが冗長になるので、Dictionaryして値を取り出しやすいようにする
       foreach (var item in (YamlMappingNode)items)
       {
         currentDeviceSettings.Add(item.Key.ToString(), item.Value);

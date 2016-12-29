@@ -47,7 +47,7 @@ page:
 - 各デバイスでクエリーが共通の場合は、query_matchを`実際のクエリー名:マッチさせたい値`で記述してください。
 - 各デバイスでクエリー名が別の場合は、query_match内に`適当なkey名:マッチさせたい値`、query内に`querymatchで記述した適当なkey名:実際のクエリー名`で記述する必要があります。
 
-#### perfect_matchについて
+#### query_match_perfectについて
 - perfect_matchが指定されていた場合は、クエリーのキーを完全一致で検索します。
 - query_matchとの併用はできません。
 - URLにクエリーがあるかないかだけ判断したい場合は、perfect_matchをキーのみの値を空で記述してください。
