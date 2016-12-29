@@ -10,6 +10,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 #endif
 
 using System;
+using System.Collections.Generic;
 
 namespace UnitTest
 {
@@ -491,6 +492,74 @@ namespace UnitTest
         Assert.IsType<Sdx.Validation.NotEmpty>(list[0]);
       }
       
+    }
+
+    [Fact]
+    public void TestFetchRecordByPkey()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunFetchRecordByPkey(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunFetchRecordByPkey(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      //single pkey
+      {
+        var tShop = new Test.Orm.Table.Shop();
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+          var shop = tShop.FetchRecordByPkey(conn, 1);
+          Assert.Equal(1, shop.GetInt32("id"));
+
+          shop = tShop.FetchRecordByPkey(conn, "2");
+          Assert.Equal(2, shop.GetInt32("id"));
+        }
+      }
+
+      //multiple key
+      {
+        var tShopCategory = new Test.Orm.Table.ShopCategory();
+        using (var conn = db.CreateConnection())
+        {
+          conn.Open();
+
+          var inserts = new List<Sdx.Db.Sql.Insert>();
+          inserts.Add(db.CreateInsert());
+          inserts[0].Into = "shop_category";
+          inserts[0].AddColumnValue("shop_id", 1);
+          inserts[0].AddColumnValue("category_id", 2);
+          inserts.Add(db.CreateInsert());
+          inserts[1].Into = "shop_category";
+          inserts[1].AddColumnValue("shop_id", 2);
+          inserts[1].AddColumnValue("category_id", 3);
+          conn.BeginTransaction();
+          inserts.ForEach(ins => conn.Execute(ins));
+          conn.Commit();
+          
+
+          var shopCategory = tShopCategory.FetchRecordByPkey(conn, new Dictionary<string, object> 
+          { 
+            {"shop_id", 1},
+            {"category_id", 2},
+          });
+          Assert.Equal(1, shopCategory.GetInt32("shop_id"));
+          Assert.Equal(2, shopCategory.GetInt32("category_id"));
+
+          shopCategory = tShopCategory.FetchRecordByPkey(conn, new Dictionary<string, object> 
+          { 
+            {"shop_id", "2"},
+            {"category_id", "3"},
+          });
+          Assert.Equal(2, shopCategory.GetInt32("shop_id"));
+          Assert.Equal(3, shopCategory.GetInt32("category_id"));
+        }
+      }
     }
   }
 }
