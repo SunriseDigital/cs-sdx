@@ -131,9 +131,16 @@ namespace Sdx.Db
       return Convert.ToDouble(this.GetValue(key));
     }
 
+    
+
     public short GetInt16(string key)
     {
       return Convert.ToInt16(this.GetValue(key));
+    }
+
+    public int GetInt(string key)
+    {
+      return GetInt32(key);
     }
 
     public int GetInt32(string key)
@@ -873,6 +880,43 @@ namespace Sdx.Db
       get
       {
         return internalCache;
+      }
+    }
+
+    public string PkeyStringValue
+    {
+      get
+      {
+        return GetString(PkeyName);
+      }
+    }
+
+    public int PkeyIntValue
+    {
+      get
+      {
+        return GetInt(PkeyName);
+      }
+    }
+
+    public object PkeyValue
+    {
+      get
+      {
+        return GetValue(PkeyName);
+      }
+    }
+
+    private string PkeyName
+    {
+      get
+      {
+        if (OwnMeta.Pkeys.Count() != 1)
+        {
+          throw new InvalidOperationException("Illegal pkey count " + OwnMeta.Pkeys.Count());
+        }
+
+        return OwnMeta.Pkeys.First().Name;
       }
     }
   }
