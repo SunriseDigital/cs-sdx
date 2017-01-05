@@ -94,6 +94,8 @@ namespace Sdx.Web
             {
               matchPage.Add(item.Key.ToString(), item.Value);
             }
+
+            return matchPage;
           }
         }
       }
