@@ -223,7 +223,7 @@ namespace Sdx.Db
       }
       catch (Exception e)
       {
-        throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText);
+        throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText, e);
       }
 
       if (log != null)
