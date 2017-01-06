@@ -663,6 +663,25 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    /// <summary>
+    /// 追加したorderをクリアする。
+    /// </summary>
+    /// <param contextName="context">contextNameを渡すとそのテーブルのorderのみをクリアします。</param>
+    /// <returns></returns>
+    public Select ClearOrders(string contextName = null)
+    {
+      if (contextName == null)
+      {
+        this.orders.Clear();
+      }
+      else
+      {
+        this.orders.RemoveAll(column => column.ContextName != null && column.ContextName == contextName);
+      }
+
+      return this;
+    }
+
     public object Clone()
     {
       var cloned = (Select)this.MemberwiseClone();
