@@ -66,7 +66,7 @@ namespace Sdx.Web
       foreach (YamlMappingNode pageYaml in yamlSettings)
       {
         var children = pageYaml.Children;
-        YamlMappingNode queryMatch = null;
+        YamlNode queryMatch = null;
 
         if (children.ContainsKey(new YamlScalarNode("query_match")) && children.ContainsKey(new YamlScalarNode("query_match_perfect")))
         {
@@ -84,7 +84,8 @@ namespace Sdx.Web
           if (children.ContainsKey(new YamlScalarNode("query_match_perfect")))
           {
             perfectCheck = true;
-            queryMatch = (YamlMappingNode)children[new YamlScalarNode("query_match_perfect")];
+
+            queryMatch = children[new YamlScalarNode("query_match_perfect")];
           }
 
           if (IsMatch(targetDevice, children[new YamlScalarNode(DeviceString(targetDevice))], queryMatch))
@@ -105,8 +106,9 @@ namespace Sdx.Web
 
     public static Sdx.Web.DeviceTable Current { get; set; }
 
-    private bool IsMatch(Device device, YamlNode items, YamlMappingNode queryMatch)
+    private bool IsMatch(Device device, YamlNode items, YamlNode queryMatch)
     {
+
       Dictionary<string, object> currentDeviceSettings = new Dictionary<string, object>();
 
       //YamlNodeだとキーへのアクセスが冗長になるので、Dictionaryして値を取り出しやすいようにする
@@ -134,17 +136,28 @@ namespace Sdx.Web
         return false;
       }
 
-      if (queryMatch != null)
+      if (splitUrl.Length <= 1)
       {
-        //対応表にquery_matchの設定があるのに現在のURLにクエリがない
-        if (splitUrl.Length <= 1)
+        //query_matchの中身があるのに現在のURLにクエリがない
+        if (queryMatch.GetType() == typeof(YamlMappingNode))
+        {
+          return false;
+        }
+      }
+      else
+      {
+        if(queryMatch == null)
+        {
+          return false;
+        }
+        //query_matchの中身が空なのに、現在のURLにクエリがある
+        else if (queryMatch.GetType() != typeof(YamlMappingNode))
         {
           return false;
         }
 
         Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
-
-        if(currentDeviceSettings.ContainsKey("query"))
+        if (currentDeviceSettings.ContainsKey("query"))
         {
           return QueryCheck(currentQuery, queryMatch, (YamlMappingNode)currentDeviceSettings["query"]);
         }
@@ -189,22 +202,23 @@ namespace Sdx.Web
       return true;
     }
 
-    private YamlMappingNode ReplaceQueryMatchKey(YamlMappingNode queryMatch, YamlMappingNode queries)
+    private YamlNode ReplaceQueryMatchKey(YamlNode queryMatch, YamlMappingNode queries)
     {
       foreach (var query in queries)
       {
         var queryKey = new YamlScalarNode(query.Key.ToString());
-        if (queryMatch.Children.ContainsKey(queryKey))
+        var children = ((YamlMappingNode)queryMatch).Children;
+        if (children.ContainsKey(queryKey))
         {
-          queryMatch.Add(query.Value.ToString(), queryMatch.Children[new YamlScalarNode(query.Key.ToString())]);
-          queryMatch.Children.Remove(new YamlScalarNode(query.Key.ToString()));
+          ((YamlMappingNode)queryMatch).Add(query.Value.ToString(), children[new YamlScalarNode(query.Key.ToString())]);
+          children.Remove(new YamlScalarNode(query.Key.ToString()));
         }
       }
 
       return queryMatch;
     }
 
-    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode queryMatch, YamlMappingNode deviceQuerySettings)
+    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlNode queryMatch, YamlMappingNode deviceQuerySettings)
     {
       //対応表に書かれたクエリが現在のURLにない
       if (deviceQuerySettings.Children.Any(q => !currentQuery.ContainsKey(q.Value.ToString())))
@@ -222,9 +236,9 @@ namespace Sdx.Web
       return true;
     }
 
-    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlMappingNode queryMatch)
+    private bool QueryCheck(Dictionary<string, string> currentQuery, YamlNode queryMatch)
     {
-      var searchQuery = queryMatch.Children;
+      var searchQuery = ((YamlMappingNode)queryMatch).Children;
 
       if(perfectCheck)
       {
