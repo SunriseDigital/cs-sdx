@@ -50,6 +50,7 @@ page:
 #### query_match_perfectについて
 - query_match_perfectが指定されていた場合は、クエリーのキーを完全一致で検索します。
 - query_matchとの併用はできません。
+- query_match_perfectの中身が空の場合は現在のURLにクエリーがあった場合マッチしません。
 
 #### exclude_build_queryについて
 - GetUrlをした際に、特定のクエリーを除外したURLが欲しい場合に配列で記述します。<br>
