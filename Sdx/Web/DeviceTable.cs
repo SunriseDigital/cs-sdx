@@ -136,34 +136,33 @@ namespace Sdx.Web
         return false;
       }
 
-      if (splitUrl.Length <= 1)
+      if (queryMatch != null)
       {
-        //query_matchの中身があるのに現在のURLにクエリがない
-        if (queryMatch != null && queryMatch.GetType() == typeof(YamlMappingNode))
+        if (splitUrl.Length <= 1)
         {
-          return false;
-        }
-      }
-      else
-      {
-        if(queryMatch == null)
-        {
-          return false;
-        }
-        //query_matchの中身が空なのに、現在のURLにクエリがある
-        else if (queryMatch.GetType() != typeof(YamlMappingNode))
-        {
-          return false;
-        }
-
-        Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
-        if (currentDeviceSettings.ContainsKey("query"))
-        {
-          return QueryCheck(currentQuery, queryMatch, (YamlMappingNode)currentDeviceSettings["query"]);
+          //query_matchの中身があるのに現在のURLにクエリがない
+          if (queryMatch.GetType() == typeof(YamlMappingNode))
+          {
+            return false;
+          }
         }
         else
         {
-          return QueryCheck(currentQuery, queryMatch);
+          //query_matchの中身が空なのに、現在のURLにクエリがある
+          if (queryMatch.GetType() != typeof(YamlMappingNode))
+          {
+            return false;
+          }
+
+          Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
+          if (currentDeviceSettings.ContainsKey("query"))
+          {
+            return QueryCheck(currentQuery, queryMatch, (YamlMappingNode)currentDeviceSettings["query"]);
+          }
+          else
+          {
+            return QueryCheck(currentQuery, queryMatch);
+          }
         }
       }
 

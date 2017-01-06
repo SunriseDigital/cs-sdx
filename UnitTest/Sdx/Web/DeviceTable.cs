@@ -91,5 +91,13 @@ namespace UnitTest
       Assert.Equal("/sp/yoshiwara/shop/", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
       Assert.Equal("/m/yoshiwara/shop/", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
     }
+
+    [Fact]
+    public void QueryMatchEmptyNotMatchTest()
+    {
+      var deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?page=5&bt=on", "../../config/config2.yml");
+      Assert.Empty(deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
+      Assert.Empty(deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
+    }
   }
 }
