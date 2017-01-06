@@ -83,5 +83,13 @@ namespace UnitTest
       Assert.Equal("/sp/yoshiwara/shop/?tg_prices_high=1&button=on", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp)); //mとpが除外される
       Assert.Equal("/m/yoshiwara/shop/?tg_prices_high=1&button=on&p=1", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb)); //mのみ除外される
     }
+
+    [Fact]
+    public void QueryMatchEmptyTest()
+    {
+      var deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/", "../../config/config2.yml");
+      Assert.Equal("/sp/yoshiwara/shop/", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
+      Assert.Equal("/m/yoshiwara/shop/", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Mb));
+    }
   }
 }

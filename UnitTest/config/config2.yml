@@ -18,7 +18,7 @@
           pa:  p
   - 
     query_match:
-      tg_prices_high:
+      tg_prices_high: 1
       button:
 
     exclude_build_query: [m]
@@ -30,6 +30,18 @@
     sp:
       url: /sp/{area:(yoshiwara|kanagawa)}/shop/
       exclude_build_query: [p]
+
+    mb:
+      url: /m/{area:(yoshiwara|kanagawa)}/shop/
+
+  - 
+    query_match_perfect:
+
+    pc:
+      url: /{area:(yoshiwara|kanagawa)}/shop/
+
+    sp:
+      url: /sp/{area:(yoshiwara|kanagawa)}/shop/
 
     mb:
       url: /m/{area:(yoshiwara|kanagawa)}/shop/
