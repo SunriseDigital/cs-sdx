@@ -59,6 +59,10 @@ namespace UnitTest
       //query_matchが空の時 
       deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/shop/?prices_high=1&button=on&m=5&p=2", "../../config/config2.yml");
       Assert.Empty(deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp)); //対応表にマッチしないので空になるはず
+
+      //query_matchが空の時 
+      deviceTable = new Sdx.Web.DeviceTable(Sdx.Web.DeviceTable.Device.Pc, "/yoshiwara/top/?prices_high=1&button=on&m=5&p=2", "../../config/config2.yml");
+      Assert.Equal("/sp/yoshiwara/top/?prices_high=1&button=on&m=5&p=2", deviceTable.GetUrl(Sdx.Web.DeviceTable.Device.Sp));
     }
 
     [Fact]
