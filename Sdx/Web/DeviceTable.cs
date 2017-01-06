@@ -139,7 +139,7 @@ namespace Sdx.Web
       if (splitUrl.Length <= 1)
       {
         //query_matchの中身があるのに現在のURLにクエリがない
-        if (queryMatch.GetType() == typeof(YamlMappingNode))
+        if (queryMatch != null && queryMatch.GetType() == typeof(YamlMappingNode))
         {
           return false;
         }
