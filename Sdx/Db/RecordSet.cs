@@ -22,11 +22,6 @@ namespace Sdx.Db
       }
 
       var pkeys = table.OwnMeta.Pkeys;
-      if (pkeys == null)
-      {
-        throw new NotImplementedException("Missing Pkeys setting in " + table.ToString() + ".Meta");
-      }
-
       while (reader.Read())
       {
         var row = new Dictionary<string, object>();
@@ -62,24 +57,27 @@ namespace Sdx.Db
     {
       //対象テーブルの主キーがNULLの場合（LEFTJOINの時）、関係ない行なのでスルーする
       var exists = true;
-      foreach(var column in pkeys)
+      if (pkeys.Count() > 0)
       {
-        var rowKey = Record.BuildColumnAliasWithContextName(column.Name, contextName);
-        if (!row.ContainsKey(rowKey))
+        foreach (var column in pkeys)
         {
-          throw new InvalidOperationException("Missing " + rowKey + " in " + Sdx.Diagnostics.Debug.Dump(row) + ". Do you call directry context.SetColumn[s]() ? You must call context.Table.SetColumn[s].");
+          var rowKey = Record.BuildColumnAliasWithContextName(column.Name, contextName);
+          if (!row.ContainsKey(rowKey))
+          {
+            throw new InvalidOperationException("Missing " + rowKey + " in " + Sdx.Diagnostics.Debug.Dump(row) + ". Do you call directry context.SetColumn[s]() ? You must call context.Table.SetColumn[s].");
+          }
+
+          if (row[rowKey] is DBNull)
+          {
+            exists = false;
+            break;
+          }
         }
 
-        if (row[rowKey] is DBNull)
+        if (!exists)
         {
-          exists = false;
-          break;
+          return;
         }
-      }
-
-      if (!exists)
-      {
-        return;
       }
 
       var key = BuildUniqueKey(pkeys, columnName => row[Record.BuildColumnAliasWithContextName(columnName, contextName)]);
@@ -95,13 +93,19 @@ namespace Sdx.Db
       {
         result = this.resultDic[key];
       }
-
+      
       result.AddRow(row);
     }
 
 
     private string BuildUniqueKey(IEnumerable<Table.Column> pkeys, Func<string, object> func)
     {
+      //主キーの無いテーブルはまとめようがないので新しいものとみなして順番にセット。
+      if(pkeys.Count() == 0)
+      {
+        return "%%SDX%%" + this.resultDic.Count;
+      }
+
       var key = "";
 
       foreach(var column in pkeys)
