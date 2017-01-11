@@ -2361,5 +2361,79 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         testDb.Command.CommandText
       );
     }
+
+    [Fact]
+    public void TestInEmptyList()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunInEmptyList(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunInEmptyList(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.SetColumns("id");
+        cShop.Where.Add("id", new List<int>());
+      });
+
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var ids = conn.FetchList<int>(select);
+        Assert.Equal(0, ids.Count);
+      }
+
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE 'id@shop' IN ('EMPTY')"
+        ),
+        Sdx.Context.Current.DbProfiler.Logs[1].CommandText
+      );
+    }
+
+    [Fact]
+    public void TestNotInEmptyList()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunNotInEmptyList(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunNotInEmptyList(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.SetColumns("id");
+        cShop.Where.Add("id", new List<int>(), Sdx.Db.Sql.Comparison.NotIn);
+      });
+
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var ids = conn.FetchList<int>(select);
+        Assert.NotEqual(0, ids.Count);
+      }
+
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE 'id@shop' NOT IN ('EMPTY')"
+        ),
+        Sdx.Context.Current.DbProfiler.Logs[1].CommandText
+      );
+    }
   }
 }
