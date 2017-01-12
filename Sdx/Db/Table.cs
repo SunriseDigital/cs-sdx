@@ -348,7 +348,7 @@ namespace Sdx.Db
       return conn.FetchRecord(select);
     }
 
-    public Record FetchRecordByPkey(Db.Connection conn, string pkeyValue)
+    public Record FetchRecordByPkey(Db.Connection conn, object pkeyValue)
     {
       if (OwnMeta.Pkeys.Count() > 1)
       {
@@ -359,6 +359,11 @@ namespace Sdx.Db
       select.Where.Add(OwnMeta.Pkeys.First((col) => true).Name, pkeyValue);
 
       return conn.FetchRecord(select);
+    }
+
+    public Record FetchRecordByColumn(Db.Connection conn, string columnName, object value)
+    {
+      return FetchRecord(conn, select => this.Context.Where.Add(columnName, value));
     }
 
     public Record FetchRecord(Db.Connection conn, Action<Sql.Select> action = null)
