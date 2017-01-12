@@ -348,7 +348,7 @@ namespace Sdx.Db
       return conn.FetchRecord(select);
     }
 
-    public Record FetchRecordByPkey(Db.Connection conn, string pkeyValue)
+    public Record FetchRecordByPkey(Db.Connection conn, object pkeyValue)
     {
       if (OwnMeta.Pkeys.Count() > 1)
       {

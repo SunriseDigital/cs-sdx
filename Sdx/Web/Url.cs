@@ -167,18 +167,30 @@ namespace Sdx.Web
       get; set;
     }
 
-    public void SetParam(string key, string value)
+    public Url SetParam(string key, int value)
+    {
+      return this.SetParam(key, value.ToString());
+    }
+
+    public Url SetParam(string key, string value)
     {
       this.RemoveParam(key);
       this.AddParam(key, value);
+      return this;
     }
 
-    public void AddParam(string key, string value)
+    public Url AddParam(string key, int value)
+    {
+      return this.AddParam(key, value.ToString());
+    }
+
+    public Url AddParam(string key, string value)
     {
       //value が null の場合、直後の EscapeUriString() でコケるので空文字を入れておく
       value = value ?? "";
       this.ParamList.Add(Tuple.Create(Uri.EscapeUriString(key), Uri.EscapeUriString(value)));
       this.AddParamCount(Uri.EscapeUriString(key));
+      return this;
     }
 
     public void RemoveParam(string key)
