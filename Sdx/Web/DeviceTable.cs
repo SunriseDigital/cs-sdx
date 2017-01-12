@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -29,6 +31,12 @@ namespace Sdx.Web
 
     private Dictionary<Device, string> matchUrls = new Dictionary<Device, string>();
 
+    private MemoryCache memoryCache = MemoryCache.Default;
+
+    private Dictionary<string, object> settingCache = new Dictionary<string, object>();
+
+    private string cacheUrl = "";
+
     public enum Device
     {
       Pc,
@@ -41,20 +49,39 @@ namespace Sdx.Web
       targetDevice = device;
       currentUrl = url;
 
-      if (!File.Exists(path))
+      var cache = memoryCache["DeviceTable"];
+      if (cache == null)
       {
-        throw new FileNotFoundException("Not Exists this FilePath");
+        //var config = new NameValueCollection();
+        //config.Add("cacheMemoryLimitMegabytes", "10");
+        //memoryCache = new MemoryCache("cacheDeviceTable", config);
       }
-
-      using (FileStream fs = new FileStream(path, FileMode.Open))
+      else
       {
-        using (var input = new StreamReader(fs, Encoding.GetEncoding("utf-8")))
+        settingCache = (Dictionary<string, object>)cache;
+        if(settingCache.ContainsKey(url))
         {
-          var yaml = new YamlStream();
-          yaml.Load(input);
-          var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+          cacheUrl = ((Dictionary<Device, string>)settingCache[url])[Device.Sp];
+        }
+      }
+      Sdx.Context.Current.Debug.Log(cache);
+      if(string.IsNullOrEmpty(cacheUrl))
+      {
+        if (!File.Exists(path))
+        {
+          throw new FileNotFoundException("Not Exists this FilePath");
+        }
 
-          yamlSettings = (YamlSequenceNode)mapping.Children[new YamlScalarNode("page")];
+        using (FileStream fs = new FileStream(path, FileMode.Open))
+        {
+          using (var input = new StreamReader(fs, Encoding.GetEncoding("utf-8")))
+          {
+            var yaml = new YamlStream();
+            yaml.Load(input);
+            var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+
+            yamlSettings = (YamlSequenceNode)mapping.Children[new YamlScalarNode("page")];
+          }
         }
       }
     }
@@ -136,34 +163,33 @@ namespace Sdx.Web
         return false;
       }
 
-      if (splitUrl.Length <= 1)
+      if (queryMatch != null)
       {
-        //query_matchの中身があるのに現在のURLにクエリがない
-        if (queryMatch != null && queryMatch.GetType() == typeof(YamlMappingNode))
+        if (splitUrl.Length <= 1)
         {
-          return false;
-        }
-      }
-      else
-      {
-        if(queryMatch == null)
-        {
-          return false;
-        }
-        //query_matchの中身が空なのに、現在のURLにクエリがある
-        else if (queryMatch.GetType() != typeof(YamlMappingNode))
-        {
-          return false;
-        }
-
-        Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
-        if (currentDeviceSettings.ContainsKey("query"))
-        {
-          return QueryCheck(currentQuery, queryMatch, (YamlMappingNode)currentDeviceSettings["query"]);
+          //query_matchの中身があるのに現在のURLにクエリがない
+          if (queryMatch.GetType() == typeof(YamlMappingNode))
+          {
+            return false;
+          }
         }
         else
         {
-          return QueryCheck(currentQuery, queryMatch);
+          //query_matchの中身が空なのに、現在のURLにクエリがある
+          if (queryMatch.GetType() != typeof(YamlMappingNode))
+          {
+            return false;
+          }
+
+          Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
+          if (currentDeviceSettings.ContainsKey("query"))
+          {
+            return QueryCheck(currentQuery, queryMatch, (YamlMappingNode)currentDeviceSettings["query"]);
+          }
+          else
+          {
+            return QueryCheck(currentQuery, queryMatch);
+          }
         }
       }
 
@@ -269,6 +295,15 @@ namespace Sdx.Web
 
     public string GetUrl(Device device)
     {
+      if (memoryCache.Contains(currentUrl))
+      {
+        var setting = (Dictionary<Device, string>)memoryCache.Get(currentUrl);
+        if (setting.ContainsKey(device))
+        {
+          return setting[device];
+        }
+      }
+
       if (matchUrls.ContainsKey(device))
       {
         return matchUrls[device];
@@ -358,7 +393,14 @@ namespace Sdx.Web
         }
 
         matchUrls[device] = url;
-      }        
+
+        if (!settingCache.ContainsKey(currentUrl))
+        {
+          settingCache.Add(currentUrl, matchUrls);
+        }
+
+        memoryCache.Set("DeviceTable", settingCache, new CacheItemPolicy());
+      }
 
       return url;
     }
