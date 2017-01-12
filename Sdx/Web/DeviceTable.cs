@@ -33,10 +33,6 @@ namespace Sdx.Web
 
     private MemoryCache memoryCache = MemoryCache.Default;
 
-    private Dictionary<string, object> settingCache = new Dictionary<string, object>();
-
-    private string cacheUrl = "";
-
     public enum Device
     {
       Pc,
@@ -49,23 +45,7 @@ namespace Sdx.Web
       targetDevice = device;
       currentUrl = url;
 
-      var cache = memoryCache["DeviceTable"];
-      if (cache == null)
-      {
-        //var config = new NameValueCollection();
-        //config.Add("cacheMemoryLimitMegabytes", "10");
-        //memoryCache = new MemoryCache("cacheDeviceTable", config);
-      }
-      else
-      {
-        settingCache = (Dictionary<string, object>)cache;
-        if(settingCache.ContainsKey(url))
-        {
-          cacheUrl = ((Dictionary<Device, string>)settingCache[url])[Device.Sp];
-        }
-      }
-      Sdx.Context.Current.Debug.Log(cache);
-      if(string.IsNullOrEmpty(cacheUrl))
+      if (!memoryCache.Contains(url))
       {
         if (!File.Exists(path))
         {
@@ -297,10 +277,10 @@ namespace Sdx.Web
     {
       if (memoryCache.Contains(currentUrl))
       {
-        var setting = (Dictionary<Device, string>)memoryCache.Get(currentUrl);
-        if (setting.ContainsKey(device))
+        var settingCache = (Dictionary<Device, string>)memoryCache[currentUrl];
+        if (settingCache.ContainsKey(device))
         {
-          return setting[device];
+          return settingCache[device];
         }
       }
 
@@ -394,12 +374,14 @@ namespace Sdx.Web
 
         matchUrls[device] = url;
 
-        if (!settingCache.ContainsKey(currentUrl))
+        Dictionary<Device, string> cacheUrlSetting = new Dictionary<Device, string>();
+        if (memoryCache.Contains(currentUrl))
         {
-          settingCache.Add(currentUrl, matchUrls);
+          cacheUrlSetting = (Dictionary<Device, string>)memoryCache[currentUrl];
         }
 
-        memoryCache.Set("DeviceTable", settingCache, new CacheItemPolicy());
+        cacheUrlSetting.Add(device, url);
+        memoryCache.Set(currentUrl, cacheUrlSetting, new CacheItemPolicy());
       }
 
       return url;
