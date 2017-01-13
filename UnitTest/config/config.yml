@@ -1,0 +1,34 @@
+﻿page:
+  - pc:
+      url: /{area:(yoshiwara|kanagawa)}/gal/
+
+    sp:
+      url: /sp/{area:(yoshiwara|kanagawa)}/gal/
+      query:
+          tag:  cute
+    mb:
+      url: /m/{area:(yoshiwara|kanagawa)}/gal/
+      query:
+          tag:  button
+  - 
+    query_match:
+          tag:  1
+          test:  on
+  
+    pc:
+      url: /{area:(yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_prices_high
+          test:  button
+
+    sp:
+      url: /sp/{area:(yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_high
+          test:  button
+
+    mb:
+      url: /m/{area:(yoshiwara|kanagawa)}/shop/
+      query:
+          tag:  tg_price
+          test:  page

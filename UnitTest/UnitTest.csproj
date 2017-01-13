@@ -70,6 +70,10 @@
       <HintPath>..\packages\xunit.1.9.2\lib\net20\xunit.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="YamlDotNet, Version=3.7.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\YamlDotNet.3.7.0\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
@@ -94,6 +98,7 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="Sdx\Pager.cs" />
     <Compile Include="Sdx\Scaffold\Manager.cs" />
+    <Compile Include="Sdx\Web\DeviceTable.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Data\LargeArea.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
@@ -129,6 +134,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="config\config2.yml" />
+    <None Include="config\config.yml" />
     <None Include="config\dir2\foo.yml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
