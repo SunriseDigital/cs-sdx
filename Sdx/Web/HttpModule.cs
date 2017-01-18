@@ -33,6 +33,7 @@ namespace Sdx.Web
 
     public void Init(HttpApplication application)
     {
+      Sdx.Context.HasSdxHttpModule = true;
       application.BeginRequest += new EventHandler(Application_BeginRequest);
       application.EndRequest += new EventHandler(Application_EndRequest);
       application.Error += new EventHandler(Application_ErrorRequest);
@@ -50,10 +51,13 @@ namespace Sdx.Web
       Sdx.Context.Current.Debug.Out = new Diagnostics.DebugHtmlWriter();
 
       //debug mode
-      var cookie = HttpContext.Current.Request.Cookies["sdx_debug_mode"];
-      if (cookie != null && cookie.Value == "1")
+      if(Sdx.Web.Helper.IsTrustedIPRequest)
       {
-        Sdx.Context.Current.IsDebugMode = true;
+        var cookie = HttpContext.Current.Request.Cookies["sdx_debug_mode"];
+        if (cookie != null && cookie.Value == "1")
+        {
+          Sdx.Context.Current.IsDebugMode = true;
+        }
       }
     }
 
@@ -81,7 +85,7 @@ namespace Sdx.Web
     {
       var debugString = new StringBuilder();
 
-      debugString.Append("<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both; position: relative; z-index: 1000;\">");
+      debugString.Append("<div style=\"padding: 10px; font-size: 12px; margin: 0; clear: both; position: relative; z-index: 2147483638; display: block !important; text-align: left; \">");
       this.AppendDebugLogs(debugString);
       this.AppendDbQueryLogs(debugString);
       this.AppendPostData(debugString);
@@ -106,7 +110,7 @@ namespace Sdx.Web
       debugString.Append(String.Format(
         LogBlockFormat,
         "Post",
-        "<pre>" + postLog.ToString() + "</pre>"
+        "<pre>" + HttpUtility.HtmlEncode(postLog.ToString()) + "</pre>"
       ));
     }
 
@@ -163,14 +167,13 @@ namespace Sdx.Web
 
     private string buildQueryString(Sdx.Db.Sql.Log query)
     {
-      if (query.CommandText == null) throw new Exception("aaaaaa");
       return String.Format(
         QueryBlockFormat,
         query.FormatedElapsedTime,
         query.Comment != null ? query.Comment : "",
         query.Adapter != null ? query.Adapter.ToString() : "",
         query.CommandText,
-        query.FormatedParameters
+        HttpUtility.HtmlEncode(query.FormatedParameters) 
       );
     }
 
@@ -190,7 +193,7 @@ namespace Sdx.Web
       debugString.Append(String.Format(
         LogBlockFormat,
         "Debug.Log",
-        "<pre style=\"margin: 0;\">" + writer.Builder.ToString() + "</pre>"
+        "<pre style=\"margin: 0;\">" + HttpUtility.HtmlEncode(writer.Builder.ToString()) + "</pre>"
       ));
     }
   }

@@ -10,7 +10,7 @@ namespace Sdx
     private int? lastPage;
     private int? perPage;
     private int? totalCount;
-    private int page = 1;
+    private int? page;
     private bool? hasNext;
 
     public Pager()
@@ -21,6 +21,12 @@ namespace Sdx
     public Pager(int perPage)
     {
       PerPage = perPage;
+    }
+
+    public Pager(int perPage, int totalCount)
+    {
+      PerPage = perPage;
+      TotalCount = totalCount;
     }
 
     /// <summary>
@@ -93,6 +99,10 @@ namespace Sdx
     {
       get
       {
+        if(page == null)
+        {
+          throw new InvalidOperationException("You must initialize Page value. Have you called `LimitPager()` before instantiate `PagerLink` ?");
+        }
         return (int)page;
       }
 
@@ -133,6 +143,68 @@ namespace Sdx
 
         return true;
       }
+    }
+
+    public class PageData
+    {
+      public bool IsCurrent
+      {
+        get;
+        internal set;
+      }
+
+      public int Id
+      {
+        get;
+        internal set;
+      }
+    }
+
+    public List<PageData> GetPageDataList(int number)
+    {
+      var tmp = (int)number/2;
+      var start = Page - tmp;
+      if(start < 1)
+      {
+        start = 1;
+      }
+      else if(start > LastPage - number + 1)
+      {
+        start = LastPage - number + 1;
+      }
+
+      var pageDataList = new List<PageData>(){};
+      for(var i = start; i < number + start; i++)
+      {
+        if (HasPage(i))
+        {
+          var pageData = new PageData();
+          pageData.Id = i;
+          pageData.IsCurrent = (Page == i) ? true : false;
+          pageDataList.Add(pageData);
+        }
+      }
+
+      return pageDataList;
+    }
+
+    public bool HasPage(int page)
+    {
+      return (page >= 1 && page <= LastPage);
+    }
+
+
+
+    public object ToDictionary()
+    {
+      return new Dictionary<string, object>()
+      {
+        {"page", Page},
+        {"pageCount", TotalCount},
+        {"hasNext", HasNext},
+        {"hasPrev", HasPrev},
+        {"perPage", PerPage},
+      };
     }
   }
 }

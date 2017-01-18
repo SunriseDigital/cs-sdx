@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Web;
+using System.Text;
 
 namespace Sdx.Diagnostics
 {
@@ -22,7 +24,7 @@ namespace Sdx.Diagnostics
 
     public TextWriter Out { get; set; }
 
-    public void Log(Object value, String title = "")
+    public void Log(Object value, String title = "", int dumpPublicMemberCount = 0)
     {
       if(Out == null)
       {
@@ -52,7 +54,7 @@ namespace Sdx.Diagnostics
         lineNumber
       ));
       prevTimerElapsedTicks = currentTicks;
-      Out.WriteLine(Dump(value));
+      Out.WriteLine(Dump(value, dumpPublicMemberCount));
       Out.WriteLine();
       Out.WriteLine();
     }
@@ -70,17 +72,52 @@ namespace Sdx.Diagnostics
       }
     }
 
-    public static string Export(object value)
+    public static void Response()
     {
-      return Dump(value, "", false);
+      var response = HttpContext.Current.Response;
+      response.Write(Environment.NewLine);
     }
 
-    public static string Dump(object value)
+    public static void Response(object value)
     {
-      return Dump(value, "", true);
+      var response = HttpContext.Current.Response;
+      response.Write(Dump(value) + Environment.NewLine);
     }
 
-    private static string Dump(object value, string indent, bool needType)
+    public static string Export(object value, int dumpPublicMemberCount = 0)
+    {
+      return Dump(value, "", false, dumpPublicMemberCount);
+    }
+
+    public static string Dump(object value, int dumpPublicMemberCount = 0)
+    {
+      return Dump(value, "", true, dumpPublicMemberCount);
+    }
+
+    /// <summary>
+    /// http://stackoverflow.com/questions/2442534/how-to-test-if-type-is-primitive
+    /// </summary>
+    /// <param name="type"></param>
+    /// <returns></returns>
+    private static bool IsSimpleType(Type type)
+    {
+      return
+          type.IsPrimitive ||
+          new Type[] {
+            typeof(Enum),
+            typeof(String),
+            typeof(Decimal),
+            typeof(DateTime),
+            typeof(DateTimeOffset),
+            typeof(TimeSpan),
+            typeof(Guid)
+        }.Contains(type) ||
+          Convert.GetTypeCode(type) != TypeCode.Object ||
+          (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>) && IsSimpleType(type.GetGenericArguments()[0]))
+          ;
+    }
+
+    private static string Dump(object value, string indent, bool needType, int dumpPublicMemberCount)
     {
       if (value == null)
       {
@@ -99,6 +136,10 @@ namespace Sdx.Diagnostics
           return indent + strVal;
         }
       }
+      else if (IsSimpleType(value.GetType()) || value is Db.Record)
+      {
+        return GetDumpTitle(value, indent, needType, " " + value.ToString()).TrimEnd('\r', '\n');
+      }
       else if (value is IDictionary)
       {
         var dic = value as IDictionary;
@@ -108,7 +149,7 @@ namespace Sdx.Diagnostics
         foreach (var key in dic.Keys)
         {
           // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
-          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ", needType) + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(dic[key], " ", needType, dumpPublicMemberCount) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -122,7 +163,7 @@ namespace Sdx.Diagnostics
         var result = GetDumpTitle(value, indent, needType, "(" + nvcol.Count + ")");
         foreach (var key in nvcol.Keys)
         {
-          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ", needType) + Environment.NewLine;
+          result += indent + DumpIndent + key + " :" + Dump(nvcol.GetValues(key.ToString()), " ", needType, dumpPublicMemberCount) + Environment.NewLine;
         }
 
         //改行を取り除く
@@ -132,7 +173,7 @@ namespace Sdx.Diagnostics
       {
         IList list = value as IList;
         var result = GetDumpTitle(value, indent, needType, "(" + list.Count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent, needType);
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicMemberCount);
       }
       else if (value is IEnumerable)
       {
@@ -143,7 +184,15 @@ namespace Sdx.Diagnostics
           ++count;
         }
         var result = GetDumpTitle(value, indent, needType, "(" + count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent, needType);
+        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicMemberCount);
+      }
+      else if (value is System.Data.Common.DbParameter)
+      {
+        var param = value as System.Data.Common.DbParameter;
+        return GetDumpTitle(
+          param,
+          indent,
+          needType, "("+ param.DbType.ToString() +") " + param.ParameterName + " " + param.Value.ToString()).TrimEnd('\r', '\n');
       }
       else
       {
@@ -151,7 +200,29 @@ namespace Sdx.Diagnostics
         if (type.Namespace + "." + type.Name == "System.Collections.Generic.KeyValuePair`2")
         {
           var dynamicValue = (dynamic)value;
-          return indent + dynamicValue.Key.ToString() + " " + Dump(dynamicValue.Value, indent, needType);
+          return indent + dynamicValue.Key.ToString() + " " + Dump(dynamicValue.Value, indent, needType, dumpPublicMemberCount);
+        }
+        else if (dumpPublicMemberCount > 0)
+        {
+          --dumpPublicMemberCount;
+          var result = GetDumpTitle(value, indent, needType, " (fields and properties)");
+          indent = indent + DumpIndent;
+
+          //TODO プロパティを呼び出すと謎なエラーが出る。詳細にテストしないと原因がわからないのでいったん保留
+          //http://stackoverflow.com/questions/1346238/method-may-only-be-called-on-a-type-for-which-type-isgenericparameter-is-true
+          //foreach(var prop in type.GetProperties().Where(prop => prop.CanRead && prop.GetIndexParameters().Length == 0))
+          //{
+          //  var val = prop.GetValue(value);
+          //  result += indent + prop.Name + " " + Dump(val, indent, needType, dumpPublicMemberCount) + Environment.NewLine;
+          //}
+
+          foreach (var fd in type.GetFields().Where(fd => fd.IsPublic))
+          {
+            var val = fd.GetValue(value);
+            result += indent + fd.Name + " " + Dump(val, indent, needType, dumpPublicMemberCount) + Environment.NewLine;
+          }
+
+          return result;
         }
         else
         {
@@ -160,11 +231,11 @@ namespace Sdx.Diagnostics
       }
     }
 
-    private static String AppendEnumerableDump(String result, IEnumerable values, String indent, bool needType)
+    private static String AppendEnumerableDump(String result, IEnumerable values, String indent, bool needType, int dumpPublicMemberCount)
     { 
       foreach (Object obj in values as IEnumerable)
       {
-        result += Dump(obj, indent + DumpIndent, needType) + Environment.NewLine;
+        result += Dump(obj, indent + DumpIndent, needType, dumpPublicMemberCount) + Environment.NewLine;
       }
 
       //改行を取り除く
@@ -181,6 +252,53 @@ namespace Sdx.Diagnostics
     public static void Console(object value)
     {
       System.Console.WriteLine(Dump(value));
+    }
+
+    public static void DumpToFile(object value, string path)
+    {
+      var now = DateTime.Now;
+      System.IO.File.AppendAllText(path, String.Format("[{0}] {1}{2}", now.ToString("yyyy-MM-dd HH:mm:ss"), Dump(value), Environment.NewLine));
+    }
+
+    public static string BuildLogString(Exception exception)
+    {
+      var stringBuilder = new StringBuilder();
+
+      while (exception != null)
+      {
+        stringBuilder.AppendLine(exception.ToString());
+        stringBuilder.AppendLine();
+
+        exception = exception.InnerException;
+      }
+
+      return stringBuilder.ToString();
+    }
+
+    public static string BuildLogString(HttpContext context)
+    {
+      var message = new StringBuilder();
+      message.Append(context.Request.HttpMethod);
+      message.Append(": ");
+      message.AppendLine(context.Request.Url.ToString());
+      message.AppendLine();
+
+      message.Append("Referer: ");
+      message.AppendLine(context.Request.UrlReferrer != null ? context.Request.UrlReferrer.ToString() : "");
+      message.AppendLine();
+
+      message.Append("IP: ");
+      message.AppendLine(Sdx.Web.Helper.ClientIPAddressByString);
+      message.AppendLine();
+
+      message.Append("UA: ");
+      message.AppendLine(context.Request.UserAgent);
+      message.AppendLine();
+
+      message.AppendLine("COOKIE: ");
+      message.AppendLine(context.Request.ServerVariables["HTTP_COOKIE"]);
+
+      return message.ToString();
     }
   }
 }

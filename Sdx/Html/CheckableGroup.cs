@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sdx.Html
 {
-  public class CheckableGroup: FormElement
+  public abstract class CheckableGroup: FormElement
   {
     private List<Checkable> elements = new List<Checkable>();
 
@@ -29,11 +29,6 @@ namespace Sdx.Html
 
     }
 
-    protected internal override FormValue CreateFormValue()
-    {
-      return new FormValue(true);
-    }
-
     internal protected override Tag CreateTag()
     {
       return new Tag("span");
@@ -52,24 +47,28 @@ namespace Sdx.Html
       }
     }
 
-    public void AddCheckable<T>(string key, string labelString = null) where T : Checkable, new()
+    public Tag AddCheckable(string key, string labelString = null)
     {
-      var checkable = new T();
+      var checkable = CreateCheckable();
       checkable.Tag.Attr["value"] = key;
-      AddCheckable(checkable, labelString);
+      return AddCheckable(checkable, labelString);
     }
 
-    public void AddCheckable<T>(KeyValuePair<string, string> pair) where T: Checkable, new()
+    public Tag AddCheckable(KeyValuePair<string, string> pair)
     {
-      AddCheckable<T>(pair.Key, pair.Value);
+      return AddCheckable(pair.Key, pair.Value);
     }
 
-    public void AddCheckable(Checkable checkable, string labelString = null)
+    protected abstract internal Checkable CreateCheckable();
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="checkable"></param>
+    /// <param name="labelString"></param>
+    /// <returns>返り値のTagはlabelがあるときはlabelが、無いときはinputが変えります。checkable.tagは常にinputなので注意してください。</returns>
+    public Tag AddCheckable(Checkable checkable, string labelString = null)
     {
-      if(checkable is Radio)
-      {
-        Value.IsMultiple = false;
-      }
       elements.Add(checkable);
 
       var tag = this.tag;
@@ -79,9 +78,15 @@ namespace Sdx.Html
         checkable.Name = this.name;
       }
 
-      if (labelString == null)
+      if(labelString != null)
+      {
+        checkable.Label = labelString;
+      }
+
+      if (checkable.Label == null)
       {
         tag.AddHtml(checkable.tag);
+        return tag;
       }
       else
       {
@@ -93,6 +98,7 @@ namespace Sdx.Html
         }
         label.AddHtml(new RawText(labelString));
         tag.AddHtml(label);
+        return label;
       }
     }
 

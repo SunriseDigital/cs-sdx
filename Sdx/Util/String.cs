@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -46,6 +47,11 @@ namespace Sdx.Util
           .Split(new[] { '_' }, StringSplitOptions.RemoveEmptyEntries)
           .Select(s => char.ToUpperInvariant(s[0]) + s.Substring(1, s.Length - 1))
           .Aggregate(string.Empty, (s1, s2) => s1 + s2);
+    }
+
+    public static string ToSnakeCase(string value)
+    {
+      return string.Concat(value.Select((x, i) => i > 0 && char.IsUpper(x) ? "_" + x.ToString() : x.ToString())).ToLower();
     }
 
     public static string RemoveFirstLines(string value, int linesCount)

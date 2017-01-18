@@ -66,7 +66,7 @@ public partial class form_test : System.Web.UI.Page
 
 
     //Checkbox
-    var checkList = new Sdx.Html.CheckableGroup();
+    var checkList = new Sdx.Html.CheckBoxGroup();
     checkList.Name = "check_list";
     checkList.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(checkList);
@@ -89,7 +89,7 @@ public partial class form_test : System.Web.UI.Page
     checkList.AddCheckable(checkbox, "さん");
 
     //Radio
-    var radios = new Sdx.Html.CheckableGroup();
+    var radios = new Sdx.Html.RadioGroup();
     radios.Name = "radios";
     radios.AddValidator(new Sdx.Validation.NotEmpty());
     form.SetElement(radios);

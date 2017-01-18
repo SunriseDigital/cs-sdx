@@ -49,7 +49,7 @@ namespace Test.Orm.Table
           //他テーブルとの関係を設定します。
         },
         typeof(Test.Orm.Shop),
-        typeof(Test.Orm.Table.Category)
+        typeof(Test.Orm.Table.Shop)
       );
     }
   }
@@ -126,7 +126,7 @@ namespace Test.Orm.Table
           }
         },
         typeof(Test.Orm.Shop),
-        typeof(Test.Orm.Table.Category)
+        typeof(Test.Orm.Table.Shop)
       );
     }
   }
@@ -139,7 +139,7 @@ namespace Test.Orm.Table
 1. 自分自身の参照カラム。`shop.id`になります。
 1. 相手テーブルの参照ラカム。`menu.shop_id`です。
 
-このようにして、テーブル同士の関係を設定していきます。[ユニットテストのテーブルクラス](../UnitTest/Test/Orm/Table)で様々な設定を確認できますので参考にしてください。
+このようにして、テーブル同士の関係を設定していきます。[ユニットテストのテーブルクラス](/UnitTest/Test/Orm/Table)で様々な設定を確認できますので参考にしてください。
 
 
 

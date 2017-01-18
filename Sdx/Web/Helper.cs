@@ -13,7 +13,7 @@ namespace Sdx.Web
     public static void JsonResponse(object values)
     {
       //IEがapplication/jsonに対応していないので
-      if (Request.Headers["Accept"].Contains("application/json"))
+      if (Request.Headers["Accept"] != null && Request.Headers["Accept"].Contains("application/json"))
       {
         Response.ContentType = "application/json; charset=utf-8";
       }
@@ -73,6 +73,74 @@ namespace Sdx.Web
       }
 
       return false;
+    }
+
+    private static List<string> trustedIPList;
+
+    public static string ClientIPAddressByString
+    {
+      get
+      {
+        string ipAddress = Request.ServerVariables["HTTP_X_FORWARDED_FOR"];
+
+        if (!string.IsNullOrEmpty(ipAddress))
+        {
+          string[] addresses = ipAddress.Split(',');
+          if (addresses.Length != 0)
+          {
+            return addresses[0];
+          }
+        }
+
+        return Request.ServerVariables["REMOTE_ADDR"];
+      }
+    }
+
+
+    public static bool IsTrustedIPRequest
+    {
+      get
+      {
+        if(Request.IsLocal)
+        {
+          return true;
+        }
+
+        if(trustedIPList == null)
+        {
+          trustedIPList = new List<string>();
+          var strList = System.Web.Configuration.WebConfigurationManager.AppSettings["TrustedIPAddressList"];
+          if(strList != null)
+          {
+            trustedIPList.AddRange(strList.Split(',').Select(str => str.Trim()));
+          }
+        }
+
+        return trustedIPList.Contains(ClientIPAddressByString);
+      }
+    }
+
+    public static void RedirectTemporary(string url)
+    {
+      Redirect(url, "307 Temporary Redirect");
+    }
+
+    public static void RedirectPermanent(string url)
+    {
+      Redirect(url, "308 Permanent Redirect");
+    }
+
+    public static void RedirectSeeOther(string url)
+    {
+      Redirect(url, "303 See Other");
+    }
+
+    private static void Redirect(string url, string code)
+    {
+      HttpContext.Current.Response.Clear();
+      HttpContext.Current.Response.Status = code;
+      HttpContext.Current.Response.AddHeader("Location", url);
+      HttpContext.Current.Response.End();
     }
   }
 }

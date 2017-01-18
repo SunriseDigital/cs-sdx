@@ -665,7 +665,7 @@ namespace UnitTest
         Assert.True(record.IsNew);
 
         var form = scaffold.BuildForm(record, conn);
-        Assert.IsType<Sdx.Html.CheckableGroup>(form["category_id"]);
+        Assert.IsType<Sdx.Html.CheckBoxGroup>(form["category_id"]);
 
         conn.BeginTransaction();
         try
@@ -778,7 +778,7 @@ namespace UnitTest
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
-          .Set("column", new Sdx.Scaffold.Config.Value("name_with_code"))
+          .Set("name", new Sdx.Scaffold.Config.Value("name_with_code"))
           .Set("setter", new Sdx.Scaffold.Config.Value("SetNameWithCode"))//カンマ区切りの[名前,コード]をそれぞれnameとcodeにセットする。
         )
         ;
@@ -1268,7 +1268,7 @@ namespace UnitTest
         var record = scaffold.LoadRecord(HttpContext.Current.Request.Params, conn);
         var form = scaffold.BuildForm(record, conn);
 
-        Assert.IsType<Sdx.Html.CheckableGroup>(form["auto_created_at"]);
+        Assert.IsType<Sdx.Html.CheckBoxGroup>(form["auto_created_at"]);
 
         Assert.True(record.IsNew);
         Assert.Equal(

@@ -346,5 +346,14 @@ namespace Sdx.Html
 
       return this["class"].Contains(className);
     }
+
+    public Attr Add(params string[] attributes)
+    {
+      for (int i = 0; i < attributes.Length; i += 2)
+      {
+        this[attributes[i]] = attributes[i + 1];
+      } 
+      return this;
+    }
   }
 }

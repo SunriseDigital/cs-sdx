@@ -538,15 +538,7 @@ namespace UnitTest
 
         shop.ClearRecordCache();
 
-        //キャッシュがクリアされたのでConnectionなしだと例外に
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          var areaEx = shop.GetRecord("area");
-        }));
-
-        Assert.IsType<ArgumentNullException>(ex);
-
-        var area3 = shop.GetRecord("area", conn);
+        var area3 = shop.GetRecord("area");
         Assert.Equal(3, Sdx.Context.Current.DbProfiler.Logs.Where(log => log.CommandText.StartsWith("SELECT")).ToList().Count);
         Assert.NotEqual(area2, area3);
       }
@@ -619,8 +611,15 @@ namespace UnitTest
         Assert.Equal("天祥", shops[0].GetString("name"));
         Assert.Equal("エスペリア", shops[1].GetString("name"));
 
-        //取得しなかったキーはNULL
-        Assert.Equal(DBNull.Value, shops[0].GetValue("area_id"));
+        //取得しなかったキーを取得すると例外
+        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        {
+          var areaEx = shops[0].GetValue("area_id");
+        }));
+
+        Assert.IsType<InvalidOperationException>(ex);
+
+        Assert.False(shops[0].CanGetValue("area_id"));
       }
     }
 
@@ -717,7 +716,11 @@ namespace UnitTest
         }
 
         Assert.Equal("foobar", shop.GetValue("login_id"));
+
+        //保存後にSetしていない値を読むとDBNull.Value。
         Assert.Equal(DBNull.Value, shop.GetValue("password"));
+        //DBNullでもCanGetValueはtrue
+        Assert.True(shop.CanGetValue("password"));
       }
       
       //DbNullで更新
@@ -728,6 +731,8 @@ namespace UnitTest
         select
           .AddFrom(new Test.Orm.Table.Shop())
           .WhereCall((where) => where.Add("id", id));
+
+        select.Context("shop");
 
         shop = conn.FetchRecord(select);
         Assert.Equal(DBNull.Value, shop.GetValue("password"));
@@ -918,6 +923,276 @@ namespace UnitTest
 
         //indexを指定して取得するジェネリックメソッド
         Assert.Equal("天府舫", shops.Get<Test.Orm.Shop>(0).GetString("name"));
+      }
+    }
+
+    [Fact]
+    public void TestSortRecordSet()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunSortRecordSet(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunSortRecordSet(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+
+      select.SetLimit(6);
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shops = conn.FetchRecordSet(select);
+
+        shops[0].SetValue("area_id", 2);
+        shops[1].SetValue("area_id", 3);
+        shops[2].SetValue("area_id", 1);
+        shops[3].SetValue("area_id", 4);
+        shops[4].SetValue("area_id", 4);
+        shops[5].SetValue("area_id", 5);
+
+        Assert.Equal(2, shops[0].GetInt32("area_id"));
+        Assert.Equal(3, shops[1].GetInt32("area_id"));
+        Assert.Equal(1, shops[2].GetInt32("area_id"));
+        Assert.Equal(4, shops[3].GetInt32("area_id"));
+        Assert.Equal(4, shops[4].GetInt32("area_id"));
+        Assert.Equal(5, shops[5].GetInt32("area_id"));
+
+
+        shops.Sort((rec1, rec2) => rec1.GetInt32("area_id") - rec2.GetInt32("area_id"));
+
+        Assert.Equal(1, shops[0].GetInt32("area_id"));
+        Assert.Equal(2, shops[1].GetInt32("area_id"));
+        Assert.Equal(3, shops[2].GetInt32("area_id"));
+        Assert.Equal(4, shops[3].GetInt32("area_id"));
+        Assert.Equal(4, shops[4].GetInt32("area_id"));
+        Assert.Equal(5, shops[5].GetInt32("area_id"));
+
+        shops.Sort((rec1, rec2) => rec2.GetInt32("area_id") - rec1.GetInt32("area_id"));
+
+        Assert.Equal(5, shops[0].GetInt32("area_id"));
+        Assert.Equal(4, shops[1].GetInt32("area_id"));
+        Assert.Equal(4, shops[2].GetInt32("area_id"));
+        Assert.Equal(3, shops[3].GetInt32("area_id"));
+        Assert.Equal(2, shops[4].GetInt32("area_id"));
+        Assert.Equal(1, shops[5].GetInt32("area_id"));
+      }
+    }
+
+    [Fact]
+    public void TestGroupingRecord()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGroupingRecord(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGroupingRecord(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+
+      select.SetLimit(6);
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shops = conn.FetchRecordSet(select);
+
+        //INT
+        shops[0].SetValue("area_id", 1);
+        shops[1].SetValue("area_id", 1);
+        shops[2].SetValue("area_id", 2);
+        shops[3].SetValue("area_id", 2);
+        shops[4].SetValue("area_id", 3);
+        shops[5].SetValue("area_id", 3);
+
+        var shops3 = shops.GroupByColumn("area_id", 3);
+        Assert.IsType<Sdx.Db.RecordSet>(shops3);
+        Assert.Equal(2, shops3.Count);
+        Assert.Equal(3, shops3[0].GetInt32("area_id"));
+        Assert.Equal(3, shops3[1].GetInt32("area_id"));
+
+        var shops2 = shops.GroupByColumn("area_id", 2);
+        Assert.IsType<Sdx.Db.RecordSet>(shops2);
+        Assert.Equal(2, shops2.Count);
+        Assert.Equal(2, shops2[0].GetInt32("area_id"));
+        Assert.Equal(2, shops2[1].GetInt32("area_id"));
+
+        var shops1 = shops.GroupByColumn("area_id", 1);
+        Assert.IsType<Sdx.Db.RecordSet>(shops2);
+        Assert.Equal(2, shops1.Count);
+        Assert.Equal(1, shops1[0].GetInt32("area_id"));
+        Assert.Equal(1, shops1[1].GetInt32("area_id"));
+
+        shops[3].SetValue("area_id", 3);
+        shops3 = shops.GroupByColumn("area_id", 3);
+        //このメソッドはキャッシュするので変わらない。
+        Assert.Equal(2, shops3.Count);
+
+        shops.ClearGroupByColumnCache("area_id");
+        shops3 = shops.GroupByColumn("area_id", 3);
+        Assert.Equal(3, shops3.Count);
+
+
+
+        //String
+        shops[0].SetValue("area_id", "1");
+        shops[1].SetValue("area_id", "1");
+        shops[2].SetValue("area_id", "2");
+        shops[3].SetValue("area_id", "2");
+        shops[4].SetValue("area_id", "3");
+        shops[5].SetValue("area_id", "3");
+
+        shops3 = shops.GroupByColumn("area_id", "3");
+        Assert.IsType<Sdx.Db.RecordSet>(shops3);
+        Assert.Equal(2, shops3.Count);
+        Assert.Equal("3", shops3[0].GetString("area_id"));
+        Assert.Equal("3", shops3[1].GetString("area_id"));
+
+        shops2 = shops.GroupByColumn("area_id", "2");
+        Assert.IsType<Sdx.Db.RecordSet>(shops2);
+        Assert.Equal(2, shops2.Count);
+        Assert.Equal("2", shops2[0].GetString("area_id"));
+        Assert.Equal("2", shops2[1].GetString("area_id"));
+
+        shops1 = shops.GroupByColumn("area_id", "1");
+        Assert.IsType<Sdx.Db.RecordSet>(shops2);
+        Assert.Equal(2, shops1.Count);
+        Assert.Equal("1", shops1[0].GetString("area_id"));
+        Assert.Equal("1", shops1[1].GetString("area_id"));
+
+        shops[3].SetValue("area_id", "3");
+        shops3 = shops.GroupByColumn("area_id", "3");
+        //このメソッドはキャッシュするので変わらない。
+        Assert.Equal(2, shops3.Count);
+
+        shops.ClearGroupByColumnCache("area_id");
+        shops3 = shops.GroupByColumn("area_id", "3");
+        Assert.Equal(3, shops3.Count);
+      }
+    }
+
+    [Fact]
+    public void TestPopByCount()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunPopByCount(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunPopByCount(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+
+      select.SetLimit(6);
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shops = conn.FetchRecordSet(select);
+        Assert.Equal(6, shops.Count);
+        Assert.Equal(1, shops[0].GetInt32("id"));
+        Assert.Equal(2, shops[1].GetInt32("id"));
+        Assert.Equal(3, shops[2].GetInt32("id"));
+        Assert.Equal(4, shops[3].GetInt32("id"));
+        Assert.Equal(5, shops[4].GetInt32("id"));
+        Assert.Equal(6, shops[5].GetInt32("id"));
+
+
+        var pops = shops.PopSet(2);
+        Assert.Equal(2, pops.Count);
+        Assert.Equal(1, pops[0].GetInt32("id"));
+        Assert.Equal(2, pops[1].GetInt32("id"));
+        Assert.Equal(4, shops.Count);
+        Assert.Equal(3, shops[0].GetInt32("id"));
+        Assert.Equal(4, shops[1].GetInt32("id"));
+        Assert.Equal(5, shops[2].GetInt32("id"));
+        Assert.Equal(6, shops[3].GetInt32("id"));
+
+        pops = shops.PopSet(1);
+        Assert.Equal(1, pops.Count);
+        Assert.Equal(3, pops[0].GetInt32("id"));
+        Assert.Equal(3, shops.Count);
+        Assert.Equal(4, shops[0].GetInt32("id"));
+        Assert.Equal(5, shops[1].GetInt32("id"));
+        Assert.Equal(6, shops[2].GetInt32("id"));
+
+        pops = shops.PopSet(0);
+        Assert.Equal(0, pops.Count);
+        Assert.Equal(3, shops.Count);
+        Assert.Equal(4, shops[0].GetInt32("id"));
+        Assert.Equal(5, shops[1].GetInt32("id"));
+        Assert.Equal(6, shops[2].GetInt32("id"));
+
+        pops = shops.PopSet(3);
+        Assert.Equal(3, pops.Count);
+        Assert.Equal(4, pops[0].GetInt32("id"));
+        Assert.Equal(5, pops[1].GetInt32("id"));
+        Assert.Equal(6, pops[2].GetInt32("id"));
+
+        Assert.Equal(0, shops.Count);
+      }
+    }
+
+    [Fact]
+    public void TestShuffle()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunShuffle(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunShuffle(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select
+         .AddFrom(new Test.Orm.Table.Shop())
+         .AddOrder("id", Sdx.Db.Sql.Order.ASC);
+
+      select.SetLimit(6);
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var tryCount = 10000;
+        //直前の並び順と同じなった回数を数えて確率でAssertします。
+        var sameCount = 0;
+        var shops = conn.FetchRecordSet(select);
+        string prev = shops.Select(rec => rec.GetString("id")).Aggregate((sum, val) => sum + val);
+        for (int i = 0; i < tryCount; i++)
+        {
+          var shuffled = shops.Shuffle().Select(rec => rec.GetString("id")).Aggregate((sum, val) => sum + val);
+          if(prev == shuffled)
+          {
+            sameCount++;
+          }
+          prev = shuffled;
+        }
+
+        //3~4%は前回と同じ並び順になってしまうので10%でチェックします。
+        Assert.True(tryCount * 0.1 > sameCount);
       }
     }
   }

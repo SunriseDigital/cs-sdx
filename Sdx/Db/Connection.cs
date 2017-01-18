@@ -223,7 +223,7 @@ namespace Sdx.Db
       }
       catch (Exception e)
       {
-        throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText);
+        throw new Sdx.Db.DbException(e.Message + "\n" + command.CommandText, e);
       }
 
       if (log != null)
@@ -530,6 +530,7 @@ namespace Sdx.Db
 
     public RecordSet FetchRecordSet(Select select, string contextName)
     {
+      select.Connection = this;
       RecordSet recordSet = null;
       using (var command = select.Build())
       {
@@ -564,7 +565,10 @@ namespace Sdx.Db
       {
         clonedSel = select.Adapter.CreateSelect();
         clonedSel.AddColumn(Sdx.Db.Sql.Expr.Wrap("COUNT(*)"));
-        clonedSel.AddFrom(select, "_t");
+
+        var subsel = (Select)select.Clone();
+        subsel.OrderList.Clear();
+        clonedSel.AddFrom(subsel, "_t");
       }
       else
       {

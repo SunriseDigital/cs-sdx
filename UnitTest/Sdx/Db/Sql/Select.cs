@@ -2040,5 +2040,400 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         Assert.Equal(scSet.GroupBy(sc => sc.GetValue("shop_id")).Count(), count);
       }
     }
+
+    [Fact]
+    public void TestIntegerIn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunIntegerIn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunIntegerIn(TestDb testDb)
+    {
+      var select = testDb.Adapter.CreateSelect();
+
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .Where.Add("id", new int[]{5,10,15});
+
+      testDb.Command = select.Build();
+      Assert.Equal(testDb.Sql(@"SELECT
+        {0}shop{1}.{0}id{1} AS {0}id@shop{1}, {0}shop{1}.{0}name{1} AS {0}name@shop{1}, {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1}, {0}shop{1}.{0}login_id{1} AS {0}login_id@shop{1}, {0}shop{1}.{0}password{1} AS {0}password@shop{1}, {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1} 
+          FROM {0}shop{1} 
+          WHERE {0}shop{1}.{0}id{1} IN (@0, @1, @2)
+"), testDb.Command.CommandText);
+
+      Assert.Equal(3, testDb.Command.Parameters.Count);
+      Assert.Equal(5, testDb.Command.Parameters["@0"].Value);
+      Assert.Equal(10, testDb.Command.Parameters["@1"].Value);
+      Assert.Equal(15, testDb.Command.Parameters["@2"].Value);
+    }
+
+    [Fact]
+    public void TestOrderRandom()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunOrderRandom(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunOrderRandom(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop())
+        .SetColumn("id")
+        .AddOrderRandom();
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}
+          ORDER BY " + db.Adapter.RandomOrderKeyword
+        ),
+        db.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestAliasInnerJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAliasInnerJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAliasInnerJoin(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop(), cShop => 
+        {
+          cShop.InnerJoin(new Test.Orm.Table.Area(), "area_1", cArea => 
+          {
+            Assert.Equal("area_1", cArea.Name);
+            cArea.Where.Add("name", "area_1_name");
+          });
+
+          cShop.InnerJoin(new Test.Orm.Table.Area(), "area_2", cArea =>
+          {
+            Assert.Equal("area_2", cArea.Name);
+            cArea.Where.Add("name", "area_2_name");
+          });
+        });
+
+      Assert.False(select.HasContext("area"));
+      Assert.True(select.HasContext("area_1"));
+      Assert.True(select.HasContext("area_2"));
+
+      Assert.Equal("area_1", select.Context("area_1").Name);
+      Assert.Equal("area_2", select.Context("area_2").Name);
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, 
+            {0}shop{1}.{0}name{1} AS {0}name@shop{1}, 
+            {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, 
+            {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
+            {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1}, 
+            {0}shop{1}.{0}login_id{1} AS {0}login_id@shop{1}, 
+            {0}shop{1}.{0}password{1} AS {0}password@shop{1}, 
+            {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1}, 
+            {0}area_1{1}.{0}id{1} AS {0}id@area_1{1}, 
+            {0}area_1{1}.{0}name{1} AS {0}name@area_1{1}, 
+            {0}area_1{1}.{0}code{1} AS {0}code@area_1{1}, 
+            {0}area_1{1}.{0}large_area_id{1} AS {0}large_area_id@area_1{1}, 
+            {0}area_1{1}.{0}sequence{1} AS {0}sequence@area_1{1}, 
+            {0}area_2{1}.{0}id{1} AS {0}id@area_2{1}, 
+            {0}area_2{1}.{0}name{1} AS {0}name@area_2{1}, 
+            {0}area_2{1}.{0}code{1} AS {0}code@area_2{1}, 
+            {0}area_2{1}.{0}large_area_id{1} AS {0}large_area_id@area_2{1}, 
+            {0}area_2{1}.{0}sequence{1} AS {0}sequence@area_2{1} 
+              FROM {0}shop{1} 
+              INNER JOIN {0}area{1} AS {0}area_1{1} ON {0}shop{1}.{0}area_id{1} = {0}area_1{1}.{0}id{1} 
+              INNER JOIN {0}area{1} AS {0}area_2{1} ON {0}shop{1}.{0}area_id{1} = {0}area_2{1}.{0}id{1} 
+              WHERE {0}area_1{1}.{0}name{1} = @0 AND {0}area_2{1}.{0}name{1} = @1"
+        ),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("area_1_name", db.Command.Parameters["@0"].Value);
+      Assert.Equal("area_2_name", db.Command.Parameters["@1"].Value);
+    }
+
+    [Fact]
+    public void TestAliasLeftJoin()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAliasLeftJoin(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAliasLeftJoin(TestDb db)
+    {
+      var select = db.Adapter.CreateSelect();
+      select
+        .AddFrom(new Test.Orm.Table.Shop(), cShop =>
+        {
+          cShop.LeftJoin(new Test.Orm.Table.Area(), "area_1", cArea =>
+          {
+            Assert.Equal("area_1", cArea.Name);
+            cArea.Where.Add("name", "area_1_name");
+          });
+
+          cShop.LeftJoin(new Test.Orm.Table.Area(), "area_2", cArea =>
+          {
+            Assert.Equal("area_2", cArea.Name);
+            cArea.Where.Add("name", "area_2_name");
+          });
+        });
+
+      Assert.False(select.HasContext("area"));
+      Assert.True(select.HasContext("area_1"));
+      Assert.True(select.HasContext("area_2"));
+
+      Assert.Equal("area_1", select.Context("area_1").Name);
+      Assert.Equal("area_2", select.Context("area_2").Name);
+
+      db.Command = select.Build();
+
+      Assert.Equal(
+        db.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, 
+        {0}shop{1}.{0}name{1} AS {0}name@shop{1}, 
+        {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, 
+        {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, 
+        {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1}, 
+        {0}shop{1}.{0}login_id{1} AS {0}login_id@shop{1}, 
+        {0}shop{1}.{0}password{1} AS {0}password@shop{1}, 
+        {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1}, 
+        {0}area_1{1}.{0}id{1} AS {0}id@area_1{1}, 
+        {0}area_1{1}.{0}name{1} AS {0}name@area_1{1}, 
+        {0}area_1{1}.{0}code{1} AS {0}code@area_1{1}, 
+        {0}area_1{1}.{0}large_area_id{1} AS {0}large_area_id@area_1{1}, 
+        {0}area_1{1}.{0}sequence{1} AS {0}sequence@area_1{1}, 
+        {0}area_2{1}.{0}id{1} AS {0}id@area_2{1}, 
+        {0}area_2{1}.{0}name{1} AS {0}name@area_2{1}, 
+        {0}area_2{1}.{0}code{1} AS {0}code@area_2{1}, 
+        {0}area_2{1}.{0}large_area_id{1} AS {0}large_area_id@area_2{1}, 
+        {0}area_2{1}.{0}sequence{1} AS {0}sequence@area_2{1} 
+          FROM {0}shop{1} 
+          LEFT JOIN {0}area{1} AS {0}area_1{1} ON {0}shop{1}.{0}area_id{1} = {0}area_1{1}.{0}id{1} 
+          LEFT JOIN {0}area{1} AS {0}area_2{1} ON {0}shop{1}.{0}area_id{1} = {0}area_2{1}.{0}id{1} 
+          WHERE {0}area_1{1}.{0}name{1} = @0 AND {0}area_2{1}.{0}name{1} = @1"
+        ),
+        db.Command.CommandText
+      );
+
+      Assert.Equal("area_1_name", db.Command.Parameters["@0"].Value);
+      Assert.Equal("area_2_name", db.Command.Parameters["@1"].Value);
+    }
+
+    [Fact]
+    public void TestGroupAndOrder()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGroupAndOrder(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGroupAndOrder(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop => 
+      {
+        cShop.AddOrder("id", Sdx.Db.Sql.Order.DESC);
+        cShop.AddOrder("created_at", Sdx.Db.Sql.Order.DESC);
+        cShop.Table.SetColumns("id");
+        cShop.AddGroup("id");
+
+        cShop.InnerJoin(new Test.Orm.Table.Area(), cArea =>
+        {
+          cArea.AddOrder("id", Sdx.Db.Sql.Order.DESC);
+          cArea.AddOrder("name", Sdx.Db.Sql.Order.DESC);
+          cArea.Table.SetColumns("id");
+          cArea.AddGroup("id");
+        });
+      });
+
+      testDb.Command = select.Build();
+
+      //Group Byに無いカラムは自動的にOrderから取り除かれます。
+      //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, {0}area{1}.{0}id{1} AS {0}id@area{1} 
+  FROM {0}shop{1} 
+  INNER JOIN {0}area{1} ON {0}shop{1}.{0}area_id{1} = {0}area{1}.{0}id{1} 
+  GROUP BY {0}shop{1}.{0}id{1}, {0}area{1}.{0}id{1} 
+  ORDER BY {0}shop{1}.{0}id{1} DESC, {0}area{1}.{0}id{1} DESC
+"
+        ),
+        testDb.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestAliasRecordCache()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunAliasRecordCache(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunAliasRecordCache(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.Where.Add("id", 5);
+        cShop.InnerJoin(new Test.Orm.Table.ShopCategory(), "ShopCategory1", cShopCategory => 
+        {
+          cShopCategory.Where.Add("category_id", 4);
+        });
+        cShop.InnerJoin(new Test.Orm.Table.ShopCategory(), "ShopCategory2", cShopCategory =>
+        {
+          cShopCategory.Where.Add("category_id", 5);
+        });
+      });
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var shop = conn.FetchRecord(select);
+
+        var sc1 = shop.GetRecordSet("ShopCategory1");
+        Assert.Equal(1, sc1.Count);
+        Assert.Equal(4, sc1[0].GetInt32("category_id"));
+
+        var sc2 = shop.GetRecordSet("ShopCategory2");
+        Assert.Equal(1, sc2.Count);
+        Assert.Equal(5, sc2[0].GetInt32("category_id"));
+      }
+    }
+
+    [Fact]
+    public void TestNotIn()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunNotIn(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunNotIn(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.SetColumns("id");
+        cShop.Where.Add("id", new List<int> { 1, 2 }, Sdx.Db.Sql.Comparison.NotIn);
+      });
+
+      testDb.Command = select.Build();
+
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE {0}shop{1}.{0}id{1} NOT IN (@0, @1)"
+        ),
+        testDb.Command.CommandText
+      );
+    }
+
+    [Fact]
+    public void TestInEmptyList()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunInEmptyList(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunInEmptyList(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.SetColumns("id");
+        cShop.Where.Add("id", new List<int>());
+      });
+
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var ids = conn.FetchList<int>(select);
+        Assert.Equal(0, ids.Count);
+      }
+
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE 'id@shop' IN ('EMPTY')"
+        ),
+        Sdx.Context.Current.DbProfiler.Logs[1].CommandText
+      );
+    }
+
+    [Fact]
+    public void TestNotInEmptyList()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunNotInEmptyList(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunNotInEmptyList(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop =>
+      {
+        cShop.SetColumns("id");
+        cShop.Where.Add("id", new List<int>(), Sdx.Db.Sql.Comparison.NotIn);
+      });
+
+      Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        var ids = conn.FetchList<int>(select);
+        Assert.NotEqual(0, ids.Count);
+      }
+
+      Assert.Equal(
+        testDb.Sql(
+          @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1} WHERE 'id@shop' NOT IN ('EMPTY')"
+        ),
+        Sdx.Context.Current.DbProfiler.Logs[1].CommandText
+      );
+    }
   }
 }

@@ -98,8 +98,7 @@ namespace Sdx.Scaffold
       else
       {
         elem = new Sdx.Html.InputText();
-
-        elem.Name = config["column"].ToString();
+        elem.Name = config.Name;
       }
 
       elem.Label = config["label"].ToString();
@@ -108,7 +107,7 @@ namespace Sdx.Scaffold
 
       if (config.ContainsKey("autoCurrentCheckbox"))
       {
-        var group = new Sdx.Html.CheckableGroup(config["autoCurrentCheckbox"].ToString());
+        var group = new Sdx.Html.CheckBoxGroup(config["autoCurrentCheckbox"].ToString());
         var checkbox = new Sdx.Html.CheckBox();
         checkbox.Tag.Attr.Set("value", "1");
         group.AddCheckable(checkbox, Sdx.I18n.GetString("現在日時で更新"));
@@ -181,6 +180,11 @@ namespace Sdx.Scaffold
           elem.IsAllowEmpty = true;
         }
 
+        if (config.ContainsKey("attributes"))
+        {
+          elem.Tag.Attr.Add(config["attributes"].ToArray());
+        }
+
         //FormにDBから戻す値を生成
         if (config.ContainsKey("getter"))
         {
@@ -216,10 +220,7 @@ namespace Sdx.Scaffold
         else if (config.ContainsKey("column"))
         {
           var columnName = config["column"].ToString();
-          if (record.HasValue(columnName))
-          {
-            bind.Set(columnName, record.GetString(columnName));
-          }
+          bind.Set(columnName, record.GetString(columnName));
         }
 
         if(config.ContainsKey("autoCurrentCheckbox"))
@@ -378,6 +379,36 @@ namespace Sdx.Scaffold
               record.SetValue(columnName, values[columnName]);
             }
           }
+        }
+      }
+
+      if(!SortingOrder.IsEmpty)
+      {
+        var column = SortingOrder["column"].ToString();
+        //SQLインジェクション対策
+        if(!TableMeta.HasColumn(column))
+        {
+          throw new InvalidOperationException("Missing " + column + " column in " + TableMeta.Name);
+        }
+
+        if(!record.HasValue(column))
+        {
+          var direction = SortingOrder["direction"].ToString().ToUpper();
+          var select = Db.CreateSelect();
+          select.AddFrom(TableMeta.CreateTable());
+
+          if (direction == "DESC")
+          {
+            select.SetColumn(Sdx.Db.Sql.Expr.Wrap("MAX(" + column + ") + 1"));
+          }
+          else
+          {
+            select.SetColumn(Sdx.Db.Sql.Expr.Wrap("MIN(" + column + ") - 1"));
+          }
+
+          var value = conn.FetchOne(select);
+
+          record.SetValue(column, value == DBNull.Value ? 1 : value);
         }
       }
 

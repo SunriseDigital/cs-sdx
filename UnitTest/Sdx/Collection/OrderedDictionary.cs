@@ -153,5 +153,38 @@ namespace UnitTest
         Assert.False(dic.ContainsKey("key" + i));
       }
     }
+
+    [Fact]
+    public void TestSort()
+    {
+      var dic = new OrderedDictionary<string, int>();
+
+      dic["2"] = 2;
+      dic["5"] = 5;
+      dic["1"] = 1;
+      dic["4"] = 4;
+      dic["3"] = 3;
+
+      Assert.Equal(2, dic.ItemAt(0));
+      Assert.Equal(5, dic.ItemAt(1));
+      Assert.Equal(1, dic.ItemAt(2));
+      Assert.Equal(4, dic.ItemAt(3));
+      Assert.Equal(3, dic.ItemAt(4));
+
+      dic.Sort((val1, val2) => val1 - val2);
+      Assert.Equal(1, dic.ItemAt(0));
+      Assert.Equal(2, dic.ItemAt(1));
+      Assert.Equal(3, dic.ItemAt(2));
+      Assert.Equal(4, dic.ItemAt(3));
+      Assert.Equal(5, dic.ItemAt(4));
+
+      dic.Sort((val1, val2) => val2 - val1);
+      Assert.Equal(5, dic.ItemAt(0));
+      Assert.Equal(4, dic.ItemAt(1));
+      Assert.Equal(3, dic.ItemAt(2));
+      Assert.Equal(2, dic.ItemAt(3));
+      Assert.Equal(1, dic.ItemAt(4));
+
+    }
   }
 }

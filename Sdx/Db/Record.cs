@@ -7,6 +7,7 @@ using System.Data;
 using Sdx.Db.Sql;
 using System.Collections.Specialized;
 using System.Web.Script.Serialization;
+using System.Globalization;
 
 namespace Sdx.Db
 {
@@ -28,6 +29,8 @@ namespace Sdx.Db
     internal List<Dictionary<string, object>> ValuesList { get; private set; }
     internal Select Select { get; set; }
 
+    private Db.Connection connection;
+
     public Record()
     {
       this.UpdatedValues = new Dictionary<string, object>();
@@ -35,6 +38,26 @@ namespace Sdx.Db
       ValueWillUpdate = new Dictionary<string, Action<object, object, bool>>();
       ValueDidUpdate = new Dictionary<string, Action<object, object>>();
       Init();
+    }
+
+    public Sdx.Db.Connection Connection
+    {
+      set
+      {
+        connection = value;
+      }
+
+      get
+      {
+        if (connection != null)
+        {
+          return connection;
+        }
+        else
+        {
+          return Select.Connection;
+        }
+      }
     }
 
     /// <summary>
@@ -82,6 +105,17 @@ namespace Sdx.Db
       }
     }
 
+    public string GetFormatedDateTime(string key, string format = null)
+    {
+      if(!HasValue(key))
+      {
+        return null;
+      }
+
+      var datetime = Convert.ToDateTime(GetValue(key));
+      return datetime.ToString(format);
+    }
+
     public DateTime GetDateTime(string key)
     {
       return Convert.ToDateTime(this.GetValue(key));
@@ -97,9 +131,16 @@ namespace Sdx.Db
       return Convert.ToDouble(this.GetValue(key));
     }
 
+    
+
     public short GetInt16(string key)
     {
       return Convert.ToInt16(this.GetValue(key));
+    }
+
+    public int GetInt(string key)
+    {
+      return GetInt32(key);
     }
 
     public int GetInt32(string key)
@@ -112,6 +153,32 @@ namespace Sdx.Db
       return Convert.ToInt64(this.GetValue(key));
     }
 
+    /// <summary>
+    /// <see cref="GetValue"/>が例外にならない場合はtrue。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
+    public bool CanGetValue(string key)
+    {
+      if (!OwnMeta.HasColumn(key))
+      {
+        throw new InvalidOperationException("Missing " + key + " column. Check table settings.");
+      }
+
+      if (this.UpdatedValues.ContainsKey(key))
+      {
+        return true;
+      }
+
+      if (IsNew)
+      {
+        return false;
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
+      return this.ValuesList[0].ContainsKey(keyWithContext);
+    }
+
     private object GetOriginValue(string key)
     {
       if (IsNew)
@@ -122,13 +189,24 @@ namespace Sdx.Db
       var keyWithContext = Record.BuildColumnAliasWithContextName(key, this.ContextName);
       if (!this.ValuesList[0].ContainsKey(keyWithContext))
       {
-        return DBNull.Value;
+        throw new InvalidOperationException("No origin values. Not loaded from db " + key + " on " + this.ContextName);
       }
       return this.ValuesList[0][keyWithContext];
     }
 
+    /// <summary>
+    /// カラムの値を取得します。テーブル定義に無いカラム名を指定すると例外になりますので注意してください。
+    /// またDBから読み込まなかったカラムを取得すると例外になります。これはGet系のユーティリティーメソッドで読み込んでいない値を使ってしまうと発見しづらいバグを生むからです。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns>新規レコードで値をsetしていない場合NULLが帰ります。DBの値がNULLの時はDBNullが帰ります。</returns>
     public object GetValue(string key)
     {
+      if(!OwnMeta.HasColumn(key))
+      {
+        throw new InvalidOperationException("Missing " + key + " column in " + this  + OwnMeta.Name + ". Check table settings.");
+      }
+
       if (this.UpdatedValues.ContainsKey(key))
       {
         return this.UpdatedValues[key];
@@ -136,7 +214,7 @@ namespace Sdx.Db
 
       if (IsNew)
       {
-        return DBNull.Value;
+        return null;
       }
 
       return GetOriginValue(key);
@@ -147,9 +225,36 @@ namespace Sdx.Db
       return Convert.ToString(this.GetValue(key));
     }
 
+    public bool GetBool(string key)
+    {
+      return (bool)GetValue(key);
+    }
+
+    public bool ContainsColumn(string key)
+    {
+      if(UpdatedValues.ContainsKey(key))
+      {
+        return true;
+      }
+
+      var keyWithContext = Record.BuildColumnAliasWithContextName(key, ContextName);
+      if (this.ValuesList.Count > 0 && this.ValuesList[0].ContainsKey(keyWithContext))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
     public bool HasValue(string key)
     {
-      return this.GetValue(key) != null;
+      var value = GetValue(key);
+      return !(value is DBNull) && value != null;
+    }
+
+    public bool HasRecordCache(string contextName)
+    {
+      return recordCache.ContainsKey(contextName);
     }
 
     public Record ClearRecordCache(string contextName = null)
@@ -167,6 +272,33 @@ namespace Sdx.Db
       }
 
       return this;
+    }
+
+    private string GetRelationName<T>()
+    {
+      var recordType = typeof(T);
+      var relations = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == recordType);
+      var count = relations.Count();
+      if (count == 0)
+      {
+        throw new NotImplementedException("Missing relation setting for " + recordType + " in " + OwnMeta.TableType);
+      }
+      else if (count > 1)
+      {
+        throw new NotImplementedException("Too many match relations for " + recordType + " in " + OwnMeta.TableType);
+      }
+
+      return relations.First().Key;
+    }
+
+    public T GetRecord<T>(Action<Select> selectHook = null) where T : Sdx.Db.Record
+    {
+      return GetRecord<T>(GetRelationName<T>(), selectHook);
+    }
+
+    public T GetRecord<T>(Connection connection, Action<Select> selectHook = null) where T : Sdx.Db.Record
+    {
+      return GetRecord<T>(GetRelationName<T>(), connection, selectHook);
     }
 
     public T GetRecord<T>(string contextName, Action<Select> selectHook = null) where T : Sdx.Db.Record
@@ -187,7 +319,7 @@ namespace Sdx.Db
 
     public Record GetRecord(string contextName, Action<Select> selectHook = null)
     {
-      return this.GetRecord<Record>(contextName, null);
+      return this.GetRecord<Record>(contextName, null, selectHook);
     }
 
     public Record GetRecord(string contextName, Connection connection, Action<Select> selectHook = null)
@@ -212,7 +344,8 @@ namespace Sdx.Db
         return (RecordSet)this.recordCache[contextName];
       }
 
-      if (this.Select != null && this.Select.HasContext(contextName)) //already joined
+      //ParentContext.Nameをチェックして自分にJOINされているかもチェックしています。
+      if (this.Select != null && this.Select.HasContext(contextName) && Select.Context(contextName).ParentContext.Name == ContextName) //already joined
       {
         if (selectHook != null)
         {
@@ -229,7 +362,7 @@ namespace Sdx.Db
       {
         if (connection == null)
         {
-          throw new ArgumentNullException("connection");
+          connection = Select.Connection;
         }
 
         if (OwnMeta.Relations.ContainsKey(contextName))
@@ -253,7 +386,7 @@ namespace Sdx.Db
           return resultSet;
         }
 
-        throw new NotImplementedException("Missing relation setting for " + contextName);
+        throw new NotImplementedException("Missing relation setting for " + contextName + " in " + OwnMeta.TableType);
       }
     }
 
@@ -397,7 +530,7 @@ namespace Sdx.Db
         .Append(this.OwnMeta.Name)
         .Append(": {")
         ;
-      this.OwnMeta.Columns.ForEach(column => 
+      foreach (var column in OwnMeta.Columns.Where(col => ContainsColumn(col.Name)))
       {
         builder
           .Append(column.Name)
@@ -406,7 +539,7 @@ namespace Sdx.Db
           .Append(this.GetString(column.Name))
           .Append("\", ")
           ;
-      });
+      }
 
       builder
         .Remove(builder.Length - 2, 2)
@@ -430,14 +563,42 @@ namespace Sdx.Db
       });
     }
 
-    public NameValueCollection ToNameValueCollection()
+    /// <summary>
+    /// FormにBindするためのNameValueCollectionを生成する。
+    /// </summary>
+    /// <param name="dateFormat">ColumnType.Date|DateTime型のカラムのフォーマット。省略すると<see cref="CultureInfo.CurrentCulture"/>より取得。</param>
+    /// <returns></returns>
+    public NameValueCollection ToNameValueCollection(string dateFormat = null)
     {
       var col = new NameValueCollection();
+      
       OwnMeta.Columns.ForEach((column) => {
-        var value = this.GetValue(column.Name);
-        if(value != null)
+        if (HasValue(column.Name))
         {
-          col.Add(column.Name, this.GetString(column.Name));
+          string value;
+          if (column.Type == Table.ColumnType.Date)
+          {
+            if(dateFormat == null)
+            {
+              dateFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern;
+            }
+            value = GetDateTime(column.Name).ToString(dateFormat);
+          }
+          else if(column.Type == Table.ColumnType.DateTime)
+          {
+            if(dateFormat == null)
+            {
+              dateFormat = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern + " " + CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern;
+            }
+            value = GetDateTime(column.Name).ToString(dateFormat);
+          }
+          else
+          {
+            value = GetString(column.Name);
+          }
+
+          col.Add(column.Name, value);
+   
         }
       });
 
@@ -599,13 +760,20 @@ namespace Sdx.Db
           var pkeyValue = GetValue(firstPkey.Name);
           //保存に成功し、PkeyがNullだったらAutoincrementのはず。
           //IsAutoincrementを見ると強引に挿入していることもあるので。
-          if (pkeyValue == DBNull.Value)
+          if (pkeyValue == null)
           {
             var key = Record.BuildColumnAliasWithContextName(firstPkey.Name, ContextName);
             newValues[key] = conn.FetchLastInsertId();
           }
         }
 
+        OwnMeta.Columns.ForEach(column => { 
+          var key = Record.BuildColumnAliasWithContextName(column.Name, ContextName);
+          if(!newValues.ContainsKey(key))
+          {
+            newValues[key] = DBNull.Value;
+          }
+        });
 
         ValuesList.Add(newValues);
       }
@@ -693,6 +861,63 @@ namespace Sdx.Db
       }
 
       return false;
+    }
+
+    private Collection.Holder vars = new Collection.Holder();
+
+    public Collection.Holder Vars
+    {
+      get
+      {
+        return vars;
+      }
+    }
+
+    private Collection.Holder internalCache = new Collection.Holder();
+
+    protected Collection.Holder InternalCache
+    {
+      get
+      {
+        return internalCache;
+      }
+    }
+
+    public string PkeyStringValue
+    {
+      get
+      {
+        return GetString(PkeyName);
+      }
+    }
+
+    public int PkeyIntValue
+    {
+      get
+      {
+        return GetInt(PkeyName);
+      }
+    }
+
+    public object PkeyValue
+    {
+      get
+      {
+        return GetValue(PkeyName);
+      }
+    }
+
+    private string PkeyName
+    {
+      get
+      {
+        if (OwnMeta.Pkeys.Count() != 1)
+        {
+          throw new InvalidOperationException("Illegal pkey count " + OwnMeta.Pkeys.Count());
+        }
+
+        return OwnMeta.Pkeys.First().Name;
+      }
     }
   }
 }

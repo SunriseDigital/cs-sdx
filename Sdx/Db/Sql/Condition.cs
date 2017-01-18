@@ -22,6 +22,7 @@ namespace Sdx.Db.Sql
       public Column Column { get; set; }
       public object Value { get; set; }
       public Type Type { get; set; }
+      public bool IsEmtpyValue { get; set; }
     }
 
     private List<Holder> wheres = new List<Holder>();
@@ -169,6 +170,17 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Condition AddWithOrNull(string column, Object value, Comparison comparison = Comparison.Equal)
+    {
+      Condition condition = new Condition();
+      this.Add(
+        condition
+         .AddIsNull(column)
+         .AddOr(column, value, Sdx.Db.Sql.Comparison.GreaterEqual)
+      );
+      return this;
+    }
+
     /// <summary>
     /// 自分の持っているConditionにContextNameをセット。
     /// </summary>
@@ -287,9 +299,15 @@ namespace Sdx.Db.Sql
       //IEnumerable<>かどうかチェック。
       else if (!(cond.Value is string) && cond.Value.GetType().GetInterfaces().Any(x => x.IsGenericType && x.GetGenericTypeDefinition() == typeof(IEnumerable<>)))
       {
-        cond.Comparison = Comparison.In;
+        //NotInかInしかありえない。各Addでやったほうが分かりやすいが、IEnumableかどうかチェックが意外に重そうなのでこちらで。
+        if(cond.Comparison != Comparison.NotIn)
+        {
+          cond.Comparison = Comparison.In;
+        }
+        
         string inCond = "";
-        var list = cond.Value as IEnumerable<object>;
+        //プリミティブ型の配列を受け付けるためあえてジェネリックを使ってません。
+        var list = cond.Value as System.Collections.IEnumerable;
         foreach (var value in list)
         {
           if (inCond != "")
@@ -302,7 +320,16 @@ namespace Sdx.Db.Sql
           condCount.Incr();
         }
 
-        rightHand = "(" + inCond + ")";
+        //IEnumerableが空だった
+        if (inCond.Length == 0)
+        {
+          cond.IsEmtpyValue = true;
+          rightHand = "('EMPTY')";
+        }
+        else
+        {
+          rightHand = "(" + inCond + ")";
+        }
       }
       else
       {
@@ -319,12 +346,25 @@ namespace Sdx.Db.Sql
       if (cond.Type == Type.Comparison)
       {
         var value = this.BuildPlaceholderAndParameters(adapter, parameters, cond, condCount);
-        return String.Format(
-          "{0}{1}{2}",
-          cond.Column.Build(adapter, parameters, condCount),
-          cond.Comparison.SqlString(),
-          value
-        );
+        if(cond.IsEmtpyValue)
+        {
+          return String.Format(
+            "'{0}@{1}'{2}{3}",
+            cond.Column.Name,
+            cond.Column.ContextName,
+            cond.Comparison.SqlString(),
+            value
+          );
+        }
+        else
+        {
+          return String.Format(
+            "{0}{1}{2}",
+            cond.Column.Build(adapter, parameters, condCount),
+            cond.Comparison.SqlString(),
+            value
+          );
+        }
       }
       else if(cond.Type == Type.NullCompare)
       {

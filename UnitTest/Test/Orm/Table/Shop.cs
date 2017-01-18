@@ -72,7 +72,7 @@ namespace Test.Orm.Table
 
     public static Sdx.Html.FormElement CreateCategoryIdElement(Sdx.Db.Connection conn)
     {
-      var elem = new Sdx.Html.CheckableGroup();
+      var elem = new Sdx.Html.CheckBoxGroup();
       elem.Name = "category_id";
 
       var select = conn.Adapter.CreateSelect();
@@ -81,7 +81,7 @@ namespace Test.Orm.Table
 
       conn.FetchKeyValuePairList<string, string>(select).ForEach(pair =>
       {
-        elem.AddCheckable<Sdx.Html.CheckBox>(pair);
+        elem.AddCheckable(pair);
       });
 
       return elem;

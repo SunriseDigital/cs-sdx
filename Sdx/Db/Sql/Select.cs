@@ -96,6 +96,18 @@ namespace Sdx.Db.Sql
     /// </summary>
     public JoinOrder JoinOrder { get; set; }
 
+    public Select AddFrom(Sdx.Db.Table target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Sdx.Db.Table target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
@@ -108,6 +120,18 @@ namespace Sdx.Db.Sql
       return context;
     }
 
+    public Select AddFrom(Expr target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Expr target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
@@ -116,12 +140,36 @@ namespace Sdx.Db.Sql
       return this.CreateContext(target, alias, JoinType.From);
     }
 
+    public Select AddFrom(String target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(String target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
+    }
+
     /// <summary>
     /// From句を追加。繰り返しコールすると繰り返し追加します。
     /// </summary>
     public Context AddFrom(String target, string alias = null)
     {
       return this.CreateContext(target, alias, JoinType.From);
+    }
+
+    public Select AddFrom(Sdx.Db.Sql.Select target, Action<Context> call)
+    {
+      call(AddFrom(target));
+      return this;
+    }
+
+    public Select AddFrom(Sdx.Db.Sql.Select target, string alias, Action<Context> call)
+    {
+      call(AddFrom(target, alias));
+      return this;
     }
 
     /// <summary>
@@ -247,10 +295,17 @@ namespace Sdx.Db.Sql
           }
 
           builder
-            .Append(column.Build(this.Adapter, parameters, condCount))
-            .Append(" ")
-            .Append(column.Order.SqlString())
-            .Append(", ");
+            .Append(column.Build(this.Adapter, parameters, condCount));
+
+          if(column.Order != null)
+          {
+            var sqlstr = ((Order)column.Order).SqlString();
+            builder
+              .Append(" ")
+              .Append(sqlstr);
+          }
+
+          builder.Append(", ");
         });
 
         builder.Remove(builder.Length - 2, 2);
@@ -319,6 +374,16 @@ namespace Sdx.Db.Sql
       if (this.Adapter == null)
       {
         throw new InvalidOperationException("Missing adapter, Set before Build.");
+      }
+
+      //SELECT句またはGROUP BY句に無いカラムは自動的にOrderから取り除かれます。
+      //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
+      if (groups.Count > 0)
+      {
+        var allowList = columns.Union(groups);
+        orders = orders
+          .Where(orderCol => allowList.Any(col => orderCol.SameAs(col)))
+          .ToList<Column>();
       }
 
       DbCommand command = this.Adapter.CreateCommand();
@@ -589,6 +654,34 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Select AddOrderRandom()
+    {
+      var column = new Column(Expr.Wrap(Adapter.RandomOrderKeyword));
+      column.Order = null;
+      orders.Add(column);
+
+      return this;
+    }
+
+    /// <summary>
+    /// 追加したorderをクリアする。
+    /// </summary>
+    /// <param contextName="context">contextNameを渡すとそのテーブルのorderのみをクリアします。</param>
+    /// <returns></returns>
+    public Select ClearOrders(string contextName = null)
+    {
+      if (contextName == null)
+      {
+        this.orders.Clear();
+      }
+      else
+      {
+        this.orders.RemoveAll(column => column.ContextName != null && column.ContextName == contextName);
+      }
+
+      return this;
+    }
+
     public object Clone()
     {
       var cloned = (Select)this.MemberwiseClone();
@@ -633,6 +726,13 @@ namespace Sdx.Db.Sql
     public void LimitPager(Pager Pager)
     {
       LimitPage(Pager.Page, Pager.PerPage);
+    }
+
+    public Connection Connection { get; internal set; }
+
+    public ContextActions CreateContextActions()
+    {
+      return new ContextActions(this);
     }
   }
 }

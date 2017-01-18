@@ -109,7 +109,7 @@ namespace Sdx
     {
       get
       {
-        return true;
+        return false;
       }
     }
 
@@ -127,5 +127,7 @@ namespace Sdx
         }
       }
     }
+
+    public static bool HasSdxHttpModule { get; internal set; }
   }
 }

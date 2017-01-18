@@ -216,5 +216,11 @@ namespace Sdx.Collection
 
       return true;
     }
+
+    public OrderedDictionary<TKey, TValue> Sort(Comparison<TValue> comp)
+    {
+      list.Sort((key1, key2) => comp(dictionary[key1], dictionary[key2]));
+      return this;
+    }
   }
 }

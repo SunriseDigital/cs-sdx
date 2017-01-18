@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Collections.Generic;
 using System.Linq;
 using Sdx.Db.Sql;
+using System.Data;
 
 namespace Sdx.Db.Adapter
 {
@@ -41,6 +42,11 @@ namespace Sdx.Db.Adapter
     {
       get
       {
+        if(!Sdx.Context.HasSdxHttpModule)
+        {
+          throw new Exception("Require Sdx.Web.HttpModule for SharedConnection");
+        }
+
         if(!Sdx.Context.Current.Vars.ContainsKey(SharedConnectionKey))
         {
           Sdx.Context.Current.Vars[SharedConnectionKey] = new Dictionary<string, Connection>();
@@ -67,17 +73,34 @@ namespace Sdx.Db.Adapter
 
     /// <summary>
     /// 既に生成されているDbConnectionを使用してSdx.Db.Connectionを生成します。
+    /// 渡されたDbConnectionが開いていなかった場合、中でOpenします。
     /// </summary>
     /// <param name="conn"></param>
     /// <returns></returns>
-    public Connection CreateConnection(DbConnection conn)
+    public Connection UseConnection(DbConnection conn)
     {
-      if(conn.ConnectionString != ConnectionString)
+      if (conn.ConnectionString != ConnectionString)
       {
         throw new InvalidOperationException("Not match connection string " + conn.ConnectionString + " and " + ConnectionString);
       }
 
+      if (conn.State != ConnectionState.Open)
+      {
+        conn.Open();
+      }
+
       return new Connection(this, conn);
+    }
+
+    /// <summary>
+    /// これで生成した接続は閉じないので、Dispose忘れじゃないかと勘違いするので名前をuseにしました。
+    /// </summary>
+    /// <param name="conn"></param>
+    /// <returns></returns>
+    [Obsolete("UseConnectionを使用して下さい")]
+    public Connection CreateConnection(DbConnection conn)
+    {
+      return UseConnection(conn);
     }
 
     public DbParameter CreateParameter(string key, object value)
@@ -158,6 +181,17 @@ namespace Sdx.Db.Adapter
     public Sql.Delete CreateDelete()
     {
       return new Sql.Delete(this);
+    }
+
+    public abstract string RandomOrderKeyword { get; }
+
+    public string QuoteColumn(string contextName, string column)
+    {
+      return string.Format(
+        "{0}.{1}",
+        QuoteIdentifier(contextName),
+        QuoteIdentifier(column)
+      );
     }
   }
 }

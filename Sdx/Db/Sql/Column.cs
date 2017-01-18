@@ -14,8 +14,11 @@ namespace Sdx.Db.Sql
 
     internal string ContextName { get; set; }
 
-    internal Order Order { get; set; }
+    internal Order? Order { get; set; }
 
+    /// <summary>
+    /// Update/Insertにおいて、更新対象の値を保持するのに使う
+    /// </summary>
     internal object Value { get; set; }
 
     public Column(Expr expr, string contextName = null, string alias = null)
@@ -100,6 +103,27 @@ namespace Sdx.Db.Sql
       }
 
       return sql;
+    }
+
+    /// <summary>
+    /// 同じカラムかどうかを返す。何に使われているかや、値、エイリアスは考慮しません。コンテキスト中で同じカラムを指しているかのみチェックします。
+    /// ContextNameとtargetを比べます。サブクエリーの場合はSelectが同じオブジェクトかどうかを返す。
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns></returns>
+    internal bool SameAs(Column column)
+    {
+      if(target is Select)
+      {
+        return target == column.target;
+      }
+
+      if(ContextName != column.ContextName)
+      {
+        return false;
+      }
+
+      return target.ToString() == column.target.ToString();
     }
   }
 }
