@@ -44,13 +44,9 @@ namespace Sdx.Web
     {
       targetDevice = device;
       currentUrl = url;
+      MemoryCache = memoryCache;
 
-      if (memoryCache != null)
-      {
-        MemoryCache = memoryCache;
-      }
-
-      if (memoryCache == null || !MemoryCache.Contains(url))
+      if (MemoryCache == null || !MemoryCache.Contains(url))
       {
         if (!File.Exists(path))
         {
