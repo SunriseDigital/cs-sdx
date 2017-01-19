@@ -31,7 +31,7 @@ namespace Sdx.Web
 
     private Dictionary<Device, string> matchUrls = new Dictionary<Device, string>();
 
-    private MemoryCache memoryCache = MemoryCache.Default;
+    public MemoryCache MemoryCache { get; set; }
 
     public enum Device
     {
@@ -40,12 +40,17 @@ namespace Sdx.Web
       Mb
     }
 
-    public DeviceTable(Device device, string url, string path)
+    public DeviceTable(Device device, string url, string path, MemoryCache memoryCache = null)
     {
       targetDevice = device;
       currentUrl = url;
 
-      if (!memoryCache.Contains(url))
+      if (memoryCache != null)
+      {
+        MemoryCache = memoryCache;
+      }
+
+      if (memoryCache == null || !MemoryCache.Contains(url))
       {
         if (!File.Exists(path))
         {
@@ -275,9 +280,9 @@ namespace Sdx.Web
 
     public string GetUrl(Device device)
     {
-      if (memoryCache.Contains(currentUrl))
+      if (MemoryCache != null && MemoryCache.Contains(currentUrl))
       {
-        var settingCache = (Dictionary<Device, string>)memoryCache[currentUrl];
+        var settingCache = (Dictionary<Device, string>)MemoryCache[currentUrl];
         if (settingCache.ContainsKey(device))
         {
           return settingCache[device];
@@ -374,14 +379,17 @@ namespace Sdx.Web
 
         matchUrls[device] = url;
 
-        Dictionary<Device, string> cacheUrlSetting = new Dictionary<Device, string>();
-        if (memoryCache.Contains(currentUrl))
+        if(MemoryCache != null)
         {
-          cacheUrlSetting = (Dictionary<Device, string>)memoryCache[currentUrl];
-        }
+          Dictionary<Device, string> cacheUrlSetting = new Dictionary<Device, string>();
+          if (MemoryCache.Contains(currentUrl))
+          {
+            cacheUrlSetting = (Dictionary<Device, string>)MemoryCache[currentUrl];
+          }
 
-        cacheUrlSetting.Add(device, url);
-        memoryCache.Set(currentUrl, cacheUrlSetting, new CacheItemPolicy());
+          cacheUrlSetting.Add(device, url);
+          MemoryCache.Set(currentUrl, cacheUrlSetting, new CacheItemPolicy());
+        }
       }
 
       return url;
