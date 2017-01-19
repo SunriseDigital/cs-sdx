@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -15,13 +16,17 @@ namespace Sdx.Web
 
     private string smartPhoneUa = @"iPhone|Android.*Mobile|Windows.*Phone";
 
+    protected static MemoryCache memCache;
+
     private void Application_BeginRequest(object source, EventArgs a)
     {
       var currentPageDevice = DetectUrlDevice(HttpContext.Current.Request.RawUrl);
 
       var settingPath = GetSettingPath();
 
-      Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(currentPageDevice, HttpContext.Current.Request.RawUrl, settingPath);
+      memCache = MemoryCacheSetting();
+
+      Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(currentPageDevice, HttpContext.Current.Request.RawUrl, settingPath, memCache);      
 
       var currentUserAgentDevice = DetectUserAgentDevice();
 
@@ -67,5 +72,7 @@ namespace Sdx.Web
     }
 
     protected abstract string GetSettingPath();
+
+    protected abstract MemoryCache MemoryCacheSetting();
   }
 }
