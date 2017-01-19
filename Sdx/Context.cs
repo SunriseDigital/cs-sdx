@@ -20,7 +20,10 @@ namespace Sdx
       this.isDebugMode = false;
       this.Culture = new CultureInfo("ja");
       this.HttpErrorHandler = new Web.HttpErrorHandler();
-      UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
+      if (HttpContext.Current != null)
+      {
+        UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
+      }
     }
 
     public static Context Current
