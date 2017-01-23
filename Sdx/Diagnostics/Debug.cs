@@ -7,6 +7,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
 using System.Text;
+using System.Runtime.CompilerServices;
 
 namespace Sdx.Diagnostics
 {
@@ -24,8 +25,14 @@ namespace Sdx.Diagnostics
 
     public TextWriter Out { get; set; }
 
-    public void Log(Object value, String title = "", int dumpPublicMemberCount = 0)
-    {
+    public void Log(
+      Object value,
+      String title = "",
+      int dumpPublicMemberCount = 0,
+      [CallerFilePath] string fileName = "",
+      [CallerLineNumber] int lineNumber = 0,
+      [CallerMemberName] string memberName = ""
+    ){
       if(Out == null)
       {
         return;
@@ -36,22 +43,15 @@ namespace Sdx.Diagnostics
       {
         delta = currentTicks - prevTimerElapsedTicks;
       }
-
-      var fileName = "";
-      var lineNumber = 0;
-#if DEBUG
-      var stack = new System.Diagnostics.StackFrame(1, true);
-      fileName = stack.GetFileName();
-      lineNumber = stack.GetFileLineNumber();
-#endif
       
       Out.WriteLine(String.Format(
-        "[{0}/{1} sec] {2} {3} - {4}",
+        "[{0}/{1} sec] {2} {3}({4}) - {5}",
         FormatStopwatchTicks(delta),
         FormatStopwatchTicks(currentTicks),
         title,
         fileName,
-        lineNumber
+        lineNumber,
+        memberName
       ));
       prevTimerElapsedTicks = currentTicks;
       Out.WriteLine(Dump(value, dumpPublicMemberCount));
