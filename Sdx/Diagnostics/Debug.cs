@@ -194,6 +194,20 @@ namespace Sdx.Diagnostics
           indent,
           needType, "("+ param.DbType.ToString() +") " + param.ParameterName + " " + param.Value.ToString()).TrimEnd('\r', '\n');
       }
+      else if (value is System.Data.DataRow)
+      {
+        var row = value as System.Data.DataRow;
+        var result = GetDumpTitle(value, indent, needType, "(" + row.Table.TableName + ")");
+
+        foreach (System.Data.DataColumn key in row.Table.Columns)
+        {
+          // ここの`Dump(dic[key], " ")`は`:`の後なので常にスペース一個でOK
+          result += indent + DumpIndent + key + " :" + Dump(row[key], " ", needType, dumpPublicMemberCount) + Environment.NewLine;
+        }
+
+        //改行を取り除く
+        return result.TrimEnd('\r', '\n');
+      }
       else
       {
         var type = value.GetType();
