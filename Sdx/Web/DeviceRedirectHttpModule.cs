@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Runtime.Caching;
@@ -15,6 +16,8 @@ namespace Sdx.Web
     private string mobileUa = @"DoCoMo|UP.Browser|SoftBank|WILLCOM";
 
     private string smartPhoneUa = @"iPhone|Android.*Mobile|Windows.*Phone";
+
+    private string cacheKey = "DeviceTable";
 
     protected static MemoryCache memCache;
 
@@ -73,6 +76,18 @@ namespace Sdx.Web
 
     protected abstract string GetSettingPath();
 
-    protected abstract MemoryCache MemoryCacheSetting();
+    protected MemoryCache MemoryCacheSetting()
+    {
+      if(memCache == null)
+      {
+        var config = new NameValueCollection();
+        config.Add("cacheMemoryLimitMegabytes", "10");
+        config.Add("pollingInterval", "00:02:00");
+
+        return new MemoryCache(cacheKey, config);
+      }
+
+      return memCache;
+    }
   }
 }
