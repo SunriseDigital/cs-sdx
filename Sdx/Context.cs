@@ -20,6 +20,10 @@ namespace Sdx
       this.isDebugMode = false;
       this.Culture = new CultureInfo("ja");
       this.HttpErrorHandler = new Web.HttpErrorHandler();
+      if (HttpContext.Current != null)
+      {
+        UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
+      }
     }
 
     public static Context Current
@@ -112,6 +116,8 @@ namespace Sdx
         return false;
       }
     }
+
+    public Web.UserAgent UserAgent { get; private set; }
 
     /// <summary>
     /// <see cref="Sdx.Db.Adapter.Base.SharedConnection"/>で生成された共有接続をすべて開放する。
