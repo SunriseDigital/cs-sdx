@@ -16,15 +16,13 @@ namespace Sdx.Web
 
     private string smartPhoneUa = @"iPhone|Android.*Mobile|Windows.*Phone";
 
-    protected static MemoryCache memCache;
-
     private void Application_BeginRequest(object source, EventArgs a)
     {
       var currentPageDevice = DetectUrlDevice(HttpContext.Current.Request.RawUrl);
 
       var settingPath = GetSettingPath();
 
-      memCache = MemoryCacheSetting();
+      MemoryCache memCache = MemoryCacheSetting();
 
       Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(currentPageDevice, HttpContext.Current.Request.RawUrl, settingPath, memCache);      
 
@@ -73,6 +71,11 @@ namespace Sdx.Web
 
     protected abstract string GetSettingPath();
 
+    /// <summary>
+    /// HttpModuleはリクエストごとに生成されるのでMemoryCacheのインスタンスは必ずstaticな変数に保持してください。
+    /// 親クラスでは保持しません。
+    /// キャッシュが必要ない場合はnullを返してください。
+    /// </summary>
     protected abstract MemoryCache MemoryCacheSetting();
   }
 }
