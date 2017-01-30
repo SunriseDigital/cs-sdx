@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -21,7 +22,9 @@ namespace Sdx.Web
 
       var settingPath = GetSettingPath();
 
-      Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(currentPageDevice, HttpContext.Current.Request.RawUrl, settingPath);
+      MemoryCache memCache = MemoryCacheSetting();
+
+      Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(currentPageDevice, HttpContext.Current.Request.RawUrl, settingPath, memCache);      
 
       var currentUserAgentDevice = DetectUserAgentDevice();
 
@@ -67,5 +70,12 @@ namespace Sdx.Web
     }
 
     protected abstract string GetSettingPath();
+
+    /// <summary>
+    /// HttpModuleはリクエストごとに生成されるのでMemoryCacheのインスタンスは必ずstaticな変数に保持してください。
+    /// 親クラスでは保持しません。
+    /// キャッシュが必要ない場合はnullを返してください。
+    /// </summary>
+    protected abstract MemoryCache MemoryCacheSetting();
   }
 }
