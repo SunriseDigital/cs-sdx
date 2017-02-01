@@ -96,5 +96,21 @@ namespace UnitTest
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(MB_USER_AGENT);
       Assert.Equal(null, gfriend.RedirectUrl);
     }
+
+    [Fact]
+    public void TestUrlPlaceFolder()
+    {
+      //mockをセット
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
+      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/base/foo2/bar5/top.aspx", "");
+
+      var gfriend = new Sdx.Web.GoogleFriendry(
+        mb: "/i/base/bar{2}/foo{1}/top.aspx",
+        sp: "/sp/bar{2}/foo{1}/top.aspx",
+        regex: "^/base/foo([0-9]+?)/bar([0-9]+?)/top.aspx"
+      );
+      Assert.Equal("/i/base/bar5/foo2/top.aspx", gfriend.MbUrl);
+      Assert.Equal("/sp/bar5/foo2/top.aspx", gfriend.SpUrl);
+    }
   }
 }

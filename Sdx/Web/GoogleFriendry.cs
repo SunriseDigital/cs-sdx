@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Sdx.Web
 {
@@ -11,11 +12,31 @@ namespace Sdx.Web
     private string mb;
     private string sp;
 
-    public GoogleFriendry(string pc = null, string sp = null, string mb = null)
+    private string[] captureGroups;
+
+    public GoogleFriendry(string pc = null, string sp = null, string mb = null, string regex = null)
     {
       this.pc = pc;
       this.sp = sp;
       this.mb = mb;
+
+      var formatValues = new List<string>();
+      if(regex != null)
+      {
+        var reg = new Regex(regex);
+        var match = reg.Match(Sdx.Context.Current.Request.Url.PathAndQuery);
+        if(!match.Success)
+        {
+          throw new ArgumentException("Not match regex to current url path " + Sdx.Context.Current.Request.Url.PathAndQuery);
+        }
+
+        for (int i = 0; i < match.Groups.Count; i++)
+        {
+          formatValues.Add(match.Groups[i].Value);
+        }
+      }
+
+      captureGroups = formatValues.ToArray<string>();
     }
 
     public bool IsPcUrl
@@ -91,14 +112,7 @@ namespace Sdx.Web
     {
       get
       {
-        if(IsPcUrl)
-        {
-          return Sdx.Context.Current.Request.Path;
-        }
-        else
-        {
-          return pc;
-        }
+        return BuildUrl(pc, IsPcUrl);
       }
     }
 
@@ -106,14 +120,7 @@ namespace Sdx.Web
     {
       get
       {
-        if (IsMbUrl)
-        {
-          return Sdx.Context.Current.Request.Path;
-        }
-        else
-        {
-          return mb;
-        }
+        return BuildUrl(mb, IsMbUrl);
       }
     }
 
@@ -121,14 +128,19 @@ namespace Sdx.Web
     {
       get
       {
-        if (IsSpUrl)
-        {
-          return Sdx.Context.Current.Request.Path;
-        }
-        else
-        {
-          return sp;
-        }
+        return BuildUrl(sp, IsSpUrl);
+      }
+    }
+
+    private string BuildUrl(string url, bool isCurrent)
+    {
+      if (isCurrent)
+      {
+        return Sdx.Context.Current.Request.Url.PathAndQuery;
+      }
+      else
+      {
+        return string.Format(url, captureGroups.ToArray<string>());
       }
     }
   }
