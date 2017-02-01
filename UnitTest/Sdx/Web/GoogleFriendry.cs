@@ -23,7 +23,7 @@ namespace UnitTest
     private const string MB_USER_AGENT = "D502i	DoCoMo/1.0/D502i	DoCoMo/1.0/D502i/c10";
 
     [Fact]
-    public void TestSimpleUrl()
+    public void TestSimplePcUrl()
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
@@ -33,18 +33,68 @@ namespace UnitTest
       Assert.True(gfriend.IsPcUrl);
       Assert.False(gfriend.IsMbUrl);
       Assert.False(gfriend.IsSpUrl);
-      
-      Assert.Null(gfriend.RedirectUrl);
 
       Assert.Equal("/top.aspx", gfriend.PcUrl);
       Assert.Equal("/i/top.aspx", gfriend.MbUrl);
       Assert.Equal("/sp/top.aspx", gfriend.SpUrl);
+
+      Assert.Equal(null, gfriend.RedirectUrl);
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(SP_USER_AGENT);
       Assert.Equal("/sp/top.aspx", gfriend.RedirectUrl);
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(MB_USER_AGENT);
       Assert.Equal("/i/top.aspx", gfriend.RedirectUrl);
+    }
+
+    [Fact]
+    public void TestSimpleSpUrl()
+    {
+      //mockをセット
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
+      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/sp/top.aspx", "");
+
+      var gfriend = new Sdx.Web.GoogleFriendry(pc: "/top.aspx", mb: "/i/top.aspx");
+      Assert.False(gfriend.IsPcUrl);
+      Assert.False(gfriend.IsMbUrl);
+      Assert.True(gfriend.IsSpUrl);
+
+      Assert.Equal("/top.aspx", gfriend.PcUrl);
+      Assert.Equal("/i/top.aspx", gfriend.MbUrl);
+      Assert.Equal("/sp/top.aspx", gfriend.SpUrl);
+
+      Assert.Equal("/top.aspx", gfriend.RedirectUrl);
+
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(SP_USER_AGENT);
+      Assert.Equal(null, gfriend.RedirectUrl);
+
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(MB_USER_AGENT);
+      Assert.Equal("/i/top.aspx", gfriend.RedirectUrl);
+    }
+
+    [Fact]
+    public void TestSimpleMbUrl()
+    {
+      //mockをセット
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
+      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/i/top.aspx", "");
+
+      var gfriend = new Sdx.Web.GoogleFriendry(sp: "/sp/top.aspx", pc: "/top.aspx");
+      Assert.False(gfriend.IsPcUrl);
+      Assert.True(gfriend.IsMbUrl);
+      Assert.False(gfriend.IsSpUrl);
+
+      Assert.Equal("/top.aspx", gfriend.PcUrl);
+      Assert.Equal("/i/top.aspx", gfriend.MbUrl);
+      Assert.Equal("/sp/top.aspx", gfriend.SpUrl);
+
+      Assert.Equal("/top.aspx", gfriend.RedirectUrl);
+
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(SP_USER_AGENT);
+      Assert.Equal("/sp/top.aspx", gfriend.RedirectUrl);
+
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(MB_USER_AGENT);
+      Assert.Equal(null, gfriend.RedirectUrl);
     }
   }
 }
