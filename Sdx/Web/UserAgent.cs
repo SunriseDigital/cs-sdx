@@ -49,6 +49,20 @@ namespace Sdx.Web
       }
     }
 
+    private DeviceInfo device;
+    public DeviceInfo Device
+    {
+      get
+      {
+        if (device == null)
+        {
+          device = new DeviceInfo(this);
+        }
+
+        return device;
+      }
+    }
+
     /// <summary>
     /// ブラウザー情報。Browserプロパティーからアクセス。
     /// </summary>
@@ -68,7 +82,7 @@ namespace Sdx.Web
         {
           if (!cache.ContainsKey("Props.IsIE"))
           {
-            cache["Props.IsIE"] = Regex.IsMatch(userAgent.Value, "(msie|MSIE|(T|t)rident)");
+            cache["Props.IsIE"] = Regex.IsMatch(userAgent.Value, "(msie|MSIE|(T|t)rident)", RegexOptions.Compiled);
           }
 
           return (bool)cache["Props.IsIE"];
@@ -87,6 +101,54 @@ namespace Sdx.Web
       {
         this.userAgent = userAgent;
         cache = new Dictionary<string, object>();
+      }
+    }
+
+    /// <summary>
+    /// Device情報。Deviceプロパティーからアクセス。
+    /// </summary>
+    public class DeviceInfo
+    {
+      private Dictionary<string, object> cache;
+      private UserAgent userAgent;
+      public DeviceInfo(UserAgent userAgent)
+      {
+        this.userAgent = userAgent;
+        cache = new Dictionary<string, object>();
+      }
+
+      public bool IsPc
+      {
+        get
+        {
+          return !IsMb && !IsSp;
+        }
+      }
+
+      public bool IsMb
+      {
+        get
+        {
+          if (!cache.ContainsKey("Props.IsSp"))
+          {
+            cache["Props.IsSp"] = Regex.IsMatch(userAgent.Value, @"DoCoMo|UP.Browser|SoftBank|WILLCOM", RegexOptions.Compiled);
+          }
+
+          return (bool)cache["Props.IsSp"];
+        }
+      }
+
+      public bool IsSp
+      {
+        get
+        {
+          if (!cache.ContainsKey("Props.IsMb"))
+          {
+            cache["Props.IsMb"] = Regex.IsMatch(userAgent.Value, @"iPhone|Android.*Mobile|Windows.*Phone", RegexOptions.Compiled);
+          }
+
+          return (bool)cache["Props.IsMb"];
+        }
       }
     }
   }

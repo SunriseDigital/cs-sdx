@@ -23,6 +23,7 @@ namespace Sdx
       if (HttpContext.Current != null)
       {
         UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
+        Request = HttpContext.Current.Request;
       }
     }
 
@@ -117,7 +118,9 @@ namespace Sdx
       }
     }
 
-    public Web.UserAgent UserAgent { get; private set; }
+    public Web.UserAgent UserAgent { get; set; }
+
+    public HttpRequest Request { get; set; }
 
     /// <summary>
     /// <see cref="Sdx.Db.Adapter.Base.SharedConnection"/>で生成された共有接続をすべて開放する。

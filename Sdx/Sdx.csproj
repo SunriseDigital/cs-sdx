@@ -106,6 +106,7 @@
     <Compile Include="Validation\Group\Function.cs" />
     <Compile Include="Web\DeviceRedirectHttpModule.cs" />
     <Compile Include="Web\DeviceTable.cs" />
+    <Compile Include="Web\GoogleFriendry.cs" />
     <Compile Include="Web\HttpModule.cs" />
     <Compile Include="Html\Attr.cs" />
     <Compile Include="Html\Checkable.cs" />
