@@ -34,17 +34,17 @@ namespace UnitTest
       Assert.False(gfriend.IsMbUrl);
       Assert.False(gfriend.IsSpUrl);
 
-      Assert.Equal("/top.aspx", gfriend.PcUrl);
-      Assert.Equal("/i/top.aspx", gfriend.MbUrl);
-      Assert.Equal("/sp/top.aspx", gfriend.SpUrl);
+      Assert.Equal("/top.aspx", gfriend.PcUrl.Build());
+      Assert.Equal("/i/top.aspx", gfriend.MbUrl.Build());
+      Assert.Equal("/sp/top.aspx", gfriend.SpUrl.Build());
 
       Assert.Equal(null, gfriend.RedirectUrl);
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(SP_USER_AGENT);
-      Assert.Equal("/sp/top.aspx", gfriend.RedirectUrl);
+      Assert.Equal("/sp/top.aspx", gfriend.RedirectUrl.Build());
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(MB_USER_AGENT);
-      Assert.Equal("/i/top.aspx", gfriend.RedirectUrl);
+      Assert.Equal("/i/top.aspx", gfriend.RedirectUrl.Build());
     }
 
     [Fact]
@@ -59,17 +59,17 @@ namespace UnitTest
       Assert.False(gfriend.IsMbUrl);
       Assert.True(gfriend.IsSpUrl);
 
-      Assert.Equal("/top.aspx", gfriend.PcUrl);
-      Assert.Equal("/i/top.aspx", gfriend.MbUrl);
-      Assert.Equal("/sp/top.aspx", gfriend.SpUrl);
+      Assert.Equal("/top.aspx", gfriend.PcUrl.Build());
+      Assert.Equal("/i/top.aspx", gfriend.MbUrl.Build());
+      Assert.Equal("/sp/top.aspx", gfriend.SpUrl.Build());
 
-      Assert.Equal("/top.aspx", gfriend.RedirectUrl);
+      Assert.Equal("/top.aspx", gfriend.RedirectUrl.Build());
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(SP_USER_AGENT);
       Assert.Equal(null, gfriend.RedirectUrl);
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(MB_USER_AGENT);
-      Assert.Equal("/i/top.aspx", gfriend.RedirectUrl);
+      Assert.Equal("/i/top.aspx", gfriend.RedirectUrl.Build());
     }
 
     [Fact]
@@ -84,14 +84,14 @@ namespace UnitTest
       Assert.True(gfriend.IsMbUrl);
       Assert.False(gfriend.IsSpUrl);
 
-      Assert.Equal("/top.aspx", gfriend.PcUrl);
-      Assert.Equal("/i/top.aspx", gfriend.MbUrl);
-      Assert.Equal("/sp/top.aspx", gfriend.SpUrl);
+      Assert.Equal("/top.aspx", gfriend.PcUrl.Build());
+      Assert.Equal("/i/top.aspx", gfriend.MbUrl.Build());
+      Assert.Equal("/sp/top.aspx", gfriend.SpUrl.Build());
 
-      Assert.Equal("/top.aspx", gfriend.RedirectUrl);
+      Assert.Equal("/top.aspx", gfriend.RedirectUrl.Build());
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(SP_USER_AGENT);
-      Assert.Equal("/sp/top.aspx", gfriend.RedirectUrl);
+      Assert.Equal("/sp/top.aspx", gfriend.RedirectUrl.Build());
 
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(MB_USER_AGENT);
       Assert.Equal(null, gfriend.RedirectUrl);
@@ -109,8 +109,8 @@ namespace UnitTest
         sp: "/sp/bar{2}/foo{1}/top.aspx",
         regex: "^/base/foo([0-9]+?)/bar([0-9]+?)/top.aspx"
       );
-      Assert.Equal("/i/base/bar5/foo2/top.aspx", gfriend.MbUrl);
-      Assert.Equal("/sp/bar5/foo2/top.aspx", gfriend.SpUrl);
+      Assert.Equal("/i/base/bar5/foo2/top.aspx", gfriend.MbUrl.Build());
+      Assert.Equal("/sp/bar5/foo2/top.aspx", gfriend.SpUrl.Build());
     }
   }
 }

@@ -63,7 +63,7 @@ namespace Sdx.Web
       }
     }
 
-    public string RedirectUrl
+    public Sdx.Web.Url RedirectUrl
     {  
       get
       {
@@ -108,7 +108,7 @@ namespace Sdx.Web
       }
     }
 
-    public string PcUrl
+    public Sdx.Web.Url PcUrl
     {
       get
       {
@@ -116,7 +116,7 @@ namespace Sdx.Web
       }
     }
 
-    public string MbUrl
+    public Sdx.Web.Url MbUrl
     {
       get
       {
@@ -124,7 +124,7 @@ namespace Sdx.Web
       }
     }
 
-    public string SpUrl
+    public Sdx.Web.Url SpUrl
     {
       get
       {
@@ -132,15 +132,16 @@ namespace Sdx.Web
       }
     }
 
-    private string BuildUrl(string url, bool isCurrent)
+    private Sdx.Web.Url BuildUrl(string url, bool isCurrent)
     {
       if (isCurrent)
       {
-        return Sdx.Context.Current.Request.Url.PathAndQuery;
+        return new Url(Sdx.Context.Current.Request.Url.PathAndQuery);
       }
       else
       {
-        return string.Format(url, captureGroups.ToArray<string>());
+        var path = string.Format(url, captureGroups.ToArray<string>());
+        return new Url(path);
       }
     }
   }
