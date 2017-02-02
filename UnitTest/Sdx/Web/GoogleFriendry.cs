@@ -176,5 +176,21 @@ namespace UnitTest
       Assert.Equal("/i/m10/s12/?mfoo=1&bar=13&mhoga=8", gfriend.MbUrl.Build());
       Assert.Equal("/sp/m10/s12/?sfoo=1&bar=13&shoga=8", gfriend.SpUrl.Build());
     }
+
+    [Fact]
+    public void TestMissingDevice()
+    {
+      //mockをセット
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
+      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+
+      var gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Pc,
+        sp: "/sp/"
+      );
+
+      Assert.Equal("/sp/?sfoo=1&bar=13&shoga=8", gfriend.SpUrl.Build());
+      Assert.Equal(null, gfriend.MbUrl);
+    }
   }
 }

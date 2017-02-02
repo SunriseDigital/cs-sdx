@@ -23,6 +23,8 @@ namespace Sdx.Web
 
     private Device currentUrlDevice;
 
+    private Dictionary<Device, Url> resultCache = new Dictionary<Device, Url>();
+
     public GoogleFriendry(Device device, string pc = null, string sp = null, string mb = null, string regex = null)
     {
       currentUrlDevice = device;
@@ -134,27 +136,33 @@ namespace Sdx.Web
 
     private Sdx.Web.Url BuildUrl(Device device)
     {
-      if (currentUrlDevice == device)
+      if (!resultCache.ContainsKey(device))
       {
-        return new Url(Sdx.Context.Current.Request.Url.PathAndQuery);
-      }
-      else if (urls[device] != null)
-      {
-        var path = string.Format(urls[device], captureGroups.ToArray<string>());
-        var result = new Url(path + Sdx.Context.Current.Request.Url.Query);
-        if(queryMap.ContainsKey(device))
+        if (currentUrlDevice == device)
         {
-          foreach (var kv in queryMap[device])
-          {
-            result.ReplaceParamKey(kv.Key, kv.Value);
-          }
+          resultCache[device] = new Url(Sdx.Context.Current.Request.Url.PathAndQuery);
         }
-        return result;
+        else if (urls[device] != null)
+        {
+          var path = string.Format(urls[device], captureGroups.ToArray<string>());
+          var result = new Url(path + Sdx.Context.Current.Request.Url.Query);
+          if (queryMap.ContainsKey(device))
+          {
+            foreach (var kv in queryMap[device])
+            {
+              result.ReplaceParamKey(kv.Key, kv.Value);
+            }
+          }
+
+          resultCache[device] = result;
+        }
+        else
+        {
+          resultCache[device] = null;
+        } 
       }
-      else
-      {
-        throw new InvalidOperationException("Missing " + device.ToString().ToLower() + " device url format.");
-      }
+
+      return resultCache[device];
     }
 
     private void AddQueryMap(Device device, string from, string to)
