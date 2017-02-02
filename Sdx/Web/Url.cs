@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace Sdx.Web
 {
-  public class Url : ICloneable
+  public class Url : ICloneable, IUrl
   {
     //コンストラクタ
     public Url(string urlStr)
@@ -174,8 +174,29 @@ namespace Sdx.Web
 
     public Url SetParam(string key, string value)
     {
-      this.RemoveParam(key);
-      this.AddParam(key, value);
+      if(!HasParam(key))
+      {
+        AddParam(key, value);
+        return this;
+      }
+
+      var found = false;
+      ParamList = ParamList.Where(tp =>
+      {
+        if(tp.Item1 == key)
+        {
+          if (found)
+          {
+            return false;
+          }
+
+          found = true;
+          return true;
+        }
+
+        return true;
+      }).Select(tp => tp.Item1 == key ? Tuple.Create(key, value) : tp).ToList();
+      ParamCount[Uri.EscapeUriString(key)] = 1;
       return this;
     }
 
@@ -307,5 +328,107 @@ namespace Sdx.Web
         }
       }
     }
+
+    public Url ToUrl()
+    {
+      return this;
+    }
+
+    #region Manipuratorを返すメソッド
+    public IUrl Next(string key, int defaultValue = 1)
+    {
+      return new Manipurator(this).Next(key, defaultValue);
+    }
+
+    public IUrl Prev(string key)
+    {
+      return new Manipurator(this).Prev(key);
+    }
+
+    public IUrl Add(string key, string value)
+    {
+      return new Manipurator(this).Add(key, value);
+    }
+
+    public IUrl Remove(string key)
+    {
+      return new Manipurator(this).Remove(key);
+    }
+
+    public IUrl Set(string key, string value)
+    {
+      return new Manipurator(this).Set(key, value);
+    }
+    #endregion
+
+    #region Manipuratorの定義
+    public class Manipurator : IUrl
+    {
+      private Url url;
+      internal Manipurator(Url url)
+      {
+        this.url = (Url)url.Clone();
+      }
+
+      public Url ToUrl()
+      {
+        return url;
+      }
+
+      public string Build()
+      {
+        return ToUrl().Build();
+      }
+
+      /// <summary>
+      /// 指定したパラメータの数字を一つ進めたURLを生成する。ページネーションのあるページで次のページのURLを取得する場合に利用可能。
+      /// </summary>
+      /// <param name="pageParamKey"></param>
+      /// <returns></returns>
+      public IUrl Next(string key, int defaultValue = 1)
+      {
+        var value = defaultValue;
+        if (url.HasParam(key))
+        {
+          value = Int32.Parse(url.GetParam(key));
+        }
+
+        url.SetParam(key, value + 1);
+
+        return this;
+      }
+
+      public IUrl Prev(string key)
+      {
+        if (!url.HasParam(key))
+        {
+          throw new Exception("Missing " + key + " column");
+        }
+
+        var value = Int32.Parse(url.GetParam(key));
+        url.SetParam(key, value - 1);
+
+        return this;
+      }
+
+      public IUrl Add(string key, string value)
+      {
+        url.AddParam(key, value);
+        return this;
+      }
+
+      public IUrl Remove(string key)
+      {
+        url.RemoveParam(key);
+        return this;
+      }
+
+      public IUrl Set(string key, string value)
+      {
+        url.SetParam(key, value);
+        return this;
+      }
+    }
+    #endregion
   }
 }
