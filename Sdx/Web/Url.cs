@@ -296,5 +296,16 @@ namespace Sdx.Web
 
       return Build(tpList);
     }
+
+    public void ReplaceParamKey(string from, string to)
+    {
+      for (int i = 0; i < ParamList.Count; i++)
+      {
+        if(ParamList[i].Item1 == from)
+        {
+          ParamList[i] = Tuple.Create(to, ParamList[i].Item2);
+        }
+      }
+    }
   }
 }

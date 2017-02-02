@@ -14,6 +14,8 @@ namespace Sdx.Web
 
     private string[] captureGroups;
 
+    private Dictionary<string, Dictionary<string, string>> queryMap = new Dictionary<string, Dictionary<string, string>>();
+
     public GoogleFriendry(string pc = null, string sp = null, string mb = null, string regex = null)
     {
       this.pc = pc;
@@ -141,8 +143,46 @@ namespace Sdx.Web
       else
       {
         var path = string.Format(url, captureGroups.ToArray<string>());
-        return new Url(path + Sdx.Context.Current.Request.Url.Query);
+        var result = new Url(path + Sdx.Context.Current.Request.Url.Query);
+        if(queryMap.ContainsKey(url))
+        {
+          foreach(var kv in queryMap[url])
+          {
+            result.ReplaceParamKey(kv.Key, kv.Value);
+          }
+        }
+        return result;
       }
+    }
+
+    public void AddMbQueryMap(string from, string to)
+    {
+      if(!queryMap.ContainsKey(mb))
+      {
+        queryMap[mb] = new Dictionary<string, string>();
+      }
+
+      queryMap[mb][from] = to;
+    }
+
+    public void AddSpQueryMap(string from, string to)
+    {
+      if (!queryMap.ContainsKey(sp))
+      {
+        queryMap[sp] = new Dictionary<string, string>();
+      }
+
+      queryMap[sp][from] = to;
+    }
+
+    public void AddPcQueryMap(string from, string to)
+    {
+      if (!queryMap.ContainsKey(pc))
+      {
+        queryMap[pc] = new Dictionary<string, string>();
+      }
+
+      queryMap[pc][from] = to;
     }
   }
 }

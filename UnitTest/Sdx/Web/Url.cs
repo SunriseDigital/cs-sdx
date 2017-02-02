@@ -502,5 +502,23 @@ namespace UnitTest
       );
       
     }
+
+    [Fact]
+    public void TestReplaceParamKey()
+    {
+      var url = new Sdx.Web.Url("http://www.example.com/path/to/no-scheme?foo=bar1&foo=bar2&baz=qux");
+      url.ReplaceParamKey("foo", "foo2");
+
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme?foo2=bar1&foo2=bar2&baz=qux",
+        url.Build()
+      );
+
+      url.ReplaceParamKey("baz", "baz2");
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme?foo2=bar1&foo2=bar2&baz2=qux",
+        url.Build()
+      );
+    }
   }
 }

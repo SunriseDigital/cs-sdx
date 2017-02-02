@@ -136,5 +136,37 @@ namespace UnitTest
       Assert.Equal("/i/m10/s12/?foo=1&bar=13&hoga=8", gfriend.MbUrl.Build());
       Assert.Equal("/sp/m10/s12/?foo=1&bar=13&hoga=8", gfriend.SpUrl.Build());
     }
+
+    [Fact]
+    public void TestDifferentQuery()
+    {
+      //mockをセット
+      Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
+      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+
+      var gfriend = new Sdx.Web.GoogleFriendry(
+        mb: "/i/",
+        sp: "/sp/"
+      );
+      gfriend.AddMbQueryMap("foo", "mfoo");
+      gfriend.AddMbQueryMap("hoga", "mhoga");
+      gfriend.AddSpQueryMap("foo", "sfoo");
+      gfriend.AddSpQueryMap("hoga", "shoga");
+      Assert.Equal("/i/?mfoo=1&bar=13&mhoga=8", gfriend.MbUrl.Build());
+      Assert.Equal("/sp/?sfoo=1&bar=13&shoga=8", gfriend.SpUrl.Build());
+
+      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/m10/s12/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+      gfriend = new Sdx.Web.GoogleFriendry(
+        mb: "/i/{1}/{2}/",
+        sp: "/sp/{1}/{2}/",
+        regex: "^/(m[0-9]+?)/(s[0-9]+?)/"
+      );
+      gfriend.AddMbQueryMap("foo", "mfoo");
+      gfriend.AddMbQueryMap("hoga", "mhoga");
+      gfriend.AddSpQueryMap("foo", "sfoo");
+      gfriend.AddSpQueryMap("hoga", "shoga");
+      Assert.Equal("/i/m10/s12/?mfoo=1&bar=13&mhoga=8", gfriend.MbUrl.Build());
+      Assert.Equal("/sp/m10/s12/?sfoo=1&bar=13&shoga=8", gfriend.SpUrl.Build());
+    }
   }
 }
