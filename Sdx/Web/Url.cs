@@ -329,12 +329,14 @@ namespace Sdx.Web
       }
     }
 
+
+
+    #region IUrlのメソッド
     public Url ToUrl()
     {
       return this;
     }
 
-    #region Manipuratorを返すメソッド
     public IUrl Next(string key, int defaultValue = 1)
     {
       return new Manipurator(this).Next(key, defaultValue);
