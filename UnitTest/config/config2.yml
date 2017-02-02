@@ -1,0 +1,57 @@
+﻿page:
+  - 
+    query_match_perfect:
+      flag: 1
+      pa:
+
+    pc:
+      url: /{area:(yoshiwara|kanagawa)}/gal/
+      query:
+          pa:  page
+    sp:
+      url: /sp/{area:(yoshiwara|kanagawa)}/gal/
+      query:
+          pa:  p
+    mb:
+      url: /m/{area:(yoshiwara|kanagawa)}/gal/
+      query:
+          pa:  p
+  - 
+    query_match:
+      tg_prices_high: 1
+      button:
+
+    exclude_build_query: [m]
+
+    pc:
+      url: /{area:(yoshiwara|kanagawa)}/shop/
+      exclude_build_query: [foo,bar]
+
+    sp:
+      url: /sp/{area:(yoshiwara|kanagawa)}/shop/
+      exclude_build_query: [p]
+
+    mb:
+      url: /m/{area:(yoshiwara|kanagawa)}/shop/
+
+  - 
+    query_match_perfect:
+
+    pc:
+      url: /{area:(yoshiwara|kanagawa)}/shop/
+
+    sp:
+      url: /sp/{area:(yoshiwara|kanagawa)}/shop/
+
+    mb:
+      url: /m/{area:(yoshiwara|kanagawa)}/shop/
+
+  - 
+    pc:
+      url: /{area:(yoshiwara|kanagawa)}/top/
+
+    sp:
+      url: /sp/{area:(yoshiwara|kanagawa)}/top/
+
+    mb:
+      url: /m/{area:(yoshiwara|kanagawa)}/top/
