@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Sdx.Web
 {
-  public class GoogleFriendry
+  public class DeviceUrl
   {
     public enum Device
     {
@@ -22,23 +22,23 @@ namespace Sdx.Web
 
     private Dictionary<Device, Dictionary<string, string>> queryMap = new Dictionary<Device, Dictionary<string, string>>();
 
-    private Device pageDevice;
+    private Device currentDevice;
 
     private Dictionary<Device, Url> resultCache = new Dictionary<Device, Url>();
 
-    public GoogleFriendry(Device pageDevice, string pc = null, string sp = null, string mb = null, string regex = null)
+    public DeviceUrl(Device currentDevice, string pc = null, string sp = null, string mb = null, string regex = null)
     {
-      this.pageDevice = pageDevice;
+      this.currentDevice = currentDevice;
 
-      if (pageDevice == Device.Pc && pc != null)
+      if (currentDevice == Device.Pc && pc != null)
       {
         throw new ArgumentException("pc is not null, for current url device must be null");
       }
-      else if (pageDevice == Device.Sp && sp != null)
+      else if (currentDevice == Device.Sp && sp != null)
       {
         throw new ArgumentException("sp is not null, for current url device must be null");
       }
-      else if (pageDevice == Device.Mb && mb != null)
+      else if (currentDevice == Device.Mb && mb != null)
       {
         throw new ArgumentException("mb is not null, for current url device must be null");
       }
@@ -67,7 +67,7 @@ namespace Sdx.Web
       captureGroups = formatValues.ToArray<string>();
     }
 
-    public Sdx.Web.Url PcUrl
+    public Sdx.Web.Url Pc
     {
       get
       {
@@ -75,7 +75,7 @@ namespace Sdx.Web
       }
     }
 
-    public Sdx.Web.Url MbUrl
+    public Sdx.Web.Url Mb
     {
       get
       {
@@ -83,7 +83,7 @@ namespace Sdx.Web
       }
     }
 
-    public Sdx.Web.Url SpUrl
+    public Sdx.Web.Url Sp
     {
       get
       {
@@ -95,7 +95,7 @@ namespace Sdx.Web
     {
       if (!resultCache.ContainsKey(device))
       {
-        if (pageDevice == device)
+        if (this.currentDevice == device)
         {
           resultCache[device] = new Url(Sdx.Context.Current.Request.Url.PathAndQuery);
         }
@@ -147,9 +147,9 @@ namespace Sdx.Web
       AddQueryMap(Device.Pc, from, to);
     }
 
-    public bool IsPageDevice(params Device[] devices)
+    public bool IsCurrent(params Device[] devices)
     {
-      return devices.Any(dev => dev == pageDevice);
+      return devices.Any(dev => dev == currentDevice);
     }
   }
 }
