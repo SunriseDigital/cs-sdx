@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Sdx.Web
 {
@@ -21,23 +22,23 @@ namespace Sdx.Web
 
     private Dictionary<Device, Dictionary<string, string>> queryMap = new Dictionary<Device, Dictionary<string, string>>();
 
-    private Device currentUrlDevice;
+    private Device pageDevice;
 
     private Dictionary<Device, Url> resultCache = new Dictionary<Device, Url>();
 
-    public GoogleFriendry(Device device, string pc = null, string sp = null, string mb = null, string regex = null)
+    public GoogleFriendry(Device pageDevice, string pc = null, string sp = null, string mb = null, string regex = null)
     {
-      currentUrlDevice = device;
+      this.pageDevice = pageDevice;
 
-      if (currentUrlDevice == Device.Pc && pc != null)
+      if (pageDevice == Device.Pc && pc != null)
       {
         throw new ArgumentException("pc is not null, for current url device must be null");
       }
-      else if (currentUrlDevice == Device.Sp && sp != null)
+      else if (pageDevice == Device.Sp && sp != null)
       {
         throw new ArgumentException("sp is not null, for current url device must be null");
       }
-      else if (currentUrlDevice == Device.Mb && mb != null)
+      else if (pageDevice == Device.Mb && mb != null)
       {
         throw new ArgumentException("mb is not null, for current url device must be null");
       }
@@ -64,50 +65,6 @@ namespace Sdx.Web
       }
 
       captureGroups = formatValues.ToArray<string>();
-    }
-
-    public Sdx.Web.Url RedirectUrl
-    {  
-      get
-      {
-        if(Sdx.Context.Current.UserAgent.Device.IsPc)
-        {
-          if(currentUrlDevice == Device.Pc)
-          {
-            return null;
-          }
-          else
-          {
-            return PcUrl;
-          }
-        }
-        else if(Sdx.Context.Current.UserAgent.Device.IsSp)
-        {
-          if (currentUrlDevice == Device.Sp)
-          {
-            return null;
-          }
-          else
-          {
-            return SpUrl;
-          }
-        }
-        else if (Sdx.Context.Current.UserAgent.Device.IsMb)
-        {
-          if (currentUrlDevice == Device.Mb)
-          {
-            return null;
-          }
-          else
-          {
-            return MbUrl;
-          }
-        }
-        else
-        {
-          return null;
-        }
-      }
     }
 
     public Sdx.Web.Url PcUrl
@@ -138,7 +95,7 @@ namespace Sdx.Web
     {
       if (!resultCache.ContainsKey(device))
       {
-        if (currentUrlDevice == device)
+        if (pageDevice == device)
         {
           resultCache[device] = new Url(Sdx.Context.Current.Request.Url.PathAndQuery);
         }
@@ -188,6 +145,11 @@ namespace Sdx.Web
     public void AddPcQueryMap(string from, string to)
     {
       AddQueryMap(Device.Pc, from, to);
+    }
+
+    public bool IsPageDevice(params Device[] devices)
+    {
+      return devices.Any(dev => dev == pageDevice);
     }
   }
 }
