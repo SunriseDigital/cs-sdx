@@ -29,10 +29,11 @@ namespace UnitTest
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/top.aspx", "");
       
-      var gfriend = new Sdx.Web.GoogleFriendry(mb: "/i/top.aspx", sp: "/sp/top.aspx");
-      Assert.True(gfriend.IsPcUrl);
-      Assert.False(gfriend.IsMbUrl);
-      Assert.False(gfriend.IsSpUrl);
+      var gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Pc,
+        mb: "/i/top.aspx",
+        sp: "/sp/top.aspx"
+      );
 
       Assert.Equal("/top.aspx", gfriend.PcUrl.Build());
       Assert.Equal("/i/top.aspx", gfriend.MbUrl.Build());
@@ -54,10 +55,11 @@ namespace UnitTest
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/sp/top.aspx", "");
 
-      var gfriend = new Sdx.Web.GoogleFriendry(pc: "/top.aspx", mb: "/i/top.aspx");
-      Assert.False(gfriend.IsPcUrl);
-      Assert.False(gfriend.IsMbUrl);
-      Assert.True(gfriend.IsSpUrl);
+      var gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Sp,
+        pc: "/top.aspx",
+        mb: "/i/top.aspx"
+      );
 
       Assert.Equal("/top.aspx", gfriend.PcUrl.Build());
       Assert.Equal("/i/top.aspx", gfriend.MbUrl.Build());
@@ -79,10 +81,11 @@ namespace UnitTest
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/i/top.aspx", "");
 
-      var gfriend = new Sdx.Web.GoogleFriendry(sp: "/sp/top.aspx", pc: "/top.aspx");
-      Assert.False(gfriend.IsPcUrl);
-      Assert.True(gfriend.IsMbUrl);
-      Assert.False(gfriend.IsSpUrl);
+      var gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Mb,
+        sp: "/sp/top.aspx",
+        pc: "/top.aspx"
+      );
 
       Assert.Equal("/top.aspx", gfriend.PcUrl.Build());
       Assert.Equal("/i/top.aspx", gfriend.MbUrl.Build());
@@ -105,6 +108,7 @@ namespace UnitTest
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/base/foo2/bar5/top.aspx", "");
 
       var gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Pc,
         mb: "/i/base/bar{2}/foo{1}/top.aspx",
         sp: "/sp/bar{2}/foo{1}/top.aspx",
         regex: "^/base/foo([0-9]+?)/bar([0-9]+?)/top.aspx"
@@ -121,6 +125,7 @@ namespace UnitTest
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
 
       var gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Pc,
         mb: "/i/",
         sp: "/sp/"
       );
@@ -129,6 +134,7 @@ namespace UnitTest
 
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/m10/s12/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
       gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Pc,
         mb: "/i/{1}/{2}/",
         sp: "/sp/{1}/{2}/",
         regex: "^/(m[0-9]+?)/(s[0-9]+?)/"
@@ -145,6 +151,7 @@ namespace UnitTest
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
 
       var gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Pc,
         mb: "/i/",
         sp: "/sp/"
       );
@@ -157,6 +164,7 @@ namespace UnitTest
 
       Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/m10/s12/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
       gfriend = new Sdx.Web.GoogleFriendry(
+        Sdx.Web.GoogleFriendry.Device.Pc,
         mb: "/i/{1}/{2}/",
         sp: "/sp/{1}/{2}/",
         regex: "^/(m[0-9]+?)/(s[0-9]+?)/"

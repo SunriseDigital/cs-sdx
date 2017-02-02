@@ -8,20 +8,43 @@ namespace Sdx.Web
 {
   public class GoogleFriendry
   {
-    private string pc;
-    private string mb;
-    private string sp;
+    public enum Device
+    {
+      Pc,
+      Sp,
+      Mb,
+    }
+
+    private Dictionary<Device, string> urls = new Dictionary<Device,string>();
 
     private string[] captureGroups;
 
-    private Dictionary<string, Dictionary<string, string>> queryMap = new Dictionary<string, Dictionary<string, string>>();
+    private Dictionary<Device, Dictionary<string, string>> queryMap = new Dictionary<Device, Dictionary<string, string>>();
 
-    public GoogleFriendry(string pc = null, string sp = null, string mb = null, string regex = null)
+    private Device currentUrlDevice;
+
+    public GoogleFriendry(Device device, string pc = null, string sp = null, string mb = null, string regex = null)
     {
-      this.pc = pc;
-      this.sp = sp;
-      this.mb = mb;
+      currentUrlDevice = device;
 
+      if (currentUrlDevice == Device.Pc && pc != null)
+      {
+        throw new ArgumentException("pc is not null, for current url device must be null");
+      }
+      else if (currentUrlDevice == Device.Sp && sp != null)
+      {
+        throw new ArgumentException("sp is not null, for current url device must be null");
+      }
+      else if (currentUrlDevice == Device.Mb && mb != null)
+      {
+        throw new ArgumentException("mb is not null, for current url device must be null");
+      }
+
+      urls[Device.Pc] = pc;
+      urls[Device.Sp] = sp;
+      urls[Device.Mb] = mb;
+
+      //URLのプレイスフォルダを正規表現から作る
       var formatValues = new List<string>();
       if(regex != null)
       {
@@ -41,38 +64,13 @@ namespace Sdx.Web
       captureGroups = formatValues.ToArray<string>();
     }
 
-    public bool IsPcUrl
-    {
-      get
-      {
-        return this.pc == null;
-      }
-    }
-
-    public bool IsMbUrl
-    {
-      get
-      {
-        return this.mb == null;
-      }
-    }
-
-    public bool IsSpUrl
-    {
-      get
-      {
-        return this.sp == null;
-      }
-    }
-
     public Sdx.Web.Url RedirectUrl
     {  
       get
       {
-        Sdx.Context.Current.Debug.Log(Sdx.Context.Current.UserAgent.Device.IsSp);
         if(Sdx.Context.Current.UserAgent.Device.IsPc)
         {
-          if(IsPcUrl)
+          if(currentUrlDevice == Device.Pc)
           {
             return null;
           }
@@ -83,7 +81,7 @@ namespace Sdx.Web
         }
         else if(Sdx.Context.Current.UserAgent.Device.IsSp)
         {
-          if(IsSpUrl)
+          if (currentUrlDevice == Device.Sp)
           {
             return null;
           }
@@ -94,7 +92,7 @@ namespace Sdx.Web
         }
         else if (Sdx.Context.Current.UserAgent.Device.IsMb)
         {
-          if (IsMbUrl)
+          if (currentUrlDevice == Device.Mb)
           {
             return null;
           }
@@ -114,7 +112,7 @@ namespace Sdx.Web
     {
       get
       {
-        return BuildUrl(pc, IsPcUrl);
+        return BuildUrl(Device.Pc);
       }
     }
 
@@ -122,7 +120,7 @@ namespace Sdx.Web
     {
       get
       {
-        return BuildUrl(mb, IsMbUrl);
+        return BuildUrl(Device.Mb);
       }
     }
 
@@ -130,59 +128,58 @@ namespace Sdx.Web
     {
       get
       {
-        return BuildUrl(sp, IsSpUrl);
+        return BuildUrl(Device.Sp);
       }
     }
 
-    private Sdx.Web.Url BuildUrl(string url, bool isCurrent)
+    private Sdx.Web.Url BuildUrl(Device device)
     {
-      if (isCurrent)
+      if (currentUrlDevice == device)
       {
         return new Url(Sdx.Context.Current.Request.Url.PathAndQuery);
       }
-      else
+      else if (urls[device] != null)
       {
-        var path = string.Format(url, captureGroups.ToArray<string>());
+        var path = string.Format(urls[device], captureGroups.ToArray<string>());
         var result = new Url(path + Sdx.Context.Current.Request.Url.Query);
-        if(queryMap.ContainsKey(url))
+        if(queryMap.ContainsKey(device))
         {
-          foreach(var kv in queryMap[url])
+          foreach (var kv in queryMap[device])
           {
             result.ReplaceParamKey(kv.Key, kv.Value);
           }
         }
         return result;
       }
+      else
+      {
+        throw new InvalidOperationException("Missing " + device.ToString().ToLower() + " device url format.");
+      }
+    }
+
+    private void AddQueryMap(Device device, string from, string to)
+    {
+      if (!queryMap.ContainsKey(device))
+      {
+        queryMap[device] = new Dictionary<string, string>();
+      }
+
+      queryMap[device][from] = to;
     }
 
     public void AddMbQueryMap(string from, string to)
     {
-      if(!queryMap.ContainsKey(mb))
-      {
-        queryMap[mb] = new Dictionary<string, string>();
-      }
-
-      queryMap[mb][from] = to;
+      AddQueryMap(Device.Mb, from, to);
     }
 
     public void AddSpQueryMap(string from, string to)
     {
-      if (!queryMap.ContainsKey(sp))
-      {
-        queryMap[sp] = new Dictionary<string, string>();
-      }
-
-      queryMap[sp][from] = to;
+      AddQueryMap(Device.Sp, from, to);
     }
 
     public void AddPcQueryMap(string from, string to)
     {
-      if (!queryMap.ContainsKey(pc))
-      {
-        queryMap[pc] = new Dictionary<string, string>();
-      }
-
-      queryMap[pc][from] = to;
+      AddQueryMap(Device.Pc, from, to);
     }
   }
 }
