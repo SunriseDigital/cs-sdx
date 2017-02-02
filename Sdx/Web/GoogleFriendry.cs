@@ -141,7 +141,7 @@ namespace Sdx.Web
       else
       {
         var path = string.Format(url, captureGroups.ToArray<string>());
-        return new Url(path);
+        return new Url(path + Sdx.Context.Current.Request.Url.Query);
       }
     }
   }
