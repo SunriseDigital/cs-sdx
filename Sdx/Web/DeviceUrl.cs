@@ -26,6 +26,14 @@ namespace Sdx.Web
 
     private Dictionary<Device, Url> resultCache = new Dictionary<Device, Url>();
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="currentDevice">対象のページのデバイス</param>
+    /// <param name="pc">対象のデバイスがPCじゃなかった場合URLのフォーマットを渡します。</param>
+    /// <param name="sp">対象のデバイスがSPじゃなかった場合URLのフォーマットを渡します。</param>
+    /// <param name="mb">対象のデバイスがMBじゃなかった場合URLのフォーマットを渡します。</param>
+    /// <param name="regex">現在のURLからURLの変数を抽出する場合に正規表現を渡します。グループキャプチャの番号でフォーマットに指定してください（つまり最初のインデックスは1になります）。</param>
     public DeviceUrl(Device currentDevice, string pc = null, string sp = null, string mb = null, string regex = null)
     {
       this.currentDevice = currentDevice;
@@ -67,6 +75,9 @@ namespace Sdx.Web
       captureGroups = formatValues.ToArray<string>();
     }
 
+    /// <summary>
+    /// URLを返す。コンストラクタでURLフォーマットをセットしなかったかつ現在のURLじゃなかった場合はNULLが返ります。
+    /// </summary>
     public Sdx.Web.Url Pc
     {
       get
@@ -75,6 +86,9 @@ namespace Sdx.Web
       }
     }
 
+    /// <summary>
+    /// URLを返す。コンストラクタでURLフォーマットをセットしなかったかつ現在のURLじゃなかった場合はNULLが返ります。
+    /// </summary>
     public Sdx.Web.Url Mb
     {
       get
@@ -83,6 +97,9 @@ namespace Sdx.Web
       }
     }
 
+    /// <summary>
+    /// URLを返す。コンストラクタでURLフォーマットをセットしなかったかつ現在のURLじゃなかった場合はNULLが返ります。
+    /// </summary>
     public Sdx.Web.Url Sp
     {
       get
@@ -132,21 +149,41 @@ namespace Sdx.Web
       queryMap[device][from] = to;
     }
 
+    /// <summary>
+    /// 現在のURLからクエリーのキーを置換したい場合にここにセット。
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
     public void AddMbQueryMap(string from, string to)
     {
       AddQueryMap(Device.Mb, from, to);
     }
 
+    /// <summary>
+    /// 現在のURLからクエリーのキーを置換したい場合にここにセット。
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
     public void AddSpQueryMap(string from, string to)
     {
       AddQueryMap(Device.Sp, from, to);
     }
 
+    /// <summary>
+    /// 現在のURLからクエリーのキーを置換したい場合にここにセット。
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
     public void AddPcQueryMap(string from, string to)
     {
       AddQueryMap(Device.Pc, from, to);
     }
 
+    /// <summary>
+    /// 現在のページのデバイスが引数と一致するかを調べる。可変引数で複数指定し、どれかだったら、というチェックも可能。
+    /// </summary>
+    /// <param name="devices"></param>
+    /// <returns></returns>
     public bool IsCurrent(params Device[] devices)
     {
       return devices.Any(dev => dev == currentDevice);
