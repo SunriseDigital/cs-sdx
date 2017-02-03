@@ -4,8 +4,6 @@
 
 PC・スマホ・ガラケーのURLが違う場合に、`alternate`タグや`canonical`タグを出す時のヘルパーです。URLから動的変数をプレイスホルダにバインドしたり、クエリーのキー名が違う場合にも対応可能です。
 
-※[DeviceTable.md](DeviceTable)
-
 ## 使い方
 
 
@@ -33,7 +31,6 @@ var deviceUrl = new Sdx.Web.DeviceUrl(
 // PCはURLフォーマットを与えていませんが現在のパスから取得されます。
 deviceUrl.Pc.Build();
 // /top.aspx?foo=bar
-
 
 deviceUrl.Sp.Build();
 // /sp/top.aspx?foo=bar
