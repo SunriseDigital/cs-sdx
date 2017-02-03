@@ -74,13 +74,6 @@ namespace Sdx.Web
       }
     }
 
-    public string Build()
-    {
-      string path = this.BuildPath();
-      string query = this.BuildQueryString(this.ParamList);
-      return path + query;
-    }
-
     public string Build(Dictionary<string, string> add)
     {
       if(add.Count == 0)
@@ -332,6 +325,13 @@ namespace Sdx.Web
 
 
     #region IUrlのメソッド
+    public string Build()
+    {
+      string path = this.BuildPath();
+      string query = this.BuildQueryString(this.ParamList);
+      return path + query;
+    }
+
     public Url ToUrl()
     {
       return this;
@@ -364,7 +364,7 @@ namespace Sdx.Web
     #endregion
 
     #region Manipuratorの定義
-    public class Manipurator : IUrl
+    private class Manipurator : IUrl
     {
       private Url url;
       internal Manipurator(Url url)
