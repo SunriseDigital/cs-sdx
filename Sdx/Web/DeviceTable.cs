@@ -162,7 +162,8 @@ namespace Sdx.Web
             return false;
           }
 
-          Dictionary<string, string> currentQuery = splitUrl[1].Split('&').Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
+          //「?&foo=bar」や「?foo=bar&」のようなクエリがあったので対応
+          Dictionary<string, string> currentQuery = splitUrl[1].Split(new string[] { "&" }, StringSplitOptions.RemoveEmptyEntries).Select(s => s.Split('=')).ToDictionary(n => n[0], n => n[1]);
           if (currentDeviceSettings.ContainsKey("query"))
           {
             return QueryCheck(currentQuery, queryMatch, (YamlMappingNode)currentDeviceSettings["query"]);
