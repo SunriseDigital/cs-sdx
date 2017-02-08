@@ -8,6 +8,31 @@ namespace Sdx.Db.Adapter
 {
   public class SqlServer : Base
   {
+    private static Dictionary<string, Table.ColumnType?> columnMapping;
+
+    public SqlServer()
+    {
+      columnMapping = new Dictionary<string, Table.ColumnType?> 
+      { 
+        {"text", Table.ColumnType.String},
+        {"date", Table.ColumnType.DateTime},
+        {"datetime2", Table.ColumnType.DateTime},
+        {"tinyint", Table.ColumnType.Integer},
+        {"smallint", Table.ColumnType.Integer},
+        {"int", Table.ColumnType.Integer},
+        {"smalldatetime", Table.ColumnType.DateTime},
+        {"real", Table.ColumnType.Float},
+        {"datetime", Table.ColumnType.DateTime},
+        {"float", Table.ColumnType.Float},
+        {"ntext", Table.ColumnType.String},
+        {"decimal", Table.ColumnType.Float},
+        {"bigint", Table.ColumnType.Integer},
+        {"varchar", Table.ColumnType.String},
+        {"timestamp", Table.ColumnType.DateTime},
+        {"nvarchar", Table.ColumnType.String},
+      };
+    }
+
     override protected DbProviderFactory GetFactory()
     {
       return DbProviderFactories.GetFactory("System.Data.SqlClient");
@@ -77,31 +102,63 @@ namespace Sdx.Db.Adapter
       var result = new List<Table.Column>();
 
       var select = CreateSelect();
-      select.AddFrom("sys.columns", cColumn =>
+      select.AddFrom("sys.columns", cColumns =>
       {
-        cColumn.AddColumn("name");
-        cColumn.Where.Add("object_id", Db.Sql.Expr.Wrap("OBJECT_ID('" + tableName + "')"));
+        cColumns.AddColumn("name");
+        cColumns.AddColumn("max_length");
+        cColumns.AddColumn("is_nullable");
+        cColumns.AddColumn("is_identity");
+        cColumns.Where.Add("object_id", Db.Sql.Expr.Wrap("OBJECT_ID('" + tableName + "')"));
+        cColumns.InnerJoin(
+          "sys.types",
+          CreateCondition().Add(
+            new Sdx.Db.Sql.Column("user_type_id", "sys.columns"),
+            new Sdx.Db.Sql.Column("user_type_id", "sys.types")
+          ),
+          cTypes => 
+          {
+            cTypes.AddColumn("name", "type");
+          }
+        );
+        cColumns.LeftJoin(
+          "sys.index_columns",
+          CreateCondition().Add(
+            new Sdx.Db.Sql.Column("object_id", "sys.columns"),
+            new Sdx.Db.Sql.Column("object_id", "sys.index_columns")
+          ).Add(
+            new Sdx.Db.Sql.Column("column_id", "sys.columns"),
+            new Sdx.Db.Sql.Column("column_id", "sys.index_columns")
+          ),
+          cIndexeColumns =>
+          {
+            cIndexeColumns.LeftJoin(
+              "sys.indexes",
+              CreateCondition().Add(
+                new Sdx.Db.Sql.Column("object_id", "sys.indexes"),
+                new Sdx.Db.Sql.Column("object_id", "sys.index_columns")
+              ).Add(
+                new Sdx.Db.Sql.Column("index_id", "sys.indexes"),
+                new Sdx.Db.Sql.Column("index_id", "sys.index_columns")
+              )
+            );
+          }
+        );
       });
 
-      Sdx.Diagnostics.Debug.Console(conn.FetchDictionaryList(select));
+      select.AddColumn(Sdx.Db.Sql.Expr.Wrap("CAST(ISNULL(is_primary_key, 0) as BIT)"), "is_primary_key");
 
-      //var columns = conn.GetSchema("Columns", new[] { null, null, tableName });
-      //Console.WriteLine(tableName);
-      //Console.WriteLine("-----------------------");
-      //foreach (System.Data.DataRow row in columns.Rows)
-      //{
-      //  foreach (System.Data.DataColumn column in columns.Columns)
-      //  {
-      //    Console.WriteLine(string.Format("{0}: {1}", column.ColumnName, row[column]));
-      //  }
-
-      //  //Sdx.Diagnostics.Debug.Console(row["COLUMN_NAME"]);
-      //  Console.WriteLine("");
-      //}
-
-      //Console.WriteLine("");
-      //Console.WriteLine("");
-      //Console.WriteLine("");
+      conn.FetchDictionaryList(select).ForEach(dic =>
+      {
+        int maxLength;
+        result.Add(new Table.Column(
+          name: dic["name"].ToString(),
+          type: columnMapping.ContainsKey(dic["type"].ToString()) ? columnMapping[dic["type"].ToString()] : null,
+          isNotNull: !(bool)dic["is_nullable"],
+          isAutoIncrement: (bool)dic["is_identity"],
+          maxLength: Int32.TryParse(dic["max_length"].ToString(), out maxLength) ? (int?)maxLength : null,
+          isPkey: (bool)dic["is_primary_key"]
+        ));
+      });
 
       return result;
     }
