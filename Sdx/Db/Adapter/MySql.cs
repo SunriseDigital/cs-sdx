@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
 
@@ -53,6 +55,43 @@ namespace Sdx.Db.Adapter
     public override string RandomOrderKeyword
     {
       get { return "RAND()"; }
+    }
+
+    internal override IEnumerable<string> FetchTableNames(Connection conn)
+    {
+      var result = new List<string>();
+      var tables = conn.GetSchema("Tables");
+      foreach (DataRow row in tables.Rows)
+      {
+        result.Add((string)row["TABLE_NAME"]);
+      }
+
+      return result;
+    }
+
+    internal override IEnumerable<Table.Column> FetchColumns(string tableName, Connection conn)
+    {
+      var result = new List<Table.Column>();
+
+      var columns = conn.GetSchema("Columns", new[] { null, null, tableName });
+      Console.WriteLine(tableName);
+      Console.WriteLine("-----------------------");
+      foreach (System.Data.DataRow row in columns.Rows)
+      {
+        foreach (System.Data.DataColumn column in columns.Columns)
+        {
+          Console.WriteLine(string.Format("{0}: {1}", column.ColumnName, row[column]));
+        }
+
+        //Sdx.Diagnostics.Debug.Console(row["COLUMN_NAME"]);
+        Console.WriteLine("");
+      }
+
+      Console.WriteLine("");
+      Console.WriteLine("");
+      Console.WriteLine("");
+
+      return result;
     }
   }
 }

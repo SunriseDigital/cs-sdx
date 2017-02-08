@@ -197,5 +197,9 @@ namespace Sdx.Db.Adapter
         QuoteIdentifier(column)
       );
     }
+
+    abstract internal IEnumerable<string> FetchTableNames(Connection conn);
+
+    abstract internal IEnumerable<Table.Column> FetchColumns(string tableName, Connection conn);
   }
 }
