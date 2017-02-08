@@ -144,7 +144,11 @@ namespace Sdx.Db.Adapter
       }
       else if(obj is string)
       {
-        return this.builder.QuoteIdentifier(obj as string);
+        var str = obj as string;
+        //スキーマー名を含めたいときテーブル名に`.`で含めることが可能です。テーブル名に`.`が含まれる場合は`..`でエスケープ可能。
+        var mword = "%%SDX_DOT_REPLACE_ESCAPE%%";
+        var escapedChunk = str.Replace("..", mword).Split('.').Select(w => builder.QuoteIdentifier(w));
+        return string.Join(".", escapedChunk).Replace(mword, ".");
       }
       else
       {
