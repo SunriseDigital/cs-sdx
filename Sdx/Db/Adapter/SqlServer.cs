@@ -108,7 +108,6 @@ namespace Sdx.Db.Adapter
         cColumns.AddColumn("max_length");
         cColumns.AddColumn("is_nullable");
         cColumns.AddColumn("is_identity");
-        cColumns.Where.Add("object_id", Db.Sql.Expr.Wrap("OBJECT_ID('" + tableName + "')"));
         cColumns.InnerJoin(
           "sys.types",
           CreateCondition().Add(
@@ -118,6 +117,18 @@ namespace Sdx.Db.Adapter
           cTypes => 
           {
             cTypes.AddColumn("name", "type");
+          }
+        );
+        cColumns.InnerJoin(
+          "sys.tables",
+          CreateCondition().Add(
+            new Sdx.Db.Sql.Column("object_id", "sys.columns"),
+            new Sdx.Db.Sql.Column("object_id", "sys.tables")
+          ),
+          cTables =>
+          {
+            //SQLサーバーのsys.系は接続したDBの情報のみ取得できるのでこれだけ見ればOK
+            cTables.Where.Add("name", tableName);
           }
         );
         cColumns.LeftJoin(
