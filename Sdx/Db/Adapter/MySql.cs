@@ -71,7 +71,27 @@ namespace Sdx.Db.Adapter
 
     internal override IEnumerable<Table.Column> FetchColumns(string tableName, Connection conn)
     {
-      throw new NotImplementedException();
+      var result = new List<Table.Column>();
+
+      var select = CreateSelect();
+      select.AddFrom("information_schema.columns", cColumns =>
+      {
+        cColumns.AddColumn("column_name");
+        cColumns.AddColumn("data_type");
+        cColumns.AddColumn("is_nullable");
+        cColumns.AddColumn("character_maximum_length");
+        cColumns.AddColumn("column_key");
+        cColumns.AddColumn("extra");
+        cColumns.Where.Add("table_name", tableName);
+        cColumns.Where.Add("table_schema", conn.Database);
+      });
+
+      conn.FetchDictionaryList(select).ForEach(dic =>
+      {
+        Sdx.Diagnostics.Debug.Console(dic);
+      });
+
+      return result;
     }
   }
 }
