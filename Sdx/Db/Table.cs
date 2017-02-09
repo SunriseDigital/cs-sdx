@@ -66,7 +66,7 @@ namespace Sdx.Db
       Date
     }
 
-    public class Column
+    public class Column : Diagnostics.IDumpable
     {
       /// <summary>
       /// 
@@ -189,6 +189,23 @@ namespace Sdx.Db
 
           return Name == Record.AutoCreateDateColumn || Name == Record.AutoUpdateDateColumn;
         }
+      }
+      
+      public string Dump()
+      {
+        return string.Format(@"name: {0}
+type: {1}
+isNotNull: {2}
+isAutoIncrement: {3}
+maxLength: {4}
+isPkey: {5}",
+          Name,
+          Type,
+          IsNotNull,
+          IsAutoIncrement,
+          MaxLength,
+          IsPkey
+        );
       }
     }
 

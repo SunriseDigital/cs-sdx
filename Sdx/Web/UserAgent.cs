@@ -35,14 +35,14 @@ namespace Sdx.Web
       }
     }
 
-    private OSInfo os;
-    public OSInfo OS
+    private OsInfo os;
+    public OsInfo Os
     {
       get
       {
         if (os == null)
         {
-          os = new OSInfo(this);
+          os = new OsInfo(this);
         }
 
         return os;
@@ -62,16 +62,16 @@ namespace Sdx.Web
         cache = new Dictionary<string, object>();
       }
 
-      public bool IsIE
+      public bool IsIe
       {
         get
         {
-          if (!cache.ContainsKey("Props.IsIE"))
+          if (!cache.ContainsKey("Props.IsIe"))
           {
-            cache["Props.IsIE"] = Regex.IsMatch(userAgent.Value, "(msie|MSIE|(T|t)rident)");
+            cache["Props.IsIe"] = Regex.IsMatch(userAgent.Value, "(msie|MSIE|(T|t)rident)", RegexOptions.Compiled);
           }
 
-          return (bool)cache["Props.IsIE"];
+          return (bool)cache["Props.IsIe"];
         }
       }
     }
@@ -79,11 +79,11 @@ namespace Sdx.Web
     /// <summary>
     /// OS情報。OSプロパティーからアクセス。
     /// </summary>
-    public class OSInfo
+    public class OsInfo
     {
       private Dictionary<string, object> cache;
       private UserAgent userAgent;
-      public OSInfo(UserAgent userAgent)
+      public OsInfo(UserAgent userAgent)
       {
         this.userAgent = userAgent;
         cache = new Dictionary<string, object>();

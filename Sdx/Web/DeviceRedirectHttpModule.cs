@@ -16,6 +16,8 @@ namespace Sdx.Web
 
     private string smartPhoneUa = @"iPhone|Android.*Mobile|Windows.*Phone";
 
+    protected Sdx.Web.DeviceTable.Device currentUserAgentDevice;
+
     private void Application_BeginRequest(object source, EventArgs a)
     {
       var currentPageDevice = DetectUrlDevice(HttpContext.Current.Request.RawUrl);
@@ -24,9 +26,9 @@ namespace Sdx.Web
 
       MemoryCache memCache = MemoryCacheSetting();
 
-      Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(currentPageDevice, HttpContext.Current.Request.RawUrl, settingPath, memCache);      
+      Sdx.Web.DeviceTable.Current = new Sdx.Web.DeviceTable(currentPageDevice, HttpContext.Current.Request.RawUrl, settingPath, memCache);
 
-      var currentUserAgentDevice = DetectUserAgentDevice();
+      currentUserAgentDevice = DetectUserAgentDevice();
 
       if (currentPageDevice == currentUserAgentDevice)
       {
@@ -35,7 +37,7 @@ namespace Sdx.Web
 
       var url = Sdx.Web.DeviceTable.Current.GetUrl(currentUserAgentDevice);
 
-      if (!string.IsNullOrEmpty(url))
+      if (!string.IsNullOrEmpty(url) && EnableRedirect())
       {
         HttpContext.Current.Response.Redirect(url, false);
       }
@@ -77,5 +79,13 @@ namespace Sdx.Web
     /// キャッシュが必要ない場合はnullを返してください。
     /// </summary>
     protected abstract MemoryCache MemoryCacheSetting();
+
+    /// <summary>
+    /// 特定の条件でリダイレクトさせたくない場合は子クラスで実装してください
+    /// </summary>
+    protected virtual bool EnableRedirect()
+    {
+      return true;
+    }
   }
 }
