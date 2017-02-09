@@ -116,9 +116,11 @@ namespace Sdx.Db.Adapter
 
     internal abstract object FetchLastInsertId(Connection connection);
 
-    public DbCommand CreateCommand()
+    public DbCommand CreateCommand(string sql = null)
     {
-      return this.Factory.CreateCommand();
+      var command = this.Factory.CreateCommand();
+      command.CommandText = sql;
+      return command;
     }
 
     public DbCommandBuilder CreateCommandBuilder()
