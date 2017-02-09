@@ -19,6 +19,9 @@ namespace GenOrm
         foreach(var tableName in tableNames)
         {
           var columns = GetColumns(tableName, db);
+          //Sdx.Diagnostics.Debug.Console(tableName);
+          //Sdx.Diagnostics.Debug.Console(columns);
+          //Console.WriteLine("\n\n");
         }
       });
     }
