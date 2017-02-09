@@ -74,6 +74,7 @@
     <Compile Include="Db\Adapter\Manager.cs" />
     <Compile Include="Db\Connection.cs" />
     <Compile Include="Db\DbException.cs" />
+    <Compile Include="Db\Sql\Cast.cs" />
     <Compile Include="Db\Sql\ContextActions.cs" />
     <Compile Include="Db\Sql\INonQueryBuilder.cs" />
     <Compile Include="Db\Adapter\MySql.cs" />

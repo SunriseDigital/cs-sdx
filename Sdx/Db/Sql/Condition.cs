@@ -73,6 +73,13 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Condition AddCast(string column, string type, object value, Comparison comparison = Comparison.Equal)
+    {
+      var cast = new Cast(column, type);
+      this.AddWithColumn(new Column(cast, this.ContextName), value, Logical.And, comparison, Type.Comparison);
+      return this;
+    }
+
     public Condition Add(string column, Object value, Comparison comparison = Comparison.Equal)
     {
       this.AddWithColumn(new Column(column, this.ContextName), value, Logical.And, comparison, Type.Comparison);

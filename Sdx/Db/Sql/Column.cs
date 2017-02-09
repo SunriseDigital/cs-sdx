@@ -50,6 +50,13 @@ namespace Sdx.Db.Sql
       Alias = alias;
     }
 
+    public Column(Cast cast, string contextName = null, string alias = null)
+    {
+      target = cast;
+      ContextName = contextName;
+      Alias = alias;
+    }
+
     public object Target
     {
       get { return this.target; }
@@ -88,13 +95,28 @@ namespace Sdx.Db.Sql
     internal string Build(Adapter.Base db, DbParameterCollection parameters, Counter condCount)
     {
       var sql = "";
-      if(this.ContextName != null)
+      if(target is Cast)
       {
-        sql = db.QuoteIdentifier(this.ContextName) + "." + this.QuotedName(db, parameters, condCount);
+        var cast = target as Cast;
+        if (this.ContextName != null)
+        {
+          sql = string.Format("CAST({0}.{1} as {2})");
+        }
+        else
+        {
+          sql = sql = string.Format("CAST({0} as {1})");
+        }
       }
       else
       {
-        sql = this.QuotedName(db, parameters, condCount);
+        if (this.ContextName != null)
+        {
+          sql = db.QuoteIdentifier(this.ContextName) + "." + this.QuotedName(db, parameters, condCount);
+        }
+        else
+        {
+          sql = this.QuotedName(db, parameters, condCount);
+        }
       }
 
       if(this.Alias != null)
