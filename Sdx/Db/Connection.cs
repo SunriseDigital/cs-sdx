@@ -608,5 +608,21 @@ namespace Sdx.Db
     {
       return Adapter.FetchColumns(tableName, this);
     }
+
+    public string Database
+    {
+      get
+      {
+        return DbConnection.Database;
+      }
+    }
+
+    public string DataSource
+    {
+      get
+      {
+        return DbConnection.DataSource;
+      }
+    }
   }
 }
