@@ -62,25 +62,34 @@ namespace UnitTest
 
 #if ON_VISUAL_STUDIO
       testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.Adapter.SqlServer();
-      testDb.Adapter.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
+      testDb.Adapter = Sdx.Db.Adapter.Manager.Get("sqlserver").Write;
+      Sdx.Context.Current.Debug.Log(testDb.Adapter.ConnectionString);
       testDb.LeftQuoteChar = "[";
       testDb.RightQupteChar = "]";
       list.Add(testDb);
 #endif
 
       testDb = new TestDb();
-      testDb.Adapter = new Sdx.Db.Adapter.MySql();
-      testDb.Adapter.ConnectionString = Test.Db.Adapter.MySqlConnectionString;
+      testDb.Adapter = Sdx.Db.Adapter.Manager.Get("mysql").Write;
+      Sdx.Context.Current.Debug.Log(testDb.Adapter.ConnectionString);
       testDb.LeftQuoteChar = "`";
       testDb.RightQupteChar = "`";
       list.Add(testDb);
+
+      
 
       return list;
     }
 
     public static void InitilizeClass(TestContext context)
     {
+      //DB Adapter
+      var settings = ConfigurationManager.GetSection("sdxDatabaseConnections") as Sdx.Configuration.DictionaryListSection;
+      foreach (var elem in settings.Items)
+      {
+        Sdx.Db.Adapter.Manager.Set(elem.Attributes, ConfigurationManager.ConnectionStrings, ConfigurationManager.AppSettings);
+      }
+
       ResetMySqlDatabase();
       ResetSqlServerDatabase();
     }
@@ -92,14 +101,9 @@ namespace UnitTest
 
     private static void ResetMySqlDatabase()
     {
-      Sdx.Db.Adapter.Base factory = new Sdx.Db.Adapter.MySql();
+      Sdx.Db.Adapter.Base factory = Sdx.Db.Adapter.Manager.Get("master_mysql").Write;
 
       var masterCon = factory.CreateConnection();
-      String pwd = "";
-#if ON_VISUAL_STUDIO
-      pwd = ConfigurationManager.AppSettings["MySqlRootPwd"];
-#endif
-      masterCon.ConnectionString = "Server=localhost;Database=mysql;Uid=root;Pwd=" + pwd;
       using (masterCon)
       {
         masterCon.Open();
@@ -122,7 +126,7 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
         }
       }
 
-      factory.ConnectionString = Test.Db.Adapter.MySqlConnectionString;
+      factory = Sdx.Db.Adapter.Manager.Get("mysql").Write;
       var con = factory.CreateConnection();
       using (con)
       {
@@ -138,10 +142,8 @@ GRANT ALL ON `sdxtest`.* TO 'sdxuser'@'localhost' IDENTIFIED BY 'sdx5963';
     private static void ResetSqlServerDatabase()
     {
       //SdxTestデータベースをDROPします
-      Sdx.Db.Adapter.Base factory = new Sdx.Db.Adapter.SqlServer();
+      Sdx.Db.Adapter.Base factory = Sdx.Db.Adapter.Manager.Get("master_sqlserver").Write;
       var masterCon = factory.CreateConnection();
-      String pwd = ConfigurationManager.AppSettings["SqlServerSaPwd"];
-      masterCon.ConnectionString = "Server=.\\SQLEXPRESS;Database=master;User Id=sa;Password=" + pwd;
       using (masterCon)
       {
         masterCon.Open();
@@ -189,7 +191,7 @@ ALTER AUTHORIZATION ON DATABASE::sdxtest TO sdxuser;
         createUserSql.ExecuteNonQuery();
       }
 
-      factory.ConnectionString = Test.Db.Adapter.SqlServerConnectionString;
+      factory = Sdx.Db.Adapter.Manager.Get("sqlserver").Write;
       var con = factory.CreateConnection();
       using (con)
       {

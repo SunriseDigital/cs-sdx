@@ -8,12 +8,8 @@ namespace Sdx.Cli.Options
 {
   public interface IDbConnection
   {
-    bool UseAppSettings { get; set; }
-
-    Db.AdapterType Type { get; set; }
-
     string ConfigPath { get; set; }
 
-    string ConnectionName { get; set; }
+    string DbAdapterName { get; set; }
   }
 }

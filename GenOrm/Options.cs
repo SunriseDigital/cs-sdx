@@ -11,17 +11,11 @@ namespace GenOrm
 {
   class Options : Sdx.Cli.Options.IDbConnection
   {
-    [Option('a', "appsettings", HelpText = "Use connection string in AppSettings section.")]
-    public bool UseAppSettings { get; set; }
-
-    [Option('t', "adapter-type", HelpText = "Db adapter type, sqlserver|mysql")]
-    public Sdx.Cli.Options.Db.AdapterType Type { get; set; }
-
     [Value(0, Required = true, HelpText = "Path to config file.")]
     public string ConfigPath { get; set; }
 
-    [Value(1, Required = true, HelpText = "Connection name.")]
-    public string ConnectionName { get; set; }
+    [Value(1, Required = true, HelpText = "Db Adapter name.")]
+    public string DbAdapterName { get; set; }
 
     [Value(2, Required = true, HelpText = "Base directory.")]
     public string BaseDir { get; set; }

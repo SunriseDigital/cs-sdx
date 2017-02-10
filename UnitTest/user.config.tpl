@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <appSettings>
-  <add key="SqlServerSaPwd" value="some password for sa user"/>
-  <add key="MySqlRootPwd" value="some password for root user"/>
+  <add key="MasterSqlServerConnectionString" value="Server=.\SQLEXPRESS;Database=mysql;User Id=sa;Password=password" />
+  <add key="MasterMySqlConnectionString" value="Server=localhost;Database=master;Uid=root;Pwd=password" />
 </appSettings>

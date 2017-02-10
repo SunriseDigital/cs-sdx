@@ -11,18 +11,21 @@ namespace GenOrm
   {
     static void Main(string[] args)
     {
+      Sdx.Context.Current.Debug.Out = Console.Out;
       var result = Parser.Default.ParseArguments<Options>(args).WithParsed(options =>
       {
-        var db = Sdx.Cli.Options.Db.CreateAdapter(options);
-        var tableNames = GetTargetTableNames(options, db);
+        Sdx.Cli.Options.Db.SetUpAdapters(options);
+        var db = Sdx.Db.Adapter.Manager.Get(options.DbAdapterName).Read;
+        Sdx.Context.Current.Debug.Log(db.ConnectionString);
+        //var tableNames = GetTargetTableNames(options, db);
 
-        foreach(var tableName in tableNames)
-        {
-          var columns = GetColumns(tableName, db);
-          //Sdx.Diagnostics.Debug.Console(tableName);
-          //Sdx.Diagnostics.Debug.Console(columns);
-          //Console.WriteLine("\n\n");
-        }
+        //foreach(var tableName in tableNames)
+        //{
+        //  var columns = GetColumns(tableName, db);
+        //  //Sdx.Diagnostics.Debug.Console(tableName);
+        //  //Sdx.Diagnostics.Debug.Console(columns);
+        //  //Console.WriteLine("\n\n");
+        //}
       });
     }
 
