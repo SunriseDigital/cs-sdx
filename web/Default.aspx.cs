@@ -18,6 +18,16 @@ public partial class _Default : System.Web.UI.Page
       {
         conn.Open();
       }
+
+      db = Sdx.Db.Adapter.Manager.Get("main").Read;
+      var tShop = new Test.Orm.Table.Shop();
+      var select = db.CreateSelect();
+      select.AddFrom(tShop);
+      using(var conn = db.CreateConnection())
+      {
+        conn.Open();
+        Sdx.Context.Current.Debug.Log(conn.FetchRecordSet(select));
+      }
     }
   }
 }

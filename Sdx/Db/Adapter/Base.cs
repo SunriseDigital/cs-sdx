@@ -202,6 +202,18 @@ namespace Sdx.Db.Adapter
 
     abstract internal IEnumerable<string> FetchTableNames(Connection conn);
 
-    abstract internal IEnumerable<Table.Column> FetchColumns(string tableName, Connection conn);
+    public List<Table.Column> FetchColumns(string tableName)
+    {
+      List<Table.Column> columns;
+      using(var conn = CreateConnection())
+      {
+        conn.Open();
+        columns = FetchColumns(tableName, conn);
+      }
+
+      return columns;
+    }
+
+    abstract internal List<Table.Column> FetchColumns(string tableName, Connection conn);
   }
 }

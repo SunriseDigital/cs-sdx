@@ -1,6 +1,6 @@
 ﻿CREATE TABLE shop (
   id int NOT NULL AUTO_INCREMENT,
-  name varchar(100),
+  name varchar(100) NOT NULL,
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,

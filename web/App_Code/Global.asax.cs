@@ -22,7 +22,7 @@ public class Global : System.Web.HttpApplication
     var settings = WebConfigurationManager.GetSection("sdxDatabaseConnections") as Sdx.Configuration.DictionaryListSection;
     foreach (var elem in settings.Items)
     {
-      Sdx.Db.Adapter.Manager.Set(elem.Attributes, WebConfigurationManager.ConnectionStrings, WebConfigurationManager.AppSettings);
+      Sdx.Db.Adapter.Manager.Add(elem.Attributes, WebConfigurationManager.ConnectionStrings, WebConfigurationManager.AppSettings);
     }
   }
 

@@ -83,13 +83,6 @@ namespace UnitTest
 
     public static void InitilizeClass(TestContext context)
     {
-      //DB Adapter
-      var settings = ConfigurationManager.GetSection("sdxDatabaseConnections") as Sdx.Configuration.DictionaryListSection;
-      foreach (var elem in settings.Items)
-      {
-        Sdx.Db.Adapter.Manager.Set(elem.Attributes, ConfigurationManager.ConnectionStrings, ConfigurationManager.AppSettings);
-      }
-
       ResetMySqlDatabase();
       ResetSqlServerDatabase();
     }

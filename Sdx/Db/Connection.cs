@@ -604,7 +604,7 @@ namespace Sdx.Db
       return DbConnection.GetSchema(collectionName, restrictionValues);
     }
 
-    public IEnumerable<Table.Column> FetchColumns(string tableName)
+    public List<Table.Column> FetchColumns(string tableName)
     {
       return Adapter.FetchColumns(tableName, this);
     }

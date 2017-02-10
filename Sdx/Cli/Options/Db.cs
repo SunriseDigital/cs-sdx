@@ -38,7 +38,7 @@ namespace Sdx.Cli.Options
           connection[attr.Name] = attr.Value;
         }
 
-        Sdx.Db.Adapter.Manager.Set(connection, config.ConnectionStrings.ConnectionStrings, config.AppSettings);
+        Sdx.Db.Adapter.Manager.Add(connection, config.ConnectionStrings.ConnectionStrings, config.AppSettings);
       }
     }
   }

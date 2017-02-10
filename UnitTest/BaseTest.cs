@@ -13,6 +13,7 @@ using System.Threading;
 using System.Globalization;
 using System.Web;
 using System.IO;
+using System.Configuration;
 
 namespace UnitTest
 {
@@ -47,6 +48,13 @@ namespace UnitTest
     {
       Sdx.Context.Current.Timer.Start();
       Sdx.Context.Current.Debug.Out = Console.Out;
+      //DB Adapter
+      var settings = ConfigurationManager.GetSection("sdxDatabaseConnections") as Sdx.Configuration.DictionaryListSection;
+      foreach (var elem in settings.Items)
+      {
+        Sdx.Db.Adapter.Manager.Add(elem.Attributes, ConfigurationManager.ConnectionStrings, ConfigurationManager.AppSettings);
+      }
+
     }
 
     public void SetFixture(Fixture fixture)

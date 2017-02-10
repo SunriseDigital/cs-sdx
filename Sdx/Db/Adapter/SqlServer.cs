@@ -97,7 +97,7 @@ namespace Sdx.Db.Adapter
       return result;
     }
 
-    internal override IEnumerable<Table.Column> FetchColumns(string tableName, Connection conn)
+    internal override List<Table.Column> FetchColumns(string tableName, Connection conn)
     {
       var result = new List<Table.Column>();
 

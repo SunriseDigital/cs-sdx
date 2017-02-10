@@ -68,12 +68,12 @@ namespace Sdx.Db.Adapter
       }
     }
 
-    public static void Set(string key, Manager manager)
+    public static void Add(string key, Manager manager)
     {
       managerDic[key] = manager;
     }
 
-    public static void Set(string key, Func<Manager> getter)
+    public static void Add(string key, Func<Manager> getter)
     {
       managerDic[key] = getter;
     }
@@ -106,7 +106,7 @@ namespace Sdx.Db.Adapter
     /// </summary>
     /// <param name="setting"></param>
     /// <param name="connectionString"></param>
-    private static void Set(IDictionary<string, string> setting, string connectionString)
+    private static void Add(IDictionary<string, string> setting, string connectionString)
     {
       Manager manager = null;
       var name = setting["name"];
@@ -117,7 +117,7 @@ namespace Sdx.Db.Adapter
       else
       {
         manager = new Manager();
-        Set(name, manager);
+        Add(name, manager);
       }
 
       var db = (Db.Adapter.Base)Activator.CreateInstance(Type.GetType(setting["adapterClass"]));
@@ -139,11 +139,11 @@ namespace Sdx.Db.Adapter
       }
     }
 
-    public static void Set(IDictionary<string, string> setting, System.Configuration.ConnectionStringSettingsCollection connectionStrings, System.Collections.Specialized.NameValueCollection appSettings)
+    public static void Add(IDictionary<string, string> setting, System.Configuration.ConnectionStringSettingsCollection connectionStrings, System.Collections.Specialized.NameValueCollection appSettings)
     {
       if (setting.ContainsKey("alias"))
       {
-        SetAlias(setting["name"], setting["alias"]);
+        AddAlias(setting["name"], setting["alias"]);
         return;
       }
 
@@ -161,14 +161,14 @@ namespace Sdx.Db.Adapter
         throw new InvalidOperationException("Missing or invalid configType " + setting["configName"] + " [connectionStrings|appSettings]");
       }
 
-      Set(setting, connectionString);
+      Add(setting, connectionString);
     }
 
-    internal static void Set(Dictionary<string, string> setting, System.Configuration.ConnectionStringSettingsCollection connectionStrings, System.Configuration.AppSettingsSection appSettings)
+    internal static void Add(Dictionary<string, string> setting, System.Configuration.ConnectionStringSettingsCollection connectionStrings, System.Configuration.AppSettingsSection appSettings)
     {
       if(setting.ContainsKey("alias"))
       {
-        SetAlias(setting["name"], setting["alias"]);
+        AddAlias(setting["name"], setting["alias"]);
         return;
       }
 
@@ -186,13 +186,13 @@ namespace Sdx.Db.Adapter
         throw new InvalidOperationException("Missing or invalid configType " + setting["configName"] + " [connectionStrings|appSettings]");
       }
 
-      Set(setting, connectionString);
+      Add(setting, connectionString);
     }
 
-    private static void SetAlias(string name, string aliasName)
+    private static void AddAlias(string name, string aliasName)
     {
       var manager = Get(aliasName);
-      Set(name, manager);
+      Add(name, manager);
     }
   }
 }
