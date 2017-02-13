@@ -8,6 +8,9 @@ namespace Sdx.Gen.Code
 {
   public class File : Base
   {
-
+    internal override void Render(StringBuilder builder, string currentIndent, string newLineChar)
+    {
+      codeList.ForEach(code => code.Render(builder, currentIndent, newLineChar));
+    }
   }
 }

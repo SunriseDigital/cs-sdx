@@ -8,20 +8,20 @@ namespace Sdx.Gen.Code
 {
   abstract public class Base
   {
-    private List<Base> codeList = new List<Base>();
+    protected List<Base> codeList = new List<Base>();
 
     private string newLineChar = Environment.NewLine;
     public string NewLineChar { get { return newLineChar; } set { newLineChar = value; } }
 
     private string indent = "  ";
-    public string Indent { get { return indent; } set { newLineChar = indent; } }
+    public string Indent { get { return indent; } set { newLineChar = value; } }
 
     public void Add(string code, params string[] formatValue)
     {
       Add(new Statement(code, formatValue));
     }
 
-    public void AddLineBreak()
+    public void AddBlankLine()
     {
       Add(new Statement(""));
     }
@@ -31,10 +31,7 @@ namespace Sdx.Gen.Code
       codeList.Add(code);
     }
 
-    protected virtual void Render(StringBuilder builder, string currentIndent, string newLineChar)
-    {
-      codeList.ForEach(code => code.Render(builder, currentIndent, newLineChar));
-    }
+    abstract internal void Render(StringBuilder builder, string currentIndent, string newLineChar);
 
     public string Render()
     {
