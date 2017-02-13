@@ -100,6 +100,10 @@
     <Compile Include="Diagnostics\Debug.cs" />
     <Compile Include="Diagnostics\DebugHtmlWriter.cs" />
     <Compile Include="Diagnostics\IDumpable.cs" />
+    <Compile Include="Gen\Code\Base.cs" />
+    <Compile Include="Gen\Code\Block.cs" />
+    <Compile Include="Gen\Code\File.cs" />
+    <Compile Include="Gen\Code\Statement.cs" />
     <Compile Include="Html\CheckBoxGroup.cs" />
     <Compile Include="Html\RadioGroup.cs" />
     <Compile Include="Util\DateTimeSpan.cs" />

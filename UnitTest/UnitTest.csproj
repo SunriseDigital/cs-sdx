@@ -91,6 +91,7 @@
     <Compile Include="Sdx\Db\Sql\Insert.cs" />
     <Compile Include="Sdx\Diagnostics\Debug.cs" />
     <Compile Include="DummyClasses.cs" />
+    <Compile Include="Sdx\Gen\Code.cs" />
     <Compile Include="Sdx\Html\PagerLink.cs" />
     <Compile Include="Sdx\Html\Tag.cs" />
     <Compile Include="Sdx\Html\Attr.cs" />
