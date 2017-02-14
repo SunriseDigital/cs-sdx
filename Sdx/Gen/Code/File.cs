@@ -12,5 +12,10 @@ namespace Sdx.Gen.Code
     {
       codeList.ForEach(code => code.Render(builder, currentIndent, newLineChar));
     }
+
+    internal override string KeyWord
+    {
+      get { throw new InvalidOperationException("`File` has no KeyWord."); }
+    }
   }
 }

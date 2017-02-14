@@ -9,15 +9,13 @@ namespace Sdx.Gen.Code
   public class Statement : Base
   {
     private string code;
-    private string[] formatValue;
 
-    public Statement(string code, params string[] formatValue)
+    public Statement(string code, params object[] formatValue)
     {
-      this.code = code;
-      this.formatValue = formatValue;
+      this.code = string.Format(code, formatValue);
     }
 
-    public override void Add(Base code)
+    public override void AddChild(Base code)
     {
       throw new NotSupportedException("You can't Add to Statement.");
     }
@@ -26,9 +24,14 @@ namespace Sdx.Gen.Code
     {
       builder
         .Append(currentIndent)
-        .AppendFormat(code, formatValue)
+        .Append(code)
         .Append(newLineChar)
         ;
+    }
+
+    internal override string KeyWord
+    {
+      get { return code; }
     }
   }
 }

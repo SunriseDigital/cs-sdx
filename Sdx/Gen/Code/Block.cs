@@ -9,12 +9,10 @@ namespace Sdx.Gen.Code
   public class Block : Base
   {
     private string firstLineCode;
-    private string[] formatValue;
 
-    public Block(string firstLineCode, params string[] formatValue)
+    public Block(string firstLineCode, params object[] formatValue)
     {
-      this.firstLineCode = firstLineCode;
-      this.formatValue = formatValue;
+      this.firstLineCode = string.Format(firstLineCode, formatValue); ;
     }
 
     internal override void Render(StringBuilder builder, string currentIndent, string newLineChar)
@@ -22,7 +20,7 @@ namespace Sdx.Gen.Code
       if (firstLineCode != null)
       {
         builder.Append(currentIndent);
-        builder.AppendFormat(firstLineCode, formatValue);
+        builder.Append(firstLineCode);
         builder.Append(newLineChar);
       }
 
@@ -33,6 +31,11 @@ namespace Sdx.Gen.Code
       builder.Append(currentIndent);
       builder.Append("}");
       builder.Append(newLineChar);
+    }
+
+    internal override string KeyWord
+    {
+      get { return firstLineCode; }
     }
   }
 }
