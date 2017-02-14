@@ -10,7 +10,7 @@ namespace Sdx.Gen.Code
   {
     private string code;
 
-    public Statement(string code, params object[] formatValue)
+    public Statement(string code, params string[] formatValue)
     {
       this.code = string.Format(code, formatValue);
     }

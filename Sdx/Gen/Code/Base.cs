@@ -25,7 +25,7 @@ namespace Sdx.Gen.Code
       }
     }
 
-    public void AddChild(string code, params object[] formatValue)
+    public void AddChild(string code, params string[] formatValue)
     {
       AddChild(new Statement(code, formatValue));
     }

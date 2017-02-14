@@ -112,7 +112,7 @@ namespace UnitTest
       var bCtor = new Sdx.Gen.Code.Block("public {0}()", className);
       bClass.AddChild(bCtor);
 
-      var sCtorLine1 = new Sdx.Gen.Code.Statement("this.name = {0};", new Sdx.Gen.Code.String("foobar"));
+      var sCtorLine1 = new Sdx.Gen.Code.Statement(@"this.name = ""{0}"";", "foobar");
       bCtor.AddChild(sCtorLine1);
 
       var sCtorLine2 = new Sdx.Gen.Code.Statement("state = 1;");

@@ -104,7 +104,6 @@
     <Compile Include="Gen\Code\Block.cs" />
     <Compile Include="Gen\Code\File.cs" />
     <Compile Include="Gen\Code\Statement.cs" />
-    <Compile Include="Gen\Code\String.cs" />
     <Compile Include="Html\CheckBoxGroup.cs" />
     <Compile Include="Html\RadioGroup.cs" />
     <Compile Include="Util\DateTimeSpan.cs" />

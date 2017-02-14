@@ -10,7 +10,7 @@ namespace Sdx.Gen.Code
   {
     private string firstLineCode;
 
-    public Block(string firstLineCode, params object[] formatValue)
+    public Block(string firstLineCode, params string[] formatValue)
     {
       this.firstLineCode = string.Format(firstLineCode, formatValue); ;
     }
