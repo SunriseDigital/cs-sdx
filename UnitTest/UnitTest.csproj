@@ -103,6 +103,7 @@
     <Compile Include="Sdx\Web\DeviceTable.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Data\LargeArea.cs" />
+    <Compile Include="Test\Db\Adapter.cs" />
     <Compile Include="Test\Db\Table.cs" />
     <Compile Include="Test\Orm\ShopImage.cs" />
     <Compile Include="Test\Orm\ShopImageType.cs" />

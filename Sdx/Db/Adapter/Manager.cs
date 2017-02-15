@@ -68,12 +68,12 @@ namespace Sdx.Db.Adapter
       }
     }
 
-    public static void Add(string key, Manager manager)
+    public static void Set(string key, Manager manager)
     {
       managerDic[key] = manager;
     }
 
-    public static void Add(string key, Func<Manager> getter)
+    public static void Set(string key, Func<Manager> getter)
     {
       managerDic[key] = getter;
     }
@@ -117,7 +117,7 @@ namespace Sdx.Db.Adapter
       else
       {
         manager = new Manager();
-        Add(name, manager);
+        Set(name, manager);
       }
 
       var db = (Db.Adapter.Base)Activator.CreateInstance(Type.GetType(setting["adapterClass"]));
@@ -143,7 +143,7 @@ namespace Sdx.Db.Adapter
     {
       if (setting.ContainsKey("alias"))
       {
-        AddAlias(setting["name"], setting["alias"]);
+        SetAlias(setting["name"], setting["alias"]);
         return;
       }
 
@@ -168,7 +168,7 @@ namespace Sdx.Db.Adapter
     {
       if(setting.ContainsKey("alias"))
       {
-        AddAlias(setting["name"], setting["alias"]);
+        SetAlias(setting["name"], setting["alias"]);
         return;
       }
 
@@ -189,10 +189,10 @@ namespace Sdx.Db.Adapter
       Add(setting, connectionString);
     }
 
-    private static void AddAlias(string name, string aliasName)
+    private static void SetAlias(string name, string aliasName)
     {
       var manager = Get(aliasName);
-      Add(name, manager);
+      Set(name, manager);
     }
   }
 }
