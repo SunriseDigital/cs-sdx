@@ -3,11 +3,11 @@ services: mysql
 solution: cs-sdx.sln
 install:
   - nuget restore cs-sdx.sln
-  - nuget install xunit.runners -Version 2.0.0 -OutputDirectory testrunner
+  - nuget install xunit.runner.console -Version 2.1.0 -OutputDirectory testrunner
 script:
   - cp UnitTest/user.config.tpl UnitTest/user.config
   - xbuild /p:Configuration=TravisCI cs-sdx.sln
-  - mono ./testrunner/xunit.runners.2.0.0/tools/xunit.console.clr4.exe ./UnitTest/bin/TravisCI/UnitTest.dll
+  - mono ./testrunner/xunit.runner.console.2.1.0/tools/xunit.console.exe ./UnitTest/bin/TravisCI/UnitTest.dll
 git:
     submodules: false
 before_install:
