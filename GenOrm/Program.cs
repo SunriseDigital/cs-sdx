@@ -16,6 +16,11 @@ namespace GenOrm
       {
         Sdx.Cli.Options.Db.SetUpAdapters(options);
         var db = Sdx.Db.Adapter.Manager.Get(options.DbAdapterName).Read;
+
+        foreach (var table in GetTargetTableNames(options, db))
+        {
+          Sdx.Context.Current.Debug.Log(table);
+        }
       });
     }
 
