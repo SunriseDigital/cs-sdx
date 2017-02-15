@@ -10,32 +10,54 @@ namespace Sdx.Gen.Code
   {
     private string firstLineCode;
 
+    public bool StartLineBreak { get; set; }
+    public bool EndLineBreak { get; set; }
+    public string StartDelimiter { get; set; }
+    public string EndDelimiter { get; set; }
+
     public Block(string firstLineCode, params string[] formatValue)
     {
-      this.firstLineCode = string.Format(firstLineCode, formatValue); ;
-    }
-
-    internal override void Render(StringBuilder builder, string currentIndent, string newLineChar)
-    {
-      if (firstLineCode != null)
+      StartLineBreak = true;
+      EndLineBreak = true;
+      if (formatValue.Length == 0)
       {
-        builder.Append(currentIndent);
-        builder.Append(firstLineCode);
+        this.firstLineCode = firstLineCode;
+      }
+      else
+      {
+        this.firstLineCode = string.Format(firstLineCode, formatValue);
+      }
+    }
+    internal override void Render(StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter)
+    {
+      builder.Append(currentIndent);
+      builder.Append(firstLineCode);
+      if (StartLineBreak)
+      {
         builder.Append(newLineChar);
+        builder.Append(currentIndent);
       }
 
-      builder.Append(currentIndent);
-      builder.Append("{");
+      builder.Append(StartDelimiter == null ? StartBlockDelimiter : StartDelimiter);
       builder.Append(newLineChar);
-      codeList.ForEach(code => code.Render(builder, currentIndent + Indent, newLineChar));
+      codeList.ForEach(code => code.Render(builder, currentIndent + Indent, newLineChar, startBlockDelimiter, endBlockDelimiter));
       builder.Append(currentIndent);
-      builder.Append("}");
-      builder.Append(newLineChar);
+      builder.Append(EndDelimiter == null ? EndBlockDelimiter : EndDelimiter);
+      if(EndLineBreak)
+      {
+        builder.Append(newLineChar);
+      }
     }
 
     internal override string KeyWord
     {
       get { return firstLineCode; }
+    }
+
+    public void ChangeDilimiter(string start, string end)
+    {
+      StartDelimiter = start;
+      EndDelimiter = end;
     }
   }
 }

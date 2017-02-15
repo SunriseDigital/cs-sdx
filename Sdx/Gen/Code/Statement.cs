@@ -12,7 +12,14 @@ namespace Sdx.Gen.Code
 
     public Statement(string code, params string[] formatValue)
     {
-      this.code = string.Format(code, formatValue);
+      if (formatValue.Length == 0)
+      {
+        this.code = code;
+      }
+      else
+      {
+        this.code = string.Format(code, formatValue);
+      }
     }
 
     public override void AddChild(Base code)
@@ -20,7 +27,7 @@ namespace Sdx.Gen.Code
       throw new NotSupportedException("You can't Add to Statement.");
     }
 
-    internal override void Render(StringBuilder builder, string currentIndent, string newLineChar)
+    internal override void Render(StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter)
     {
       builder
         .Append(currentIndent)

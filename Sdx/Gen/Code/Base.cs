@@ -17,6 +17,12 @@ namespace Sdx.Gen.Code
     private string indent = "  ";
     public string Indent { get { return indent; } set { newLineChar = value; } }
 
+    private string startBlockDelimiter = "{";
+    public string StartBlockDelimiter { get { return startBlockDelimiter; } set { startBlockDelimiter = value; } }
+
+    private string endBlockDelimiter = "}";
+    public string EndBlockDelimiter { get { return endBlockDelimiter; } set { endBlockDelimiter = value; } }
+
     public IEnumerable<Base> Children
     {
       get
@@ -44,12 +50,12 @@ namespace Sdx.Gen.Code
       codeList.Add(code);
     }
 
-    abstract internal void Render(StringBuilder builder, string currentIndent, string newLineChar);
+    abstract internal void Render(StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter);
 
     public string Render()
     {
       var builder = new StringBuilder();
-      Render(builder, "", NewLineChar);
+      Render(builder, "", NewLineChar, StartBlockDelimiter, EndBlockDelimiter);
       return builder.ToString();
     }
 
