@@ -572,12 +572,11 @@ namespace UnitTest
       {
         conn.Open();
         //Tableを使ってないと、MetaDataが取れないので主キーがわからず組み立てられない。
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        var ex = Assert.Throws<InvalidOperationException>(() =>
         {
           var shop = conn.FetchRecord(select);
-        }));
+        });
 
-        Assert.IsType<InvalidOperationException>(ex);
         Assert.Equal("Use Sdx.Db.Table, if you want to get Record.", ex.Message);
       }
     }
@@ -612,12 +611,10 @@ namespace UnitTest
         Assert.Equal("エスペリア", shops[1].GetString("name"));
 
         //取得しなかったキーを取得すると例外
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        Assert.Throws<InvalidOperationException>(() =>
         {
           var areaEx = shops[0].GetValue("area_id");
-        }));
-
-        Assert.IsType<InvalidOperationException>(ex);
+        });
 
         Assert.False(shops[0].CanGetValue("area_id"));
       }

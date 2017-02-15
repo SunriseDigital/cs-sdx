@@ -72,12 +72,10 @@ namespace UnitTest
       }
       Assert.Equal(5, connStr.Count);
 
-      Exception ex2 = Record.Exception(new Assert.ThrowsDelegate(() =>
+      Assert.Throws<InvalidOperationException>(() =>
       {
         var db = main.Write;
-      }));
-
-      Assert.IsType<InvalidOperationException>(ex2);
+      });
     }
 
     [Fact]
@@ -104,12 +102,10 @@ namespace UnitTest
       }
       Assert.Equal(5, connStr.Count);
 
-      Exception ex2 = Record.Exception(new Assert.ThrowsDelegate(() =>
+      Assert.Throws<InvalidOperationException>(() =>
       {
         var db = main.Read;
-      }));
-
-      Assert.IsType<InvalidOperationException>(ex2);
+      });
     }
 
     [Fact]

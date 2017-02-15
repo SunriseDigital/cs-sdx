@@ -562,10 +562,10 @@ English
   <option value=""11"">sigle11</option>
 </select>"), select.Tag.Render());
 
-      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+      Assert.Throws<InvalidOperationException>(() =>
+      {
         select.Bind(new string[] { "10", "11" });
-      }));
-      Assert.IsType<InvalidOperationException>(ex);
+      });
 
       select.IsMultiple = true;
       select.Bind(new string[] { "10", "11" });
@@ -576,10 +576,10 @@ English
   <option value=""11"" selected>sigle11</option>
 </select>"), select.Tag.Render());
 
-      ex = Record.Exception(new Assert.ThrowsDelegate(() => {
+      Assert.Throws<InvalidOperationException>(() =>
+      {
         select.Bind("10");
-      }));
-      Assert.IsType<InvalidOperationException>(ex);
+      });
 
       Sdx.Context.Current.Debug.Log(select.Tag.Render());
     }
@@ -814,12 +814,10 @@ English
       post.Add("secret", "");//secretは空の時更新をしない
 
       //validate前
-      Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+      Assert.Throws<InvalidOperationException>(() =>
       {
         var errorResult = form.ToNameValueCollection();
-      }));
-
-      Assert.IsType<InvalidOperationException>(ex);
+      });
 
       form.Bind(post);
       Assert.True(form.ExecValidators());

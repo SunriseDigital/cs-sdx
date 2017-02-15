@@ -491,12 +491,11 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         string id = null;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        //connectionを開いてないので例外になるはず
+        Assert.Throws<Sdx.Db.DbException>(() =>
         {
           id = con.FetchOne<string>(select);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+        });
 
         con.Open();
         id = con.FetchOne<string>(select);
@@ -509,12 +508,11 @@ namespace UnitTest
         var command = select.Build();
 
         string id = null;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        //connectionを開いてないので例外になるはず
+        Assert.Throws<Sdx.Db.DbException>(() =>
         {
           id = con.FetchOne<string>(command);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+        });
 
         con.Open();
         id = con.FetchOne<string>(command);
@@ -548,12 +546,11 @@ namespace UnitTest
       {
         var command = sel.Build();
 
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        //connectionを開いてないので例外になるはず
+        Assert.Throws<Sdx.Db.DbException>(() =>
         {
           list = con.FetchList<string>(command);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+        });
 
         con.Open();
         list = con.FetchList<string>(command);
@@ -576,12 +573,11 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        //connectionを開いてないので例外になるはず
+        Assert.Throws<Sdx.Db.DbException>(() =>
         {
           list = con.FetchList<string>(sel);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+        });
 
         con.Open();
         list = con.FetchList<string>(sel);
@@ -616,12 +612,11 @@ namespace UnitTest
       {
         Dictionary<string, string> strDic = null;
         var command = sel.Build();
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        //connectionを開いてないので例外になるはず
+        Assert.Throws<Sdx.Db.DbException>(() =>
         {
           strDic = con.FetchDictionary<string>(command);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
+        });
 
         con.Open();
         strDic = con.FetchDictionary<string>(sel.Build());
@@ -645,12 +640,6 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Dictionary<string, object> objDic;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          objDic = con.FetchDictionary<object>(sel);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
         objDic = con.FetchDictionary<object>(sel);
@@ -685,14 +674,8 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          list = con.FetchDictionaryList<string>(command);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
-        command.Connection.Open();
+        con.Open();
         list = con.FetchDictionaryList<string>(command);
         Assert.IsType<List<Dictionary<string, string>>>(list);
         Assert.Equal(2, list.Count);
@@ -713,13 +696,6 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          list = con.FetchDictionaryList<string>(sel);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
-
         con.Open();
         list = con.FetchDictionaryList<string>(sel);
         Assert.IsType<List<Dictionary<string, string>>>(list);
@@ -753,12 +729,6 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         var command = sel.Build();
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          list = con.FetchKeyValuePairList<int, string>(command);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
         list = con.FetchKeyValuePairList<int, string>(command);
@@ -782,13 +752,6 @@ namespace UnitTest
 
       using (var con = db.Adapter.CreateConnection())
       {
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          list = con.FetchKeyValuePairList<int, string>(sel);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
-
         con.Open();
         list = con.FetchKeyValuePairList<int, string>(sel);
         Assert.IsType<List<KeyValuePair<int, string>>>(list);
@@ -819,12 +782,6 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Test.Orm.Shop shop;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          shop = (Test.Orm.Shop)con.FetchRecord(sel);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
         shop = (Test.Orm.Shop)con.FetchRecord(sel);
@@ -855,12 +812,6 @@ namespace UnitTest
       using (var con = db.Adapter.CreateConnection())
       {
         Sdx.Db.RecordSet set;
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
-        {
-          set = con.FetchRecordSet(sel);
-        }));
-        //connectionを開いてないので例外になるはず
-        Assert.Equal(typeof(Sdx.Db.DbException), ex.GetType());
 
         con.Open();
         set = con.FetchRecordSet(sel);

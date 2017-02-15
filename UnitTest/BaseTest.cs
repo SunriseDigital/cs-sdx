@@ -42,7 +42,7 @@ namespace UnitTest
       }
     }
   }
-  public class BaseTest : Xunit.IUseFixture<Fixture>, IDisposable
+  public class BaseTest : Xunit.ICollectionFixture<Fixture>, IDisposable
   {
     public BaseTest()
     {
@@ -57,11 +57,11 @@ namespace UnitTest
 
     }
 
-    public void SetFixture(Fixture fixture)
-    {
-      fixture.TestClass = this;
-      this.SetUp();
-    }
+    //public void SetFixture(Fixture fixture)
+    //{
+    //  fixture.TestClass = this;
+    //  this.SetUp();
+    //}
 
     [TestInitialize]
     public void TestInitialize()

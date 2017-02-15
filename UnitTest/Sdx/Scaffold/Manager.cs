@@ -256,12 +256,10 @@ namespace UnitTest
         scaffold.Group.Strict = true;
 
         //Handlerが無ければ例外
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        Assert.Throws<HttpException>(() =>
         {
           scaffold.Group.Init();
-        }));
-
-        Assert.IsType<HttpException>(ex);
+        });
       }))();
 
       //Group strict with handler
@@ -518,12 +516,10 @@ namespace UnitTest
 
         scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"), new Sdx.Scaffold.Config.Value("GetList"));
         scaffold.Group.FixedValue = "1";
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        Assert.Throws<InvalidOperationException>(() =>
         {
           scaffold.Group.Init();
-        }));
-
-        Assert.IsType<InvalidOperationException>(ex);
+        });
       }))();
 
       //例外2
@@ -541,12 +537,10 @@ namespace UnitTest
         scaffold.Group = new Sdx.Scaffold.Group.StaticClass("large_area_id", typeof(Test.Data.LargeArea), new Sdx.Scaffold.Config.Value("GetName"));
         scaffold.Group.FixedValue = "1";
         scaffold.Group.DefaultValue = "2";
-        Exception ex = Record.Exception(new Assert.ThrowsDelegate(() =>
+        Assert.Throws<InvalidOperationException>(() =>
         {
           scaffold.Group.Init();
-        }));
-
-        Assert.IsType<InvalidOperationException>(ex);
+        });
       }))();
     }
 
