@@ -50,11 +50,13 @@ namespace UnitTest
       Sdx.Context.Current.Debug.Out = Console.Out;
       //DB Adapter
       var settings = ConfigurationManager.GetSection("sdxDatabaseConnections") as Sdx.Configuration.DictionaryListSection;
-      foreach (var elem in settings.Items)
+      if (settings != null)
       {
-        Sdx.Db.Adapter.Manager.Add(elem.Attributes, ConfigurationManager.ConnectionStrings, ConfigurationManager.AppSettings);
+        foreach (var elem in settings.Items)
+        {
+          Sdx.Db.Adapter.Manager.Add(elem.Attributes, ConfigurationManager.ConnectionStrings, ConfigurationManager.AppSettings);
+        }
       }
-
     }
 
     public void SetFixture(Fixture fixture)
