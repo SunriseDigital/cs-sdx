@@ -1003,12 +1003,12 @@ namespace UnitTest
 
 
         var nameValidators = form["name"].Validators.ToList();
-        Assert.Equal(2, nameValidators.Count);
+        Assert.Equal(1, nameValidators.Count);
         
         Assert.IsType<Sdx.Validation.NotEmpty>(nameValidators[0]);
-        Assert.IsType<Sdx.Validation.StringLength>(nameValidators[1]);
-        Assert.Equal(null, ((Sdx.Validation.StringLength)nameValidators[1]).Min);
-        Assert.Equal(100, ((Sdx.Validation.StringLength)nameValidators[1]).Max);
+        //Assert.IsType<Sdx.Validation.StringLength>(nameValidators[1]);
+        //Assert.Equal(null, ((Sdx.Validation.StringLength)nameValidators[1]).Min);
+        //Assert.Equal(100, ((Sdx.Validation.StringLength)nameValidators[1]).Max);
       }
     }
 

@@ -9,10 +9,19 @@ namespace Test.Orm.Table
 
     static Shop()
     {
-      var db = Sdx.Db.Adapter.Manager.Get("mysql").Read;
       Meta =  new Sdx.Db.TableMeta(
         "shop",
-        db.FetchColumns("shop"),
+        new List<Column>()
+        {
+          new Column("id", isAutoIncrement: true, isPkey: true),
+          new Column("name"),
+          new Column("area_id", type: ColumnType.Integer),
+          new Column("main_image_id", isNotNull: false),
+          new Column("sub_image_id", isNotNull: false),
+          new Column("login_id", isNotNull: false),
+          new Column("password", isNotNull: false),
+          new Column("created_at", type: ColumnType.DateTime),
+        },
         new Dictionary<string, Relation>()
         {
           {
