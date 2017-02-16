@@ -42,15 +42,19 @@ namespace Sdx.Gen.Code
       builder.Append(blockStart);
       builder.Append(newLine);
       codeList.ForEach(code => code.Render(rootCode, builder, currentIndent + indent));
-      if ((bool)endLineBreak)
+
+      if (blockEnd.Length > 0)
       {
-        builder.Append(currentIndent);
-      }
-      
-      builder.Append(blockEnd);
-      if ((bool)endLineBreak)
-      {
-        builder.Append(newLine);
+        if ((bool)endLineBreak)
+        {
+          builder.Append(currentIndent);
+        }
+
+        builder.Append(blockEnd);
+        if ((bool)endLineBreak)
+        {
+          builder.Append(newLine);
+        }
       }
     }
 

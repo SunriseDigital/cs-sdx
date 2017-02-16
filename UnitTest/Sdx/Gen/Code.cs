@@ -415,5 +415,39 @@ function1()
 }}
 ".TrimStart(), func1.Render());
     }
+
+    [Fact]
+    public void Python()
+    {
+      var expected = @"
+class MyClass:
+    count = 0
+
+    def __init__(self):
+        self.name = """"
+
+    def getName(self):
+        return self.name
+".TrimStart();
+
+      var bClass = new Sdx.Gen.Code.Block("class MyClass");
+      bClass.ChangeBlockStrings(":", "");
+      bClass.StartLineBreak = false;
+      bClass.Indent = "    ";
+
+      bClass.AddChild("count = 0");
+      bClass.AddBlankLine();
+
+      var bInit = new Sdx.Gen.Code.Block("def __init__(self)");
+      bInit.AppendTo(bClass);
+      bInit.AddChild(@"self.name = """"");
+      bClass.AddBlankLine();
+
+      var bGetName = new Sdx.Gen.Code.Block("def getName(self)");
+      bGetName.AppendTo(bClass);
+      bGetName.AddChild("return self.name");
+
+      Assert.Equal(expected, bClass.Render());
+    }
   }
 }

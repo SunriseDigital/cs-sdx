@@ -31,11 +31,14 @@ namespace Sdx.Gen.Code
     {
       var newLine = NewLine == null ? rootCode.NewLine : NewLine;
 
-      builder
-        .Append(currentIndent)
-        .Append(code)
-        .Append(newLine)
-        ;
+      if (code.Length > 0)
+      {
+        builder
+          .Append(currentIndent)
+          .Append(code);
+      }
+
+      builder.Append(newLine);
     }
 
     internal override string KeyWord
