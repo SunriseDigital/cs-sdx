@@ -268,7 +268,7 @@ function1()
     {
       //ルートを変えるとすべて変わる
       var func1 = new Sdx.Gen.Code.Block("function1()");
-      func1.NewLine = "...\r\n";
+      func1.NewLine = "..." + Environment.NewLine;
 
       var func2 = new Sdx.Gen.Code.Block("function2()");
       func2.AppendTo(func1);
