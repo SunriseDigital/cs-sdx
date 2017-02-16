@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,23 +20,52 @@ namespace GenOrm
 
         foreach (var table in GetTargetTableNames(options, db))
         {
-          var tableClass = CreateTableClass(table, options, db);
-          Sdx.Context.Current.Debug.Log(tableClass.Render());
+          var className = Sdx.Util.String.ToCamelCase(table);
+          var tableClass = CreateTableClass(options.Namespace, className, table, db);
+          SaveClassFile(options.BaseDir, options.Namespace, className, tableClass.Render(), "Table");
         }
       });
     }
 
-    private static Sdx.Gen.Code.File CreateTableClass(string tableName, Options options, Sdx.Db.Adapter.Base db)
+    private static void SaveClassFile(string baseDir, string ns, string className, string body, string additionalns = null)
     {
-      var className = Sdx.Util.String.ToCamelCase(tableName);
+      var bPath = new StringBuilder();
+      bPath.Append(baseDir);
+      bPath.Append(Path.DirectorySeparatorChar);
+
+      var acutualNs = ns;
+      if (additionalns != null)
+      {
+        acutualNs = acutualNs + "." + additionalns;
+      }
+
+      bPath.Append(acutualNs.Replace('.', Path.DirectorySeparatorChar));
+      bPath.Append(Path.DirectorySeparatorChar);
+      bPath.Append(className);
+      bPath.Append(".cs");
+
+      var path = bPath.ToString();
+      Console.WriteLine("Saving {0}.{1} at {2}", acutualNs, className, path);
+
+      var dir = Path.GetDirectoryName(path);
+      if (!Directory.Exists(dir))
+      {
+        Directory.CreateDirectory(dir);
+      }
+      File.WriteAllText(path, body);
+    }
+
+    private static Sdx.Gen.Code.File CreateTableClass(string ns, string className, string tableName, Sdx.Db.Adapter.Base db)
+    {
+      
       var file = new Sdx.Gen.Code.File();
 
       file.AddChild("using System;");
       file.AddChild("using System.Collections.Generic;");
-      file.AddChild("using System.Linq");
+      file.AddChild("using System.Linq;");
       file.AddBlankLine();
 
-      var bNamespace = new Sdx.Gen.Code.Block("namespace {0}.Table", options.Namespace);
+      var bNamespace = new Sdx.Gen.Code.Block("namespace {0}.Table", ns);
       bNamespace.AppendTo(file);
 
       var bClass = new Sdx.Gen.Code.Block("public class {0} : Sdx.Db.Table", className);
@@ -64,7 +94,7 @@ namespace GenOrm
       bRelation.BlockEnd = "},";
 
       bCreateTableMeta.AddChild("typeof(Test.Orm.{0}),", className);
-      bCreateTableMeta.AddChild("typeof(Test.Orm.Table.{0}),", className);
+      bCreateTableMeta.AddChild("typeof(Test.Orm.Table.{0})", className);
 
       return file;
     }
