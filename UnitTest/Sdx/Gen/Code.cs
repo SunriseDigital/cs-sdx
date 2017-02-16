@@ -295,7 +295,7 @@ function1()...
       
 
       func2 = new Sdx.Gen.Code.Block("function2()");
-      func2.NewLine = "...\r\n";
+      func2.NewLine = "..." + Environment.NewLine;
       func1.AddChild(func2);
 
       func3 = new Sdx.Gen.Code.Block("function3()");
