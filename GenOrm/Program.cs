@@ -36,23 +36,23 @@ namespace GenOrm
       file.AddBlankLine();
 
       var bNamespace = new Sdx.Gen.Code.Block("namespace {0}.Table", options.Namespace);
-      file.AddChild(bNamespace);
+      bNamespace.AppendTo(file);
 
       var bClass = new Sdx.Gen.Code.Block("public class {0} : Sdx.Db.Table", className);
-      bNamespace.AddChild(bClass);
+      bClass.AppendTo(bNamespace);
       bClass.AddChild("public static Sdx.Db.TableMeta Meta { get; private set; }");
 
       var bClassCtor = new Sdx.Gen.Code.Block("static {0}()", className);
-      bClass.AddChild(bClassCtor);
+      bClassCtor.AppendTo(bClass);
 
       var bCreateTableMeta = new Sdx.Gen.Code.Block("Meta =  new Sdx.Db.TableMeta");
-      bClassCtor.AddChild(bCreateTableMeta);
+      bCreateTableMeta.AppendTo(bClassCtor);
       bCreateTableMeta.ChangeBlockStrings("(", ");");
       bCreateTableMeta.StartLineBreak = false;
       bCreateTableMeta.AddChild(@"""{0}"",", tableName);
 
       var bColumnList = new Sdx.Gen.Code.Block("new List<Column>()");
-      bCreateTableMeta.AddChild(bColumnList);
+      bColumnList.AppendTo(bCreateTableMeta);
       bColumnList.BlockEnd = "},";
       foreach (var column in GetColumns(tableName, db))
       {
@@ -60,7 +60,7 @@ namespace GenOrm
       }
 
       var bRelation = new Sdx.Gen.Code.Block("new Dictionary<string, Relation>()");
-      bCreateTableMeta.AddChild(bRelation);
+      bRelation.AppendTo(bCreateTableMeta);
       bRelation.BlockEnd = "},";
 
       bCreateTableMeta.AddChild("typeof(Test.Orm.{0}),", className);
