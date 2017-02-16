@@ -18,11 +18,9 @@ namespace Sdx.Gen.Code
 
     public string Indent { get; set; }
 
-    private string startBlockDelimiter = "{";
-    public string StartBlockDelimiter { get { return startBlockDelimiter; } set { startBlockDelimiter = value; } }
+    public string BlockStart { get; set; }
 
-    private string endBlockDelimiter = "}";
-    public string EndBlockDelimiter { get { return endBlockDelimiter; } set { endBlockDelimiter = value; } }
+    public string BlockEnd { get; set; }
 
     public IEnumerable<Base> Children
     {
@@ -52,7 +50,7 @@ namespace Sdx.Gen.Code
       code.Parent = this;
     }
 
-    abstract internal void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter);
+    abstract internal void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar);
 
     public string Render()
     {
@@ -60,9 +58,19 @@ namespace Sdx.Gen.Code
       {
         Indent = "  ";//defulat value
       }
+
+      if(BlockStart == null)
+      {
+        BlockStart = "{";
+      }
+
+      if (BlockEnd == null)
+      {
+        BlockEnd = "}";
+      }
       
       var builder = new StringBuilder();
-      Render(this, builder, "", NewLineChar, StartBlockDelimiter, EndBlockDelimiter);
+      Render(this, builder, "", NewLineChar);
       return builder.ToString();
     }
 
@@ -107,6 +115,12 @@ namespace Sdx.Gen.Code
       }
 
       return results.FirstOrDefault();
+    }
+
+    public void ChangeBlockStrings(string start, string end)
+    {
+      BlockStart = start;
+      BlockEnd = end;
     }
   }
 }

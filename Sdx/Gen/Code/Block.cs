@@ -12,8 +12,6 @@ namespace Sdx.Gen.Code
 
     public bool StartLineBreak { get; set; }
     public bool EndLineBreak { get; set; }
-    public string StartDelimiter { get; set; }
-    public string EndDelimiter { get; set; }
 
     public Block(string firstLineCode, params string[] formatValue)
     {
@@ -29,10 +27,12 @@ namespace Sdx.Gen.Code
       }
     }
 
-    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter)
+    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar)
     {
-      Sdx.Context.Current.Debug.Log(string.Format("{0}: {1} {2}", KeyWord, rootCode.Indent, Indent == null ? "null" : Indent));
       var indent = Indent == null ? rootCode.Indent : Indent;
+      var blockStart = BlockStart == null ? rootCode.BlockStart : BlockStart;
+      var blockEnd = BlockEnd == null ? rootCode.BlockEnd : BlockEnd;
+
       builder.Append(currentIndent);
       builder.Append(firstLineCode);
       if (StartLineBreak)
@@ -41,11 +41,11 @@ namespace Sdx.Gen.Code
         builder.Append(currentIndent);
       }
 
-      builder.Append(StartDelimiter == null ? StartBlockDelimiter : StartDelimiter);
+      builder.Append(blockStart);
       builder.Append(newLineChar);
-      codeList.ForEach(code => code.Render(rootCode, builder, currentIndent + indent, newLineChar, startBlockDelimiter, endBlockDelimiter));
+      codeList.ForEach(code => code.Render(rootCode, builder, currentIndent + indent, newLineChar));
       builder.Append(currentIndent);
-      builder.Append(EndDelimiter == null ? EndBlockDelimiter : EndDelimiter);
+      builder.Append(blockEnd);
       if(EndLineBreak)
       {
         builder.Append(newLineChar);
@@ -55,12 +55,6 @@ namespace Sdx.Gen.Code
     internal override string KeyWord
     {
       get { return firstLineCode; }
-    }
-
-    public void ChangeDilimiter(string start, string end)
-    {
-      StartDelimiter = start;
-      EndDelimiter = end;
     }
   }
 }

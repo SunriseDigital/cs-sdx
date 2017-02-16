@@ -47,13 +47,13 @@ namespace GenOrm
 
       var bCreateTableMeta = new Sdx.Gen.Code.Block("Meta =  new Sdx.Db.TableMeta");
       bClassCtor.AddChild(bCreateTableMeta);
-      bCreateTableMeta.ChangeDilimiter("(", ");");
+      bCreateTableMeta.ChangeBlockString("(", ");");
       bCreateTableMeta.StartLineBreak = false;
       bCreateTableMeta.AddChild(@"""{0}"",", tableName);
 
       var bColumnList = new Sdx.Gen.Code.Block("new List<Column>()");
       bCreateTableMeta.AddChild(bColumnList);
-      bColumnList.EndDelimiter = "},";
+      bColumnList.BlockEnd = "},";
       foreach (var column in GetColumns(tableName, db))
       {
         bColumnList.AddChild(BuildCreateColumnString(column));
@@ -61,7 +61,7 @@ namespace GenOrm
 
       var bRelation = new Sdx.Gen.Code.Block("new Dictionary<string, Relation>()");
       bCreateTableMeta.AddChild(bRelation);
-      bRelation.EndDelimiter = "},";
+      bRelation.BlockEnd = "},";
 
       bCreateTableMeta.AddChild("typeof(Test.Orm.{0}),", className);
       bCreateTableMeta.AddChild("typeof(Test.Orm.Table.{0}),", className);
