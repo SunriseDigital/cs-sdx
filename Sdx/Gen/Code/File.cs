@@ -8,9 +8,9 @@ namespace Sdx.Gen.Code
 {
   public class File : Base
   {
-    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar)
+    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent)
     {
-      codeList.ForEach(code => code.Render(rootCode, builder, currentIndent, newLineChar));
+      codeList.ForEach(code => code.Render(rootCode, builder, currentIndent));
     }
 
     internal override string KeyWord

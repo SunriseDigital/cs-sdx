@@ -13,8 +13,7 @@ namespace Sdx.Gen.Code
 
     public Base Parent { get; private set; }
 
-    private string newLineChar = Environment.NewLine;
-    public string NewLineChar { get { return newLineChar; } set { newLineChar = value; } }
+    public string NewLine { get; set; }
 
     public string Indent { get; set; }
 
@@ -28,6 +27,11 @@ namespace Sdx.Gen.Code
       {
         return codeList;
       }
+    }
+
+    public void AppendTo(Base parent)
+    {
+      parent.AddChild(this);
     }
 
     public void AddChild(string code, params string[] formatValue)
@@ -50,7 +54,7 @@ namespace Sdx.Gen.Code
       code.Parent = this;
     }
 
-    abstract internal void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar);
+    abstract internal void Render(Base rootCode, StringBuilder builder, string currentIndent);
 
     public string Render()
     {
@@ -68,9 +72,14 @@ namespace Sdx.Gen.Code
       {
         BlockEnd = "}";
       }
+
+      if (NewLine == null)
+      {
+        NewLine = Environment.NewLine;
+      }
       
       var builder = new StringBuilder();
-      Render(this, builder, "", NewLineChar);
+      Render(this, builder, "");
       return builder.ToString();
     }
 

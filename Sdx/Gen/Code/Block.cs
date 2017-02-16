@@ -27,28 +27,29 @@ namespace Sdx.Gen.Code
       }
     }
 
-    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar)
+    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent)
     {
       var indent = Indent == null ? rootCode.Indent : Indent;
       var blockStart = BlockStart == null ? rootCode.BlockStart : BlockStart;
       var blockEnd = BlockEnd == null ? rootCode.BlockEnd : BlockEnd;
+      var newLine = NewLine == null ? rootCode.NewLine : NewLine;
 
       builder.Append(currentIndent);
       builder.Append(firstLineCode);
       if (StartLineBreak)
       {
-        builder.Append(newLineChar);
+        builder.Append(newLine);
         builder.Append(currentIndent);
       }
 
       builder.Append(blockStart);
-      builder.Append(newLineChar);
-      codeList.ForEach(code => code.Render(rootCode, builder, currentIndent + indent, newLineChar));
+      builder.Append(newLine);
+      codeList.ForEach(code => code.Render(rootCode, builder, currentIndent + indent));
       builder.Append(currentIndent);
       builder.Append(blockEnd);
       if(EndLineBreak)
       {
-        builder.Append(newLineChar);
+        builder.Append(newLine);
       }
     }
 

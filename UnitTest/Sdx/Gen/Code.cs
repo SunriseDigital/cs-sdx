@@ -262,5 +262,58 @@ function1()
 }
 ".TrimStart(), func1.Render());
     }
+
+    [Fact]
+    public void ChangeNewLineString()
+    {
+      //ルートを変えるとすべて変わる
+      var func1 = new Sdx.Gen.Code.Block("function1()");
+      func1.NewLine = "...\r\n";
+
+      var func2 = new Sdx.Gen.Code.Block("function2()");
+      func2.AppendTo(func1);
+
+      var func3 = new Sdx.Gen.Code.Block("function3()");
+      func3.AppendTo(func2);
+      func3.AddChild("var foo = 1;");
+
+      Assert.Equal(@"
+function1()...
+{...
+  function2()...
+  {...
+    function3()...
+    {...
+      var foo = 1;...
+    }...
+  }...
+}...
+".TrimStart(), func1.Render());
+
+      //子供はそこだけ
+      func1 = new Sdx.Gen.Code.Block("function1()");
+      
+
+      func2 = new Sdx.Gen.Code.Block("function2()");
+      func2.NewLine = "...\r\n";
+      func1.AddChild(func2);
+
+      func3 = new Sdx.Gen.Code.Block("function3()");
+      func2.AddChild(func3);
+      func3.AddChild("var foo = 1;");
+
+      Assert.Equal(@"
+function1()
+{
+  function2()...
+  {...
+    function3()
+    {
+      var foo = 1;
+    }
+  }...
+}
+".TrimStart(), func1.Render());
+    }
   }
 }

@@ -27,12 +27,14 @@ namespace Sdx.Gen.Code
       throw new NotSupportedException("You can't Add to Statement.");
     }
 
-    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar)
+    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent)
     {
+      var newLine = NewLine == null ? rootCode.NewLine : NewLine;
+
       builder
         .Append(currentIndent)
         .Append(code)
-        .Append(newLineChar)
+        .Append(newLine)
         ;
     }
 

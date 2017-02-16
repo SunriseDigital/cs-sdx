@@ -47,7 +47,7 @@ namespace GenOrm
 
       var bCreateTableMeta = new Sdx.Gen.Code.Block("Meta =  new Sdx.Db.TableMeta");
       bClassCtor.AddChild(bCreateTableMeta);
-      bCreateTableMeta.ChangeBlockString("(", ");");
+      bCreateTableMeta.ChangeBlockStrings("(", ");");
       bCreateTableMeta.StartLineBreak = false;
       bCreateTableMeta.AddChild(@"""{0}"",", tableName);
 
