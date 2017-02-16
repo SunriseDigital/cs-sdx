@@ -315,5 +315,105 @@ function1()
 }
 ".TrimStart(), func1.Render());
     }
+
+    [Fact]
+    public void ChangeFirstLineBreak()
+    {
+      //ルートを変えるとすべて変わる
+      var func1 = new Sdx.Gen.Code.Block("function1()");
+      func1.StartLineBreak = false;
+
+      var func2 = new Sdx.Gen.Code.Block("function2()");
+      func2.AppendTo(func1);
+
+      var func3 = new Sdx.Gen.Code.Block("function3()");
+      func3.AppendTo(func2);
+      func3.AddChild("var foo = 1;");
+
+      Sdx.Context.Current.Debug.Log(func1.Render());
+
+      Assert.Equal(@"
+function1(){
+  function2(){
+    function3(){
+      var foo = 1;
+    }
+  }
+}
+".TrimStart(), func1.Render());
+
+      //子供だと変えた時だけ
+      func1 = new Sdx.Gen.Code.Block("function1()");
+
+      func2 = new Sdx.Gen.Code.Block("function2()");
+      func2.StartLineBreak = false;
+      func2.AppendTo(func1);
+
+      func3 = new Sdx.Gen.Code.Block("function3()");
+      func3.AppendTo(func2);
+      func3.AddChild("var foo = 1;");
+
+      Assert.Equal(@"
+function1()
+{
+  function2(){
+    function3()
+    {
+      var foo = 1;
+    }
+  }
+}
+".TrimStart(), func1.Render());
+    }
+
+    [Fact]
+    public void ChangeEndLineBreak()
+    {
+      //ルートを変えるとすべて変わる
+      var func1 = new Sdx.Gen.Code.Block("function1()");
+      func1.EndLineBreak = false;
+
+      var func2 = new Sdx.Gen.Code.Block("function2()");
+      func2.AppendTo(func1);
+
+      var func3 = new Sdx.Gen.Code.Block("function3()");
+      func3.AppendTo(func2);
+      func3.AddChild("var foo = 1;");
+
+      Sdx.Context.Current.Debug.Log(func1.Render());
+
+      Assert.Equal(@"
+function1()
+{
+  function2()
+  {
+    function3()
+    {
+      var foo = 1;
+}}}".TrimStart(), func1.Render());
+
+      //子供だと変えた時だけ
+      func1 = new Sdx.Gen.Code.Block("function1()");
+
+      func2 = new Sdx.Gen.Code.Block("function2()");
+      func2.EndLineBreak = false;
+      func2.AppendTo(func1);
+
+      func3 = new Sdx.Gen.Code.Block("function3()");
+      func3.AppendTo(func2);
+      func3.AddChild("var foo = 1;");
+
+      Assert.Equal(@"
+function1()
+{
+  function2()
+  {
+    function3()
+    {
+      var foo = 1;
+    }
+}}
+".TrimStart(), func1.Render());
+    }
   }
 }

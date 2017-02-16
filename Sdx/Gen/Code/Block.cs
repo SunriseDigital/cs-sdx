@@ -10,13 +10,8 @@ namespace Sdx.Gen.Code
   {
     private string firstLineCode;
 
-    public bool StartLineBreak { get; set; }
-    public bool EndLineBreak { get; set; }
-
     public Block(string firstLineCode, params string[] formatValue)
     {
-      StartLineBreak = true;
-      EndLineBreak = true;
       if (formatValue.Length == 0)
       {
         this.firstLineCode = firstLineCode;
@@ -33,10 +28,12 @@ namespace Sdx.Gen.Code
       var blockStart = BlockStart == null ? rootCode.BlockStart : BlockStart;
       var blockEnd = BlockEnd == null ? rootCode.BlockEnd : BlockEnd;
       var newLine = NewLine == null ? rootCode.NewLine : NewLine;
+      var startLineBreak = StartLineBreak == null ? rootCode.StartLineBreak : StartLineBreak;
+      var endLineBreak = EndLineBreak == null ? rootCode.EndLineBreak : EndLineBreak;
 
       builder.Append(currentIndent);
       builder.Append(firstLineCode);
-      if (StartLineBreak)
+      if ((bool)startLineBreak)
       {
         builder.Append(newLine);
         builder.Append(currentIndent);
@@ -45,9 +42,13 @@ namespace Sdx.Gen.Code
       builder.Append(blockStart);
       builder.Append(newLine);
       codeList.ForEach(code => code.Render(rootCode, builder, currentIndent + indent));
-      builder.Append(currentIndent);
+      if ((bool)endLineBreak)
+      {
+        builder.Append(currentIndent);
+      }
+      
       builder.Append(blockEnd);
-      if(EndLineBreak)
+      if ((bool)endLineBreak)
       {
         builder.Append(newLine);
       }

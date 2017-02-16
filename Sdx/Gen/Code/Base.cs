@@ -21,6 +21,10 @@ namespace Sdx.Gen.Code
 
     public string BlockEnd { get; set; }
 
+    public bool? StartLineBreak { get; set; }
+
+    public bool? EndLineBreak { get; set; }
+
     public IEnumerable<Base> Children
     {
       get
@@ -58,9 +62,10 @@ namespace Sdx.Gen.Code
 
     public string Render()
     {
+      //defulat value
       if (Indent == null)
       {
-        Indent = "  ";//defulat value
+        Indent = "  ";
       }
 
       if(BlockStart == null)
@@ -76,6 +81,16 @@ namespace Sdx.Gen.Code
       if (NewLine == null)
       {
         NewLine = Environment.NewLine;
+      }
+
+      if(StartLineBreak == null)
+      {
+        StartLineBreak = true;
+      }
+
+      if (EndLineBreak == null)
+      {
+        EndLineBreak = true;
       }
       
       var builder = new StringBuilder();
