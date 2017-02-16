@@ -157,5 +157,58 @@ namespace UnitTest
 
       Assert.Equal(bNamespace, code.FindChild(new Regex("^namespace UnitTest$")));
     }
+
+    [Fact]
+    public void ChangeIndent()
+    {
+      //ルートを変えるとすべて変わる
+      var func1 = new Sdx.Gen.Code.Block("function1()");
+      func1.Indent = "....";
+
+      var func2 = new Sdx.Gen.Code.Block("function2()");
+      func1.AddChild(func2);
+
+      var func3 = new Sdx.Gen.Code.Block("function3()");
+      func2.AddChild(func3);
+      func3.AddChild("var foo = 1;");
+
+      //Renderを呼んだのがルートになる。
+      Assert.Equal(@"
+function1()
+{
+....function2()
+....{
+........function3()
+........{
+............var foo = 1;
+........}
+....}
+}
+".TrimStart(), func1.Render());
+
+      //途中を変えるとそこだけ変わります。
+      func1 = new Sdx.Gen.Code.Block("function1()");
+
+      func2 = new Sdx.Gen.Code.Block("function2()");
+      func2.Indent = "....";
+      func1.AddChild(func2);
+
+      func3 = new Sdx.Gen.Code.Block("function3()");
+      func2.AddChild(func3);
+      func3.AddChild("var foo = 1;");
+
+      Assert.Equal(@"
+function1()
+{
+  function2()
+  {
+  ....function3()
+  ....{
+  ....  var foo = 1;
+  ....}
+  }
+}
+".TrimStart(), func1.Render());
+    }
   }
 }

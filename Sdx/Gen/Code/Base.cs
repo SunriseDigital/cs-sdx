@@ -11,11 +11,12 @@ namespace Sdx.Gen.Code
   {
     protected List<Base> codeList = new List<Base>();
 
+    public Base Parent { get; private set; }
+
     private string newLineChar = Environment.NewLine;
     public string NewLineChar { get { return newLineChar; } set { newLineChar = value; } }
 
-    private string indent = "  ";
-    public string Indent { get { return indent; } set { newLineChar = value; } }
+    public string Indent { get; set; }
 
     private string startBlockDelimiter = "{";
     public string StartBlockDelimiter { get { return startBlockDelimiter; } set { startBlockDelimiter = value; } }
@@ -48,14 +49,20 @@ namespace Sdx.Gen.Code
         throw new ArgumentException("`File` can not be added to other objects. It is the root object.");
       }
       codeList.Add(code);
+      code.Parent = this;
     }
 
-    abstract internal void Render(StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter);
+    abstract internal void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter);
 
     public string Render()
     {
+      if (Indent == null)
+      {
+        Indent = "  ";//defulat value
+      }
+      
       var builder = new StringBuilder();
-      Render(builder, "", NewLineChar, StartBlockDelimiter, EndBlockDelimiter);
+      Render(this, builder, "", NewLineChar, StartBlockDelimiter, EndBlockDelimiter);
       return builder.ToString();
     }
 

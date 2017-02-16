@@ -28,8 +28,11 @@ namespace Sdx.Gen.Code
         this.firstLineCode = string.Format(firstLineCode, formatValue);
       }
     }
-    internal override void Render(StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter)
+
+    internal override void Render(Base rootCode, StringBuilder builder, string currentIndent, string newLineChar, string startBlockDelimiter, string endBlockDelimiter)
     {
+      Sdx.Context.Current.Debug.Log(string.Format("{0}: {1} {2}", KeyWord, rootCode.Indent, Indent == null ? "null" : Indent));
+      var indent = Indent == null ? rootCode.Indent : Indent;
       builder.Append(currentIndent);
       builder.Append(firstLineCode);
       if (StartLineBreak)
@@ -40,7 +43,7 @@ namespace Sdx.Gen.Code
 
       builder.Append(StartDelimiter == null ? StartBlockDelimiter : StartDelimiter);
       builder.Append(newLineChar);
-      codeList.ForEach(code => code.Render(builder, currentIndent + Indent, newLineChar, startBlockDelimiter, endBlockDelimiter));
+      codeList.ForEach(code => code.Render(rootCode, builder, currentIndent + indent, newLineChar, startBlockDelimiter, endBlockDelimiter));
       builder.Append(currentIndent);
       builder.Append(EndDelimiter == null ? EndBlockDelimiter : EndDelimiter);
       if(EndLineBreak)
