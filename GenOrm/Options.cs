@@ -26,6 +26,9 @@ namespace GenOrm
     [Value(4, Required = false, HelpText = "Table names with comma separator.")]
     public string TableName { get; set; }
 
+    [Option('f', "force", Required = false, HelpText = "If there is a file in the save destination, overwrite the file.")]
+    public bool ForceOverWrite { get; set; }
+
     public IEnumerable<string> TableNames
     {
       get

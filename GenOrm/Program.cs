@@ -22,12 +22,19 @@ namespace GenOrm
         {
           var className = Sdx.Util.String.ToCamelCase(table);
           var tableClass = CreateTableClass(options.Namespace, className, table, db);
-          SaveClassFile(options.BaseDir, options.Namespace, className, tableClass.Render(), "Table");
+          SaveClassFile(
+            options.BaseDir,
+            options.Namespace,
+            className,
+            tableClass.Render(),
+            options.ForceOverWrite,
+            "Table"
+          );
         }
       });
     }
 
-    private static void SaveClassFile(string baseDir, string ns, string className, string body, string additionalns = null)
+    private static void SaveClassFile(string baseDir, string ns, string className, string body, bool forceOverWrite, string additionalns = null)
     {
       var bPath = new StringBuilder();
       bPath.Append(baseDir);
@@ -45,7 +52,15 @@ namespace GenOrm
       bPath.Append(".cs");
 
       var path = bPath.ToString();
-      Console.WriteLine("Saving {0}.{1} at {2}", acutualNs, className, path);
+      var fileExsits = File.Exists(path);
+      if (!forceOverWrite && fileExsits)
+      {
+        Console.WriteLine("Already exists {0}", path);
+        return;
+      }
+
+      var action = fileExsits ? "Overwrite" : "Create";
+      Console.WriteLine("{0} {1}.{2} at {3}", action, acutualNs, className, path);
 
       var dir = Path.GetDirectoryName(path);
       if (!Directory.Exists(dir))
@@ -57,7 +72,6 @@ namespace GenOrm
 
     private static Sdx.Gen.Code.File CreateTableClass(string ns, string className, string tableName, Sdx.Db.Adapter.Base db)
     {
-      
       var file = new Sdx.Gen.Code.File();
 
       file.AddChild("using System;");
