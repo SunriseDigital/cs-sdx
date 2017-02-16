@@ -21,6 +21,7 @@ namespace GenOrm
         foreach (var table in GetTargetTableNames(options, db))
         {
           var className = Sdx.Util.String.ToCamelCase(table);
+          
           var tableClass = CreateTableClass(options.Namespace, className, table, db);
           SaveClassFile(
             options.BaseDir,
@@ -30,8 +31,100 @@ namespace GenOrm
             options.ForceOverWrite,
             "Table"
           );
+
+          var recordClass = CreateRecordClass(options.Namespace, className, table, db);
+          SaveClassFile(
+            options.BaseDir,
+            options.Namespace,
+            className,
+            recordClass.Render(),
+            options.ForceOverWrite
+          );
         }
       });
+    }
+
+    private static Sdx.Gen.Code.File CreateRecordClass(string ns, string className, string tableName, Sdx.Db.Adapter.Base db)
+    {
+      var file = new Sdx.Gen.Code.File();
+
+      file.AddChild("using System;");
+      file.AddChild("using System.Collections.Generic;");
+      file.AddChild("using System.Linq;");
+      file.AddBlankLine();
+
+      var bNamespace = new Sdx.Gen.Code.Block("namespace {0}", ns);
+      bNamespace.AppendTo(file);
+
+      var bClass = new Sdx.Gen.Code.Block("public class {0} : Sdx.Db.Record", className);
+      bClass.AppendTo(bNamespace);
+      bClass.AddChild("public static Sdx.Db.TableMeta Meta { get; private set; }");
+      bClass.AddBlankLine();
+
+      var bStaticCtor = new Sdx.Gen.Code.Block("static {0}()", className);
+      bStaticCtor.AppendTo(bClass);
+      bStaticCtor.AddChild("Meta = {0}.Table.{1}.Meta;", ns, className);
+
+      foreach (var column in GetColumns(tableName, db))
+      {
+        bClass.AddBlankLine();
+
+        string type = "string";
+        string getter = "GetString";
+        if(column.Type == Sdx.Db.Table.ColumnType.Integer)
+        {
+          if (column.MaxLength != null && column.MaxLength > 4)
+          {
+            type = "long";
+            getter = "GetInt64";
+          }
+          else
+          {
+            type = "int";
+            getter = "GetInt32";
+          }
+        }
+        else if (column.Type == Sdx.Db.Table.ColumnType.UnsignedInteger)
+        {
+          if (column.MaxLength != null && column.MaxLength > 4)
+          {
+            type = "ulong";
+            getter = "GetUInt64";
+          }
+          else
+          {
+            type = "uint";
+            getter = "GetUInt32";
+          }
+        }
+        else if(column.Type == Sdx.Db.Table.ColumnType.DateTime)
+        {
+          type = "DateTime";
+          getter = "GetDateTime";
+        }
+        else if ( column.Type == Sdx.Db.Table.ColumnType.Float)
+        {
+          if (column.MaxLength != null && column.MaxLength > 4)
+          {
+            type = "double";
+            getter = "GetDouble";
+          }
+          else
+          {
+            type = "float";
+            getter = "GetFloat";
+          }
+        }
+
+        var bProps = new Sdx.Gen.Code.Block("public {0} {1}", type, Sdx.Util.String.ToCamelCase(column.Name));
+        bProps.AppendTo(bClass);
+
+        var bPropsGetter = new Sdx.Gen.Code.Block("get");
+        bPropsGetter.AppendTo(bProps);
+        bPropsGetter.AddChild(@"return {0}(""{1}"");", getter, column.Name);
+      }
+
+      return file;
     }
 
     private static void SaveClassFile(string baseDir, string ns, string className, string body, bool forceOverWrite, string additionalns = null)

@@ -44,8 +44,8 @@ namespace Sdx.Db.Adapter
         {"float", Table.ColumnType.Float},
         {"double", Table.ColumnType.Float},
 
-        {"ufloat", Table.ColumnType.UnsignedFloat},
-        {"udouble", Table.ColumnType.UnsignedFloat},
+        {"ufloat", Table.ColumnType.Float},
+        {"udouble", Table.ColumnType.Float},
 
         {"date", Table.ColumnType.Date},
         {"datetime", Table.ColumnType.DateTime},
@@ -185,8 +185,7 @@ namespace Sdx.Db.Adapter
           }
         }
         else if(new Table.ColumnType?[]{
-          Table.ColumnType.Float,
-          Table.ColumnType.UnsignedFloat
+          Table.ColumnType.Float
         }.Any(tp => tp == type))
         {
           if (typeKey.IndexOf("double") >= 0)
