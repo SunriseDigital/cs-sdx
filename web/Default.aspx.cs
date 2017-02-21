@@ -11,7 +11,7 @@ public partial class _Default : System.Web.UI.Page
 {
   protected void Page_Load(object sender, EventArgs e)
   {
-    foreach(var name in new string[]{"sqlserver", "mysql", "main"})
+    foreach (var name in new string[] { "sqlserver", "mysql", "main", "sqlserver-string" })
     {
       var db = Sdx.Db.Adapter.Manager.Get(name).Read;
       using (var conn = db.CreateConnection())

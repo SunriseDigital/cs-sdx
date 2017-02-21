@@ -148,7 +148,11 @@ namespace Sdx.Db.Adapter
       }
 
       string connectionString;
-      if (setting["configType"] == "connectionStrings")
+      if (setting.ContainsKey("connectionString"))
+      {
+        connectionString = setting["connectionString"];
+      }
+      else if (setting["configType"] == "connectionStrings")
       {
         connectionString = connectionStrings[setting["configName"]].ConnectionString;
       }
