@@ -200,8 +200,8 @@ namespace GenOrm
       bRelation.AppendTo(bCreateTableMeta);
       bRelation.BlockEnd = "},";
 
-      bCreateTableMeta.AddChild("typeof(Test.Orm.{0}),", className);
-      bCreateTableMeta.AddChild("typeof(Test.Orm.Table.{0})", className);
+      bCreateTableMeta.AddChild("typeof({0}.{1}),", ns, className);
+      bCreateTableMeta.AddChild("typeof({0}.Table.{1})", ns, className);
 
       return file;
     }

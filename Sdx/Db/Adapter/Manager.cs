@@ -154,11 +154,20 @@ namespace Sdx.Db.Adapter
       }
       else if (setting["configType"] == "connectionStrings")
       {
-        connectionString = connectionStrings[setting["configName"]].ConnectionString;
+        var config = connectionStrings[setting["configName"]];
+        if (config == null)
+        {
+          throw new InvalidOperationException("Missing " + setting["configName"] + " in connectionStrings");
+        }
+        connectionString = config.ConnectionString;
       }
       else if (setting["configType"] == "appSettings")
       {
         connectionString = appSettings[setting["configName"]];
+        if(connectionString == null)
+        {
+          throw new InvalidOperationException("Missing " + setting["configName"] + " in appSettings");
+        }
       }
       else
       {
@@ -179,11 +188,21 @@ namespace Sdx.Db.Adapter
       string connectionString;
       if (setting["configType"] == "connectionStrings")
       {
-        connectionString = connectionStrings[setting["configName"]].ConnectionString;
+        var config = connectionStrings[setting["configName"]];
+        if (config == null)
+        {
+          throw new InvalidOperationException("Missing " + setting["configName"] + " in connectionStrings");
+        }
+        connectionString = config.ConnectionString;
       }
       else if (setting["configType"] == "appSettings")
       {
-        connectionString = appSettings.Settings[setting["configName"]].Value;
+        var config = appSettings.Settings[setting["configName"]];
+        if(config == null)
+        {
+          throw new InvalidOperationException("Missing " + setting["configName"] + " in appSettings");
+        }
+        connectionString = config.Value;
       }
       else
       {
