@@ -189,7 +189,7 @@ namespace Sdx.Db.Adapter
       return new Sql.Delete(this);
     }
 
-    public abstract string RandomOrderKeyword { get; }
+    public abstract string RandomOrderKeyword(int? seed = null, Column column = null);
 
     public string QuoteColumn(string contextName, string column)
     {

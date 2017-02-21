@@ -99,9 +99,16 @@ namespace Sdx.Db.Adapter
       return connection.ExecuteScalar(command);
     }
 
-    public override string RandomOrderKeyword
+    public override string RandomOrderKeyword(int? seed = null, Sql.Column column = null)
     {
-      get { return "RAND()"; }
+      if(seed == null)
+      {
+        return "RAND()";
+      }
+      else
+      {
+        return "RAND("+seed.ToString()+")";
+      }
     }
 
     internal override IEnumerable<string> FetchTableNames(Connection conn)

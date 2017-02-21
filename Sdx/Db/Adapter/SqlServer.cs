@@ -80,9 +80,20 @@ namespace Sdx.Db.Adapter
       return connection.ExecuteScalar(command);
     }
 
-    public override string RandomOrderKeyword
+    public override string RandomOrderKeyword(int? seed = null, Sql.Column column = null)
     {
-      get { return "NEWID()"; }
+      if (seed == null)
+      {
+        return "NEWID()";
+      }
+      else
+      {
+        if (column == null || column.Target == null)
+        {
+          throw new InvalidOperationException("Require base column to random order with seed in SQL SERVER.");
+        }
+        return "HASHBYTES('md5',cast(" + seed.ToString() + " + " + column.Build(this, null, null)+ " as varchar))";
+      }
     }
 
     internal override IEnumerable<string> FetchTableNames(Connection conn)
