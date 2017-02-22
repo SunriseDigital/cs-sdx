@@ -24,6 +24,20 @@ namespace Sdx
       {
         UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
         Request = HttpContext.Current.Request;
+
+        var protocol = "http://"; 
+        if(Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
+        {
+          protocol = "https://";
+        }
+
+        var pathAndQuery = Request.Url.PathAndQuery;
+        if(Request.ServerVariables["HTTP_X_REWRITE_URL"] != null)
+        {
+          pathAndQuery = Request.ServerVariables["HTTP_X_REWRITE_URL"];
+        }
+
+        Url = new Web.Url(protocol + Request.Url.Host + pathAndQuery);
       }
     }
 
@@ -138,5 +152,7 @@ namespace Sdx
     }
 
     public static bool HasSdxHttpModule { get; internal set; }
+
+    public Web.Url Url { get; private set; }
   }
 }
