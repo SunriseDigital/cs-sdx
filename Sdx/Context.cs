@@ -30,13 +30,13 @@ namespace Sdx
     private void InitUrlWithRequest()
     {
       var protocol = "http://";
-      if (Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
+      if (Request.ServerVariables != null && Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
       {
         protocol = "https://";
       }
 
       var pathAndQuery = Request.Url.PathAndQuery;
-      if (Request.ServerVariables["HTTP_X_REWRITE_URL"] != null)
+      if (Request.ServerVariables != null && Request.ServerVariables["HTTP_X_REWRITE_URL"] != null)
       {
         pathAndQuery = Request.ServerVariables["HTTP_X_REWRITE_URL"];
       }
