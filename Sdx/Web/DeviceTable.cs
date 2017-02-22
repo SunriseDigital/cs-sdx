@@ -53,7 +53,7 @@ namespace Sdx.Web
           throw new FileNotFoundException("Not Exists this FilePath");
         }
 
-        using (FileStream fs = new FileStream(path, FileMode.Open))
+        using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
           using (var input = new StreamReader(fs, Encoding.GetEncoding("utf-8")))
           {

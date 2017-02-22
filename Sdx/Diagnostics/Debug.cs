@@ -136,6 +136,13 @@ namespace Sdx.Diagnostics
           return indent + strVal;
         }
       }
+      else if (value is IDumpable)
+      {
+        var result = GetDumpTitle(value, indent, needType);
+        var dump = ((IDumpable)value).Dump();
+        result += indent + DumpIndent + dump.Replace("\n", "\n" + indent + DumpIndent);
+        return result;
+      }
       else if (IsSimpleType(value.GetType()) || value is Db.Record)
       {
         return GetDumpTitle(value, indent, needType, " " + value.ToString()).TrimEnd('\r', '\n');
