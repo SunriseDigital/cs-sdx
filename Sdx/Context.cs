@@ -24,21 +24,25 @@ namespace Sdx
       {
         UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
         Request = HttpContext.Current.Request;
-
-        var protocol = "http://"; 
-        if(Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
-        {
-          protocol = "https://";
-        }
-
-        var pathAndQuery = Request.Url.PathAndQuery;
-        if(Request.ServerVariables["HTTP_X_REWRITE_URL"] != null)
-        {
-          pathAndQuery = Request.ServerVariables["HTTP_X_REWRITE_URL"];
-        }
-
-        Url = new Web.Url(protocol + Request.Url.Host + pathAndQuery);
+        InitUrlWithRequest();
       }
+    }
+
+    private void InitUrlWithRequest()
+    {
+      var protocol = "http://";
+      if (Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
+      {
+        protocol = "https://";
+      }
+
+      var pathAndQuery = Request.Url.PathAndQuery;
+      if (Request.ServerVariables["HTTP_X_REWRITE_URL"] != null)
+      {
+        pathAndQuery = Request.ServerVariables["HTTP_X_REWRITE_URL"];
+      }
+
+      Url = new Web.Url(protocol + Request.Url.Host + pathAndQuery);
     }
 
     public static Context Current
@@ -134,7 +138,20 @@ namespace Sdx
 
     public Web.UserAgent UserAgent { get; set; }
 
-    public HttpRequest Request { get; set; }
+    private HttpRequest request;
+    public HttpRequest Request
+    {  
+      get
+      {
+        return request;
+      }
+
+      set
+      {
+        request = value;
+        InitUrlWithRequest();
+      }
+    }
 
     /// <summary>
     /// <see cref="Sdx.Db.Adapter.Base.SharedConnection"/>で生成された共有接続をすべて開放する。
@@ -153,6 +170,6 @@ namespace Sdx
 
     public static bool HasSdxHttpModule { get; internal set; }
 
-    public Web.Url Url { get; private set; }
+    public Web.Url Url { get; set; }
   }
 }
