@@ -22,22 +22,19 @@ namespace Sdx
       this.HttpErrorHandler = new Web.HttpErrorHandler();
       if (HttpContext.Current != null)
       {
-        UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
         Request = HttpContext.Current.Request;
+        UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
       }
     }
 
     private void InitUrlWithRequest()
     {
-      if (Request == null) throw new Exception("maji hara tatu");
-      if (Request.ServerVariables == null) throw new Exception("kore dounika naranaino?!!");
       var protocol = "http://";
       if (Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
       {
         protocol = "https://";
       }
 
-      throw new Exception(Sdx.Diagnostics.Debug.Dump(Request.Url));
       var pathAndQuery = Request.Url.PathAndQuery;
       if (Request.ServerVariables["HTTP_X_REWRITE_URL"] != null)
       {
