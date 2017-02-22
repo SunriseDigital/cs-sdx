@@ -29,6 +29,8 @@ namespace Sdx
 
     private void InitUrlWithRequest()
     {
+      if (Request == null) throw new Exception("maji hara tatu");
+      if (Request.ServerVariables == null) throw new Exception("kore dounika naranaino?!!");
       var protocol = "http://";
       if (Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
       {
