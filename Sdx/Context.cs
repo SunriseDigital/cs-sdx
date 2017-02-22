@@ -24,7 +24,6 @@ namespace Sdx
       {
         UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
         Request = HttpContext.Current.Request;
-        InitUrlWithRequest();
       }
     }
 
