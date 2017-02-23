@@ -27,8 +27,8 @@ namespace UnitTest
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/top.aspx", "");
-      
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/top.aspx");
+
       var gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Pc,
         mb: "/i/top.aspx",
@@ -45,7 +45,7 @@ namespace UnitTest
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/sp/top.aspx", "");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/sp/top.aspx");
 
       var gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Sp,
@@ -63,7 +63,7 @@ namespace UnitTest
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/i/top.aspx", "");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/i/top.aspx");
 
       var gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Mb,
@@ -81,7 +81,7 @@ namespace UnitTest
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/base/foo2/bar5/top.aspx", "");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/base/foo2/bar5/top.aspx");
 
       var gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Pc,
@@ -98,7 +98,7 @@ namespace UnitTest
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/?foo=1&bar=13&hoga=8");
 
       var gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Pc,
@@ -108,7 +108,7 @@ namespace UnitTest
       Assert.Equal("/i/?foo=1&bar=13&hoga=8", gfriend.Mb.Build());
       Assert.Equal("/sp/?foo=1&bar=13&hoga=8", gfriend.Sp.Build());
 
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/m10/s12/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/m10/s12/?foo=1&bar=13&hoga=8");
       gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Pc,
         mb: "/i/{1}/{2}/",
@@ -124,7 +124,7 @@ namespace UnitTest
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/?foo=1&bar=13&hoga=8");
 
       var gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Pc,
@@ -138,7 +138,7 @@ namespace UnitTest
       Assert.Equal("/i/?mfoo=1&bar=13&mhoga=8", gfriend.Mb.Build());
       Assert.Equal("/sp/?sfoo=1&bar=13&shoga=8", gfriend.Sp.Build());
 
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/m10/s12/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/m10/s12/?foo=1&bar=13&hoga=8");
       gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Pc,
         mb: "/i/{1}/{2}/",
@@ -158,7 +158,7 @@ namespace UnitTest
     {
       //mockをセット
       Sdx.Context.Current.UserAgent = new Sdx.Web.UserAgent(PC_USER_AGENT);
-      Sdx.Context.Current.Request = new HttpRequest("", "http://www.example.com/?foo=1&bar=13&hoga=8", "foo=1&bar=13&hoga=8");
+      Sdx.Context.Current.Url = new Sdx.Web.Url("http://www.example.com/?foo=1&bar=13&hoga=8");
 
       var gfriend = new Sdx.Web.DeviceUrl(
         Sdx.Web.DeviceUrl.Device.Pc,

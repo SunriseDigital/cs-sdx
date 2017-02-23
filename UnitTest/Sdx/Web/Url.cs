@@ -542,6 +542,21 @@ namespace UnitTest
       );
 
       Assert.Equal(
+        "http://www.example.com/",
+        url.RemoveAll().Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/?foo=bar1&foo=bar2",
+        url.RemoveAll("foo").Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/?baz=qux",
+        url.RemoveAll("baz").Build()
+      );
+
+      Assert.Equal(
         "http://www.example.com/?foo=bar1&foo=bar2&baz=qux",
         url.Build()
       );

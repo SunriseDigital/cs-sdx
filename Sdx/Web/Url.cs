@@ -377,6 +377,11 @@ namespace Sdx.Web
     {
       return new Manipurator(this).Set(key, value);
     }
+
+    public IUrl RemoveAll(params string[] excepts)
+    {
+      return new Manipurator(this).RemoveAll(excepts);
+    }
     #endregion
 
     #region Manipuratorの定義
@@ -444,6 +449,16 @@ namespace Sdx.Web
       public IUrl Set(string key, string value)
       {
         url.SetParam(key, value);
+        return this;
+      }
+
+      public IUrl RemoveAll(params string[] excepts)
+      {
+        var removes = url.ParamList.Where(tpl => !excepts.Contains(tpl.Item1)).Select(tpl => tpl.Item1).ToArray();
+        foreach (var key in removes)
+        {
+          url.RemoveParam(key);
+        }
         return this;
       }
     }

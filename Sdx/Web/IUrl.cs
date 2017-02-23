@@ -13,6 +13,7 @@ namespace Sdx.Web
     IUrl Add(string key, string value);
     IUrl Remove(string key);
     IUrl Set(string key, string value);
+    IUrl RemoveAll(params string[] excepts);
     string Build();
     Url ToUrl();
   }

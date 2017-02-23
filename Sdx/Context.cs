@@ -137,20 +137,7 @@ namespace Sdx
 
     public Web.UserAgent UserAgent { get; set; }
 
-    private HttpRequest request;
-    public HttpRequest Request
-    {  
-      get
-      {
-        return request;
-      }
-
-      set
-      {
-        request = value;
-        InitUrlWithRequest();
-      }
-    }
+    public HttpRequest Request { get; set; }
 
     /// <summary>
     /// <see cref="Sdx.Db.Adapter.Base.SharedConnection"/>で生成された共有接続をすべて開放する。
@@ -169,6 +156,25 @@ namespace Sdx
 
     public static bool HasSdxHttpModule { get; internal set; }
 
-    public Web.Url Url { get; set; }
+    private Web.Url url;
+    public Web.Url Url
+    {
+      get
+      {
+        //遅延初期化になっているのはtravisでRequest.ServerVariablesにアクセスるうとnull referenceで死んでしまう問題があるからです。
+        //InitUrlWithRequest内でアクセスしているのでテストでUrlにアクセスする場合はUrlを外で生成してSetしないとtravisだけこけますので注意してください。
+        if(url == null && Request != null)
+        {
+          InitUrlWithRequest();
+        }
+
+        return url;
+      }
+
+      set
+      {
+        url = value;
+      }
+    }
   }
 }
