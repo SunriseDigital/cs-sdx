@@ -96,6 +96,22 @@ namespace Sdx.Web
       return path + query;
     }
 
+    public string Query
+    {
+      get
+      {
+        return BuildQueryString(ParamList);
+      }
+    }
+
+    public string PathAndQuery
+    {
+      get
+      {
+        return LocalPath + Query;
+      }
+    }
+
     public string Build(NameValueCollection add)
     {
       if (add.Count == 0)

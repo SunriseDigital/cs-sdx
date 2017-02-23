@@ -25,6 +25,8 @@ namespace Sdx.Web
     private Device currentDevice;
 
     private Dictionary<Device, Url> resultCache = new Dictionary<Device, Url>();
+    private Device device;
+    private List<Dictionary<string, string>> list;
 
     /// <summary>
     /// 
@@ -37,7 +39,15 @@ namespace Sdx.Web
     public DeviceUrl(Device currentDevice, string pc = null, string sp = null, string mb = null, string regex = null)
     {
       this.currentDevice = currentDevice;
+      SetUp(pc, sp, mb, regex);
+      if (!IsMatch)
+      {
+        throw new ArgumentException("Setting did not match " + Sdx.Context.Current.Url.PathAndQuery);
+      }
+    }
 
+    private void SetUp(string pc, string sp, string mb, string regex)
+    {
       if (currentDevice == Device.Pc && pc != null)
       {
         throw new ArgumentException("pc is not null, for current url device must be null");
@@ -57,23 +67,64 @@ namespace Sdx.Web
 
       //URLのプレイスフォルダを正規表現から作る
       var formatValues = new List<string>();
-      if(regex != null)
+      if (regex != null)
       {
         var reg = new Regex(regex);
-        var match = reg.Match(Sdx.Context.Current.Request.Url.PathAndQuery);
-        if(!match.Success)
+        var match = reg.Match(Sdx.Context.Current.Url.PathAndQuery);
+        if (match.Success)
         {
-          throw new ArgumentException("Not match regex to current url path " + Sdx.Context.Current.Request.Url.PathAndQuery);
+          IsMatch = true;
+          for (int i = 0; i < match.Groups.Count; i++)
+          {
+            formatValues.Add(match.Groups[i].Value);
+          }
         }
-
-        for (int i = 0; i < match.Groups.Count; i++)
-        {
-          formatValues.Add(match.Groups[i].Value);
-        }
+      }
+      else
+      {
+        IsMatch = true;
       }
 
       captureGroups = formatValues.ToArray<string>();
     }
+
+    public DeviceUrl(Device currentDevice, List<Dictionary<string, string>> settings)
+    {
+      this.currentDevice = currentDevice;
+      foreach (var setting in settings)
+      {
+        SetUp(
+          GetSettingValue("pc", setting),
+          GetSettingValue("sp", setting),
+          GetSettingValue("mb", setting),
+          GetSettingValue("regex", setting)
+        );
+
+        if(IsMatch)
+        {
+          break;
+        }
+      }
+
+      if(!IsMatch)
+      {
+        throw new ArgumentException("There was no setting to match " + Sdx.Context.Current.Url.PathAndQuery);
+      }
+    }
+
+    private string GetSettingValue(string key, Dictionary<string, string> settings)
+    {
+      if(settings.ContainsKey(key))
+      {
+        return settings[key];
+      }
+      else
+      {
+        return null;
+      }
+    }
+
+    private bool IsMatch { get; set; }
 
     /// <summary>
     /// URLを返す。コンストラクタでURLフォーマットをセットしなかったかつ現在のURLじゃなかった場合はNULLが返ります。
@@ -114,12 +165,12 @@ namespace Sdx.Web
       {
         if (this.currentDevice == device)
         {
-          resultCache[device] = new Url(Sdx.Context.Current.Request.Url.PathAndQuery);
+          resultCache[device] = new Url(Sdx.Context.Current.Url.PathAndQuery);
         }
         else if (urls[device] != null)
         {
           var path = string.Format(urls[device], captureGroups.ToArray<string>());
-          var result = new Url(path + Sdx.Context.Current.Request.Url.Query);
+          var result = new Url(path + Sdx.Context.Current.Url.Query);
           if (queryMap.ContainsKey(device))
           {
             foreach (var kv in queryMap[device])
