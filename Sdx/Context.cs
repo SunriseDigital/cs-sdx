@@ -161,6 +161,8 @@ namespace Sdx
     {
       get
       {
+        //遅延初期化になっているのはtravisでRequest.ServerVariablesにアクセスるうとnull referenceで死んでしまう問題があるからです。
+        //InitUrlWithRequest内でアクセスしているのでテストでUrlにアクセスする場合はUrlを外で生成してSetしないとtravisだけこけますので注意してください。
         if(url == null && Request != null)
         {
           InitUrlWithRequest();
