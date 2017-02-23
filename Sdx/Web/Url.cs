@@ -338,6 +338,15 @@ namespace Sdx.Web
       }
     }
 
+    public bool IsParamOnly(params string[] keys)
+    {
+      if (ParamList.Count == 0 && keys.Length > 0)
+      {
+        return false;
+      }
+
+      return ParamList.All(tpl => keys.Contains(tpl.Item1));
+    }
 
 
     #region IUrlのメソッド
