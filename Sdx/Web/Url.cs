@@ -46,6 +46,8 @@ namespace Sdx.Web
       }
     }
 
+    public bool IsImmutable { get; internal set; }
+
     private string BuildQueryString(List<Tuple<string,string>> param)
     {
       if (param.Count == 0)
@@ -183,6 +185,11 @@ namespace Sdx.Web
 
     public Url SetParam(string key, string value)
     {
+      if (IsImmutable)
+      {
+        throw new InvalidOperationException("This url is immutable.");
+      }
+
       if(!HasParam(key))
       {
         AddParam(key, value);
@@ -216,6 +223,11 @@ namespace Sdx.Web
 
     public Url AddParam(string key, string value)
     {
+      if(IsImmutable)
+      {
+        throw new InvalidOperationException("This url is immutable.");
+      }
+
       //value が null の場合、直後の EscapeUriString() でコケるので空文字を入れておく
       value = value ?? "";
       this.ParamList.Add(Tuple.Create(Uri.EscapeUriString(key), Uri.EscapeUriString(value)));
@@ -225,6 +237,10 @@ namespace Sdx.Web
 
     public void RemoveParam(string key)
     {
+      if (IsImmutable)
+      {
+        throw new InvalidOperationException("This url is immutable.");
+      }
       this.ParamList.RemoveAll(tp => tp.Item1 == Uri.EscapeUriString(key));
       this.ParamCount[Uri.EscapeUriString(key)] = 0;
     }
@@ -329,6 +345,11 @@ namespace Sdx.Web
 
     public void ReplaceParamKey(string from, string to)
     {
+      if (IsImmutable)
+      {
+        throw new InvalidOperationException("This url is immutable.");
+      }
+
       for (int i = 0; i < ParamList.Count; i++)
       {
         if(ParamList[i].Item1 == from)
@@ -400,6 +421,7 @@ namespace Sdx.Web
       internal Manipurator(Url url)
       {
         this.url = (Url)url.Clone();
+        this.url.IsImmutable = false;
       }
 
       public Url ToUrl()

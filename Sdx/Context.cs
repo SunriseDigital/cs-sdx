@@ -42,6 +42,7 @@ namespace Sdx
       }
 
       Url = new Web.Url(protocol + Request.Url.Host + pathAndQuery);
+      Url.IsImmutable = true;
     }
 
     public static Context Current
