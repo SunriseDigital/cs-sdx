@@ -100,3 +100,32 @@ deviceUrl.Sp.Build();
 deviceUrl.Mb.Build();
 // /m/tokyo/A1301/A130102/
 ```
+
+### 複雑さへの対応
+
+同じプログラムで複数のURLに対応しないといけない場合、正規表現が複雑になったり、あるいは、正規表現で全てにマッチさせるのが不可能な場合があるでしょう。その場合は複数のパターンをListで与えて初期化し、最初にマッチしたものを採用させることが可能です。
+
+```c#
+var deviceUrl = new Sdx.Web.DeviceUrl(
+	Sdx.Web.DeviceUrl.Device.Pc,
+  new List<Dictionary<string, string>>
+  {
+    new Dictionary<string, string>
+    {
+      {"sp",  "/sp/{1}/{2}/review/"},
+      {"mb", "/mb/{1}/{2}/review/"},
+      {"regex", "^/(.+?)/(m|a[0-9]+)/review/"}
+    },
+    new Dictionary<string, string>
+    {
+      {"sp",  "/sp/{1}/review/"},
+      {"mb", "/mb/{1}/review/"},
+      {"regex", "^/(.+?)/review/"}
+    },
+    new Dictionary<string, string>
+    {
+      {"sp",  "/sp/review/"},
+      {"mb", "/mb/review/"},
+    }
+  }
+```
