@@ -561,5 +561,30 @@ namespace UnitTest
         url.Build()
       );
     }
+
+    [Fact]
+    public void TestCondition()
+    {
+      var url = new Sdx.Web.Url("http://www.example.com/?foo=bar1&foo=bar2&baz=qux");
+
+      Assert.True(url.IsParamOnly("foo", "baz"));
+      Assert.False(url.IsParamOnly("baz"));
+      Assert.False(url.IsParamOnly("foo"));
+      Assert.False(url.IsParamOnly());
+
+      url = new Sdx.Web.Url("http://www.example.com/");
+
+      Assert.False(url.IsParamOnly("foo", "baz"));
+      Assert.False(url.IsParamOnly("baz"));
+      Assert.False(url.IsParamOnly("foo"));
+      Assert.True(url.IsParamOnly());
+
+      url = new Sdx.Web.Url("http://www.example.com/?foo=1&bar=2&baz=3");
+      Assert.False(url.IsParamOnly("foo", "baz"));
+      Assert.False(url.IsParamOnly("baz"));
+      Assert.False(url.IsParamOnly("foo"));
+      Assert.False(url.IsParamOnly());
+      Assert.True(url.IsParamOnly("foo", "bar", "baz"));
+    }
   }
 }
