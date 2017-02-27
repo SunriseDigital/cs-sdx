@@ -392,9 +392,20 @@ namespace Sdx.Db.Sql
       {
         var allowList = columns.Union(groups);
         orders = orders
-          .Where(orderCol => allowList.Any(col => orderCol.SameAs(col)))
+          .Where(orderCol => {
+            //通常のカラムじゃなかったら（サブクエリーや集計関数）取り除かない
+            if (!(orderCol.Target is string))
+            {
+              return true;
+            }
+            else
+            {
+              return allowList.Any(col => orderCol.SameAs(col));
+            }
+          })
           .ToList<Column>();
       }
+
 
       DbCommand command = this.Adapter.CreateCommand();
 
