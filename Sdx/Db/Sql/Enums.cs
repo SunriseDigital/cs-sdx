@@ -8,7 +8,7 @@ namespace Sdx.Db.Sql
     DESC
   }
 
-  internal enum JoinType
+  public enum JoinType
   {
     From,
     Inner,

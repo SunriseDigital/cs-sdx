@@ -181,16 +181,6 @@ namespace Sdx.Db.Sql
       return this.CreateContext(target, alias, JoinType.From);
     }
 
-    public IEnumerable<Context> Froms
-    {
-      get
-      {
-        return ContextList
-          .Where(kv => kv.Value.JoinType == JoinType.From)
-          .Select(kv => kv.Value);
-      }
-    }
-
     internal Context CreateContext(object target, string alias, JoinType jointType)
     {
       Context context = new Context(this);
@@ -203,6 +193,14 @@ namespace Sdx.Db.Sql
       this.contextList.Add(context.Name, context);
 
       return context;
+    }
+
+    public IEnumerable<Context> Contexts
+    {
+      get
+      {
+        return ContextList.Select(kv => kv.Value);
+      }
     }
 
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)

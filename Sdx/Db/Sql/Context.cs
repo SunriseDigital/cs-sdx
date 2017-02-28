@@ -258,7 +258,7 @@ namespace Sdx.Db.Sql
 
     internal Condition JoinCondition { get; private set; }
 
-    internal JoinType JoinType { get; set; }
+    public JoinType JoinType { get; internal set; }
 
     /// <summary>
     /// <see cref="Sql.Select"/>からこのテーブルのカラムをすべて除きます。
