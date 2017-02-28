@@ -129,22 +129,15 @@ namespace GenOrm
 
     private static void SaveClassFile(string baseDir, string ns, string className, string body, bool forceOverWrite, string additionalns = null)
     {
-      var bPath = new StringBuilder();
-      bPath.Append(baseDir);
-      bPath.Append(Path.DirectorySeparatorChar);
-
-      var acutualNs = ns;
+      var pathChunk = ns.Split('.').ToList();
       if (additionalns != null)
       {
-        acutualNs = acutualNs + "." + additionalns;
+        pathChunk.Add(additionalns);
       }
 
-      bPath.Append(acutualNs.Replace('.', Path.DirectorySeparatorChar));
-      bPath.Append(Path.DirectorySeparatorChar);
-      bPath.Append(className);
-      bPath.Append(".cs");
+      pathChunk.Add(className + ".cs");
 
-      var path = bPath.ToString();
+      var path = baseDir + Path.DirectorySeparatorChar + string.Join(Path.DirectorySeparatorChar.ToString(), pathChunk);
       var fileExsits = File.Exists(path);
       if (!forceOverWrite && fileExsits)
       {
@@ -153,7 +146,7 @@ namespace GenOrm
       }
 
       var action = fileExsits ? "Overwrite" : "Create";
-      Console.WriteLine("{0} {1}.{2} at {3}", action, acutualNs, className, path);
+      Console.WriteLine("{0} {1}.{2} at {3}", action, string.Join(".", pathChunk.Take(pathChunk.Count - 1)), className, path);
 
       var dir = Path.GetDirectoryName(path);
       if (!Directory.Exists(dir))
