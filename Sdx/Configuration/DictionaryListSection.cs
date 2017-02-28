@@ -8,16 +8,16 @@ namespace Sdx.Configuration
 {
   public class DictionaryListSection : ConfigurationSection
   {
-    [ConfigurationProperty("List", IsDefaultCollection = false)]
+    [ConfigurationProperty("Items", IsDefaultCollection = false)]
     [ConfigurationCollection(typeof(Configuration.ElementCollection<Configuration.DictionaryElement>),
         AddItemName = "add",
         ClearItemsName = "clear",
         RemoveItemName = "remove")]
-    public Configuration.ElementCollection<Configuration.DictionaryElement> List
+    public Configuration.ElementCollection<Configuration.DictionaryElement> Items
     {
       get
       {
-        return (Configuration.ElementCollection<Configuration.DictionaryElement>)base["List"];
+        return (Configuration.ElementCollection<Configuration.DictionaryElement>)base["Items"];
       }
     }
   }

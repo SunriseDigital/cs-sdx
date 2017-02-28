@@ -13,6 +13,7 @@ using System.Threading;
 using System.Globalization;
 using System.Web;
 using System.IO;
+using System.Configuration;
 
 namespace UnitTest
 {
