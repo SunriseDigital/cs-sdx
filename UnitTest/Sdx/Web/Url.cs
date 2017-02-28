@@ -300,7 +300,7 @@ namespace UnitTest
 
       //SetParam のテスト。同じキーの値が既にあったら全て削除してから新しい値をセットする
       url.SetParam("sameKey", "value3");
-      Assert.Equal("http://example.com/path/to/api?newKey=newValue&newKey=newValue2&sameKey=value3", url.Build());
+      Assert.Equal("http://example.com/path/to/api?sameKey=value3&newKey=newValue&newKey=newValue2", url.Build());
 
       //RemoveParam のテスト。同じキーの値が複数あったら、その全てを削除する
       url.RemoveParam("newKey");
@@ -338,7 +338,7 @@ namespace UnitTest
 
       //Null を Set
       url.SetParam("key", null);
-      Assert.Equal("http://example.com/path/to/api?foo=&foo=&foo=bar&key=", url.Build());
+      Assert.Equal("http://example.com/path/to/api?key=&foo=&foo=&foo=bar", url.Build());
 
       //空文字を Set
       url.SetParam("foo", "");
@@ -501,6 +501,90 @@ namespace UnitTest
         url.BuildWith("bar", "", "piyo", "hogera", "bar", "bazzzz")
       );
       
+    }
+
+    [Fact]
+    public void TestReplaceParamKey()
+    {
+      var url = new Sdx.Web.Url("http://www.example.com/path/to/no-scheme?foo=bar1&foo=bar2&baz=qux");
+      url.ReplaceParamKey("foo", "foo2");
+
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme?foo2=bar1&foo2=bar2&baz=qux",
+        url.Build()
+      );
+
+      url.ReplaceParamKey("baz", "baz2");
+      Assert.Equal(
+        "http://www.example.com/path/to/no-scheme?foo2=bar1&foo2=bar2&baz2=qux",
+        url.Build()
+      );
+    }
+
+    [Fact]
+    public void TestManipurator()
+    {
+      var url = new Sdx.Web.Url("http://www.example.com/?foo=bar1&foo=bar2&baz=qux");
+
+      Assert.Equal(
+        "http://www.example.com/?foo=bar1&foo=bar2&baz=qux&pid=2",
+        url.Next("pid").Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/?foo=bar1&foo=bar2&baz=qux&pid=1",
+        url.Next("pid").Prev("pid").Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/?baz=qux2&key1=val1&key1=val2",
+        url.Add("key1", "val1").Add("key1", "val2").Remove("foo").Set("baz", "qux2").Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/",
+        url.RemoveAll().Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/?foo=bar1&foo=bar2",
+        url.RemoveAll("foo").Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/?baz=qux",
+        url.RemoveAll("baz").Build()
+      );
+
+      Assert.Equal(
+        "http://www.example.com/?foo=bar1&foo=bar2&baz=qux",
+        url.Build()
+      );
+    }
+
+    [Fact]
+    public void TestCondition()
+    {
+      var url = new Sdx.Web.Url("http://www.example.com/?foo=bar1&foo=bar2&baz=qux");
+
+      Assert.True(url.IsParamOnly("foo", "baz"));
+      Assert.False(url.IsParamOnly("baz"));
+      Assert.False(url.IsParamOnly("foo"));
+      Assert.False(url.IsParamOnly());
+
+      url = new Sdx.Web.Url("http://www.example.com/");
+
+      Assert.False(url.IsParamOnly("foo", "baz"));
+      Assert.False(url.IsParamOnly("baz"));
+      Assert.False(url.IsParamOnly("foo"));
+      Assert.True(url.IsParamOnly());
+
+      url = new Sdx.Web.Url("http://www.example.com/?foo=1&bar=2&baz=3");
+      Assert.False(url.IsParamOnly("foo", "baz"));
+      Assert.False(url.IsParamOnly("baz"));
+      Assert.False(url.IsParamOnly("foo"));
+      Assert.False(url.IsParamOnly());
+      Assert.True(url.IsParamOnly("foo", "bar", "baz"));
     }
   }
 }
