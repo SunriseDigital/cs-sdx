@@ -21,8 +21,13 @@ namespace GenOrm
 
         var firstNs = options.Namespace.Split('.').First();
         var csproj = options.BaseDir + Path.DirectorySeparatorChar + firstNs + Path.DirectorySeparatorChar + firstNs + ".csproj";
-        XmlDocument doc = new XmlDocument();
-        doc.Load(csproj);
+        XmlDocument doc = null;
+
+        if (File.Exists(csproj))
+        {
+          doc = new XmlDocument();
+          doc.Load(csproj);
+        }
 
         foreach (var table in GetTargetTableNames(options, db))
         {
@@ -50,7 +55,10 @@ namespace GenOrm
           );
         }
 
-        doc.Save(csproj);
+        if (doc != null)
+        {
+          doc.Save(csproj);
+        }
       });
     }
 
@@ -170,7 +178,10 @@ namespace GenOrm
 
     private static void UpdateCsproj(XmlDocument doc, List<string> pathChunk)
     {
-
+      if(doc == null)
+      {
+        return;
+      }
       //XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
       //ns.AddNamespace("msbld", "http://schemas.microsoft.com/developer/msbuild/2003");
       //var compilesNode = doc.DocumentElement.SelectNodes(@"/msbld:Project/msbld:ItemGroup/msbld:Compile", ns);
@@ -280,18 +291,30 @@ namespace GenOrm
 
     private static IEnumerable<string> GetTargetTableNames(Options options, Sdx.Db.Adapter.Base db)
     {
-      if(options.TableNames.Count() > 0)
+      using (var conn = db.CreateConnection())
       {
-        return options.TableNames;
-      }
-      else
-      {
-        using (var conn = db.CreateConnection())
+        conn.Open();
+        var allTables = conn.FetchTableNames();
+        if (options.TableNames.Count() > 0)
         {
-          conn.Open();
-          return conn.FetchTableNames();
+          foreach(var table in options.TableNames)
+          {
+            if(!allTables.Any(existsTable => existsTable == table))
+            {
+              Console.Error.WriteLine(table + " is not exists.");
+              Environment.Exit(-1);
+            }
+          }
+
+          return options.TableNames;
+        }
+        else
+        {
+          return allTables;
         }
       }
+
+
     }
   }
 }
