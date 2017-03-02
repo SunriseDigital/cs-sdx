@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace GenOrm
 {
@@ -18,12 +19,23 @@ namespace GenOrm
         Sdx.Cli.Options.Db.SetUpAdapters(options);
         var db = Sdx.Db.Adapter.Manager.Get(options.DbAdapterName).Read;
 
+        var firstNs = options.Namespace.Split('.').First();
+        var csproj = options.BaseDir + Path.DirectorySeparatorChar + firstNs + Path.DirectorySeparatorChar + firstNs + ".csproj";
+        XmlDocument doc = null;
+
+        if (File.Exists(csproj))
+        {
+          doc = new XmlDocument();
+          doc.Load(csproj);
+        }
+
         foreach (var table in GetTargetTableNames(options, db))
         {
           var className = Sdx.Util.String.ToCamelCase(table);
           
           var tableClass = CreateTableClass(options.Namespace, className, table, db);
           SaveClassFile(
+            doc,
             options.BaseDir,
             options.Namespace,
             className,
@@ -34,12 +46,18 @@ namespace GenOrm
 
           var recordClass = CreateRecordClass(options.Namespace, className, table, db);
           SaveClassFile(
+            doc,
             options.BaseDir,
             options.Namespace,
             className,
             recordClass.Render(),
             options.ForceOverWrite
           );
+        }
+
+        if (doc != null)
+        {
+          doc.Save(csproj);
         }
       });
     }
@@ -127,24 +145,17 @@ namespace GenOrm
       return file;
     }
 
-    private static void SaveClassFile(string baseDir, string ns, string className, string body, bool forceOverWrite, string additionalns = null)
+    private static void SaveClassFile(XmlDocument doc, string baseDir, string ns, string className, string body, bool forceOverWrite, string additionalns = null)
     {
-      var bPath = new StringBuilder();
-      bPath.Append(baseDir);
-      bPath.Append(Path.DirectorySeparatorChar);
-
-      var acutualNs = ns;
+      var pathChunk = ns.Split('.').ToList();
       if (additionalns != null)
       {
-        acutualNs = acutualNs + "." + additionalns;
+        pathChunk.Add(additionalns);
       }
 
-      bPath.Append(acutualNs.Replace('.', Path.DirectorySeparatorChar));
-      bPath.Append(Path.DirectorySeparatorChar);
-      bPath.Append(className);
-      bPath.Append(".cs");
+      pathChunk.Add(className + ".cs");
 
-      var path = bPath.ToString();
+      var path = baseDir + Path.DirectorySeparatorChar + string.Join(Path.DirectorySeparatorChar.ToString(), pathChunk);
       var fileExsits = File.Exists(path);
       if (!forceOverWrite && fileExsits)
       {
@@ -152,8 +163,10 @@ namespace GenOrm
         return;
       }
 
+      UpdateCsproj(doc, pathChunk);
+
       var action = fileExsits ? "Overwrite" : "Create";
-      Console.WriteLine("{0} {1}.{2} at {3}", action, acutualNs, className, path);
+      Console.WriteLine("{0} {1}.{2} at {3}", action, string.Join(".", pathChunk.Take(pathChunk.Count - 1)), className, path);
 
       var dir = Path.GetDirectoryName(path);
       if (!Directory.Exists(dir))
@@ -161,6 +174,29 @@ namespace GenOrm
         Directory.CreateDirectory(dir);
       }
       File.WriteAllText(path, body);
+    }
+
+    private static void UpdateCsproj(XmlDocument doc, List<string> pathChunk)
+    {
+      if(doc == null)
+      {
+        return;
+      }
+      //XmlNamespaceManager ns = new XmlNamespaceManager(doc.NameTable);
+      //ns.AddNamespace("msbld", "http://schemas.microsoft.com/developer/msbuild/2003");
+      //var compilesNode = doc.DocumentElement.SelectNodes(@"/msbld:Project/msbld:ItemGroup/msbld:Compile", ns);
+
+
+      var projNode = doc.ChildNodes.Cast<XmlNode>().Where(node => node.Name == "Project").First();
+      var compilesNode = projNode.ChildNodes.Cast<XmlNode>()
+          .Where(node => node.Name == "ItemGroup")
+          .Where(node => node.ChildNodes.Cast<XmlNode>().Any(childNode => childNode.Name == "Compile"))
+          .First();
+
+      var path = string.Join("\\", pathChunk.Skip(1));
+      var elem = doc.CreateElement("Compile", doc.DocumentElement.NamespaceURI);
+      elem.SetAttribute("Include", path);
+      compilesNode.AppendChild(elem);
     }
 
     private static Sdx.Gen.Code.File CreateTableClass(string ns, string className, string tableName, Sdx.Db.Adapter.Base db)
@@ -255,18 +291,30 @@ namespace GenOrm
 
     private static IEnumerable<string> GetTargetTableNames(Options options, Sdx.Db.Adapter.Base db)
     {
-      if(options.TableNames.Count() > 0)
+      using (var conn = db.CreateConnection())
       {
-        return options.TableNames;
-      }
-      else
-      {
-        using (var conn = db.CreateConnection())
+        conn.Open();
+        var allTables = conn.FetchTableNames();
+        if (options.TableNames.Count() > 0)
         {
-          conn.Open();
-          return conn.FetchTableNames();
+          foreach(var table in options.TableNames)
+          {
+            if(!allTables.Any(existsTable => existsTable == table))
+            {
+              Console.Error.WriteLine(table + " is not exists.");
+              Environment.Exit(-1);
+            }
+          }
+
+          return options.TableNames;
+        }
+        else
+        {
+          return allTables;
         }
       }
+
+
     }
   }
 }
