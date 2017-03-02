@@ -1,6 +1,6 @@
 ﻿CREATE TABLE shop (
   id int IDENTITY ,
-  name nvarchar(100),
+  name nvarchar(100) NOT NULL,
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,

@@ -131,7 +131,10 @@ namespace Sdx.Db
       return Convert.ToDouble(this.GetValue(key));
     }
 
-    
+    public float GetFloat(string key)
+    {
+      return float.Parse(this.GetString(key));
+    }
 
     public short GetInt16(string key)
     {

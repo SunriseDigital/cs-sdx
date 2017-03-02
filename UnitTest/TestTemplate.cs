@@ -42,6 +42,9 @@ namespace UnitTest
       //各テストメソッドの後に実行する処理はここ
     }
 
+    /// <summary>
+    /// このメソッドは消してはダメ
+    /// </summary>
     override public void FixtureSetUp()
     {
       _TestTemplate.InitilizeClass(null);
@@ -49,6 +52,9 @@ namespace UnitTest
       //MSTestのFixtureSetUpがstaticじゃないとだめだったのでこのような構造になってます。
     }
 
+    /// <summary>
+    /// このメソッドは消してはダメ
+    /// </summary>
     override public void FixtureTearDown()
     {
       _TestTemplate.CleanupClass();

@@ -18,7 +18,12 @@ public class Global : System.Web.HttpApplication
       new Test.Route.LangRouteHandler("~/{controller}/{action}")
     ));
 
-    Test.Db.Adapter.SetupManager();
+    //DB Adapter
+    var settings = WebConfigurationManager.GetSection("sdxDatabaseConnections") as Sdx.Configuration.DictionaryListSection;
+    foreach (var elem in settings.Items)
+    {
+      Sdx.Db.Adapter.Manager.Add(elem.Attributes, WebConfigurationManager.ConnectionStrings, WebConfigurationManager.AppSettings);
+    }
   }
 
   protected void Application_BeginRequest(Object sender, EventArgs e)

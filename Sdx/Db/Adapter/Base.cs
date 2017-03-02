@@ -116,9 +116,11 @@ namespace Sdx.Db.Adapter
 
     internal abstract object FetchLastInsertId(Connection connection);
 
-    public DbCommand CreateCommand()
+    public DbCommand CreateCommand(string sql = null)
     {
-      return this.Factory.CreateCommand();
+      var command = this.Factory.CreateCommand();
+      command.CommandText = sql;
+      return command;
     }
 
     public DbCommandBuilder CreateCommandBuilder()
@@ -144,7 +146,11 @@ namespace Sdx.Db.Adapter
       }
       else if(obj is string)
       {
-        return this.builder.QuoteIdentifier(obj as string);
+        var str = obj as string;
+        //スキーマー名を含めたいときテーブル名に`.`で含めることが可能です。テーブル名に`.`が含まれる場合は`..`でエスケープ可能。
+        var mword = "%%SDX_DOT_REPLACE_ESCAPE%%";
+        var escapedChunk = str.Replace("..", mword).Split('.').Select(w => builder.QuoteIdentifier(w));
+        return string.Join(".", escapedChunk).Replace(mword, ".");
       }
       else
       {
@@ -183,7 +189,7 @@ namespace Sdx.Db.Adapter
       return new Sql.Delete(this);
     }
 
-    public abstract string RandomOrderKeyword { get; }
+    public abstract string RandomOrderKeyword(int? seed = null, Column column = null);
 
     public string QuoteColumn(string contextName, string column)
     {
@@ -193,5 +199,21 @@ namespace Sdx.Db.Adapter
         QuoteIdentifier(column)
       );
     }
+
+    abstract internal IEnumerable<string> FetchTableNames(Connection conn);
+
+    public List<Table.Column> FetchColumns(string tableName)
+    {
+      List<Table.Column> columns;
+      using(var conn = CreateConnection())
+      {
+        conn.Open();
+        columns = FetchColumns(tableName, conn);
+      }
+
+      return columns;
+    }
+
+    abstract internal List<Table.Column> FetchColumns(string tableName, Connection conn);
   }
 }

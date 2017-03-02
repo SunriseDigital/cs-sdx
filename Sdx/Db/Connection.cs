@@ -583,5 +583,46 @@ namespace Sdx.Db
 
       return Int32.Parse(count);
     }
+
+    public IEnumerable<string> FetchTableNames()
+    {
+      return Adapter.FetchTableNames(this);
+    }
+
+    public DataTable GetSchema(string collectionName)
+    {
+      return DbConnection.GetSchema(collectionName);
+    }
+
+    public DataTable GetSchema()
+    {
+      return DbConnection.GetSchema();
+    }
+
+    public DataTable GetSchema(string collectionName, string[] restrictionValues)
+    {
+      return DbConnection.GetSchema(collectionName, restrictionValues);
+    }
+
+    public List<Table.Column> FetchColumns(string tableName)
+    {
+      return Adapter.FetchColumns(tableName, this);
+    }
+
+    public string Database
+    {
+      get
+      {
+        return DbConnection.Database;
+      }
+    }
+
+    public string DataSource
+    {
+      get
+      {
+        return DbConnection.DataSource;
+      }
+    }
   }
 }

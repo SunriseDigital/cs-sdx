@@ -656,7 +656,16 @@ namespace Sdx.Db.Sql
 
     public Select AddOrderRandom()
     {
-      var column = new Column(Expr.Wrap(Adapter.RandomOrderKeyword));
+      var column = new Column(Expr.Wrap(Adapter.RandomOrderKeyword()));
+      column.Order = null;
+      orders.Add(column);
+
+      return this;
+    }
+
+    public Select AddOrderRandom(int seed, string columnName = null)
+    {
+      var column = new Column(Expr.Wrap(Adapter.RandomOrderKeyword(seed, new Column(columnName))));
       column.Order = null;
       orders.Add(column);
 

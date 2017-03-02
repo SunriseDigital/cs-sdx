@@ -54,7 +54,7 @@ namespace Sdx.Web
       var url = WebConfigurationManager.GetSection("handleMaxRequestLengthWithJson") as Sdx.Configuration.DictionaryListSection;
       if (url != null)
       {
-        if (url.List.Any(elem => elem.Attributes["path"] == Request.Path))
+        if (url.Items.Any(elem => elem.Attributes["path"] == Request.Path))
         {
           var serverError = Server.GetLastError() as HttpException;
           //TODO 他言語時のエラーメッセージチェックの対応。
