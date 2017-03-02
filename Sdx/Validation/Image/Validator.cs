@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+using Sdx.Html;
+using System.Reflection;
+using System.IO;
 
 namespace Sdx.Validation.Image
 {
-  class Validator
+  public abstract class Validator : Base.Validator
   {
   }
 }
