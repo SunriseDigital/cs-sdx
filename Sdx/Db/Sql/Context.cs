@@ -448,7 +448,16 @@ namespace Sdx.Db.Sql
 
     public Context AddOrderRandom()
     {
-      var column = new Column(Expr.Wrap(Select.Adapter.RandomOrderKeyword));
+      var column = new Column(Expr.Wrap(Select.Adapter.RandomOrderKeyword()));
+      column.Order = null;
+      Select.OrderList.Add(column);
+
+      return this;
+    }
+
+    public Context AddOrderRandom(int seed, string columnName = null)
+    {
+      var column = new Column(Expr.Wrap(Select.Adapter.RandomOrderKeyword(seed, new Column(columnName, Name))));
       column.Order = null;
       Select.OrderList.Add(column);
 
@@ -481,6 +490,11 @@ namespace Sdx.Db.Sql
       /// <see cref="Select"/>と<see cref="ParentContext"/>は<see cref="Sql.Select.Clone"/>ですげ替えを行っています。
 
       return cloned;
+    }
+
+    public T GetTable<T>() where T:Sdx.Db.Table
+    {
+      return (T)Table;
     }
   }
 }

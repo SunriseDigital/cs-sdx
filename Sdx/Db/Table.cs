@@ -60,7 +60,6 @@ namespace Sdx.Db
       Integer,
       UnsignedInteger,
       Float,
-      UnsignedFloat,
       String,
       DateTime,
       Date

@@ -112,10 +112,9 @@ namespace Test.Orm.Table
       return elem;
     }
 
-    public static void CreateNameValidators(Sdx.Html.FormElement element, Sdx.Db.Record record, Sdx.Db.Connection conn)
-    {
-      Meta.GetColumn("name").AppendValidators(element, record);
-      element.AddValidator(new Sdx.Validation.StringLength(min: 3, max: 50));
-    }
+    //public static void CreateNameValidators(Sdx.Html.FormElement element, Sdx.Db.Record record, Sdx.Db.Connection conn)
+    //{
+    //  Meta.GetColumn("name").AppendValidators(element, record);
+    //}
   }
 }

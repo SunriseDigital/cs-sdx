@@ -96,6 +96,35 @@ select.AddFrom("shop")
   .AddColumn("area_id");
 ```
 
+#### テーブル名にスキーマを付与する
+
+スキーマーを指定したい場合テーブル名に.で区切って指定してください。
+
+```c#
+var select = db.CreateSelect();
+
+select.AddFrom("dbo.shop")
+  .AddColumn("id");
+```
+
+```sql
+SELECT [dbo].[shop].[id] FROM [dbo].[shop];
+```
+
+もしテーブル名に`.`が含まれる場合は`..`でエスケープ可能です。
+
+
+```c#
+var select = db.CreateSelect();
+
+select.AddFrom("dot..table")
+  .AddColumn("id");
+```
+
+```sql
+SELECT [dot.table].[id] FROM [dot.table];
+```
+
 #### クオートを回避する
 
 例えば下記のようなSQLを作りたいとき、自動クオートを回避したいと思います。
