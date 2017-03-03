@@ -203,6 +203,14 @@ namespace Sdx.Db.Sql
       }
     }
 
+    public Context FirstFrom
+    {
+      get
+      {
+        return Contexts.FirstOrDefault(ctx => ctx.JoinType == JoinType.From);
+      }
+    }
+
     internal string BuildSelectString(DbParameterCollection parameters, Counter condCount)
     {
       var builder = new StringBuilder();
