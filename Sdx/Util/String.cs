@@ -11,7 +11,7 @@ namespace Sdx.Util
   {
     private const string RandomSeeds = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-    private static readonly Dictionary<char, char> fullWidthCharacterlist = new Dictionary<char, char>{
+    private static readonly Dictionary<char, char> fullWidthNumberlist = new Dictionary<char, char>{
      {'１','1'},{'２','2'},{'３','3'},{'４','4'},{'５','5'},{'６','6'},{'７','7'},{'８','8'},{'９','9'},{'０','0'},
     };
 
@@ -80,16 +80,13 @@ namespace Sdx.Util
     }
 
     /// <summary>
-    /// 文字列に含まれている全角英数字を半角英数字へ変換する。
-    /// 
-    /// 2017-03-02時点では、全角数字にしか対応していません。
-    /// 全角英字に対応する場合は、fullWidthCharacterlistメンバ変数に対応リストを追加してください。
+    /// 文字列に含まれている全角数字を半角数字へ変換する。
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
-    public static string ConvertFullWidthAlphanumericToHalfSizeAlphanumeric (string value)
+    public static string ConvertFullWidthNumbersToHalfWidthNumbers(string value)
     {
-      return new string(value.Select( chr => (fullWidthCharacterlist.ContainsKey(chr) ? fullWidthCharacterlist[chr] : chr )).ToArray());
+      return new string(value.Select( chr => (fullWidthNumberlist.ContainsKey(chr) ? fullWidthNumberlist[chr] : chr )).ToArray());
     }
   }
 }
