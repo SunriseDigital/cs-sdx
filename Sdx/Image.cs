@@ -4,43 +4,91 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Drawing;
 
 namespace Sdx
 {
   public class Image
   {
     Stream stream;
-    string height;
-    string width;
-    string size; //単位はbyte
-    string type; //ファイルの種類
+    Bitmap bitmap = null;
+    string type = null; //ファイルの種類
 
     public Image(Stream stream){
       this.stream = stream;
     }
 
-    public string Height
+    public Bitmap Bitmap
     {
-      get{return this.height;}
-      set{this.height = value;}
+      get{
+        if(this.bitmap != null){
+           return this.bitmap;
+        }
+
+        this.bitmap = new Bitmap(this.stream);
+        return this.bitmap;
+      }
     }
 
-    public string Width
+    public int Height
     {
-      get{return this.width;}
-      set{this.width = value;}
+      get{
+        return this.Bitmap.Height;
+      }
     }
 
-    public string Size
+    public int Width
     {
-      get{return this.size;}
-      set{this.size = value;}
+      get{
+        return this.Bitmap.Width;
+      }
     }
 
-    public string Type
+    /// <summary>
+    /// 単位はbyte
+    /// </summary>
+    public long Size
     {
-      get{return this.type;}
-      set{this.type = value;}
+      get{
+        return this.stream.Length;
+      }
     }
+
+    private string Type
+    {
+      get { return this.type; }
+      set { this.type = value; }
+    }
+
+    /// <summary>
+    /// ファイルの形式(拡張子)を返す。
+    /// </summary>
+    /// <returns></returns>
+    public string GetFileFormat()
+    {
+      if(this.Type != null){
+        return this.Type;
+      }
+
+      try
+      {
+          foreach (System.Drawing.Imaging.ImageCodecInfo ici in System.Drawing.Imaging.ImageCodecInfo.GetImageDecoders())
+          {
+            if (ici.FormatID == this.Bitmap.RawFormat.Guid)
+            {
+              //該当するFormatDescriptionを返す。
+              this.Type = ici.FormatDescription;
+              return this.Type;
+            }
+          }
+
+          return string.Empty;
+      }
+      catch
+      {
+          return string.Empty;
+      }
+    }
+
   }
 }

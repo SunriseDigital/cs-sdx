@@ -12,6 +12,8 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 using System;
 using System.Threading;
 using System.Globalization;
+using System.Drawing;
+using System.IO;
 
 namespace UnitTest
 {
@@ -65,11 +67,58 @@ namespace UnitTest
 
 
     [Fact]
-    public void TestMethod1()
+    public void TestImage()
     {
       Console.WriteLine("TestMethod1");
       Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
-      var validator = new Sdx.Validation.NotEmpty();
+
+      //JPEG
+      var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\100x100.jpg";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+
+        Assert.Equal("JPEG", sdxImg.GetFileFormat());
+        Assert.Equal(100, sdxImg.Width);
+        Assert.Equal(100, sdxImg.Height);
+        Assert.Equal(2033, sdxImg.Size);
+      }
+
+      //PNG
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\80x80.png";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+
+        Assert.Equal("PNG", sdxImg.GetFileFormat());
+        Assert.Equal(80, sdxImg.Width);
+        Assert.Equal(80, sdxImg.Height);
+        Assert.Equal(382, sdxImg.Size);
+      }
+
+
+      //GIF
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\acrobat.gif";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+
+        Assert.Equal("GIF", sdxImg.GetFileFormat());
+        Assert.Equal(100, sdxImg.Width);
+        Assert.Equal(100, sdxImg.Height);
+        Assert.Equal(46468 , sdxImg.Size);
+      }
+
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\preloader-2-128px-1.gif";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+
+        Assert.Equal("GIF", sdxImg.GetFileFormat());
+        Assert.Equal(128, sdxImg.Width);
+        Assert.Equal(128, sdxImg.Height);
+        Assert.Equal(8165, sdxImg.Size);
+      }
     }
 
   }
