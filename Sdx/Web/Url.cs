@@ -369,6 +369,17 @@ namespace Sdx.Web
       return ParamList.All(tpl => keys.Contains(tpl.Item1));
     }
 
+    public IEnumerable<KeyValuePair<string, string>> Queries
+    {
+      get
+      {
+        foreach(var tupl in ParamList)
+        {
+          yield return new KeyValuePair<string, string>(tupl.Item1, tupl.Item2);
+        }
+      }
+    }
+
 
     #region IUrlのメソッド
     public string Build()
