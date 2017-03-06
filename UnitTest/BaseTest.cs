@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Web;
 using System.IO;
 using System.Reflection;
+using System.Configuration;
 
 namespace UnitTest
 {

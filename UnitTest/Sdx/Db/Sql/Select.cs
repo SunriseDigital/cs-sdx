@@ -2095,7 +2095,7 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       Assert.Equal(
         db.Sql(
           @"SELECT {0}shop{1}.{0}id{1} FROM {0}shop{1}
-          ORDER BY " + db.Adapter.RandomOrderKeyword
+          ORDER BY " + db.Adapter.RandomOrderKeyword()
         ),
         db.Command.CommandText
       );

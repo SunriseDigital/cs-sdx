@@ -1,6 +1,6 @@
 ﻿CREATE TABLE shop (
   id int NOT NULL AUTO_INCREMENT,
-  name varchar(100),
+  name varchar(100) NOT NULL,
   area_id int NOT NULL,
   main_image_id int,
   sub_image_id int,
@@ -85,3 +85,14 @@ CREATE TABLE shop_category (
 
 ALTER TABLE shop_category ADD FOREIGN KEY (shop_id) REFERENCES shop(id) ON DELETE CASCADE;
 ALTER TABLE shop_category ADD FOREIGN KEY (category_id) REFERENCES category(id);
+
+CREATE TABLE get_orm (
+  id int NOT NULL AUTO_INCREMENT,
+  double_column DOUBLE PRECISION UNSIGNED ZEROFILL,
+  text_value text CHARACTER SET utf8 COLLATE utf8_general_ci,
+  size ENUM('x-small', 'small', 'medium', 'large', 'x-large'),
+  varchar_value varchar(100),
+  real_value REAL(1, 1),
+  timestamp_value TIMESTAMP,
+  PRIMARY KEY (id)
+);
