@@ -100,6 +100,7 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="Sdx\Pager.cs" />
     <Compile Include="Sdx\Scaffold\Manager.cs" />
+    <Compile Include="Sdx\Validation\ImageValidator.cs" />
     <Compile Include="Sdx\Web\DeviceTable.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Data\LargeArea.cs" />
