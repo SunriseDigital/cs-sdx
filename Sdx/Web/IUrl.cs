@@ -14,6 +14,7 @@ namespace Sdx.Web
     IUrl Remove(string key);
     IUrl Set(string key, string value);
     IUrl RemoveAll(params string[] excepts);
+    IUrl ReplaceKey(string from, string to);
     string Build();
     Url ToUrl();
   }
