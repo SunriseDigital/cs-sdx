@@ -7,6 +7,9 @@ using System.Text.RegularExpressions;
 
 namespace Sdx.Web
 {
+  /// <summary>
+  /// URLを表現したクラスです。IUrlを返すメソッドは元のURLを変更しません。
+  /// </summary>
   public class Url : ICloneable, IUrl
   {
     //コンストラクタ
@@ -394,34 +397,78 @@ namespace Sdx.Web
       return this;
     }
 
+    /// <summary>
+    /// パラメータ名を指定してその値を一つ増やます。元のURLは変更しません。ページネーションのあるページで次のページのURLを取得したいときに利用します。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="defaultValue">対象のパラメータがなかっときの初期値</param>
+    /// <returns></returns>
     public IUrl Next(string key, int defaultValue = 1)
     {
       return new Manipurator(this).Next(key, defaultValue);
     }
 
+    /// <summary>
+    /// パラメータ名を指定してその値を一つ減らします。元のURLは変更しません。ページネーションのあるページで前のページのURLを取得したいときに利用します。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public IUrl Prev(string key)
     {
       return new Manipurator(this).Prev(key);
     }
 
+    /// <summary>
+    /// パラメータを追加します。元のURLは変更しません。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public IUrl Add(string key, string value)
     {
       return new Manipurator(this).Add(key, value);
     }
 
+    /// <summary>
+    /// パラメータを削除します。元のURLは変更しません。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <returns></returns>
     public IUrl Remove(string key)
     {
       return new Manipurator(this).Remove(key);
     }
 
+    /// <summary>
+    /// パラメータの値を変更します。元のURLは変更しません。
+    /// </summary>
+    /// <param name="key"></param>
+    /// <param name="value"></param>
+    /// <returns></returns>
     public IUrl Set(string key, string value)
     {
       return new Manipurator(this).Set(key, value);
     }
 
+    /// <summary>
+    /// すべてのパラメータを削除します。元のURLは変更しません。
+    /// </summary>
+    /// <param name="excepts">残すぱらーメータを指定できます。</param>
+    /// <returns></returns>
     public IUrl RemoveAll(params string[] excepts)
     {
       return new Manipurator(this).RemoveAll(excepts);
+    }
+
+    /// <summary>
+    /// パラメータのキーを置換します。元のURLは変更しません。
+    /// </summary>
+    /// <param name="from"></param>
+    /// <param name="to"></param>
+    /// <returns></returns>
+    public IUrl ReplaceKey(string from, string to)
+    {
+      return new Manipurator(this).ReplaceKey(from, to);
     }
     #endregion
 
@@ -501,6 +548,12 @@ namespace Sdx.Web
         {
           url.RemoveParam(key);
         }
+        return this;
+      }
+
+      public IUrl ReplaceKey(string from, string to)
+      {
+        url.ReplaceParamKey(from, to);
         return this;
       }
     }

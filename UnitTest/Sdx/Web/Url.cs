@@ -558,6 +558,11 @@ namespace UnitTest
       );
 
       Assert.Equal(
+        "http://www.example.com/?fooo=bar1&fooo=bar2&bazz=qux",
+        url.ReplaceKey("foo", "fooo").ReplaceKey("baz", "bazz").Build()
+      );
+
+      Assert.Equal(
         "http://www.example.com/?foo=bar1&foo=bar2&baz=qux",
         url.Build()
       );
