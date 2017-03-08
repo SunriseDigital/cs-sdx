@@ -121,5 +121,41 @@ namespace UnitTest
       }
     }
 
+    [Fact]
+    public void TestMaxSize()
+    {
+      var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\100x100.jpg";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+
+        var validator = new Sdx.Validation.Image.MaxSize(maxHeight: 10, maxWidht: 10);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        var count = validator.Errors.Count;
+        Assert.Equal(2, count);
+        Assert.Equal("高さが10より小さい画像を入力してください。", validator.Errors[0].Message);
+        Assert.Equal("幅が10より小さい画像を入力してください。", validator.Errors[1].Message);
+
+        validator = new Sdx.Validation.Image.MaxSize(maxHeight: 10, maxWidht: 101);
+        isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        count = validator.Errors.Count;
+        Assert.Equal(1, count);
+
+        validator = new Sdx.Validation.Image.MaxSize(maxHeight: 101, maxWidht: 10);
+        isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        count = validator.Errors.Count;
+        Assert.Equal(1, count);
+
+        validator = new Sdx.Validation.Image.MaxSize(maxHeight: 101, maxWidht: 101);
+        isValid = validator.IsValid(sdxImg);
+        Assert.True(isValid);
+        count = validator.Errors.Count;
+        Assert.Equal(0, count);
+      }
+    }
+
   }
 }
