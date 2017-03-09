@@ -194,6 +194,30 @@ namespace UnitTest
         Assert.Equal(2, validatorSet.Errors.Count);
         Assert.Equal("幅が100より小さい画像を入力してください。", validatorSet.Errors[0].Message);
         Assert.Equal("高さが100より大きい画像を入力してください。", validatorSet.Errors[1].Message);
+
+        //■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ total ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 100))
+          .AddValidator(new Sdx.Validation.Image.MinSize(height: 100, widht: 90))
+          .AddValidator(new Sdx.Validation.Image.Capacity(5000))
+          .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Validation.Image.Type.Jpeg, png: Sdx.Validation.Image.Type.png, gif: Sdx.Validation.Image.Type.gif))
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.True(validatorSet.IsValid(sdxImg));
+        Assert.Equal(0, validatorSet.Errors.Count);
+
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 100))
+          .AddValidator(new Sdx.Validation.Image.MinSize(height: 100, widht: 90))
+          .AddValidator(new Sdx.Validation.Image.Capacity(2000)) // ここでエラーになるようにしています。
+          .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Validation.Image.Type.Jpeg, png: Sdx.Validation.Image.Type.png, gif: Sdx.Validation.Image.Type.gif))
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(1, validatorSet.Errors.Count);
+        Assert.Equal("2000バイトより小さいサイズの画像を入力してください。", validatorSet.Errors[0].Message);
       }
 
     }
