@@ -96,7 +96,7 @@ namespace Sdx.Html
         {
           label.Attr["for"] = checkable.tag.Attr["id"];
         }
-        label.AddHtml(new RawText(labelString));
+        label.AddHtml(new RawText(checkable.Label));
         tag.AddHtml(label);
         return label;
       }
