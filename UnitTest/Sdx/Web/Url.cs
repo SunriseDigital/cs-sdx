@@ -11,6 +11,7 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace UnitTest
 {
@@ -557,6 +558,11 @@ namespace UnitTest
       );
 
       Assert.Equal(
+        "http://www.example.com/?fooo=bar1&fooo=bar2&bazz=qux",
+        url.ReplaceKey("foo", "fooo").ReplaceKey("baz", "bazz").Build()
+      );
+
+      Assert.Equal(
         "http://www.example.com/?foo=bar1&foo=bar2&baz=qux",
         url.Build()
       );
@@ -585,6 +591,19 @@ namespace UnitTest
       Assert.False(url.IsParamOnly("foo"));
       Assert.False(url.IsParamOnly());
       Assert.True(url.IsParamOnly("foo", "bar", "baz"));
+    }
+
+    [Fact]
+    public void QueryCheck()
+    {
+      var url = new Sdx.Web.Url("http://www.example.com/?tg_foo=on&tg_bar=off&hoge=1&fuga=2");
+      Assert.True(url.Queries.Any(kv => kv.Key.IndexOf("tg_") == 0));
+      Assert.False(url.Queries.Any(kv => kv.Key.IndexOf("fg_") == 0));
+
+
+      Assert.True(url.Queries.Any(kv => kv.Key == "hoge" || kv.Key == "hogeeee"));
+      Assert.True(url.Queries.Any(kv => kv.Key == "fuga" || kv.Key == "fugaaaa"));
+      Assert.False(url.Queries.Any(kv => kv.Key == "hogeeee" || kv.Key == "fugaaaa"));
     }
   }
 }
