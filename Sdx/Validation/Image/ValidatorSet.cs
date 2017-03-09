@@ -15,7 +15,6 @@ namespace Sdx.Validation.Image
     public ValidatorSet()
     {
       this.Errors = new Validation.Errors();
-      this.IsAllowEmpty = false;
     }
 
     public IEnumerable<Validation.Image.Validator> Validators
@@ -44,11 +43,6 @@ namespace Sdx.Validation.Image
     {
       var result = true;
       this.Errors.Clear();
-
-      if(this.IsAllowEmpty)
-      {
-        return true;
-      }
 
       foreach (var val in validators)
       {
