@@ -295,7 +295,97 @@ namespace UnitTest
       }
     }
 
+    [Fact]
+    public void TestType()
+    {
+      //PNG
+      var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\80x80.png";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(png: Sdx.Validation.Image.Type.png);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.True(isValid);
+        Assert.Equal(0, validator.Errors.Count);
+      }
 
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\acrobat.gif";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(png: Sdx.Validation.Image.Type.png);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        Assert.Equal(1, validator.Errors.Count);
+        Assert.Equal("拡張子が「PNG」の画像を入力してください。", validator.Errors[0].Message);
+      }
 
+      //GIF
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\acrobat.gif";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(gif: Sdx.Validation.Image.Type.gif);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.True(isValid);
+        Assert.Equal(0, validator.Errors.Count);
+      }
+
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\80x80.png";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(gif: Sdx.Validation.Image.Type.gif);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        Assert.Equal(1, validator.Errors.Count);
+        Assert.Equal("拡張子が「GIF」の画像を入力してください。", validator.Errors[0].Message);
+      }
+
+      //JPEG
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\100x100.jpg";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(Sdx.Validation.Image.Type.Jpeg);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.True(isValid);
+        Assert.Equal(0, validator.Errors.Count);
+      }
+
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\80x80.png";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(Sdx.Validation.Image.Type.Jpeg);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        Assert.Equal(1, validator.Errors.Count);
+        Assert.Equal("拡張子が「JPEG」の画像を入力してください。", validator.Errors[0].Message);
+      }
+
+      //複数バリデーション
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\100x100.jpg";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(png: Sdx.Validation.Image.Type.png, gif: Sdx.Validation.Image.Type.gif);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        Assert.Equal(1, validator.Errors.Count);
+        Assert.Equal("拡張子が「PNG,GIF」の画像を入力してください。", validator.Errors[0].Message);
+      }
+
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\bitmap_test_image.bmp";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Type(jpeg: Sdx.Validation.Image.Type.Jpeg, png: Sdx.Validation.Image.Type.png, gif: Sdx.Validation.Image.Type.gif);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        Assert.Equal(1, validator.Errors.Count);
+        Assert.Equal("拡張子が「JPEG,PNG,GIF」の画像を入力してください。", validator.Errors[0].Message);
+      }
+    }
   }
 }
