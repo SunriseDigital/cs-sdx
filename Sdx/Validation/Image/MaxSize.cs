@@ -27,15 +27,15 @@ namespace Sdx.Validation.Image
     public int? MaxHeight { get; set; }
     public int? MaxWidht { get; set; }
 
-    public MaxSize(int? maxHeight = null, int? maxWidht = null)
+    public MaxSize(int? height = null, int? widht = null)
     {
-      if (maxHeight == null && maxWidht == null)
+      if (height == null && widht == null)
       {
         throw new ArgumentNullException("min and max are both null.");
       }
 
-      this.MaxHeight = maxHeight;
-      this.MaxWidht = maxWidht;
+      this.MaxHeight = height;
+      this.MaxWidht = widht;
     }
 
     protected override bool IsValidImage(Sdx.Image value)
