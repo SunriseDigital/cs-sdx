@@ -122,6 +122,83 @@ namespace UnitTest
     }
 
     [Fact]
+    public void TestValidatorSet()
+    {
+      var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\100x100.jpg";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        //許容範囲
+        var validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+        .AddValidator(new Sdx.Validation.Image.MaxSize(maxHeight: 101, maxWidht: 101))
+        .AddValidator(new Sdx.Validation.Image.MinSize(minHeight: 90, minWidht: 90))
+        ;
+        var sdxImg = new Sdx.Image(stream);
+        Assert.True(validatorSet.IsValid(sdxImg));
+        Assert.Equal(0, validatorSet.Errors.Count);
+
+        //maxHeightだけ引っかかる
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+        .AddValidator(new Sdx.Validation.Image.MaxSize(maxHeight: 100, maxWidht: 101))
+        .AddValidator(new Sdx.Validation.Image.MinSize(minHeight: 90, minWidht: 90))
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(1, validatorSet.Errors.Count);
+        Assert.Equal("高さが100より小さい画像を入力してください。", validatorSet.Errors[0].Message);
+
+        //maxWidhtだけ引っかかる
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+        .AddValidator(new Sdx.Validation.Image.MaxSize(maxHeight: 101, maxWidht: 100))
+        .AddValidator(new Sdx.Validation.Image.MinSize(minHeight: 90, minWidht: 90))
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(1, validatorSet.Errors.Count);
+        Assert.Equal("幅が100より小さい画像を入力してください。", validatorSet.Errors[0].Message);
+
+        //maxHeightとmaxWidhtだけ引っかかる
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+        .AddValidator(new Sdx.Validation.Image.MaxSize(maxHeight: 100, maxWidht: 100))
+        .AddValidator(new Sdx.Validation.Image.MinSize(minHeight: 90, minWidht: 90))
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(2, validatorSet.Errors.Count);
+        Assert.Equal("高さが100より小さい画像を入力してください。", validatorSet.Errors[0].Message);
+        Assert.Equal("幅が100より小さい画像を入力してください。", validatorSet.Errors[1].Message);
+
+        //maxHeightとminWidhtだけ引っかかる
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+        .AddValidator(new Sdx.Validation.Image.MaxSize(maxHeight: 100, maxWidht: 101))
+        .AddValidator(new Sdx.Validation.Image.MinSize(minHeight: 90, minWidht: 100))
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(2, validatorSet.Errors.Count);
+        Assert.Equal("高さが100より小さい画像を入力してください。", validatorSet.Errors[0].Message);
+        Assert.Equal("幅が100より大きい画像を入力してください。", validatorSet.Errors[1].Message);
+
+        //maxWidhtとminHeightだけ引っかかる
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+        .AddValidator(new Sdx.Validation.Image.MaxSize(maxHeight: 101, maxWidht: 100))
+        .AddValidator(new Sdx.Validation.Image.MinSize(minHeight: 100, minWidht: 90))
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(2, validatorSet.Errors.Count);
+        Assert.Equal("幅が100より小さい画像を入力してください。", validatorSet.Errors[0].Message);
+        Assert.Equal("高さが100より大きい画像を入力してください。", validatorSet.Errors[1].Message);
+      }
+
+    }
+
+    [Fact]
     public void TestMaxSize()
     {
       var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\100x100.jpg";

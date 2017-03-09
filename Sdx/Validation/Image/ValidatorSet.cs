@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sdx.Validation.Image
 {
-  class ValidatorSet
+  public class ValidatorSet
   {
     private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
     public Validation.Errors Errors { get; private set; }
@@ -18,18 +18,18 @@ namespace Sdx.Validation.Image
       this.IsAllowEmpty = false;
     }
 
-    public IEnumerable<Validation.Validator> Validators
+    public IEnumerable<Validation.Image.Validator> Validators
     {
       get
       {
         foreach(var dic in validators)
         {
-          yield return (Validation.Validator)dic["validator"];
+          yield return (Validation.Image.Validator)dic["validator"];
         }
       }
     }
 
-    public ValidatorSet AddValidator(Validation.Validator validator, bool breakChain = false)
+    public ValidatorSet AddValidator(Validation.Image.Validator validator, bool breakChain = false)
     {
       validators.Add(new Dictionary<string, object> {
         {"validator", validator},
@@ -52,7 +52,7 @@ namespace Sdx.Validation.Image
 
       foreach (var val in validators)
       {
-        var validator = (Sdx.Validation.Image.Validator)val["validator"];
+        var validator = (Validation.Image.Validator)val["validator"];
         var breakChain = (bool)val["breakChain"];
 
         validator.Errors = this.Errors;
