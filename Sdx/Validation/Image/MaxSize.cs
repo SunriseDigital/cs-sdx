@@ -27,8 +27,6 @@ namespace Sdx.Validation.Image
     public int? MaxHeight { get; set; }
     public int? MaxWidht { get; set; }
 
-    public string DateFormat { get; private set; }
-
     public MaxSize(int? maxHeight = null, int? maxWidht = null)
     {
       if (maxHeight == null && maxWidht == null)
@@ -61,7 +59,7 @@ namespace Sdx.Validation.Image
       if(this.Errors.Count() > 0){
         return false;
       }
-      
+
       return true;
     }
   }
