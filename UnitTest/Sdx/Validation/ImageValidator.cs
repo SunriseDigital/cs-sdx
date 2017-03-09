@@ -274,5 +274,28 @@ namespace UnitTest
       }
     }
 
+    [Fact]
+    public void TestCapacity()
+    {
+      var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\100x100.jpg";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var sdxImg = new Sdx.Image(stream);
+        var validator = new Sdx.Validation.Image.Capacity(2033);
+        var isValid = validator.IsValid(sdxImg);
+        Assert.False(isValid);
+        Assert.Equal(1, validator.Errors.Count);
+        Assert.Equal("2033バイトより小さいサイズの画像を入力してください。", validator.Errors[0].Message);
+
+        sdxImg = new Sdx.Image(stream);
+        validator = new Sdx.Validation.Image.Capacity(2034);
+        isValid = validator.IsValid(sdxImg);
+        Assert.True(isValid);
+        Assert.Equal(0, validator.Errors.Count);
+      }
+    }
+
+
+
   }
 }
