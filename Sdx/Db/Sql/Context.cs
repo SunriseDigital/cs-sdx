@@ -414,6 +414,23 @@ namespace Sdx.Db.Sql
     }
 
     /// <summary>
+    /// 全てのカラムをGroupに
+    /// </summary>
+    /// <returns></returns>
+    public Context AddColumnsToGroup(Predicate<Table.Column> predicate = null)
+    {
+      foreach (var column in Table.OwnMeta.Columns)
+      {
+        if (predicate == null ? true : predicate(column))
+        {
+          AddGroup(column.Name);
+        }
+      }
+
+      return this;
+    }
+
+    /// <summary>
     /// ORDER句を付与します。カラム名にこの<see cref="Context"/>の名前が付与されます。
     /// </summary>
     /// <param name="expr"></param>
