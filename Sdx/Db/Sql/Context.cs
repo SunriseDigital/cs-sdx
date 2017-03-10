@@ -258,7 +258,7 @@ namespace Sdx.Db.Sql
 
     internal Condition JoinCondition { get; private set; }
 
-    public JoinType JoinType { get; internal set; }
+    internal JoinType JoinType { get; set; }
 
     /// <summary>
     /// <see cref="Sql.Select"/>からこのテーブルのカラムをすべて除きます。
@@ -293,7 +293,8 @@ namespace Sdx.Db.Sql
 
     public Context AddColumn(Expr expr, string alias = null)
     {
-      this.Select.ColumnList.Add(new Column(expr, this.Name, alias));
+      //exprの時はテーブル名はつけないのでContextNameはnull
+      this.Select.ColumnList.Add(new Column(expr, null, alias));
       return this;
     }
 
@@ -410,6 +411,23 @@ namespace Sdx.Db.Sql
     {
       var column = new Column(select, this.Name);
       this.Select.GroupList.Add(column);
+      return this;
+    }
+
+    /// <summary>
+    /// 全てのカラムをGroupに
+    /// </summary>
+    /// <returns></returns>
+    public Context AddColumnsToGroup(Predicate<Table.Column> predicate = null)
+    {
+      foreach (var column in Table.OwnMeta.Columns)
+      {
+        if (predicate == null ? true : predicate(column))
+        {
+          AddGroup(column.Name);
+        }
+      }
+
       return this;
     }
 

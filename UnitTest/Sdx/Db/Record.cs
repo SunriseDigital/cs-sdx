@@ -1195,5 +1195,36 @@ namespace UnitTest
         Assert.True(tryCount * 0.1 > sameCount);
       }
     }
+
+    [Fact]
+    public void TestExtraValue()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunExtraValue(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunExtraValue(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+
+      var select = db.CreateSelect();
+      select.AddFrom(new Test.Orm.Table.Shop(), cShop => 
+      {
+        cShop.Table.AddColumn(Sdx.Db.Sql.Expr.Wrap("CONCAT(name, '@', id)"), "extra_value");
+      });
+
+      using (var conn = db.CreateConnection())
+      {
+        conn.Open();
+        foreach(var shop in conn.FetchRecordSet(select))
+        {
+          var expect = string.Format("{0}@{1}", shop.GetString("name"), shop.GetString("id"));
+          Assert.Equal(expect, shop.GetString("extra_value"));
+        }
+      }
+    }
   }
 }
