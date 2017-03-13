@@ -21,11 +21,10 @@ namespace Sdx
     public Bitmap Bitmap
     {
       get{
-        if(this.bitmap != null){
-           return this.bitmap;
+        if(this.bitmap == null){
+           this.bitmap = new Bitmap(this.stream);
         }
 
-        this.bitmap = new Bitmap(this.stream);
         return this.bitmap;
       }
     }
