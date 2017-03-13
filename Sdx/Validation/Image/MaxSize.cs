@@ -8,16 +8,16 @@ namespace Sdx.Validation.Image
 {
   public class MaxSize : Validator
   {
-    public const string ErrorOverWidhtLImit = "ErrorOverWidhtLImit";
-    public const string ErrorOverHeightLImit = "ErrorOverHeightLImit";
+    public const string ErrorOverWidhtLimit = "ErrorOverWidhtLImit";
+    public const string ErrorOverHeightLimit = "ErrorOverHeightLImit";
 
     protected override string GetDefaultMessage(string errorType)
     {
       switch (errorType)
       {
-        case ErrorOverWidhtLImit:
+        case ErrorOverWidhtLimit:
           return Sdx.I18n.GetString("高さが{0}より小さい画像を入力してください。", MaxHeight);
-        case ErrorOverHeightLImit:
+        case ErrorOverHeightLimit:
           return Sdx.I18n.GetString("幅が{0}より小さい画像を入力してください。", MaxWidht);
         default:
           return null;
@@ -44,7 +44,7 @@ namespace Sdx.Validation.Image
       {
         if (value.Height >= this.MaxHeight)
         {
-          this.AddError(ErrorOverWidhtLImit);
+          this.AddError(ErrorOverWidhtLimit);
         }
       }
 
@@ -52,7 +52,7 @@ namespace Sdx.Validation.Image
       {
         if (value.Width >= this.MaxWidht)
         {
-          this.AddError(ErrorOverHeightLImit);
+          this.AddError(ErrorOverHeightLimit);
         }
       }
 

@@ -8,13 +8,13 @@ namespace Sdx.Validation.Image
 {
   public class Capacity : Validator
   {
-    public const string ErrorOverCapacityLImit = "ErrorOverCapacityLImit";
+    public const string ErrorOverCapacityLimit = "ErrorOverCapacityLImit";
 
     protected override string GetDefaultMessage(string errorType)
     {
       switch (errorType)
       {
-        case ErrorOverCapacityLImit:
+        case ErrorOverCapacityLimit:
           return Sdx.I18n.GetString("{0}バイトより小さいサイズの画像を入力してください。", MaxCapacity);
         default:
           return null;
@@ -34,7 +34,7 @@ namespace Sdx.Validation.Image
       {
         if (value.Size >= this.MaxCapacity)
         {
-          this.AddError(ErrorOverCapacityLImit);
+          this.AddError(ErrorOverCapacityLimit);
           return false;
         }
       }

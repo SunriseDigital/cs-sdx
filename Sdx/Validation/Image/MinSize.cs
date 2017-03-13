@@ -8,16 +8,16 @@ namespace Sdx.Validation.Image
 {
   public class MinSize : Validator
   {
-    public const string ErrorUnderWidhtLImit = "ErrorUnderWidhtLImit";
-    public const string ErrorUnderHeightLImit = "ErrorUnderHeightLImit";
+    public const string ErrorUnderWidhtLimit = "ErrorUnderWidhtLImit";
+    public const string ErrorUnderHeightLimit = "ErrorUnderHeightLImit";
 
     protected override string GetDefaultMessage(string errorType)
     {
       switch (errorType)
       {
-        case ErrorUnderWidhtLImit:
+        case ErrorUnderWidhtLimit:
           return Sdx.I18n.GetString("高さが{0}より大きい画像を入力してください。", MinHeight);
-        case ErrorUnderHeightLImit:
+        case ErrorUnderHeightLimit:
           return Sdx.I18n.GetString("幅が{0}より大きい画像を入力してください。", MinWidht);
         default:
           return null;
@@ -44,7 +44,7 @@ namespace Sdx.Validation.Image
       {
         if (value.Height <= this.MinHeight)
         {
-          this.AddError(ErrorUnderWidhtLImit);
+          this.AddError(ErrorUnderWidhtLimit);
         }
       }
 
@@ -52,7 +52,7 @@ namespace Sdx.Validation.Image
       {
         if (value.Width <= this.MinWidht)
         {
-          this.AddError(ErrorUnderHeightLImit);
+          this.AddError(ErrorUnderHeightLimit);
         }
       }
 
