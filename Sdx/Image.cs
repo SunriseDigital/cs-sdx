@@ -10,9 +10,31 @@ namespace Sdx
 {
   public class Image
   {
+    public enum FileType
+    {
+      /// <summary>それ以外 : 0</summary>
+      NONE = 0,
+      /// <summary>JPEG(jpg, jpeg, jpe, jfif) : 1</summary>
+      JPEG = 1,
+      /// <summary>GIF(gif) : 2</summary>
+      GIF = 2,
+      /// <summary>PNG(png) : 4</summary>
+      PNG = 4,
+      /// <summary>BMP(bmp, dib, rle) : 8</summary>
+      BMP = 8,
+      /// <summary>TIFF(tif, tiff) : 16</summary>
+      TIFF = 16,
+      /// <summary>EMF(emf) : 32</summary>
+      EMF = 32,
+      /// <summary>WMF(wmf) : 64</summary>
+      WMF = 64,
+      /// <summary>ICON(ico) : 128</summary>
+      ICON = 128,
+    }
+
     Stream stream;
     Bitmap bitmap = null;
-    string type = null; //ファイルの種類
+    Sdx.Image.FileType? type = null; //ファイルの種類
 
     public Image(Stream stream){
       this.stream = stream;
@@ -56,29 +78,29 @@ namespace Sdx
     /// <summary>
     /// ファイルの形式(拡張子)を返す。
     /// </summary>
-    private string Type
+    public Sdx.Image.FileType? Type
     {
       get {
         if(this.type == null){
-          this.type = this.GetTypeString();
+          this.type = this.GetType();
         }
 
         return this.type;
       }
     }
 
-    private string GetTypeString()
+    private Sdx.Image.FileType GetType()
     {
       foreach (System.Drawing.Imaging.ImageCodecInfo ici in System.Drawing.Imaging.ImageCodecInfo.GetImageDecoders())
       {
         if (ici.FormatID == this.Bitmap.RawFormat.Guid)
         {
           //該当するFormatDescriptionを返す。
-          return ici.FormatDescription;
+          return (Sdx.Image.FileType)(Enum.Parse(typeof(Sdx.Image.FileType), ici.FormatDescription, false));
         }
       }
 
-      return string.Empty;
+      return Sdx.Image.FileType.NONE;
     }
 
   }

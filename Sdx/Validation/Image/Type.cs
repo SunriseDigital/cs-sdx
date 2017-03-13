@@ -27,9 +27,9 @@ namespace Sdx.Validation.Image
       }
     }
 
-    public List<string> FormatList = new List<string>();
+    public List<Sdx.Image.FileType> FormatList = new List<Sdx.Image.FileType>();
 
-    public Type(string jpeg = null, string png = null, string gif = null)
+    public Type(Sdx.Image.FileType? jpeg = null, Sdx.Image.FileType? png = null, Sdx.Image.FileType? gif = null)
     {
       if (jpeg == null && png == null && gif == null)
       {
@@ -37,51 +37,51 @@ namespace Sdx.Validation.Image
       }
 
       if(jpeg != null){
-        if(jpeg != Type.Jpeg){
+        if(jpeg != Sdx.Image.FileType.JPEG){
           throw new Exception("The argument value of jpeg is different");
         }
-        this.FormatList.Add(Type.Jpeg);
+        this.FormatList.Add(Sdx.Image.FileType.JPEG);
       }
 
       if(png != null){
-        if(png != Type.png){
+        if(png != Sdx.Image.FileType.PNG){
           throw new Exception("The argument value of png is different");
         }
-        this.FormatList.Add(Type.png);
+        this.FormatList.Add(Sdx.Image.FileType.PNG);
       }
 
       if(gif != null){
-        if(gif != Type.gif){
+        if(gif != Sdx.Image.FileType.GIF){
           throw new Exception("The argument value of gif is different");
         }
-        this.FormatList.Add(Type.gif);
+        this.FormatList.Add(Sdx.Image.FileType.GIF);
       }
 
     }
 
     protected override bool IsValidImage(Sdx.Image value)
     {
-      if(this.FormatList.IndexOf(Type.Jpeg) > -1)
+      if(this.FormatList.IndexOf(Sdx.Image.FileType.JPEG) > -1)
       {
-        if (value.GetFileFormat() != Type.Jpeg)
+        if (value.Type != Sdx.Image.FileType.JPEG)
         {
           this.AddError(ErrorOtherThanTargetFormat);
           return false;
         }
       }
 
-      if(this.FormatList.IndexOf(Type.png) > -1)
+      if(this.FormatList.IndexOf(Sdx.Image.FileType.PNG) > -1)
       {
-        if (value.GetFileFormat() != Type.png)
+        if (value.Type != Sdx.Image.FileType.PNG)
         {
           this.AddError(ErrorOtherThanTargetFormat);
           return false;
         }
       }
 
-      if(this.FormatList.IndexOf(Type.gif) > -1)
+      if(this.FormatList.IndexOf(Sdx.Image.FileType.GIF) > -1)
       {
-        if (value.GetFileFormat() != Type.gif)
+        if (value.Type != Sdx.Image.FileType.GIF)
         {
           this.AddError(ErrorOtherThanTargetFormat);
           return false;
