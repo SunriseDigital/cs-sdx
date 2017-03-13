@@ -53,40 +53,32 @@ namespace Sdx
       }
     }
 
-    private string Type
-    {
-      get { return this.type; }
-      set { this.type = value; }
-    }
-
     /// <summary>
     /// ファイルの形式(拡張子)を返す。
     /// </summary>
-    /// <returns></returns>
-    public string GetFileFormat()
+    private string Type
     {
-      if(this.Type != null){
-        return this.Type;
+      get {
+        if(this.type == null){
+          this.type = this.GetTypeString();
+        }
+
+        return this.type;
+      }
+    }
+
+    private string GetTypeString()
+    {
+      foreach (System.Drawing.Imaging.ImageCodecInfo ici in System.Drawing.Imaging.ImageCodecInfo.GetImageDecoders())
+      {
+        if (ici.FormatID == this.Bitmap.RawFormat.Guid)
+        {
+          //該当するFormatDescriptionを返す。
+          return ici.FormatDescription;
+        }
       }
 
-      try
-      {
-          foreach (System.Drawing.Imaging.ImageCodecInfo ici in System.Drawing.Imaging.ImageCodecInfo.GetImageDecoders())
-          {
-            if (ici.FormatID == this.Bitmap.RawFormat.Guid)
-            {
-              //該当するFormatDescriptionを返す。
-              this.Type = ici.FormatDescription;
-              return this.Type;
-            }
-          }
-
-          return string.Empty;
-      }
-      catch
-      {
-          return string.Empty;
-      }
+      return string.Empty;
     }
 
   }
