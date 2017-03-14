@@ -431,6 +431,20 @@ namespace Sdx.Db.Sql
     }
 
     /// <summary>
+    /// 渡ってきたカラムをGroupに
+    /// </summary>
+    /// <returns></returns>
+    public Context AddColumnsToGroup(IEnumerable<string> columns)
+    {
+      foreach (var column in columns)
+      {
+        AddGroup(column);
+      }
+
+      return this;
+    }
+
+    /// <summary>
     /// ORDER句を付与します。カラム名にこの<see cref="Context"/>の名前が付与されます。
     /// </summary>
     /// <param name="expr"></param>
