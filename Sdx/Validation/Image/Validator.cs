@@ -9,7 +9,7 @@ using System.Drawing;
 
 namespace Sdx.Validation.Image
 {
-  public abstract class Validator : Base.Validator
+  public abstract class Validator : Sdx.Validation.Base
   {
     public Sdx.Image Value { get; private set; }
 

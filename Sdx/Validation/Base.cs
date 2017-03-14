@@ -6,9 +6,9 @@ using Sdx.Html;
 using System.Reflection;
 using System.IO;
 
-namespace Sdx.Validation.Base
+namespace Sdx.Validation
 {
-  public abstract class Validator
+  public abstract class Base
   {
     public Errors Errors { get; internal set; }
 
@@ -30,7 +30,7 @@ namespace Sdx.Validation.Base
       return message;
     }
 
-    public Func<string, Validator, string> MessageDetector { get; set; }
+    public Func<string, Base, string> MessageDetector { get; set; }
 
     protected void AddError(string errorType)
     {

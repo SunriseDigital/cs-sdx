@@ -8,7 +8,7 @@ using System.IO;
 
 namespace Sdx.Validation
 {
-  public abstract class Validator : Base.Validator
+  public abstract class Validator : Sdx.Validation.Base
   {
     protected abstract bool IsValidString(string value);
 
