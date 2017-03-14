@@ -78,7 +78,7 @@ namespace UnitTest
       {
         var sdxImg = new Sdx.Image(stream);
 
-        Assert.Equal(Sdx.Image.FileType.JPEG, sdxImg.Type);
+        Assert.Equal(Sdx.Image.Format.JPEG, sdxImg.Type);
         Assert.Equal(100, sdxImg.Width);
         Assert.Equal(100, sdxImg.Height);
         Assert.Equal(2033, sdxImg.Size);
@@ -90,7 +90,7 @@ namespace UnitTest
       {
         var sdxImg = new Sdx.Image(stream);
 
-        Assert.Equal(Sdx.Image.FileType.PNG, sdxImg.Type);
+        Assert.Equal(Sdx.Image.Format.PNG, sdxImg.Type);
         Assert.Equal(80, sdxImg.Width);
         Assert.Equal(80, sdxImg.Height);
         Assert.Equal(382, sdxImg.Size);
@@ -103,7 +103,7 @@ namespace UnitTest
       {
         var sdxImg = new Sdx.Image(stream);
 
-        Assert.Equal(Sdx.Image.FileType.GIF, sdxImg.Type);
+        Assert.Equal(Sdx.Image.Format.GIF, sdxImg.Type);
         Assert.Equal(100, sdxImg.Width);
         Assert.Equal(100, sdxImg.Height);
         Assert.Equal(46468 , sdxImg.Size);
@@ -114,7 +114,7 @@ namespace UnitTest
       {
         var sdxImg = new Sdx.Image(stream);
 
-        Assert.Equal(Sdx.Image.FileType.GIF, sdxImg.Type);
+        Assert.Equal(Sdx.Image.Format.GIF, sdxImg.Type);
         Assert.Equal(128, sdxImg.Width);
         Assert.Equal(128, sdxImg.Height);
         Assert.Equal(8165, sdxImg.Size);
@@ -201,7 +201,7 @@ namespace UnitTest
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 101))
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
           .AddValidator(new Sdx.Validation.Image.Capacity(5000))
-          .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Image.FileType.JPEG, png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF))
+          .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Image.Format.JPEG, png: Sdx.Image.Format.PNG, gif: Sdx.Image.Format.GIF))
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.True(validatorSet.IsValid(sdxImg));
@@ -212,7 +212,7 @@ namespace UnitTest
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 101))
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
           .AddValidator(new Sdx.Validation.Image.Capacity(2000)) // ここでエラーになるようにしています。
-          .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Image.FileType.JPEG, png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF))
+          .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Image.Format.JPEG, png: Sdx.Image.Format.PNG, gif: Sdx.Image.Format.GIF))
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
@@ -224,7 +224,7 @@ namespace UnitTest
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 101))
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
           .AddValidator(new Sdx.Validation.Image.Capacity(3000))
-          .AddValidator(new Sdx.Validation.Image.Type(png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF)) // ここでエラーになるようにしています。
+          .AddValidator(new Sdx.Validation.Image.Type(png: Sdx.Image.Format.PNG, gif: Sdx.Image.Format.GIF)) // ここでエラーになるようにしています。
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
@@ -236,7 +236,7 @@ namespace UnitTest
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 100)) //ここでエラーになるようにしています。
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
           .AddValidator(new Sdx.Validation.Image.Capacity(3000))
-          .AddValidator(new Sdx.Validation.Image.Type(png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF)) // ここでエラーになるようにしています。
+          .AddValidator(new Sdx.Validation.Image.Type(png: Sdx.Image.Format.PNG, gif: Sdx.Image.Format.GIF)) // ここでエラーになるようにしています。
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
@@ -352,7 +352,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(png: Sdx.Image.FileType.PNG);
+        var validator = new Sdx.Validation.Image.Type(png: Sdx.Image.Format.PNG);
         var isValid = validator.IsValid(sdxImg);
         Assert.True(isValid);
         Assert.Equal(0, validator.Errors.Count);
@@ -362,7 +362,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(png: Sdx.Image.FileType.PNG);
+        var validator = new Sdx.Validation.Image.Type(png: Sdx.Image.Format.PNG);
         var isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         Assert.Equal(1, validator.Errors.Count);
@@ -374,7 +374,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(gif: Sdx.Image.FileType.GIF);
+        var validator = new Sdx.Validation.Image.Type(gif: Sdx.Image.Format.GIF);
         var isValid = validator.IsValid(sdxImg);
         Assert.True(isValid);
         Assert.Equal(0, validator.Errors.Count);
@@ -384,7 +384,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(gif: Sdx.Image.FileType.GIF);
+        var validator = new Sdx.Validation.Image.Type(gif: Sdx.Image.Format.GIF);
         var isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         Assert.Equal(1, validator.Errors.Count);
@@ -396,7 +396,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(Sdx.Image.FileType.JPEG);
+        var validator = new Sdx.Validation.Image.Type(Sdx.Image.Format.JPEG);
         var isValid = validator.IsValid(sdxImg);
         Assert.True(isValid);
         Assert.Equal(0, validator.Errors.Count);
@@ -406,7 +406,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(Sdx.Image.FileType.JPEG);
+        var validator = new Sdx.Validation.Image.Type(Sdx.Image.Format.JPEG);
         var isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         Assert.Equal(1, validator.Errors.Count);
@@ -418,7 +418,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF);
+        var validator = new Sdx.Validation.Image.Type(png: Sdx.Image.Format.PNG, gif: Sdx.Image.Format.GIF);
         var isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         Assert.Equal(1, validator.Errors.Count);
@@ -429,7 +429,7 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Type(jpeg: Sdx.Image.FileType.JPEG, png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF);
+        var validator = new Sdx.Validation.Image.Type(jpeg: Sdx.Image.Format.JPEG, png: Sdx.Image.Format.PNG, gif: Sdx.Image.Format.GIF);
         var isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         Assert.Equal(1, validator.Errors.Count);

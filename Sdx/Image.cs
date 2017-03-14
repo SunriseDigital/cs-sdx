@@ -10,7 +10,7 @@ namespace Sdx
 {
   public class Image
   {
-    public enum FileType
+    public enum Format
     {
       /// <summary>それ以外 : 0</summary>
       NONE = 0,
@@ -34,7 +34,7 @@ namespace Sdx
 
     Stream stream;
     Bitmap bitmap = null;
-    Sdx.Image.FileType? type = null; //ファイルの種類
+    Sdx.Image.Format? type = null; //ファイルの種類
 
     public Image(Stream stream){
       this.stream = stream;
@@ -78,7 +78,7 @@ namespace Sdx
     /// <summary>
     /// ファイルの形式(拡張子)を返す。
     /// </summary>
-    public Sdx.Image.FileType? Type
+    public Sdx.Image.Format? Type
     {
       get {
         if(this.type == null){
@@ -89,18 +89,18 @@ namespace Sdx
       }
     }
 
-    private Sdx.Image.FileType GetType()
+    private Sdx.Image.Format GetType()
     {
       foreach (System.Drawing.Imaging.ImageCodecInfo ici in System.Drawing.Imaging.ImageCodecInfo.GetImageDecoders())
       {
         if (ici.FormatID == this.Bitmap.RawFormat.Guid)
         {
           //該当するFormatDescriptionを返す。
-          return (Sdx.Image.FileType)(Enum.Parse(typeof(Sdx.Image.FileType), ici.FormatDescription, false));
+          return (Sdx.Image.Format)(Enum.Parse(typeof(Sdx.Image.Format), ici.FormatDescription, false));
         }
       }
 
-      return Sdx.Image.FileType.NONE;
+      return Sdx.Image.Format.NONE;
     }
 
   }

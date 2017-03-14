@@ -24,9 +24,9 @@ namespace Sdx.Validation.Image
       }
     }
 
-    public List<Sdx.Image.FileType> FormatList = new List<Sdx.Image.FileType>();
+    public List<Sdx.Image.Format> FormatList = new List<Sdx.Image.Format>();
 
-    public Type(Sdx.Image.FileType? jpeg = null, Sdx.Image.FileType? png = null, Sdx.Image.FileType? gif = null)
+    public Type(Sdx.Image.Format? jpeg = null, Sdx.Image.Format? png = null, Sdx.Image.Format? gif = null)
     {
       if (jpeg == null && png == null && gif == null)
       {
@@ -34,24 +34,24 @@ namespace Sdx.Validation.Image
       }
 
       if(jpeg != null){
-        if(jpeg != Sdx.Image.FileType.JPEG){
+        if(jpeg != Sdx.Image.Format.JPEG){
           throw new Exception("The argument value of jpeg is different");
         }
-        this.FormatList.Add(Sdx.Image.FileType.JPEG);
+        this.FormatList.Add(Sdx.Image.Format.JPEG);
       }
 
       if(png != null){
-        if(png != Sdx.Image.FileType.PNG){
+        if(png != Sdx.Image.Format.PNG){
           throw new Exception("The argument value of png is different");
         }
-        this.FormatList.Add(Sdx.Image.FileType.PNG);
+        this.FormatList.Add(Sdx.Image.Format.PNG);
       }
 
       if(gif != null){
-        if(gif != Sdx.Image.FileType.GIF){
+        if(gif != Sdx.Image.Format.GIF){
           throw new Exception("The argument value of gif is different");
         }
-        this.FormatList.Add(Sdx.Image.FileType.GIF);
+        this.FormatList.Add(Sdx.Image.Format.GIF);
       }
 
       Sdx.Diagnostics.Debug.DumpToFile(this.FormatList, "/dump/Image_type.txt");
