@@ -198,8 +198,8 @@ namespace UnitTest
         //■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ total ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 100))
-          .AddValidator(new Sdx.Validation.Image.MinSize(height: 100, widht: 90))
+          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 101))
+          .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
           .AddValidator(new Sdx.Validation.Image.Capacity(5000))
           .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Image.FileType.JPEG, png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF))
         ;
@@ -209,8 +209,8 @@ namespace UnitTest
 
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 100))
-          .AddValidator(new Sdx.Validation.Image.MinSize(height: 100, widht: 90))
+          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 101))
+          .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
           .AddValidator(new Sdx.Validation.Image.Capacity(2000)) // ここでエラーになるようにしています。
           .AddValidator(new Sdx.Validation.Image.Type(jpeg: Sdx.Image.FileType.JPEG, png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF))
         ;
@@ -218,6 +218,31 @@ namespace UnitTest
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(1, validatorSet.Errors.Count);
         Assert.Equal("2000バイトより小さいサイズの画像を入力してください。", validatorSet.Errors[0].Message);
+
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 101))
+          .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
+          .AddValidator(new Sdx.Validation.Image.Capacity(3000))
+          .AddValidator(new Sdx.Validation.Image.Type(png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF)) // ここでエラーになるようにしています。
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(1, validatorSet.Errors.Count);
+        Assert.Equal("拡張子が「PNG,GIF」の画像を入力してください。", validatorSet.Errors[0].Message);
+
+        validatorSet = new Sdx.Validation.Image.ValidatorSet();
+        validatorSet
+          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, widht: 100)) //ここでエラーになるようにしています。
+          .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, widht: 99))
+          .AddValidator(new Sdx.Validation.Image.Capacity(3000))
+          .AddValidator(new Sdx.Validation.Image.Type(png: Sdx.Image.FileType.PNG, gif: Sdx.Image.FileType.GIF)) // ここでエラーになるようにしています。
+        ;
+        sdxImg = new Sdx.Image(stream);
+        Assert.False(validatorSet.IsValid(sdxImg));
+        Assert.Equal(2, validatorSet.Errors.Count);
+        Assert.Equal("幅が100より小さい画像を入力してください。", validatorSet.Errors[0].Message);
+        Assert.Equal("拡張子が「PNG,GIF」の画像を入力してください。", validatorSet.Errors[1].Message);
       }
 
     }

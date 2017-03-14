@@ -8,9 +8,6 @@ namespace Sdx.Validation.Image
 {
   public class Type : Validator
   {
-    public const string Jpeg = "JPEG";
-    public const string png = "PNG";
-    public const string gif = "GIF";
     public const string ErrorOtherThanTargetFormat = "ErrorOtherThanTargetFormat";
 
     protected override string GetDefaultMessage(string errorType)
@@ -57,38 +54,19 @@ namespace Sdx.Validation.Image
         this.FormatList.Add(Sdx.Image.FileType.GIF);
       }
 
+      Sdx.Diagnostics.Debug.DumpToFile(this.FormatList, "/dump/Image_type.txt");
     }
 
     protected override bool IsValidImage(Sdx.Image value)
     {
-      if(this.FormatList.IndexOf(Sdx.Image.FileType.JPEG) > -1)
-      {
-        if (value.Type != Sdx.Image.FileType.JPEG)
-        {
-          this.AddError(ErrorOtherThanTargetFormat);
-          return false;
+      foreach(var format in this.FormatList){
+        if(format == value.Type){
+          return true;
         }
       }
 
-      if(this.FormatList.IndexOf(Sdx.Image.FileType.PNG) > -1)
-      {
-        if (value.Type != Sdx.Image.FileType.PNG)
-        {
-          this.AddError(ErrorOtherThanTargetFormat);
-          return false;
-        }
-      }
-
-      if(this.FormatList.IndexOf(Sdx.Image.FileType.GIF) > -1)
-      {
-        if (value.Type != Sdx.Image.FileType.GIF)
-        {
-          this.AddError(ErrorOtherThanTargetFormat);
-          return false;
-        }
-      }
-
-      return true;
+      this.AddError(ErrorOtherThanTargetFormat);
+      return false;
     }
   }
 }
