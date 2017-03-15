@@ -77,6 +77,7 @@ namespace Sdx
 
     /// <summary>
     /// ファイルの形式(拡張子)を返す。
+    /// 戻り値はSdx.Image.Format(enum型)。
     /// </summary>
     public Sdx.Image.Format? Type
     {
@@ -95,7 +96,7 @@ namespace Sdx
       {
         if (ici.FormatID == this.Bitmap.RawFormat.Guid)
         {
-          //該当するFormatDescriptionを返す。
+          //該当するFormatDescriptionがあったら、値をSdx.Image.Formatにキャストして返す。
           return (Sdx.Image.Format)(Enum.Parse(typeof(Sdx.Image.Format), ici.FormatDescription, false));
         }
       }
