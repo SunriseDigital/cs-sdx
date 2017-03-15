@@ -431,14 +431,17 @@ namespace Sdx.Db.Sql
     }
 
     /// <summary>
-    /// 渡ってきたカラムをGroupに
+    /// 渡ってきたカラム名をGroupに追加
     /// </summary>
     /// <returns></returns>
     public Context AddColumnsToGroup(IEnumerable<string> columns)
     {
       foreach (var column in columns)
       {
-        AddGroup(column);
+        if(Table.OwnMeta.HasColumn(column))
+        {
+          AddGroup(column);
+        }
       }
 
       return this;
