@@ -53,8 +53,6 @@ namespace Sdx.Validation.Image
         }
         this.FormatList.Add(Sdx.Image.Format.GIF);
       }
-
-      Sdx.Diagnostics.Debug.DumpToFile(this.FormatList, "/dump/Image_type.txt");
     }
 
     protected override bool IsValidImage(Sdx.Image value)
