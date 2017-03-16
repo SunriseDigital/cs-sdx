@@ -29,6 +29,7 @@ namespace Sdx.Diagnostics
       Object value,
       String title = "",
       int dumpPublicMemberCount = 0,
+      string startIndent = "",
       [CallerFilePath] string fileName = "",
       [CallerLineNumber] int lineNumber = 0,
       [CallerMemberName] string memberName = ""
@@ -45,7 +46,8 @@ namespace Sdx.Diagnostics
       }
       
       Out.WriteLine(String.Format(
-        "[{0}/{1} sec] {2} {3}({4}) - {5}",
+        "{0}[{1}/{2} sec] {3} {4}({5}) - {6}",
+        startIndent,
         FormatStopwatchTicks(delta),
         FormatStopwatchTicks(currentTicks),
         title,
@@ -54,7 +56,7 @@ namespace Sdx.Diagnostics
         memberName
       ));
       prevTimerElapsedTicks = currentTicks;
-      Out.WriteLine(Dump(value, dumpPublicMemberCount));
+      Out.WriteLine(Dump(value, dumpPublicMemberCount, startIndent));
       Out.WriteLine();
       Out.WriteLine();
     }
@@ -89,9 +91,9 @@ namespace Sdx.Diagnostics
       return Dump(value, "", false, dumpPublicMemberCount);
     }
 
-    public static string Dump(object value, int dumpPublicMemberCount = 0)
+    public static string Dump(object value, int dumpPublicMemberCount = 0, string startIndent = "")
     {
-      return Dump(value, "", true, dumpPublicMemberCount);
+      return Dump(value, startIndent, true, dumpPublicMemberCount);
     }
 
     /// <summary>
