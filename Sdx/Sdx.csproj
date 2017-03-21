@@ -109,7 +109,7 @@
     <Compile Include="Image.cs" />
     <Compile Include="Util\DateTimeSpan.cs" />
     <Compile Include="Util\Yaml.cs" />
-    <Compile Include="Validation\Base\Validator.cs" />
+    <Compile Include="Validation\Base.cs" />
     <Compile Include="Validation\Function.cs" />
     <Compile Include="Validation\Group\Base.cs" />
     <Compile Include="Validation\Group\Function.cs" />
