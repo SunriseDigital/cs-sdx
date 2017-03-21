@@ -12,24 +12,24 @@ namespace Sdx
   {
     public enum Format
     {
-      /// <summary>それ以外 : 0</summary>
-      NONE = 0,
-      /// <summary>JPEG(jpg, jpeg, jpe, jfif) : 1</summary>
-      JPEG = 1,
-      /// <summary>GIF(gif) : 2</summary>
-      GIF = 2,
-      /// <summary>PNG(png) : 4</summary>
-      PNG = 4,
-      /// <summary>BMP(bmp, dib, rle) : 8</summary>
-      BMP = 8,
-      /// <summary>TIFF(tif, tiff) : 16</summary>
-      TIFF = 16,
-      /// <summary>EMF(emf) : 32</summary>
-      EMF = 32,
+      /// <summary>それ以外</summary>
+      NONE,
+      /// <summary>JPEG(jpg, jpeg, jpe, jfif)</summary>
+      JPEG,
+      /// <summary>GIF(gif)</summary>
+      GIF,
+      /// <summary>PNG(png)</summary>
+      PNG,
+      /// <summary>BMP(bmp, dib, rle)</summary>
+      BMP,
+      /// <summary>TIFF(tif, tiff)</summary>
+      TIFF,
+      /// <summary>EMF(emf)</summary>
+      EMF,
       /// <summary>WMF(wmf) : 64</summary>
-      WMF = 64,
+      WMF,
       /// <summary>ICON(ico) : 128</summary>
-      ICON = 128,
+      ICON,
     }
 
     Stream stream;
