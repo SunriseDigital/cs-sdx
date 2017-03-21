@@ -438,10 +438,7 @@ namespace Sdx.Db.Sql
     {
       foreach (var column in columns)
       {
-        if(Table.OwnMeta.HasColumn(column))
-        {
-          AddGroup(column);
-        }
+        AddGroup(column);
       }
 
       return this;
