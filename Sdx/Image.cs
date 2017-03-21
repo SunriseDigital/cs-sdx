@@ -79,14 +79,14 @@ namespace Sdx
     /// ファイルの形式(拡張子)を返す。
     /// 戻り値はSdx.Image.Format(enum型)。
     /// </summary>
-    public Sdx.Image.Format? Type
+    public Sdx.Image.Format Type
     {
       get {
         if(this.type == null){
           this.type = this.GetType();
         }
 
-        return this.type;
+        return (Sdx.Image.Format)this.type;
       }
     }
 

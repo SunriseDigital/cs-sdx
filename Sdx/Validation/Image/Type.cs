@@ -26,28 +26,28 @@ namespace Sdx.Validation.Image
 
     public List<Sdx.Image.Format> FormatList = new List<Sdx.Image.Format>();
 
-    public Type(Sdx.Image.Format? jpeg = null, Sdx.Image.Format? png = null, Sdx.Image.Format? gif = null)
+    public Type(Sdx.Image.Format jpeg = Sdx.Image.Format.NONE, Sdx.Image.Format png = Sdx.Image.Format.NONE, Sdx.Image.Format gif = Sdx.Image.Format.NONE)
     {
-      if (jpeg == null && png == null && gif == null)
+      if (jpeg == Sdx.Image.Format.NONE && png == Sdx.Image.Format.NONE && gif == Sdx.Image.Format.NONE)
       {
-        throw new ArgumentNullException("jpeg and png and gif are both null.");
+        throw new ArgumentNullException("jpeg,png,gif", "jpeg and png and gif are both null.");
       }
 
-      if(jpeg != null){
+      if(jpeg != Sdx.Image.Format.NONE){
         if(jpeg != Sdx.Image.Format.JPEG){
           throw new Exception("The argument value of jpeg is different");
         }
         this.FormatList.Add(Sdx.Image.Format.JPEG);
       }
 
-      if(png != null){
+      if(png != Sdx.Image.Format.NONE){
         if(png != Sdx.Image.Format.PNG){
           throw new Exception("The argument value of png is different");
         }
         this.FormatList.Add(Sdx.Image.Format.PNG);
       }
 
-      if(gif != null){
+      if(gif != Sdx.Image.Format.NONE){
         if(gif != Sdx.Image.Format.GIF){
           throw new Exception("The argument value of gif is different");
         }

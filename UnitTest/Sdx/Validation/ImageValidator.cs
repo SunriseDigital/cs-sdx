@@ -347,8 +347,25 @@ namespace UnitTest
     [Fact]
     public void TestType()
     {
-      //PNG
+      //Typeが何も指定されていない
       var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\80x80.png";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        try
+        {
+          var sdxImg = new Sdx.Image(stream);
+          var validator = new Sdx.Validation.Image.Type();
+          var isValid = validator.IsValid(sdxImg);
+        }
+        catch(ArgumentNullException e)
+        {
+          Sdx.Diagnostics.Debug.DumpToFile(e.Message, "/dump/test_type.txt");
+          Assert.Equal("jpeg and png and gif are both null.\r\nパラメーター名:jpeg,png,gif", e.Message);
+        }
+      }
+
+      //PNG
+      filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\80x80.png";
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
