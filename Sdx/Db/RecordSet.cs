@@ -320,5 +320,10 @@ namespace Sdx.Db
       Sort((rec1, rec2) => random.Next(-1, 1));
       return this;
     }
+
+    public void MergeRecordSet(RecordSet recordSet)
+    {
+      recordSet.ForEach(rec => AddRecord(rec));
+    }
   }
 }

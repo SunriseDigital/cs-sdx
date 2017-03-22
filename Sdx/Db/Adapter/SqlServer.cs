@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace Sdx.Db.Adapter
 {
@@ -62,7 +63,7 @@ namespace Sdx.Db.Adapter
       select.AfterOrderFunc = (sel) => {
         if (sel.Limit >= 0)
         {
-          if (select.OrderList.Count == 0)
+          if (sel.OrderList.Count == 0)
           {
             throw new InvalidOperationException("Needs ORDER BY statement to use OFFSET/LIMIT on SQLServer.");
           }
