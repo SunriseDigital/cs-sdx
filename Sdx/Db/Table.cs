@@ -253,7 +253,8 @@ isPkey: {5}",
 
     public Table AddColumn(Sql.Expr expr, string alias = null)
     {
-      Select.ColumnList.Add(new Sql.Column(expr, this.Context.Name, NormalizeAlias(expr, alias)));
+      //exprの時はテーブル名はつけないのでContextNameはnull
+      Select.ColumnList.Add(new Sql.Column(expr, null, NormalizeAlias(expr, alias)));
       return this;
     }
 

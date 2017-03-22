@@ -293,7 +293,8 @@ namespace Sdx.Db.Sql
 
     public Context AddColumn(Expr expr, string alias = null)
     {
-      this.Select.ColumnList.Add(new Column(expr, this.Name, alias));
+      //exprの時はテーブル名はつけないのでContextNameはnull
+      this.Select.ColumnList.Add(new Column(expr, null, alias));
       return this;
     }
 
