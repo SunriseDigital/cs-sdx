@@ -7,41 +7,42 @@ namespace Sdx.Collection
 {
   public class NameValueCollection : System.Collections.Specialized.NameValueCollection
   {
-    public int GetInt32Value(string key)
+    public NameValueCollection()
     {
-      return Int32.Parse(this[key]);
+
     }
 
-    public bool IsInt32(string key)
+    public NameValueCollection(System.Collections.Specialized.NameValueCollection nameValueCollection)
+      : base(nameValueCollection)
     {
-      return GetValues(key).All(val => {
-        int i;
-        return Int32.TryParse(val, out i);
-      });
+
     }
 
-    public IEnumerable<int> GetInt32Values(string key)
+    public IEnumerable<Dictionary<string, string>> GetDictionaryValues(string groupKey, string delim = "@")
     {
-      return GetValues(key).Select(val => Int32.Parse(val));
-    }
+      var result  = new List<Dictionary<string, string>>();
+      var prefix = groupKey + delim;
+      var keys = AllKeys.Where(k => k.StartsWith(prefix));
 
-    public bool IsDateTime(string key)
-    {
-      return GetValues(key).All(val =>
+      foreach (var key in keys)
       {
-        DateTime i;
-        return DateTime.TryParse(val, out i);
-      });
-    }
+        var index = 0;
+        foreach(var value in GetValues(key))
+        {
+          var dic = result.ElementAtOrDefault(index);
+          if(dic == null)
+          {
+            dic = new Dictionary<string, string>();
+            result.Add(dic);
+          }
 
-    public DateTime GetDateTimeValue(string key)
-    {
-      return DateTime.Parse(this[key]);
-    }
+          dic[key.Substring(prefix.Length)] = value;
 
-    public IEnumerable<DateTime> GetDateTimeValues(string key)
-    {
-      return GetValues(key).Select(val => DateTime.Parse(val));
+          ++index;
+        }
+      }
+
+      return result;
     }
   }
 }

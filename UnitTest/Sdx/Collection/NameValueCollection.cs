@@ -10,6 +10,8 @@ using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 #endif
 
 using System;
+using System.Linq;
+using System.Collections.Generic;
 
 namespace UnitTest
 {
@@ -35,21 +37,40 @@ namespace UnitTest
       //@see FixtureSetUp
     }
 
-
     [Fact]
-    public void TestType()
+    public void TestDictionary()
     {
       var param = new Sdx.Collection.NameValueCollection();
-      param.Add("int", "1");
-      param.Add("datetime", "2017-03-01");
+      param.Add("dic@id", "1");
+      param.Add("dic@name", "foobar");
+      param.Add("dic@date", "2017-03-01");
 
-      Assert.True(param.IsInt32("int"));
-      Assert.Equal(1, param.GetInt32Value("int"));
-      Assert.Equal(new int[]{1}, param.GetInt32Values("int"));
+      param.Add("dic@id", "2");
+      param.Add("dic@name", "hoge");
+      param.Add("dic@date", "2017-03-02");
 
-      Assert.True(param.IsDateTime("datetime"));
-      Assert.Equal("2017-03-01", param.GetDateTimeValue("datetime").ToString("yyyy-MM-dd"));
-      Assert.Equal(new string[] { "2017-03-01" }, param.GetDateTimeValues("datetime").Select(val => val.ToString("yyyy-MM-dd")));
+      param.Add("dic@id", "3");
+      param.Add("dic@name", "");
+      param.Add("dic@date", "2017-03-03");
+
+      var expectedDics = new List<Dictionary<string, string>>{
+        new Dictionary<string, string>{
+          {"id", "1"},
+          {"name", "foobar"},
+          {"date", "2017-03-01"}
+        },
+        new Dictionary<string, string>{
+          {"id", "2"},
+          {"name", "hoge"},
+          {"date", "2017-03-02"}
+        },
+        new Dictionary<string, string>{
+          {"id", "3"},
+          {"name", ""},
+          {"date", "2017-03-03"}
+        }
+      };
+      Assert.Equal(expectedDics, param.GetDictionaryValues("dic", "@"));
     }
   }
 }
