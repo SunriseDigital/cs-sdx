@@ -111,6 +111,7 @@
     <Compile Include="Validation\Function.cs" />
     <Compile Include="Validation\Group\Base.cs" />
     <Compile Include="Validation\Group\Function.cs" />
+    <Compile Include="Validation\ValidatorSet.cs" />
     <Compile Include="Web\DeviceRedirectHttpModule.cs" />
     <Compile Include="Web\DeviceTable.cs" />
     <Compile Include="Web\HttpModule.cs" />
