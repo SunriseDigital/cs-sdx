@@ -26,33 +26,9 @@ namespace Sdx.Validation.Image
 
     public List<Sdx.Image.Format> FormatList = new List<Sdx.Image.Format>();
 
-    public Type(Sdx.Image.Format jpeg = Sdx.Image.Format.NONE, Sdx.Image.Format png = Sdx.Image.Format.NONE, Sdx.Image.Format gif = Sdx.Image.Format.NONE)
+    public Type(params Sdx.Image.Format[] types)
     {
-      if (jpeg == Sdx.Image.Format.NONE && png == Sdx.Image.Format.NONE && gif == Sdx.Image.Format.NONE)
-      {
-        throw new ArgumentNullException("jpeg,png,gif", "jpeg and png and gif are both null.");
-      }
-
-      if(jpeg != Sdx.Image.Format.NONE){
-        if(jpeg != Sdx.Image.Format.JPEG){
-          throw new Exception("The argument value of jpeg is different");
-        }
-        this.FormatList.Add(Sdx.Image.Format.JPEG);
-      }
-
-      if(png != Sdx.Image.Format.NONE){
-        if(png != Sdx.Image.Format.PNG){
-          throw new Exception("The argument value of png is different");
-        }
-        this.FormatList.Add(Sdx.Image.Format.PNG);
-      }
-
-      if(gif != Sdx.Image.Format.NONE){
-        if(gif != Sdx.Image.Format.GIF){
-          throw new Exception("The argument value of gif is different");
-        }
-        this.FormatList.Add(Sdx.Image.Format.GIF);
-      }
+      this.FormatList.AddRange(types);
     }
 
     protected override bool IsValidImage(Sdx.Image value)
