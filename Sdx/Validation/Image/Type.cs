@@ -18,7 +18,7 @@ namespace Sdx.Validation.Image
       switch (errorType)
       {
         case ErrorOtherThanTargetFormat:
-          return Sdx.I18n.GetString("拡張子が「{0}」の画像を入力してください。", messageValue);
+          return Sdx.I18n.GetString("「{0}」が登録可能です。", messageValue);
         default:
           return null;
       }
