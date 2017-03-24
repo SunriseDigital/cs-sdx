@@ -20,7 +20,7 @@ namespace Sdx.Validation
 
     public ValidatorSet()
     {
-      this.Errors = new Validation.Errors();
+
     }
 
     public IEnumerable<Validation.Validator> Validators
@@ -45,7 +45,7 @@ namespace Sdx.Validation
     public bool IsValid(string value)
     {
       var result = true;
-      this.Errors.Clear();
+      this.Errors = new Validation.Errors();
 
       foreach (var wrapper in validators)
       {
