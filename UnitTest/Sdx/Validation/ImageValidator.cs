@@ -453,5 +453,25 @@ namespace UnitTest
         Assert.Equal("「JPEG,PNG,GIF」が登録可能です。", validator.Errors[0].Message);
       }
     }
+
+    [Fact]
+    public void TestNotEmpty()
+    {
+      var filePath = "C:\\Projects\\cs-sdx\\UnitTest\\test_image\\80x80.png";
+      using (FileStream stream = File.OpenRead(filePath))
+      {
+        var validator = new Sdx.Validation.Image.NotEmpty();
+        var isValid = validator.IsValid(null);
+        Assert.False(isValid);
+        Assert.Equal(1, validator.Errors.Count);
+        Assert.Equal("必須項目です。", validator.Errors[0].Message);
+
+        var sdxImg = new Sdx.Image(stream);
+        validator = new Sdx.Validation.Image.NotEmpty();
+        isValid = validator.IsValid(sdxImg);
+        Assert.True(isValid);
+        Assert.Equal(0, validator.Errors.Count);
+      }
+    }
   }
 }

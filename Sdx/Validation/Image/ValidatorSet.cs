@@ -8,7 +8,12 @@ namespace Sdx.Validation.Image
 {
   public class ValidatorSet
   {
-    private List<Dictionary<string, object>> validators = new List<Dictionary<string, object>>();
+    private class ValidatorWrapper
+    {
+      public Validation.Image.Validator Validator { get; set; }
+      public bool BreakChain { get; set; }
+    }
+    private List<ValidatorWrapper> validators = new List<ValidatorWrapper>();
     public Validation.Errors Errors { get; private set; }
     public bool IsAllowEmpty { get; set; }
 
@@ -21,19 +26,16 @@ namespace Sdx.Validation.Image
     {
       get
       {
-        foreach(var dic in validators)
+        foreach (var wrapper in validators)
         {
-          yield return (Validation.Image.Validator)dic["validator"];
+          yield return wrapper.Validator;
         }
       }
     }
 
     public ValidatorSet AddValidator(Validation.Image.Validator validator, bool breakChain = false)
     {
-      validators.Add(new Dictionary<string, object> {
-        {"validator", validator},
-        {"breakChain", breakChain}
-      });
+      validators.Add(new ValidatorWrapper { Validator = validator, BreakChain = breakChain });
 
       return this;
     }
@@ -44,19 +46,16 @@ namespace Sdx.Validation.Image
       var result = true;
       this.Errors = new Validation.Errors();
 
-      foreach (var val in validators)
+      foreach (var wrapper in validators)
       {
-        var validator = (Validation.Image.Validator)val["validator"];
-        var breakChain = (bool)val["breakChain"];
-
-        validator.Errors = this.Errors;
-        bool isValid = validator.IsValid(image);
+        wrapper.Validator.Errors = this.Errors;
+        bool isValid = wrapper.Validator.IsValid(image);
 
         if (!isValid)
         {
-          validator.Errors = null;
+          wrapper.Validator.Errors = null;
           result = false;
-          if (breakChain)
+          if (wrapper.BreakChain)
           {
             break;
           }
