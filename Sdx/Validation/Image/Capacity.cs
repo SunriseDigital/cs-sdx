@@ -30,13 +30,10 @@ namespace Sdx.Validation.Image
 
     protected override bool IsValidImage(Sdx.Image value)
     {
-      if(this.MaxCapacity != null)
+      if (value.Size >= this.MaxCapacity)
       {
-        if (value.Size >= this.MaxCapacity)
-        {
-          this.AddError(ErrorOverCapacityLimit);
-          return false;
-        }
+        this.AddError(ErrorOverCapacityLimit);
+        return false;
       }
 
       return true;
