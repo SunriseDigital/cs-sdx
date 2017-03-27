@@ -103,6 +103,5 @@ namespace Sdx
 
       return Sdx.Image.Format.NONE;
     }
-
   }
 }

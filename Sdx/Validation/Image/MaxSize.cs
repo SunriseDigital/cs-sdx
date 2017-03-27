@@ -8,34 +8,34 @@ namespace Sdx.Validation.Image
 {
   public class MaxSize : Validator
   {
-    public const string ErrorOverWidhtLimit = "ErrorOverWidhtLImit";
-    public const string ErrorOverHeightLimit = "ErrorOverHeightLImit";
+    public const string ErrorOverWidthLimit = "ErrorOverWidthLimit";
+    public const string ErrorOverHeightLimit = "ErrorOverHeightLimit";
 
     protected override string GetDefaultMessage(string errorType)
     {
       switch (errorType)
       {
-        case ErrorOverWidhtLimit:
-          return Sdx.I18n.GetString("高さが{0}より小さい画像を入力してください。", MaxHeight);
+        case ErrorOverWidthLimit:
+          return Sdx.I18n.GetString("高さが{0}より小さい画像が登録可能です。", MaxHeight);
         case ErrorOverHeightLimit:
-          return Sdx.I18n.GetString("幅が{0}より小さい画像を入力してください。", MaxWidht);
+          return Sdx.I18n.GetString("幅が{0}より小さい画像が登録可能です。", MaxWidth);
         default:
           return null;
       }
     }
 
     public int? MaxHeight { get; set; }
-    public int? MaxWidht { get; set; }
+    public int? MaxWidth { get; set; }
 
-    public MaxSize(int? height = null, int? widht = null)
+    public MaxSize(int? height = null, int? width = null)
     {
-      if (height == null && widht == null)
+      if (height == null && width == null)
       {
         throw new ArgumentNullException("min and max are both null.");
       }
 
       this.MaxHeight = height;
-      this.MaxWidht = widht;
+      this.MaxWidth = width;
     }
 
     protected override bool IsValidImage(Sdx.Image value)
@@ -44,13 +44,13 @@ namespace Sdx.Validation.Image
       {
         if (value.Height >= this.MaxHeight)
         {
-          this.AddError(ErrorOverWidhtLimit);
+          this.AddError(ErrorOverWidthLimit);
         }
       }
 
-      if(this.MaxWidht != null)
+      if(this.MaxWidth != null)
       {
-        if (value.Width >= this.MaxWidht)
+        if (value.Width >= this.MaxWidth)
         {
           this.AddError(ErrorOverHeightLimit);
         }

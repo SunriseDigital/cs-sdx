@@ -15,7 +15,7 @@ namespace Sdx.Validation.Image
       switch (errorType)
       {
         case ErrorOverCapacityLimit:
-          return Sdx.I18n.GetString("{0}バイトより小さいサイズの画像を入力してください。", MaxCapacity);
+          return Sdx.I18n.GetString("{0}より小さいサイズの画像が登録可能です。", Sdx.Util.Number.BytesToHumanRedable(MaxCapacity));
         default:
           return null;
       }
@@ -23,20 +23,17 @@ namespace Sdx.Validation.Image
 
     public int MaxCapacity { get; set; }
 
-    public Capacity(int capacity)
+    public Capacity(int bytes)
     {
-      this.MaxCapacity = capacity;
+      this.MaxCapacity = bytes;
     }
 
     protected override bool IsValidImage(Sdx.Image value)
     {
-      if(this.MaxCapacity != null)
+      if (value.Size >= this.MaxCapacity)
       {
-        if (value.Size >= this.MaxCapacity)
-        {
-          this.AddError(ErrorOverCapacityLimit);
-          return false;
-        }
+        this.AddError(ErrorOverCapacityLimit);
+        return false;
       }
 
       return true;
