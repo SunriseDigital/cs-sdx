@@ -61,6 +61,18 @@ namespace Sdx.Db.Sql
       return this;
     }
 
+    public Condition AddIsNull(Column column)
+    {
+      this.AddWithColumn(column, null, Logical.And, Comparison.Equal, Type.NullCompare);
+      return this;
+    }
+
+    public Condition AddIsNotNull(Column column)
+    {
+      this.AddWithColumn(column, null, Logical.And, Comparison.NotEqual, Type.NullCompare);
+      return this;
+    }
+
     public Condition Add(Condition condition)
     {
       this.AddWithCondition(condition, Logical.And, Type.Free);
@@ -96,7 +108,6 @@ namespace Sdx.Db.Sql
       this.AddWithColumn(new Column(column, this.ContextName), value, Logical.Or, comparison, Type.Comparison);
       return this;
     }
-
 
     public Condition AddIsNull(string column)
     {
