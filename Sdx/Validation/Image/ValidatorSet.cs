@@ -40,6 +40,13 @@ namespace Sdx.Validation.Image
       return this;
     }
 
+    /// <summary>
+    /// バリデーションをする必要がないシチュエーションで呼んでください。例えば画像は編集時、更新がないと何も飛んできませんが、物と画像があったときはバリデーションそのものをする必要がありません。
+    /// </summary>
+    public void Ignore()
+    {
+      this.Errors = new Validation.Errors();
+    }
 
     public bool IsValid(Sdx.Image image)
     {
