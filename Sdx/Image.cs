@@ -103,20 +103,5 @@ namespace Sdx
 
       return Sdx.Image.Format.NONE;
     }
-
-    /// <summary>
-    /// postedFileがNULLの時NULLを返します。Validationしやすいように作りました。
-    /// </summary>
-    /// <param name="postedFile"></param>
-    /// <returns></returns>
-    public static Image Create(System.Web.HttpPostedFile postedFile)
-    {
-      if(postedFile == null)
-      {
-        return null;
-      }
-
-      return new Image(postedFile.InputStream);
-    }
   }
 }
