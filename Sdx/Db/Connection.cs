@@ -14,7 +14,7 @@ namespace Sdx.Db
 
     public Adapter.Base Adapter { get; private set; }
 
-    private DbConnection DbConnection { get; set; }
+    public DbConnection DbConnection { get; private set; }
 
     private DbTransaction DbTransaction { get; set; }
 
