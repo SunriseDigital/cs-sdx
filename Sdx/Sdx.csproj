@@ -118,6 +118,7 @@
     <Compile Include="Validation\Image\MaxSize.cs" />
     <Compile Include="Validation\Image\MinSize.cs" />
     <Compile Include="Validation\Image\NotEmpty.cs" />
+    <Compile Include="Validation\Image\Size.cs" />
     <Compile Include="Validation\Image\Type.cs" />
     <Compile Include="Validation\Image\Validator.cs" />
     <Compile Include="Validation\Image\ValidatorSet.cs" />

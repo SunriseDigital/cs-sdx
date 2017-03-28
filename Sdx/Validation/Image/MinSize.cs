@@ -16,9 +16,9 @@ namespace Sdx.Validation.Image
       switch (errorType)
       {
         case ErrorUnderWidthLimit:
-          return Sdx.I18n.GetString("高さが{0}より大きい画像が登録可能です。", MinHeight);
+          return Sdx.I18n.GetString("高さが{0}px以上の画像が登録可能です。", MinHeight);
         case ErrorUnderHeightLimit:
-          return Sdx.I18n.GetString("幅が{0}より大きい画像が登録可能です。", MinWidth);
+          return Sdx.I18n.GetString("幅が{0}px以上の画像が登録可能です。", MinWidth);
         default:
           return null;
       }
@@ -42,7 +42,7 @@ namespace Sdx.Validation.Image
     {
       if(this.MinHeight != null)
       {
-        if (value.Height <= this.MinHeight)
+        if (value.Height < this.MinHeight)
         {
           this.AddError(ErrorUnderWidthLimit);
         }
@@ -50,7 +50,7 @@ namespace Sdx.Validation.Image
 
       if(this.MinWidth != null)
       {
-        if (value.Width <= this.MinWidth)
+        if (value.Width < this.MinWidth)
         {
           this.AddError(ErrorUnderHeightLimit);
         }
