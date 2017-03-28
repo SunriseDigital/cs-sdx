@@ -73,7 +73,7 @@ namespace UnitTest
       Sdx.Context.Current.Culture = new CultureInfo("ja-JP");
 
       //JPEG
-      var filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\100x100.jpg";
+      var filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/100x100.jpg".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -85,7 +85,7 @@ namespace UnitTest
       }
 
       //PNG
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\80x80.png";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/80x80.png".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -98,7 +98,7 @@ namespace UnitTest
 
 
       //GIF
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\acrobat.gif";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/acrobat.gif".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -109,7 +109,7 @@ namespace UnitTest
         Assert.Equal(46468 , sdxImg.Size);
       }
 
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\preloader-2-128px-1.gif";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/preloader-2-128px-1.gif".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -124,7 +124,7 @@ namespace UnitTest
     [Fact]
     public void TestValidatorSet()
     {
-      var filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\100x100.jpg";
+      var filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/100x100.jpg".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         //許容範囲
@@ -250,7 +250,7 @@ namespace UnitTest
     [Fact]
     public void TestMaxSize()
     {
-      var filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\100x100.jpg";
+      var filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/100x100.jpg".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -286,7 +286,7 @@ namespace UnitTest
     [Fact]
     public void TestMinSize()
     {
-      var filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\100x100.jpg";
+      var filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/100x100.jpg".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -326,7 +326,7 @@ namespace UnitTest
     [Fact]
     public void TestCapacity()
     {
-      var filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\100x100.jpg";
+      var filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/100x100.jpg".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -348,7 +348,7 @@ namespace UnitTest
     public void TestType()
     {
       //Typeが何も指定されていない
-      var filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\80x80.png";
+      var filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/80x80.png".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         try
@@ -359,13 +359,12 @@ namespace UnitTest
         }
         catch(ArgumentNullException e)
         {
-          Sdx.Diagnostics.Debug.DumpToFile(e.Message, "/dump/test_type.txt");
           Assert.Equal("jpeg and png and gif are both null.\r\nパラメーター名:jpeg,png,gif", e.Message);
         }
       }
 
       //PNG
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\80x80.png";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/80x80.png".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -375,7 +374,7 @@ namespace UnitTest
         Assert.Equal(0, validator.Errors.Count);
       }
 
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\acrobat.gif";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/acrobat.gif".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -387,7 +386,7 @@ namespace UnitTest
       }
 
       //GIF
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\acrobat.gif";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/acrobat.gif".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -397,7 +396,7 @@ namespace UnitTest
         Assert.Equal(0, validator.Errors.Count);
       }
 
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\80x80.png";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/80x80.png".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -409,7 +408,7 @@ namespace UnitTest
       }
 
       //JPEG
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\100x100.jpg";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/100x100.jpg".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -419,7 +418,7 @@ namespace UnitTest
         Assert.Equal(0, validator.Errors.Count);
       }
 
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\80x80.png";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/80x80.png".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -431,7 +430,7 @@ namespace UnitTest
       }
 
       //複数バリデーション
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\100x100.jpg";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/100x100.jpg".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -442,7 +441,7 @@ namespace UnitTest
         Assert.Equal("「PNG,GIF」が登録可能です。", validator.Errors[0].Message);
       }
 
-      filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\bitmap_test_image.bmp";
+      filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/bitmap_test_image.bmp".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
@@ -457,7 +456,7 @@ namespace UnitTest
     [Fact]
     public void TestNotEmpty()
     {
-      var filePath = AppDomain.CurrentDomain.BaseDirectory + "\\test_image\\80x80.png";
+      var filePath = AppDomain.CurrentDomain.BaseDirectory + "/test_image/80x80.png".Replace('/', System.IO.Path.DirectorySeparatorChar);
       using (FileStream stream = File.OpenRead(filePath))
       {
         var validator = new Sdx.Validation.Image.NotEmpty();
