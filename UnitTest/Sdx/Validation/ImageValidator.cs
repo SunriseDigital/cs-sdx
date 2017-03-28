@@ -140,60 +140,60 @@ namespace UnitTest
         //maxHeightだけ引っかかる
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 100, width: 101))
+        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 99, width: 101))
         .AddValidator(new Sdx.Validation.Image.MinSize(height: 90, width: 90))
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(1, validatorSet.Errors.Count);
-        Assert.Equal("高さが100より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
+        Assert.Equal("高さが99より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
 
         //maxWidhtだけ引っかかる
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 100))
+        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 99))
         .AddValidator(new Sdx.Validation.Image.MinSize(height: 90, width: 90))
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(1, validatorSet.Errors.Count);
-        Assert.Equal("幅が100より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
+        Assert.Equal("幅が99より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
 
         //maxHeightとmaxWidhtだけ引っかかる
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 100, width: 100))
+        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 99, width: 99))
         .AddValidator(new Sdx.Validation.Image.MinSize(height: 90, width: 90))
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(2, validatorSet.Errors.Count);
-        Assert.Equal("高さが100より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
-        Assert.Equal("幅が100より小さい画像が登録可能です。", validatorSet.Errors[1].Message);
+        Assert.Equal("高さが99より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
+        Assert.Equal("幅が99より小さい画像が登録可能です。", validatorSet.Errors[1].Message);
 
         //maxHeightとminWidhtだけ引っかかる
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 100, width: 101))
-        .AddValidator(new Sdx.Validation.Image.MinSize(height: 90, width: 100))
+        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 99, width: 110))
+        .AddValidator(new Sdx.Validation.Image.MinSize(height: 90, width: 101))
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(2, validatorSet.Errors.Count);
-        Assert.Equal("高さが100より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
-        Assert.Equal("幅が100より大きい画像が登録可能です。", validatorSet.Errors[1].Message);
+        Assert.Equal("高さが99より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
+        Assert.Equal("幅が101より大きい画像が登録可能です。", validatorSet.Errors[1].Message);
 
         //maxWidhtとminHeightだけ引っかかる
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 100))
-        .AddValidator(new Sdx.Validation.Image.MinSize(height: 100, width: 90))
+        .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 99))
+        .AddValidator(new Sdx.Validation.Image.MinSize(height: 101, width: 90))
         ;
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(2, validatorSet.Errors.Count);
-        Assert.Equal("幅が100より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
-        Assert.Equal("高さが100より大きい画像が登録可能です。", validatorSet.Errors[1].Message);
+        Assert.Equal("幅が99より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
+        Assert.Equal("高さが101より大きい画像が登録可能です。", validatorSet.Errors[1].Message);
 
         //■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■ total ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
@@ -233,7 +233,7 @@ namespace UnitTest
 
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
         validatorSet
-          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 100)) //ここでエラーになるようにしています。
+          .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 99)) //ここでエラーになるようにしています。
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, width: 99))
           .AddValidator(new Sdx.Validation.Image.Capacity(3000))
           .AddValidator(new Sdx.Validation.Image.Type(Sdx.Image.Format.PNG, Sdx.Image.Format.GIF)) // ここでエラーになるようにしています。
@@ -241,7 +241,7 @@ namespace UnitTest
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(2, validatorSet.Errors.Count);
-        Assert.Equal("幅が100より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
+        Assert.Equal("幅が99より小さい画像が登録可能です。", validatorSet.Errors[0].Message);
         Assert.Equal("「PNG,GIF」が登録可能です。", validatorSet.Errors[1].Message);
       }
 
@@ -293,27 +293,27 @@ namespace UnitTest
         Assert.Equal(100, sdxImg.Width);
         Assert.Equal(100, sdxImg.Height);
 
-        var validator = new Sdx.Validation.Image.MinSize(height: 100, width: 100);
+        var validator = new Sdx.Validation.Image.MinSize(height: 101, width: 101);
         var isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         var count = validator.Errors.Count;
         Assert.Equal(2, count);
-        Assert.Equal("高さが100より大きい画像が登録可能です。", validator.Errors[0].Message);
-        Assert.Equal("幅が100より大きい画像が登録可能です。", validator.Errors[1].Message);
+        Assert.Equal("高さが101より大きい画像が登録可能です。", validator.Errors[0].Message);
+        Assert.Equal("幅が101より大きい画像が登録可能です。", validator.Errors[1].Message);
 
-        validator = new Sdx.Validation.Image.MinSize(height: 99, width: 100);
+        validator = new Sdx.Validation.Image.MinSize(height: 99, width: 101);
         isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         count = validator.Errors.Count;
         Assert.Equal(1, count);
-        Assert.Equal("幅が100より大きい画像が登録可能です。", validator.Errors[0].Message);
+        Assert.Equal("幅が101より大きい画像が登録可能です。", validator.Errors[0].Message);
 
-        validator = new Sdx.Validation.Image.MinSize(height: 100, width: 99);
+        validator = new Sdx.Validation.Image.MinSize(height: 101, width: 99);
         isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         count = validator.Errors.Count;
         Assert.Equal(1, count);
-        Assert.Equal("高さが100より大きい画像が登録可能です。", validator.Errors[0].Message);
+        Assert.Equal("高さが101より大きい画像が登録可能です。", validator.Errors[0].Message);
 
         validator = new Sdx.Validation.Image.MinSize(height: 99, width: 99);
         isValid = validator.IsValid(sdxImg);

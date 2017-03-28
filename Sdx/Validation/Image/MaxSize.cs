@@ -42,7 +42,7 @@ namespace Sdx.Validation.Image
     {
       if(this.MaxHeight != null)
       {
-        if (value.Height >= this.MaxHeight)
+        if (value.Height > this.MaxHeight)
         {
           this.AddError(ErrorOverWidthLimit);
         }
@@ -50,7 +50,7 @@ namespace Sdx.Validation.Image
 
       if(this.MaxWidth != null)
       {
-        if (value.Width >= this.MaxWidth)
+        if (value.Width > this.MaxWidth)
         {
           this.AddError(ErrorOverHeightLimit);
         }
