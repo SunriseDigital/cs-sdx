@@ -40,6 +40,14 @@ namespace Sdx
       this.stream = stream;
     }
 
+    public Stream Stream
+    {
+      get
+      {
+        return this.stream;
+      }
+    }
+
     public Bitmap Bitmap
     {
       get{
