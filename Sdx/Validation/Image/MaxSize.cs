@@ -16,9 +16,9 @@ namespace Sdx.Validation.Image
       switch (errorType)
       {
         case ErrorOverWidthLimit:
-          return Sdx.I18n.GetString("高さが{0}より小さい画像が登録可能です。", MaxHeight);
+          return Sdx.I18n.GetString("高さが{0}px以下の画像が登録可能です。", MaxHeight);
         case ErrorOverHeightLimit:
-          return Sdx.I18n.GetString("幅が{0}より小さい画像が登録可能です。", MaxWidth);
+          return Sdx.I18n.GetString("幅が{0}px以下の画像が登録可能です。", MaxWidth);
         default:
           return null;
       }
