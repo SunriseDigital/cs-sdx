@@ -253,7 +253,8 @@ isPkey: {5}",
 
     public Table AddColumn(Sql.Expr expr, string alias = null)
     {
-      Select.ColumnList.Add(new Sql.Column(expr, this.Context.Name, NormalizeAlias(expr, alias)));
+      //exprの時はテーブル名はつけないのでContextNameはnull
+      Select.ColumnList.Add(new Sql.Column(expr, null, NormalizeAlias(expr, alias)));
       return this;
     }
 
@@ -375,6 +376,11 @@ isPkey: {5}",
       select.Where.Add(OwnMeta.Pkeys.First((col) => true).Name, pkeyValue);
 
       return conn.FetchRecord(select);
+    }
+
+    public RecordSet FetchRecordSetByColumn(Db.Connection conn, string columnName, object value)
+    {
+      return FetchRecordSet(conn, select => this.Context.Where.Add(columnName, value));
     }
 
     public Record FetchRecordByColumn(Db.Connection conn, string columnName, object value)

@@ -198,18 +198,13 @@ namespace Sdx.Db
     }
 
     /// <summary>
-    /// カラムの値を取得します。テーブル定義に無いカラム名を指定すると例外になりますので注意してください。
+    /// カラムの値を取得します。
     /// またDBから読み込まなかったカラムを取得すると例外になります。これはGet系のユーティリティーメソッドで読み込んでいない値を使ってしまうと発見しづらいバグを生むからです。
     /// </summary>
     /// <param name="key"></param>
     /// <returns>新規レコードで値をsetしていない場合NULLが帰ります。DBの値がNULLの時はDBNullが帰ります。</returns>
     public object GetValue(string key)
     {
-      if(!OwnMeta.HasColumn(key))
-      {
-        throw new InvalidOperationException("Missing " + key + " column in " + this  + OwnMeta.Name + ". Check table settings.");
-      }
-
       if (this.UpdatedValues.ContainsKey(key))
       {
         return this.UpdatedValues[key];
@@ -365,7 +360,7 @@ namespace Sdx.Db
       {
         if (connection == null)
         {
-          connection = Select.Connection;
+          connection = Connection;
         }
 
         if (OwnMeta.Relations.ContainsKey(contextName))

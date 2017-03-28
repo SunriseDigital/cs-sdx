@@ -293,7 +293,8 @@ namespace Sdx.Db.Sql
 
     public Context AddColumn(Expr expr, string alias = null)
     {
-      this.Select.ColumnList.Add(new Column(expr, this.Name, alias));
+      //exprの時はテーブル名はつけないのでContextNameはnull
+      this.Select.ColumnList.Add(new Column(expr, null, alias));
       return this;
     }
 
@@ -425,6 +426,20 @@ namespace Sdx.Db.Sql
         {
           AddGroup(column.Name);
         }
+      }
+
+      return this;
+    }
+
+    /// <summary>
+    /// 渡ってきたカラム名をGroupに追加
+    /// </summary>
+    /// <returns></returns>
+    public Context AddColumnsToGroup(IEnumerable<string> columns)
+    {
+      foreach (var column in columns)
+      {
+        AddGroup(column);
       }
 
       return this;
