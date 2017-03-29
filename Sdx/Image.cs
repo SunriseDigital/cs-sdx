@@ -6,6 +6,14 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Drawing;
 
+public static class Sdx_Image_FormatExt
+{
+  public static string ToExt(this Sdx.Image.Format format)
+  {
+    return format.ToString().ToLower();
+  }
+}
+
 namespace Sdx
 {
   public class Image
@@ -38,6 +46,14 @@ namespace Sdx
 
     public Image(Stream stream){
       this.stream = stream;
+    }
+
+    public Stream Stream
+    {
+      get
+      {
+        return this.stream;
+      }
     }
 
     public Bitmap Bitmap
@@ -103,6 +119,5 @@ namespace Sdx
 
       return Sdx.Image.Format.NONE;
     }
-
   }
 }
