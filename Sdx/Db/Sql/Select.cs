@@ -392,27 +392,6 @@ namespace Sdx.Db.Sql
         throw new InvalidOperationException("Missing adapter, Set before Build.");
       }
 
-      //SELECT句またはGROUP BY句に無いカラムは自動的にOrderから取り除かれます。
-      //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
-      if (groups.Count > 0)
-      {
-        var allowList = columns.Union(groups);
-        orders = orders
-          .Where(orderCol => {
-            //通常のカラムじゃなかったら（サブクエリーや集計関数）取り除かない
-            if (!(orderCol.Target is string))
-            {
-              return true;
-            }
-            else
-            {
-              return allowList.Any(col => orderCol.SameAs(col));
-            }
-          })
-          .ToList<Column>();
-      }
-
-
       DbCommand command = this.Adapter.CreateCommand();
 
       var condCount = new Counter();
@@ -722,6 +701,36 @@ namespace Sdx.Db.Sql
         this.orders.RemoveAll(column => column.ContextName != null && column.ContextName == contextName);
       }
 
+      return this;
+    }
+
+    public Select ClearOrders(Predicate<Column> predicate)
+    {
+      this.orders.RemoveAll(predicate);
+      return this;
+    }
+
+    /// <summary>
+    /// Group句に無いORDERを削除する。2フェーズクエリー時に子階層のORDERを一発でクリアできます。
+    /// </summary>
+    /// <returns></returns>
+    public Select CleanOrders()
+    {
+      if (groups.Count > 0)
+      {
+        ClearOrders(orderCol => 
+        {
+          //通常のカラムじゃなかったら（サブクエリーや集計関数）取り除かない
+          if (!(orderCol.Target is string))
+          {
+            return false;
+          }
+          else
+          {
+            return !groups.Any(col => orderCol.SameAs(col));
+          }
+        });
+      }
       return this;
     }
 
