@@ -60,7 +60,7 @@ namespace Sdx
         return memoryCache[path];
       }
 
-      using (var fs = new FileStream(path, FileMode.Open))
+      using (var fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read))
       {
         var input = new StreamReader(fs, encoding);
         tree.Load(input);
