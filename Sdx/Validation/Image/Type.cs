@@ -26,6 +26,11 @@ namespace Sdx.Validation.Image
 
     public List<Sdx.Image.Format> FormatList = new List<Sdx.Image.Format>();
 
+    public Type(IEnumerable<Sdx.Image.Format> types)
+    {
+      this.FormatList.AddRange(types);
+    }
+
     public Type(params Sdx.Image.Format[] types)
     {
       this.FormatList.AddRange(types);
