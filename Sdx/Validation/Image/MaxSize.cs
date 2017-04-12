@@ -27,7 +27,7 @@ namespace Sdx.Validation.Image
     public int? MaxHeight { get; set; }
     public int? MaxWidth { get; set; }
 
-    public MaxSize(int? height = null, int? width = null)
+    public MaxSize(int? width = null, int? height = null)
     {
       if (height == null && width == null)
       {
@@ -40,19 +40,19 @@ namespace Sdx.Validation.Image
 
     protected override bool IsValidImage(Sdx.Image value)
     {
-      if(this.MaxHeight != null)
-      {
-        if (value.Height > this.MaxHeight)
-        {
-          this.AddError(ErrorOverWidthLimit);
-        }
-      }
-
       if(this.MaxWidth != null)
       {
         if (value.Width > this.MaxWidth)
         {
           this.AddError(ErrorOverHeightLimit);
+        }
+      }
+
+      if (this.MaxHeight != null)
+      {
+        if (value.Height > this.MaxHeight)
+        {
+          this.AddError(ErrorOverWidthLimit);
         }
       }
 

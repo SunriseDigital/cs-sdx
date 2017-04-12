@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sdx.Validation.Image
 {
-  public class Capacity : Validator
+  public class MaxCapacity : Validator
   {
     public const string ErrorOverCapacityLimit = "ErrorOverCapacityLImit";
 
@@ -15,22 +15,22 @@ namespace Sdx.Validation.Image
       switch (errorType)
       {
         case ErrorOverCapacityLimit:
-          return Sdx.I18n.GetString("{0}より小さいサイズの画像が登録可能です。", Sdx.Util.Number.BytesToHumanRedable(MaxCapacity));
+          return Sdx.I18n.GetString("{0}より小さいサイズの画像が登録可能です。", Sdx.Util.Number.BytesToHumanRedable(BytesValue));
         default:
           return null;
       }
     }
 
-    public int MaxCapacity { get; set; }
+    public int BytesValue { get; set; }
 
-    public Capacity(int bytes)
+    public MaxCapacity(int bytes)
     {
-      this.MaxCapacity = bytes;
+      this.BytesValue = bytes;
     }
 
     protected override bool IsValidImage(Sdx.Image value)
     {
-      if (value.Size >= this.MaxCapacity)
+      if (value.Size >= this.BytesValue)
       {
         this.AddError(ErrorOverCapacityLimit);
         return false;

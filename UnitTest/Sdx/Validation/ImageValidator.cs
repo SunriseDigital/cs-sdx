@@ -168,8 +168,8 @@ namespace UnitTest
         sdxImg = new Sdx.Image(stream);
         Assert.False(validatorSet.IsValid(sdxImg));
         Assert.Equal(2, validatorSet.Errors.Count);
-        Assert.Equal("高さが99px以下の画像が登録可能です。", validatorSet.Errors[0].Message);
-        Assert.Equal("幅が99px以下の画像が登録可能です。", validatorSet.Errors[1].Message);
+        Assert.Equal("幅が99px以下の画像が登録可能です。", validatorSet.Errors[0].Message);
+        Assert.Equal("高さが99px以下の画像が登録可能です。", validatorSet.Errors[1].Message);
 
         //maxHeightとminWidhtだけ引っかかる
         validatorSet = new Sdx.Validation.Image.ValidatorSet();
@@ -200,7 +200,7 @@ namespace UnitTest
         validatorSet
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 101))
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, width: 99))
-          .AddValidator(new Sdx.Validation.Image.Capacity(5000))
+          .AddValidator(new Sdx.Validation.Image.MaxCapacity(5000))
           .AddValidator(new Sdx.Validation.Image.Type(Sdx.Image.Format.JPEG, Sdx.Image.Format.PNG, Sdx.Image.Format.GIF))
         ;
         sdxImg = new Sdx.Image(stream);
@@ -211,7 +211,7 @@ namespace UnitTest
         validatorSet
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 101))
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, width: 99))
-          .AddValidator(new Sdx.Validation.Image.Capacity(2000)) // ここでエラーになるようにしています。
+          .AddValidator(new Sdx.Validation.Image.MaxCapacity(2000)) // ここでエラーになるようにしています。
           .AddValidator(new Sdx.Validation.Image.Type(Sdx.Image.Format.JPEG, Sdx.Image.Format.PNG, Sdx.Image.Format.GIF))
         ;
         sdxImg = new Sdx.Image(stream);
@@ -223,7 +223,7 @@ namespace UnitTest
         validatorSet
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 101))
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, width: 99))
-          .AddValidator(new Sdx.Validation.Image.Capacity(3000))
+          .AddValidator(new Sdx.Validation.Image.MaxCapacity(3000))
           .AddValidator(new Sdx.Validation.Image.Type(Sdx.Image.Format.PNG, Sdx.Image.Format.GIF)) // ここでエラーになるようにしています。
         ;
         sdxImg = new Sdx.Image(stream);
@@ -235,7 +235,7 @@ namespace UnitTest
         validatorSet
           .AddValidator(new Sdx.Validation.Image.MaxSize(height: 101, width: 99)) //ここでエラーになるようにしています。
           .AddValidator(new Sdx.Validation.Image.MinSize(height: 99, width: 99))
-          .AddValidator(new Sdx.Validation.Image.Capacity(3000))
+          .AddValidator(new Sdx.Validation.Image.MaxCapacity(3000))
           .AddValidator(new Sdx.Validation.Image.Type(Sdx.Image.Format.PNG, Sdx.Image.Format.GIF)) // ここでエラーになるようにしています。
         ;
         sdxImg = new Sdx.Image(stream);
@@ -260,9 +260,9 @@ namespace UnitTest
         Assert.False(isValid);
         var count = validator.Errors.Count;
         Assert.Equal(2, count);
-        Assert.Equal("高さが10px以下の画像が登録可能です。", validator.Errors[0].Message);
-        Assert.Equal("幅が10px以下の画像が登録可能です。", validator.Errors[1].Message);
-
+        Assert.Equal("幅が10px以下の画像が登録可能です。", validator.Errors[0].Message);
+        Assert.Equal("高さが10px以下の画像が登録可能です。", validator.Errors[1].Message);
+       
         validator = new Sdx.Validation.Image.MaxSize(height: 10, width: 101);
         isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
@@ -298,8 +298,8 @@ namespace UnitTest
         Assert.False(isValid);
         var count = validator.Errors.Count;
         Assert.Equal(2, count);
-        Assert.Equal("高さが101px以上の画像が登録可能です。", validator.Errors[0].Message);
-        Assert.Equal("幅が101px以上の画像が登録可能です。", validator.Errors[1].Message);
+        Assert.Equal("幅が101px以上の画像が登録可能です。", validator.Errors[0].Message);
+        Assert.Equal("高さが101px以上の画像が登録可能です。", validator.Errors[1].Message);
 
         validator = new Sdx.Validation.Image.MinSize(height: 99, width: 101);
         isValid = validator.IsValid(sdxImg);
@@ -330,14 +330,14 @@ namespace UnitTest
       using (FileStream stream = File.OpenRead(filePath))
       {
         var sdxImg = new Sdx.Image(stream);
-        var validator = new Sdx.Validation.Image.Capacity(2033);
+        var validator = new Sdx.Validation.Image.MaxCapacity(2033);
         var isValid = validator.IsValid(sdxImg);
         Assert.False(isValid);
         Assert.Equal(1, validator.Errors.Count);
         Assert.Equal("2KBより小さいサイズの画像が登録可能です。", validator.Errors[0].Message);
 
         sdxImg = new Sdx.Image(stream);
-        validator = new Sdx.Validation.Image.Capacity(2034);
+        validator = new Sdx.Validation.Image.MaxCapacity(2034);
         isValid = validator.IsValid(sdxImg);
         Assert.True(isValid);
         Assert.Equal(0, validator.Errors.Count);
@@ -501,8 +501,8 @@ namespace UnitTest
         isValid = validator.IsValid(image);
         Assert.False(isValid);
         Assert.Equal(2, validator.Errors.Count);
-        Assert.Equal("高さ100pxの画像が登録可能です。", validator.Errors[0].Message);
-        Assert.Equal("幅90pxの画像が登録可能です。", validator.Errors[1].Message);
+        Assert.Equal("幅90pxの画像が登録可能です。", validator.Errors[0].Message);
+        Assert.Equal("高さ100pxの画像が登録可能です。", validator.Errors[1].Message);
 
         validator = new Sdx.Validation.Image.Size(width: 90);
         isValid = validator.IsValid(image);

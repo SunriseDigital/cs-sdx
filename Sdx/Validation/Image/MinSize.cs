@@ -27,7 +27,7 @@ namespace Sdx.Validation.Image
     public int? MinHeight { get; set; }
     public int? MinWidth { get; set; }
 
-    public MinSize(int? height = null, int? width = null)
+    public MinSize(int? width = null, int? height = null)
     {
       if (height == null && width == null)
       {
@@ -40,19 +40,19 @@ namespace Sdx.Validation.Image
 
     protected override bool IsValidImage(Sdx.Image value)
     {
+      if (this.MinWidth != null)
+      {
+        if (value.Width < this.MinWidth)
+        {
+          this.AddError(ErrorUnderHeightLimit);
+        }
+      }
+
       if(this.MinHeight != null)
       {
         if (value.Height < this.MinHeight)
         {
           this.AddError(ErrorUnderWidthLimit);
-        }
-      }
-
-      if(this.MinWidth != null)
-      {
-        if (value.Width < this.MinWidth)
-        {
-          this.AddError(ErrorUnderHeightLimit);
         }
       }
 
