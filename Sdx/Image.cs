@@ -40,9 +40,9 @@ namespace Sdx
       ICON,
     }
 
-    Stream stream;
-    Bitmap bitmap = null;
-    Sdx.Image.Format? type = null; //ファイルの種類
+    private Stream stream;
+    private Bitmap bitmap = null;
+    private Sdx.Image.Format? formatType = null; //ファイルの種類
 
     public Image(Stream stream){
       this.stream = stream;
@@ -98,15 +98,15 @@ namespace Sdx
     public Sdx.Image.Format Type
     {
       get {
-        if(this.type == null){
-          this.type = this.GetType();
+        if(this.formatType == null){
+          this.formatType = this.GetFormatType();
         }
 
-        return (Sdx.Image.Format)this.type;
+        return (Sdx.Image.Format)this.formatType;
       }
     }
 
-    private Sdx.Image.Format GetType()
+    private Sdx.Image.Format GetFormatType()
     {
       foreach (System.Drawing.Imaging.ImageCodecInfo ici in System.Drawing.Imaging.ImageCodecInfo.GetImageDecoders())
       {
