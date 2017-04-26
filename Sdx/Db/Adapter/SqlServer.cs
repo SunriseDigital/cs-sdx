@@ -31,6 +31,7 @@ namespace Sdx.Db.Adapter
         {"varchar", Table.ColumnType.String},
         {"timestamp", Table.ColumnType.DateTime},
         {"nvarchar", Table.ColumnType.String},
+        {"bit", Table.ColumnType.Bit}
       };
     }
 

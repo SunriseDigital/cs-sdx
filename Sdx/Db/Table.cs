@@ -62,7 +62,8 @@ namespace Sdx.Db
       Float,
       String,
       DateTime,
-      Date
+      Date,
+      Bit
     }
 
     public class Column : Diagnostics.IDumpable

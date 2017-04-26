@@ -133,6 +133,11 @@ namespace GenOrm
             getter = "GetFloat";
           }
         }
+        else if ( column.Type == Sdx.Db.Table.ColumnType.Bit)
+        {
+          type = "bool";
+          getter = "GetBool";
+        }
 
         var bProps = new Sdx.Gen.Code.Block("public {0} {1}", type, Sdx.Util.String.ToCamelCase(column.Name));
         bProps.AppendTo(bClass);
