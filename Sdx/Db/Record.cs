@@ -360,7 +360,7 @@ namespace Sdx.Db
       {
         if (connection == null)
         {
-          connection = Select.Connection;
+          connection = Connection;
         }
 
         if (OwnMeta.Relations.ContainsKey(contextName))

@@ -7,6 +7,14 @@ namespace Sdx.Util
 {
   public static class Datetime
   {
+    public static System.DateTime Now
+    {
+      get
+      {
+        return System.DateTime.Now;
+      }
+    }
+
     public static System.DateTime RoundTicks(System.DateTime dateTime)
     {
       return dateTime.AddTicks(-(dateTime.Ticks % TimeSpan.TicksPerSecond));
