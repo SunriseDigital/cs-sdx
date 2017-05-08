@@ -63,7 +63,7 @@ namespace Sdx.Db
       String,
       DateTime,
       Date,
-      Bit
+      Boolean
     }
 
     public class Column : Diagnostics.IDumpable

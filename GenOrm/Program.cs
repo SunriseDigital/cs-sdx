@@ -133,7 +133,7 @@ namespace GenOrm
             getter = "GetFloat";
           }
         }
-        else if ( column.Type == Sdx.Db.Table.ColumnType.Bit)
+        else if ( column.Type == Sdx.Db.Table.ColumnType.Boolean)
         {
           type = "bool";
           getter = "GetBool";
