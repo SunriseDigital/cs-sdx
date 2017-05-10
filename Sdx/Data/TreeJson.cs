@@ -18,7 +18,27 @@ namespace Sdx.Data
     public override void Load(TextReader input)
     {
       var serializer = new JavaScriptSerializer();
-      BaseJson = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
+
+      var jsonstring = input.ReadToEnd();
+      //JavaScriptSerializer.Deserialize()はjson配列の出シリアライズはサポートされていないようなので、空配列(返ってくるデータが1件もない場合)は空オブジェクトにすりかえる。
+      //ちなみですが、下記のようにオブジェクトの中に配列がある分には問題ないようです。
+      //{
+      //    "error": {
+      //        "global": [
+      //            {
+      //                "class": "Np_Api_Error",
+      //                "code": 1,
+      //                "dev": "Missing client_id parameter.",
+      //                "msg": "必須項目が足りていません"
+      //            }
+      //        ]
+      //    }
+      //}
+      if(jsonstring == "[]"){
+        jsonstring = "{}";
+      }
+
+      BaseJson = serializer.Deserialize<Dictionary<string, object>>(jsonstring);
     }
 
     public override string ToValue()
