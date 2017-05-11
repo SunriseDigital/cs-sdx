@@ -917,5 +917,15 @@ namespace Sdx.Db
         return OwnMeta.Pkeys.First().Name;
       }
     }
+
+    public T GetEnum<T>(string key) where T : struct, IConvertible
+    {
+      if (!typeof(T).IsEnum)
+      {
+        throw new ArgumentException("T must be an enumerated type");
+      }
+
+      return (T)Enum.Parse(typeof(T), GetString(key));
+    }
   }
 }
