@@ -22,8 +22,27 @@ namespace Sdx
       this.HttpErrorHandler = new Web.HttpErrorHandler();
       if (HttpContext.Current != null)
       {
+        Request = HttpContext.Current.Request;
         UserAgent = new Web.UserAgent(HttpContext.Current.Request.UserAgent);
       }
+    }
+
+    private void InitUrlWithRequest()
+    {
+      var protocol = "http://";
+      if (Request.ServerVariables["SERVER_PORT"] != null && Request.ServerVariables["SERVER_PORT"] == "443")
+      {
+        protocol = "https://";
+      }
+
+      var pathAndQuery = Request.Url.PathAndQuery;
+      if (Request.ServerVariables["HTTP_X_REWRITE_URL"] != null)
+      {
+        pathAndQuery = Request.ServerVariables["HTTP_X_REWRITE_URL"];
+      }
+
+      Url = new Web.Url(protocol + Request.Url.Host + pathAndQuery);
+      Url.IsImmutable = true;
     }
 
     public static Context Current
@@ -117,7 +136,9 @@ namespace Sdx
       }
     }
 
-    public Web.UserAgent UserAgent { get; private set; }
+    public Web.UserAgent UserAgent { get; set; }
+
+    public HttpRequest Request { get; set; }
 
     /// <summary>
     /// <see cref="Sdx.Db.Adapter.Base.SharedConnection"/>で生成された共有接続をすべて開放する。
@@ -135,5 +156,26 @@ namespace Sdx
     }
 
     public static bool HasSdxHttpModule { get; internal set; }
+
+    private Web.Url url;
+    public Web.Url Url
+    {
+      get
+      {
+        //遅延初期化になっているのはtravisでRequest.ServerVariablesにアクセスるうとnull referenceで死んでしまう問題があるからです。
+        //InitUrlWithRequest内でアクセスしているのでテストでUrlにアクセスする場合はUrlを外で生成してSetしないとtravisだけこけますので注意してください。
+        if(url == null && Request != null)
+        {
+          InitUrlWithRequest();
+        }
+
+        return url;
+      }
+
+      set
+      {
+        url = value;
+      }
+    }
   }
 }
