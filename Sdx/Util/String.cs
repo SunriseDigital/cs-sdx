@@ -100,21 +100,20 @@ namespace Sdx.Util
     {
       if (enableReservedChar)
       {
-        string reservedChar = "!*'();:@&=+$,/?#[]";
+        string reservedChars = "!*'();:@&=+$,/?#[]";
         //reservedChar += "%";
 
         var sb = new StringBuilder();
 
         foreach (char @char in str)
         {
-          if (reservedChar.IndexOf(@char) == -1)
+          if (reservedChars.IndexOf(@char) == -1)
           {
             sb.Append(@char);
+            continue;
           }
-          else
-          {
-            sb.AppendFormat("%{0:X2}", (int)@char);
-          }
+
+          sb.AppendFormat("%{0:X2}", (int)@char);
         }
       }
 
