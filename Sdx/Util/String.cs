@@ -96,9 +96,9 @@ namespace Sdx.Util
     /// <param name="str"></param>
     /// <param name="enableReservedChar"></param>
     /// <returns></returns>
-    public static string UrlEncode(string str, bool enableReservedChar = false)
+    public static string UrlEncode(string str, bool isEnableReservedChar = false)
     {
-      if (enableReservedChar)
+      if (isEnableReservedChar)
       {
         string reservedChars = "!*'();:@&=+$,/?#[]";
         //reservedChar += "%";
