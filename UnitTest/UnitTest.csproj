@@ -104,6 +104,7 @@
     <Compile Include="Sdx\Scaffold\Manager.cs" />
     <Compile Include="Sdx\Validation\ImageValidator.cs" />
     <Compile Include="Sdx\Web\DeviceTable.cs" />
+    <Compile Include="Sdx\Web\DeviceUrl.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Data\LargeArea.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
