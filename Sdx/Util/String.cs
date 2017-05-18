@@ -88,5 +88,30 @@ namespace Sdx.Util
     {
       return new string(value.Select( chr => (fullWidthNumberlist.ContainsKey(chr) ? fullWidthNumberlist[chr] : chr )).ToArray());
     }
+
+    public static string UrlEncode(string str, bool enableReservedChar = false)
+    {
+      if (enableReservedChar)
+      {
+        string reservedChar = "!*'();:@&=+$,/?#[]";
+        //reservedChar += "%";
+
+        var sb = new StringBuilder();
+
+        foreach (char @char in str)
+        {
+          if (reservedChar.IndexOf(@char) == -1)
+          {
+            sb.Append(@char);
+          }
+          else
+          {
+            sb.AppendFormat("%{0:X2}", (int)@char);
+          }
+        }
+      }
+
+      return UrlEncode(str);
+    }
   }
 }
