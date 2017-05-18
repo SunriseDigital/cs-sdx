@@ -102,7 +102,6 @@ namespace Sdx.Util
       if (isEnableReservedChar)
       {
         string reservedChars = "!*'();:@&=+$,/?#[]";
-        //reservedChar += "%";
 
         var sb = new StringBuilder();
 
@@ -116,6 +115,8 @@ namespace Sdx.Util
 
           sb.AppendFormat("%{0:X2}", (int)@char);
         }
+
+        str = sb.ToString();
       }
 
       return HttpUtility.UrlEncode(str);
