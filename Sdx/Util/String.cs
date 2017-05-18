@@ -89,6 +89,13 @@ namespace Sdx.Util
       return new string(value.Select( chr => (fullWidthNumberlist.ContainsKey(chr) ? fullWidthNumberlist[chr] : chr )).ToArray());
     }
 
+    /// <summary>
+    /// QRコードを読むアプリケーションで正規表現が正しく機能せずリンクが生成されないケースがある為
+    /// 本来はURLエンコードの必要のない記号（予約文字）も含めてエンコードします
+    /// </summary>
+    /// <param name="str"></param>
+    /// <param name="enableReservedChar"></param>
+    /// <returns></returns>
     public static string UrlEncode(string str, bool enableReservedChar = false)
     {
       if (enableReservedChar)
