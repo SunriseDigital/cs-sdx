@@ -99,6 +99,9 @@ namespace Sdx.Util
     /// <returns></returns>
     public static string UrlEncode(string str, bool isEnableReservedChar = false)
     {
+      // !()_-*.以外の文字列がエンコードされます
+      str = HttpUtility.UrlEncode(str);
+
       if (isEnableReservedChar)
       {
         string reservedChars = "!*'();:@&=+$,/?#[]";
@@ -119,7 +122,7 @@ namespace Sdx.Util
         str = sb.ToString();
       }
 
-      return HttpUtility.UrlEncode(str);
+      return str;
     }
   }
 }
