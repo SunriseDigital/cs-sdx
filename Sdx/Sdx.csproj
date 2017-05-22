@@ -109,23 +109,11 @@
     <Compile Include="Gen\Code\Statement.cs" />
     <Compile Include="Html\CheckBoxGroup.cs" />
     <Compile Include="Html\RadioGroup.cs" />
-    <Compile Include="Image.cs" />
     <Compile Include="Util\DateTimeSpan.cs" />
     <Compile Include="Util\Yaml.cs" />
-    <Compile Include="Validation\Base.cs" />
     <Compile Include="Validation\Function.cs" />
     <Compile Include="Validation\Group\Base.cs" />
     <Compile Include="Validation\Group\Function.cs" />
-    <Compile Include="Validation\Image\MaxCapacity.cs" />
-    <Compile Include="Validation\Image\MaxSize.cs" />
-    <Compile Include="Validation\Image\MinSize.cs" />
-    <Compile Include="Validation\Image\NotEmpty.cs" />
-    <Compile Include="Validation\Image\Settings.cs" />
-    <Compile Include="Validation\Image\Size.cs" />
-    <Compile Include="Validation\Image\Type.cs" />
-    <Compile Include="Validation\Image\Validator.cs" />
-    <Compile Include="Validation\Image\ValidatorSet.cs" />
-    <Compile Include="Validation\ValidatorSet.cs" />
     <Compile Include="Web\DeviceRedirectHttpModule.cs" />
     <Compile Include="Web\DeviceTable.cs" />
     <Compile Include="Web\DeviceUrl.cs" />
@@ -198,7 +186,6 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
