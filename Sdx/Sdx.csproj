@@ -63,7 +63,6 @@
     <Compile Include="Cli\Options\Db.cs" />
     <Compile Include="Cli\Options\IDbConnection.cs" />
     <Compile Include="Collection\Holder.cs" />
-    <Compile Include="Collection\NameValueCollection.cs" />
     <Compile Include="Collection\OrderedDictionary.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Configuration\DictionaryListSection.cs" />
