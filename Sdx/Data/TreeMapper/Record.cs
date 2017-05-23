@@ -24,11 +24,9 @@ namespace Sdx.Data.TreeMapper
 
         public IEnumerable<Sdx.Data.TreeMapper.Record.Item> GetItems(string key)
         {
-            //foreach (var childTree in new List<Sdx.Data.TreeJson>())
-            foreach (var childTree in Tree.Get("list").List)
+            foreach (var childTree in Tree.Get(key).List)
             {
                 var treeItem = new T();
-                //treeItem.Tree = new Sdx.Data.TreeJson();
                 treeItem.Tree = childTree;
                 treeItem.Record = RecordSet.Select(rec => (R)rec).FirstOrDefault(rec => this.Condition(treeItem, rec));
                 yield return treeItem;
