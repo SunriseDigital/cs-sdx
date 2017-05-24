@@ -49,7 +49,7 @@ Invoke-Command -ComputerName $hostName -Credential $cred -ScriptBlock {
   $siteConfig.save($xmlPath)
 
   # サイトを登録する
-  Get-Content $xmlPath | cmd /c "$Env:Windir\System32\inetsrv\appcmd add site /in"
+  Get-Content $xmlPath | cmd /c "$Env:Windir\System32\inetsrv\appcmd add site /in" | Write-Host -foregroundcolor "green"
 
   # applicationHost.configのlocationを複製する。
   $iisConfigPath = "$Env:Windir\System32\inetsrv\config\applicationHost.config"
@@ -71,6 +71,7 @@ Invoke-Command -ComputerName $hostName -Credential $cred -ScriptBlock {
     $newLocation.path = $toPath
 
     $iisConfig.configuration.AppendChild($newLocation) | Out-Null
+    Write-Host "Add location[path=${toPath}] to ${iisConfigPath}" -foregroundcolor "green"
     ++$updateCount
   }
 
