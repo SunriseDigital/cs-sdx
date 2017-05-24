@@ -1,3 +1,4 @@
+# IISのサイトを複製します。サイト単体の設定だけでなくapplicationHost.configのlocationもコピーします。
 param([string]$hostName, [string]$adminPwd, [string]$fromIISName, [string]$toIISName)
 
 
