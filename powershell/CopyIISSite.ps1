@@ -20,6 +20,28 @@ Invoke-Command -ComputerName $hostName -Credential $cred -ScriptBlock {
   $fromIISName = $args[0]
   $toIISName = $args[1]
 
+  # 一度だけ「別のプロセスで使用されているため、保存できません」のようなエラーで保存に失敗したが、再現することができなかった。
+  # とりえあず、tryで囲ってリトライするように実装してみたがそのエラーがtryでキャッチできるか不明です。
+  #
+  # ちなみに別プロセスでファイルをFileShare.Noneでロックしてみたが、ロック解除まで待たされるだけで例外にならなかった。
+  $saveRetry = 0
+  function saveIISConfig($iisConfig, $iisConfigPath, $toIISName){
+    try{
+      $iisConfig.save($iisConfigPath)
+    } catch [Exception]{
+      if($saveRetry -lt 5){
+        $sec = 3
+        Write-Host "Fail to save by '$($error[0])'. I will try to save again after ${sec} second..." -foregroundcolor "red"
+        Start-Sleep -s $sec
+        ++$saveRetry
+        saveIISConfig $iisConfig $iisConfigPath $toIISName
+      } else {
+        Write-Error "Fail to save by '$($error[0])'."
+        cmd /c "$Env:Windir\System32\inetsrv\appcmd delete site ""$toIISName"""
+      }
+    }
+  }
+
   #コピー元があるかチェック
   $exists = cmd /c "$Env:Windir\System32\inetsrv\appcmd list site /site.name:""${fromIISName}"""
   if($exists.Length -eq 0){
@@ -30,7 +52,7 @@ Invoke-Command -ComputerName $hostName -Credential $cred -ScriptBlock {
   #コピー先がないかチェック
   $exists = cmd /c "$Env:Windir\System32\inetsrv\appcmd list site /site.name:""${toIISName}"""
   if($exists.Length -ne 0){
-    Write-Host "Already exists ${fromIISName}" -foregroundcolor "red"
+    Write-Host "Already exists ${toIISName}" -foregroundcolor "red"
     exit 1
   }
 
@@ -76,7 +98,7 @@ Invoke-Command -ComputerName $hostName -Credential $cred -ScriptBlock {
   }
 
   if($updateCount -gt 0){
-    $iisConfig.save($iisConfigPath)
+    saveIISConfig $iisConfig $iisConfigPath $toIISName
   }
 
   # 書き出したxmlは掃除。
