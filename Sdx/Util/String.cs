@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web;
 
 namespace Sdx.Util
 {
@@ -87,6 +88,41 @@ namespace Sdx.Util
     public static string ConvertFullWidthNumbersToHalfWidthNumbers(string value)
     {
       return new string(value.Select( chr => (fullWidthNumberlist.ContainsKey(chr) ? fullWidthNumberlist[chr] : chr )).ToArray());
+    }
+
+    /// <summary>
+    /// QRコードを読むアプリケーションで正規表現が正しく機能せずリンクが生成されないケースがある為
+    /// 本来はURLエンコードの必要のない記号（予約文字）も含めてエンコードします
+    /// </summary>
+    /// <param name="str"></param>
+    /// <param name="enableReservedChar"></param>
+    /// <returns></returns>
+    public static string UrlEncode(string str, bool isEnableReservedChar = false)
+    {
+      // !()_-*.以外の文字列がエンコードされます
+      str = HttpUtility.UrlEncode(str);
+
+      if (isEnableReservedChar)
+      {
+        string reservedChars = "!*'();:@&=+$,/?#[]";
+
+        var sb = new StringBuilder();
+
+        foreach (char @char in str)
+        {
+          if (reservedChars.IndexOf(@char) == -1)
+          {
+            sb.Append(@char);
+            continue;
+          }
+
+          sb.AppendFormat("%{0:X2}", (int)@char);
+        }
+
+        str = sb.ToString();
+      }
+
+      return str;
     }
   }
 }
