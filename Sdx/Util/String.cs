@@ -104,7 +104,7 @@ namespace Sdx.Util
 
       if (isEnableReservedChar)
       {
-        string reservedChars = "!*'();:@&=+$,/?#[]";
+        string reservedChars = "!()_-*.";
 
         var sb = new StringBuilder();
 
