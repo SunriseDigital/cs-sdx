@@ -8,33 +8,12 @@ namespace Sdx.Data.TreeMapper.Record
 {
     public class Item
     {
-        private Tree ChildTree;
-        private Sdx.Db.Record TreeRecord;
+        public Tree Tree { get; set; }
+        protected Dictionary<string, Sdx.Db.Record> TreeRecords;
 
-        public Tree Tree
+        public void AddRecord(string key, Sdx.Db.Record record)
         {
-            get
-            {
-                return ChildTree;
-            }
-
-            set
-            {
-                ChildTree = value;
-            }
-        }
-
-        public Sdx.Db.Record Record
-        {
-            get
-            {
-                return TreeRecord;
-            }
-
-            set
-            {
-                TreeRecord =  value;
-            }
+            TreeRecords.Add(key, record);
         }
     }
 }

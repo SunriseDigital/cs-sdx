@@ -12,25 +12,43 @@ namespace Sdx.Data.TreeMapper
         where R : Sdx.Db.Record
     {
         private Tree Tree;
-        private Sdx.Db.RecordSet RecordSet;
+        private Dictionary<string, Sdx.Db.RecordSet> RecordSetDictionary;
+        private string RecordKey;
         private Func<T, R, bool> Condition;
 
-        public Record(Tree tree, Sdx.Db.RecordSet recordSet, Func<T, R, bool> condition)
+        public Record(Tree tree, Dictionary<string, Sdx.Db.RecordSet> recordSetList, Func<T, R, bool> condition)
         {
             Tree = tree;
-            RecordSet = recordSet;
+            RecordSetDictionary = recordSetList;
             Condition = condition;
+        }
+
+        public IEnumerable<Sdx.Data.TreeMapper.Record.Item> GetItems()
+        {
+            foreach (var childTree in Tree.List)
+            {
+                yield return CreateItem(childTree);
+            }
         }
 
         public IEnumerable<Sdx.Data.TreeMapper.Record.Item> GetItems(string key)
         {
             foreach (var childTree in Tree.Get(key).List)
             {
-                var treeItem = new T();
-                treeItem.Tree = childTree;
-                treeItem.Record = RecordSet.Select(rec => (R)rec).FirstOrDefault(rec => this.Condition(treeItem, rec));
-                yield return treeItem;
+                yield return CreateItem(childTree);
             }
+        }
+
+        private T CreateItem(Tree childTree)
+        {
+            var treeItem = new T();
+            treeItem.Tree = childTree;
+            foreach (KeyValuePair<string, Sdx.Db.RecordSet> pair in RecordSetDictionary)
+            {
+              treeItem.AddRecord(pair.Key, pair.Value.Select(rec => (R)rec).FirstOrDefault(rec => this.Condition(treeItem, rec)));
+            }
+
+            return treeItem;
         }
     }
 }
