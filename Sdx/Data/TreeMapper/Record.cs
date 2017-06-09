@@ -50,5 +50,17 @@ namespace Sdx.Data.TreeMapper
 
             return treeItem;
         }
+
+        public int Count(string key = null)
+        {
+          if (key == null)
+          {
+            return Tree.Count;
+          }
+          else
+          {
+            return Tree.Get(key).Count;
+          }
+        }
     }
 }
