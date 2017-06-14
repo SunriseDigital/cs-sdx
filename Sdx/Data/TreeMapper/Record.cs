@@ -7,60 +7,64 @@ using System.Linq;
 
 namespace Sdx.Data.TreeMapper
 {
-    public class Record<T, R>
-        where T : Sdx.Data.TreeMapper.Record.Item, new() 
-        where R : Sdx.Db.Record
+    public class Record<T>
+        where T : Sdx.Data.TreeMapper.Record.Item, new()
     {
-        private Tree Tree;
-        private Dictionary<string, Sdx.Db.RecordSet> RecordSetDictionary;
-        private string RecordKey;
-        private Func<T, R, bool> Condition;
+        private Tree tree;
+        private Dictionary<string, RecordSetData> recordSetDictionary = null;
 
-        public Record(Tree tree, Dictionary<string, Sdx.Db.RecordSet> recordSetList, Func<T, R, bool> condition)
+        public Record(Tree tree)
         {
-            Tree = tree;
-            RecordSetDictionary = recordSetList;
-            Condition = condition;
+            this.tree = tree;
+        }
+        
+        public class RecordSetData
+        {
+            public Sdx.Db.RecordSet RecordSet { get; set;}
+            public Func<T, Sdx.Db.Record, bool> Matcher { get; set; }
+        }
+
+        public void AddRecordSet(string key, Sdx.Db.RecordSet recordSet, Func<T, Sdx.Db.Record, bool> matcher) 
+        {
+            if (recordSetDictionary == null)
+            {
+                recordSetDictionary = new Dictionary<string,RecordSetData>{};
+            }
+            recordSetDictionary[key] = new RecordSetData
+            {
+                RecordSet = recordSet,
+                Matcher = matcher
+            };
         }
 
         public IEnumerable<Sdx.Data.TreeMapper.Record.Item> GetItems()
         {
-            foreach (var childTree in Tree.List)
+            foreach (var childTree in tree)
             {
-                yield return CreateItem(childTree);
+                var treeItem = new T();
+                treeItem.AddTree(childTree);
+                foreach (KeyValuePair<string, RecordSetData> pair in recordSetDictionary)
+                {
+                    var data = pair.Value;
+                    treeItem.AddRecord(
+                        pair.Key,
+                        data.RecordSet
+                            .Select(rec => rec)
+                            .FirstOrDefault(rec => data.Matcher(treeItem, rec))
+                    );
+                }
+
+                yield return treeItem;
             }
         }
 
-        public IEnumerable<Sdx.Data.TreeMapper.Record.Item> GetItems(string key)
+        public int Count
         {
-            foreach (var childTree in Tree.Get(key).List)
+            get
             {
-                yield return CreateItem(childTree);
+                //return 0;
+                return tree.Count;
             }
-        }
-
-        private T CreateItem(Tree childTree)
-        {
-            var treeItem = new T();
-            treeItem.Tree = childTree;
-            foreach (KeyValuePair<string, Sdx.Db.RecordSet> pair in RecordSetDictionary)
-            {
-              treeItem.AddRecord(pair.Key, pair.Value.Select(rec => (R)rec).FirstOrDefault(rec => this.Condition(treeItem, rec)));
-            }
-
-            return treeItem;
-        }
-
-        public int Count(string key = null)
-        {
-          if (key == null)
-          {
-            return Tree.Count;
-          }
-          else
-          {
-            return Tree.Get(key).Count;
-          }
         }
     }
 }

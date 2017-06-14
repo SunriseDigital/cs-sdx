@@ -8,17 +8,22 @@ namespace Sdx.Data.TreeMapper.Record
 {
     public class Item
     {
-        public Tree Tree { get; set; }
-        protected Dictionary<string, Sdx.Db.Record> TreeRecords = null;
+        protected Dictionary<string, Sdx.Db.Record> treeRecords = null;
+        protected Sdx.Data.Tree tree = null;
+
+        public void AddTree(Sdx.Data.Tree tree)
+        {
+          this.tree = tree;
+        }
 
         public void AddRecord(string key, Sdx.Db.Record record)
         {
-          if (TreeRecords== null)
+          if (treeRecords == null)
           {
-            TreeRecords = new Dictionary<string,Db.Record>{};
+            treeRecords = new Dictionary<string, Db.Record> { };
           }
-          
-          TreeRecords.Add(key, record);
+
+          treeRecords.Add(key, record);
         }
     }
 }
