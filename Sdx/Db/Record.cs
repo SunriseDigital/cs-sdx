@@ -917,5 +917,19 @@ namespace Sdx.Db
         return OwnMeta.Pkeys.First().Name;
       }
     }
+
+    public Dictionary<string, object> ToDictionary(params string[] columns)
+    {
+      var dic = new Dictionary<string, object>(){};
+
+      return dic;
+    }
+
+    public Dictionary<string, T> ToDictionary<T>(params string[] columns)
+    {
+      var dic = new Dictionary<string, T>() { };
+
+      return dic;
+    }
   }
 }
