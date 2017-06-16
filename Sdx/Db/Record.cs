@@ -951,7 +951,7 @@ namespace Sdx.Db
       {
         OwnMeta.Columns.ForEach(col =>
         {
-          dic.Add(col.Name, (T)this.GetValue(col.Name));
+          dic.Add(col.Name, (T)Convert.ChangeType(this.GetValue(col.Name), typeof(T)));
         });
       }
       else
@@ -960,7 +960,7 @@ namespace Sdx.Db
         {
           if (this.CanGetValue(column))
           {
-            dic.Add(column, (T)this.GetValue(column));
+            dic.Add(column, (T)Convert.ChangeType(this.GetValue(column), typeof(T)));
           }
         }
       }
