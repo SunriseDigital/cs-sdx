@@ -11,7 +11,8 @@ namespace Sdx.Data.TreeMapper
         where T : Sdx.Data.TreeMapper.Record.Item, new()
     {
         private Tree tree;
-        private Dictionary<string, RecordSetData> recordSetDictionary = null;
+        private Dictionary<Sdx.Data.TreeMapper.Record.Item.RecordKey, RecordSetData> recordSetDictionary = 
+            new Dictionary<Sdx.Data.TreeMapper.Record.Item.RecordKey, RecordSetData> { };
 
         public Record(Tree tree)
         {
@@ -24,12 +25,8 @@ namespace Sdx.Data.TreeMapper
             public Func<T, Sdx.Db.Record, bool> Matcher { get; set; }
         }
 
-        public void AddRecordSet(string key, Sdx.Db.RecordSet recordSet, Func<T, Sdx.Db.Record, bool> matcher) 
+        public void AddRecordSet(Sdx.Data.TreeMapper.Record.Item.RecordKey key, Sdx.Db.RecordSet recordSet, Func<T, Sdx.Db.Record, bool> matcher) 
         {
-            if (recordSetDictionary == null)
-            {
-                recordSetDictionary = new Dictionary<string,RecordSetData>{};
-            }
             recordSetDictionary[key] = new RecordSetData
             {
                 RecordSet = recordSet,
@@ -43,7 +40,7 @@ namespace Sdx.Data.TreeMapper
             {
                 var treeItem = new T();
                 treeItem.AddTree(childTree);
-                foreach (KeyValuePair<string, RecordSetData> pair in recordSetDictionary)
+                foreach (KeyValuePair<Sdx.Data.TreeMapper.Record.Item.RecordKey, RecordSetData> pair in recordSetDictionary)
                 {
                     var data = pair.Value;
                     treeItem.AddRecord(
