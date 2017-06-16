@@ -920,7 +920,25 @@ namespace Sdx.Db
 
     public Dictionary<string, object> ToDictionary(params string[] columns)
     {
-      var dic = new Dictionary<string, object>(){};
+      var dic = new Dictionary<string, object>() { };
+
+      if (columns.Length == 0)
+      {
+        OwnMeta.Columns.ForEach(col =>
+        {
+          dic.Add(col.Name, this.GetValue(col.Name));
+        });
+      }
+      else
+      {
+        foreach (var column in columns)
+        {
+          if (this.CanGetValue(column))
+          {
+            dic.Add(column, this.GetValue(column));
+          }
+        }
+      }
 
       return dic;
     }
@@ -928,6 +946,24 @@ namespace Sdx.Db
     public Dictionary<string, T> ToDictionary<T>(params string[] columns)
     {
       var dic = new Dictionary<string, T>() { };
+
+      if (columns.Length == 0)
+      {
+        OwnMeta.Columns.ForEach(col =>
+        {
+          dic.Add(col.Name, (T)this.GetValue(col.Name));
+        });
+      }
+      else
+      {
+        foreach (var column in columns)
+        {
+          if (this.CanGetValue(column))
+          {
+            dic.Add(column, (T)this.GetValue(column));
+          }
+        }
+      }
 
       return dic;
     }
