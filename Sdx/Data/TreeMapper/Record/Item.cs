@@ -8,21 +8,55 @@ namespace Sdx.Data.TreeMapper.Record
 {
     public class Item
     {
-        protected Dictionary<string, Sdx.Db.Record> treeRecords = null;
+      protected Dictionary<RecordKey, Sdx.Db.Record> treeRecords = new Dictionary<RecordKey, Db.Record> { };
         protected Sdx.Data.Tree tree = null;
+
+        public class RecordKey
+        {
+          public string Code { get; private set; }
+          public RecordKey (string code)
+          {
+            Code = code;
+          }
+
+          public override int GetHashCode()
+          {
+            return Code.GetHashCode();
+          }
+
+          public override bool Equals(object obj)
+          {
+            return Equals(obj as RecordKey);
+          }
+
+          public bool Equals(RecordKey recordKey)
+          {
+            return recordKey != null && recordKey.Code == this.Code;
+          }
+        }
+
+        public bool HasRecordKey(RecordKey recordKey)
+        {
+          return this.GetType().GetProperties()
+            .Where(prop => prop.GetGetMethod().IsStatic) 
+            .Where(prop => prop.PropertyType == typeof(RecordKey))
+            .Any(prop => {
+              var val = prop.GetValue(null, null) as RecordKey;
+              return val != null && val.Equals(recordKey);
+            });
+        }
 
         public void AddTree(Sdx.Data.Tree tree)
         {
           this.tree = tree;
         }
 
-        public void AddRecord(string key, Sdx.Db.Record record)
+        public void AddRecord(RecordKey key, Sdx.Db.Record record)
         {
-          if (treeRecords == null)
+          if(!HasRecordKey(key))
           {
-            treeRecords = new Dictionary<string, Db.Record> { };
+            throw new ArgumentException("Argument 'key' is invalid. It must be of type 'RecordKey'.");
           }
-
           treeRecords.Add(key, record);
         }
     }
