@@ -37,16 +37,16 @@ namespace Sdx.Data.TreeMapper.Record
 
         public bool HasRecordKey(RecordKey recordKey)
         {
+          if (recordKey == null)
+          {
+            throw new ArgumentNullException("The argument 'recordKey' null is not allowed.");
+          }
+
           return this.GetType().GetFields()
             .Where(prop => prop.IsStatic)
             .Where(prop => prop.FieldType == typeof(RecordKey))
-            .Any(prop => {
-              var val = prop.GetValue(null) as RecordKey;
-              return val != null && val.Equals(recordKey);
-            });
+            .Any(prop => recordKey.Equals(prop.GetValue(null)));
         }
-
-
 
         public void AddTree(Sdx.Data.Tree tree)
         {
@@ -57,7 +57,7 @@ namespace Sdx.Data.TreeMapper.Record
         {
           if(!HasRecordKey(key))
           {
-            throw new ArgumentException("Argument 'key' is invalid. It must be of type 'RecordKey'.");
+            throw new ArgumentException("Missing `" + key.Code + "` RecordKey property in this item.");
           }
 
           treeRecords.Add(key, record);
