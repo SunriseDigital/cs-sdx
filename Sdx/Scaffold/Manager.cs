@@ -438,6 +438,14 @@ namespace Sdx.Scaffold
 
         currentRecords.ForEach(crec => crec.Delete(conn));
       }
+
+      if (PostSaveHookList != null)
+      {
+        PostSaveHookList.ForEach(action =>
+        {
+          action(record, values, conn, true);
+        });
+      }
     }
 
     /// <summary>
