@@ -545,5 +545,21 @@ namespace Sdx.Scaffold
           .ToDictionary(kv => kv.Key, kv => kv.Value.ToString())
       );
     }
+
+    /// <summary>
+    /// Save() 後に何かさせたい場合は AddPostSaveHook でセットしてください
+    /// </summary>
+    private List<Action<Db.Record, NameValueCollection, bool>> PostSaveHookList = null;
+
+    public void AddPostSaveHook(Action<Db.Record, NameValueCollection, bool> callback)
+    {
+      if(PostSaveHookList == null)
+      {
+        PostSaveHookList = new List<Action<Db.Record, NameValueCollection, bool>>();
+      }
+
+      PostSaveHookList.Add(callback);
+    }
+
   }
 }
