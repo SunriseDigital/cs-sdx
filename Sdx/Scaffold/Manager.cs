@@ -549,13 +549,13 @@ namespace Sdx.Scaffold
     /// <summary>
     /// Save() 後に何かさせたい場合は AddPostSaveHook でセットしてください
     /// </summary>
-    private List<Action<Db.Record, NameValueCollection, bool>> PostSaveHookList = null;
+    private List<Action<Db.Record, NameValueCollection, Db.Connection, bool>> PostSaveHookList = null;
 
-    public void AddPostSaveHook(Action<Db.Record, NameValueCollection, bool> callback)
+    public void AddPostSaveHook(Action<Db.Record, NameValueCollection, Db.Connection, bool> callback)
     {
       if(PostSaveHookList == null)
       {
-        PostSaveHookList = new List<Action<Db.Record, NameValueCollection, bool>>();
+        PostSaveHookList = new List<Action<Db.Record, NameValueCollection, Db.Connection, bool>>();
       }
 
       PostSaveHookList.Add(callback);
