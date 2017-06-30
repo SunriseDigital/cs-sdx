@@ -1318,5 +1318,42 @@ namespace UnitTest
         Assert.NotEqual("", form["created_at"].Value.ToString());
       }
     }
+
+    [Fact]
+    public void TestPostSaveHook()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunPostSaveHook(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunPostSaveHook(TestDb db)
+    {
+      var epoch = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0);
+      var timeStamp = (long)epoch.TotalSeconds;//少数点以下は丸める
+
+      //仮想送信パラメータ
+      //テストの度に新しいレコードができるようにするためタイムスタンプを名前に付けてます
+      var requestForm = new NameValueCollection()
+      {
+        {"name", "test_area" + timeStamp.ToString()},
+        {"code", "test_code" + timeStamp.ToString()}
+      };
+
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter);
+
+      //form
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("name"))
+          .Set("label", new Sdx.Scaffold.Config.Value("名称"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
+          .Set("label", new Sdx.Scaffold.Config.Value("コード"))
+        );
+
+    }
   }
 }
