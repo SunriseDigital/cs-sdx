@@ -1344,12 +1344,10 @@ namespace UnitTest
       );
 
       //仮想送信パラメータ
-      var epoch = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0);
-      var timeStamp = (long)epoch.TotalSeconds;
       var postParams = new NameValueCollection()
       {
-        {"name", "test_area" + timeStamp.ToString()},
-        {"code", "test_code" + timeStamp.ToString()}
+        {"name", "test_area"},
+        {"code", "test_code"}
       };
 
       using (var conn = scaffold.Db.CreateConnection())
@@ -1357,7 +1355,6 @@ namespace UnitTest
         conn.Open();
 
         var record = scaffold.LoadRecord(new NameValueCollection(), conn);
-        var form = scaffold.BuildForm(record, conn);
 
         conn.BeginTransaction();
         try
@@ -1374,13 +1371,13 @@ namespace UnitTest
         var select = conn.Adapter.CreateSelect();
         select.AddFrom(new Test.Orm.Table.LargeArea(), cLargeArea =>
         {
-          cLargeArea.Where.Add("name", "test_area" + timeStamp.ToString());
-          cLargeArea.Where.Add("code", "test_code" + timeStamp.ToString());
+          cLargeArea.Where.Add("name", "test_area");
+          cLargeArea.Where.Add("code", "test_code");
         });
 
         var savedRecord = conn.FetchRecord(select);
-        Assert.Equal("test_code" + timeStamp.ToString(), savedRecord.GetString("code"));
-        Assert.Equal("test_area" + timeStamp.ToString(), savedRecord.GetString("name"));
+        Assert.Equal("test_code", savedRecord.GetString("code"));
+        Assert.Equal("test_area", savedRecord.GetString("name"));
       }
 
     }
