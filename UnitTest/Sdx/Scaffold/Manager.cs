@@ -1331,17 +1331,6 @@ namespace UnitTest
 
     private void RunPostSaveHook(TestDb db)
     {
-      var epoch = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0);
-      var timeStamp = (long)epoch.TotalSeconds;//少数点以下は丸める
-
-      //仮想送信パラメータ
-      //テストの度に新しいレコードができるようにするためタイムスタンプを名前に付けてます
-      var requestForm = new NameValueCollection()
-      {
-        {"name", "test_area" + timeStamp.ToString()},
-        {"code", "test_code" + timeStamp.ToString()}
-      };
-
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter);
 
       //form
@@ -1352,7 +1341,47 @@ namespace UnitTest
         ).Add(Sdx.Scaffold.Config.Item.Create()
           .Set("column", new Sdx.Scaffold.Config.Value("code"))
           .Set("label", new Sdx.Scaffold.Config.Value("コード"))
-        );
+      );
+
+      //仮想送信パラメータ
+      var epoch = DateTime.Now - new DateTime(1970, 1, 1, 0, 0, 0);
+      var timeStamp = (long)epoch.TotalSeconds;
+      var postParams = new NameValueCollection()
+      {
+        {"name", "test_area" + timeStamp.ToString()},
+        {"code", "test_code" + timeStamp.ToString()}
+      };
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(new NameValueCollection(), conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, postParams, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        var select = conn.Adapter.CreateSelect();
+        select.AddFrom(new Test.Orm.Table.LargeArea(), cLargeArea =>
+        {
+          cLargeArea.Where.Add("name", "test_area" + timeStamp.ToString());
+          cLargeArea.Where.Add("code", "test_code" + timeStamp.ToString());
+        });
+
+        var savedRecord = conn.FetchRecord(select);
+        Assert.Equal("test_code" + timeStamp.ToString(), savedRecord.GetString("code"));
+        Assert.Equal("test_area" + timeStamp.ToString(), savedRecord.GetString("name"));
+      }
 
     }
   }
