@@ -1346,9 +1346,31 @@ namespace UnitTest
       //仮想送信パラメータ
       var postParams = new NameValueCollection()
       {
-        {"name", "test_area"},
+        {"name", "test_large_area"},
         {"code", "test_code"}
       };
+
+      //hook
+      //large_area を追加したら、その配下に属する area を追加する
+      scaffold.AddPostSaveHook((rec, post, con, isnew) =>
+      {
+        var insert = con.Adapter.CreateInsert();
+
+        insert
+         .SetInto("area")
+         .AddColumnValue("name", "テスト小エリア")
+         .AddColumnValue("large_area_id", rec.GetInt32("id"))
+         .AddColumnValue("code", "test_area");
+
+        try
+        {
+          con.Execute(insert);
+        }
+        catch (Exception)
+        {
+          throw;
+        }
+      });
 
       using (var conn = scaffold.Db.CreateConnection())
       {
@@ -1371,13 +1393,23 @@ namespace UnitTest
         var select = conn.Adapter.CreateSelect();
         select.AddFrom(new Test.Orm.Table.LargeArea(), cLargeArea =>
         {
-          cLargeArea.Where.Add("name", "test_area");
+          cLargeArea.Where.Add("name", "test_large_area");
           cLargeArea.Where.Add("code", "test_code");
         });
 
         var savedRecord = conn.FetchRecord(select);
         Assert.Equal("test_code", savedRecord.GetString("code"));
-        Assert.Equal("test_area", savedRecord.GetString("name"));
+        Assert.Equal("test_large_area", savedRecord.GetString("name"));
+
+        //hook が動いたかの確認
+        var selectArea = conn.Adapter.CreateSelect();
+        selectArea.AddFrom(new Test.Orm.Table.Area(), cArea =>
+        {
+          cArea.Where.Add("large_area_id", savedRecord.GetInt32("id"));
+        });
+
+        var area = conn.FetchRecord(select);
+        Assert.NotNull(area);
       }
 
     }
