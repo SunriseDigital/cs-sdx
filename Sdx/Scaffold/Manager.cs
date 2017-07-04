@@ -412,6 +412,7 @@ namespace Sdx.Scaffold
         }
       }
 
+      var isNew = record.IsNew;//フック内で使いたいので record.Save が呼ばれる前に控えておく
       record.Save(conn);
 
       foreach (var config in relationList)
@@ -443,7 +444,7 @@ namespace Sdx.Scaffold
       {
         PostSaveHookList.ForEach(action =>
         {
-          action(record, values, conn, true);
+          action(record, values, conn, isNew);
         });
       }
     }
