@@ -1430,7 +1430,6 @@ namespace UnitTest
         conn.Open();
 
         var record = scaffold.LoadRecord(new NameValueCollection(), conn);
-        var form = scaffold.BuildForm(record, conn);
 
         conn.BeginTransaction();
         try
