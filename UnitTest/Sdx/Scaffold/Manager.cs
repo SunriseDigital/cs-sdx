@@ -1501,8 +1501,8 @@ namespace UnitTest
         conn.BeginTransaction();
         try
         {
-          largeArea.Delete(conn);
           area.Delete(conn);
+          largeArea.Delete(conn);
           conn.Commit();
         }
         catch (Exception)
