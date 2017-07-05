@@ -442,6 +442,7 @@ namespace Sdx.Scaffold
 
       if (PostSaveHookList != null)
       {
+        record.ClearRecordCache();
         PostSaveHookList.ForEach(action =>
         {
           action(record, values, conn, isNew);
