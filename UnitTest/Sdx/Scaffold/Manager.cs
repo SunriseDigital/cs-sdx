@@ -1450,15 +1450,15 @@ namespace UnitTest
           cLargeArea.Where.Add("code", "test_code");
         });
 
-        var savedRecord = conn.FetchRecord(select);
-        Assert.Equal("test_code", savedRecord.GetString("code"));
-        Assert.Equal("test_large_area", savedRecord.GetString("name"));
+        var largeArea = conn.FetchRecord(select);
+        Assert.Equal("test_code", largeArea.GetString("code"));
+        Assert.Equal("test_large_area", largeArea.GetString("name"));
 
         //共通 hook 確認
         var tArea = new Test.Orm.Table.Area();
         var area = tArea.FetchRecord(conn, (sArea =>
         {
-          sArea.Where.Add("large_area_id", savedRecord.GetInt32("id"));
+          sArea.Where.Add("large_area_id", largeArea.GetInt32("id"));
         }));
         Assert.NotNull(area);
 
@@ -1480,7 +1480,7 @@ namespace UnitTest
         conn.BeginTransaction();
         try
         {
-          scaffold.Save(savedRecord, updateParams, conn);
+          scaffold.Save(largeArea, updateParams, conn);
           conn.Commit();
         }
         catch (Exception)
@@ -1494,6 +1494,22 @@ namespace UnitTest
         {
           sShop.Where.Add("area_id", area.GetInt32("id"));
         })));
+
+        //TestGroupingStaticClass に支障が出る場合があるので
+        //このテストで追加した large_area と area のレコードを掃除
+        //shop は update 時のフックで削除済み
+        conn.BeginTransaction();
+        try
+        {
+          largeArea.Delete(conn);
+          area.Delete(conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
       }
 
     }
