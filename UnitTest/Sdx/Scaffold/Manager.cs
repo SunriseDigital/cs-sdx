@@ -1495,7 +1495,7 @@ namespace UnitTest
           sShop.Where.Add("area_id", area.GetInt32("id"));
         })));
 
-        //TestGroupingStaticClass に支障が出る場合があるので
+        //他のテストに支障が出る場合があるので
         //このテストで追加した large_area と area のレコードを掃除
         //shop は update 時のフックで削除済み
         conn.BeginTransaction();
