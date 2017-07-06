@@ -440,10 +440,10 @@ namespace Sdx.Scaffold
         currentRecords.ForEach(crec => crec.Delete(conn));
       }
 
-      if (PostSaveHookList != null)
+      if (postSaveHookList != null)
       {
         record.ClearRecordCache();
-        PostSaveHookList.ForEach(action =>
+        postSaveHookList.ForEach(action =>
         {
           action(record, values, conn, isNew);
         });
@@ -559,16 +559,16 @@ namespace Sdx.Scaffold
     /// <summary>
     /// Save() 後に何かさせたい場合は AddPostSaveHook でセットしてください
     /// </summary>
-    private List<Action<Db.Record, NameValueCollection, Db.Connection, bool>> PostSaveHookList = null;
+    private List<Action<Db.Record, NameValueCollection, Db.Connection, bool>> postSaveHookList = null;
 
     public void AddPostSaveHook(Action<Db.Record, NameValueCollection, Db.Connection, bool> callback)
     {
-      if(PostSaveHookList == null)
+      if(postSaveHookList == null)
       {
-        PostSaveHookList = new List<Action<Db.Record, NameValueCollection, Db.Connection, bool>>();
+        postSaveHookList = new List<Action<Db.Record, NameValueCollection, Db.Connection, bool>>();
       }
 
-      PostSaveHookList.Add(callback);
+      postSaveHookList.Add(callback);
     }
 
   }
