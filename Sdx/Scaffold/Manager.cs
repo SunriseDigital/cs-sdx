@@ -441,14 +441,11 @@ namespace Sdx.Scaffold
         currentRecords.ForEach(crec => crec.Delete(conn));
       }
 
-      if (postSaveHookList != null)
+      record.ClearRecordCache();
+      postSaveHookList.ForEach(action =>
       {
-        record.ClearRecordCache();
-        postSaveHookList.ForEach(action =>
-        {
-          action(record, values, conn, isNew);
-        });
-      }
+        action(record, values, conn, isNew);
+      });
     }
 
     /// <summary>
