@@ -25,6 +25,7 @@ namespace Sdx.Scaffold
       FormList = new Config.List();
       SortingOrder = new Config.Item();
       OutlineRank = 1;
+      postSaveHookList = new List<Action<Db.Record, NameValueCollection, Db.Connection, bool>>();
     }
 
     internal Db.TableMeta TableMeta { get; set; }
@@ -559,15 +560,10 @@ namespace Sdx.Scaffold
     /// <summary>
     /// Save() 後に何かさせたい場合は AddPostSaveHook でセットしてください
     /// </summary>
-    private List<Action<Db.Record, NameValueCollection, Db.Connection, bool>> postSaveHookList = null;
+    private List<Action<Db.Record, NameValueCollection, Db.Connection, bool>> postSaveHookList;
 
     public void AddPostSaveHook(Action<Db.Record, NameValueCollection, Db.Connection, bool> callback)
     {
-      if(postSaveHookList == null)
-      {
-        postSaveHookList = new List<Action<Db.Record, NameValueCollection, Db.Connection, bool>>();
-      }
-
       postSaveHookList.Add(callback);
     }
 
