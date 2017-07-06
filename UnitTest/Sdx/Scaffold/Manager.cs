@@ -1364,14 +1364,7 @@ namespace UnitTest
            .AddColumnValue("large_area_id", rec.GetInt32("id"))
            .AddColumnValue("code", "test_area");
 
-          try
-          {
-            con.Execute(insert);
-          }
-          catch (Exception)
-          {
-            throw;
-          }
+          con.Execute(insert);
         }
       });
 
@@ -1397,14 +1390,7 @@ namespace UnitTest
             .AddColumnValue("area_id", areaId)
             .AddColumnValue("created_at", DateTime.Now);
 
-          try
-          {
-            con.Execute(insert);
-          }
-          catch (Exception)
-          {
-            throw;
-          }
+          con.Execute(insert);
         }
         else if(isnew == false)
         {
@@ -1414,14 +1400,7 @@ namespace UnitTest
             .SetFrom("shop")
             .Where.Add("area_id", areaId);
 
-          try
-          {
-            con.Execute(delete);
-          }
-          catch (Exception)
-          {
-            throw;
-          }
+          con.Execute(delete);
         }
       });
 
