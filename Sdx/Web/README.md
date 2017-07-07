@@ -8,5 +8,5 @@ Webページやテンプレートエンジン回りのユーティリティー�
 ## Classes
 
 * [DeviceTable](DeviceTable.md)
-
+* [DeviceUrl](DeviceUrl.md)
 * [View](View.md)

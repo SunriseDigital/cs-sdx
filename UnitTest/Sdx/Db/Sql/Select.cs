@@ -2271,10 +2271,10 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         });
       });
 
+      select.CleanOrders();
       testDb.Command = select.Build();
 
-      //Group Byに無いカラムは自動的にOrderから取り除かれます。
-      //SELECT句はからは取り除きません。DBベンダーによっては取得できますし、意味がないわけではないので。
+
       Assert.Equal(
         testDb.Sql(
           @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, {0}area{1}.{0}id{1} AS {0}id@area{1} 

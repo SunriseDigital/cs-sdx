@@ -114,6 +114,7 @@
     <Compile Include="Validation\Group\Function.cs" />
     <Compile Include="Web\DeviceRedirectHttpModule.cs" />
     <Compile Include="Web\DeviceTable.cs" />
+    <Compile Include="Web\DeviceUrl.cs" />
     <Compile Include="Web\HttpModule.cs" />
     <Compile Include="Html\Attr.cs" />
     <Compile Include="Html\Checkable.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Scaffold\Manager.cs" />
     <Compile Include="Web\Helper.cs" />
     <Compile Include="Web\HttpErrorHandler.cs" />
+    <Compile Include="Web\IUrl.cs" />
     <Compile Include="Web\Url.cs" />
     <Compile Include="Web\UserAgent.cs" />
     <Compile Include="Web\View.cs" />

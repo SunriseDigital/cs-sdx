@@ -1,6 +1,10 @@
 ﻿# Sdx.Web.DeviceTable
 
 ## 概要
+
+
+※こちらのクラスはHttpModuleを入れた全ページで評価されるため非効率なので、[DeviceUrl.md](DeviceUrl)を使ってください。
+
 デバイス毎にURLが違う場合に、その対応表を管理します。<br>
 URLがyaml形式の対応表に存在するかチェックをし、存在した場合各デバイスに対応したURLを取得できます。
 
