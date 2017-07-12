@@ -80,6 +80,7 @@
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
     <Compile Include="Sdx\Collection\OrderedDictionary.cs" />
+    <Compile Include="Sdx\Collection\NameValueCollection.cs" />
     <Compile Include="Sdx\Context.cs" />
     <Compile Include="Sdx\Db\Adapter.cs" />
     <Compile Include="Sdx\Db\Connection.cs" />
