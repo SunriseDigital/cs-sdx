@@ -284,6 +284,16 @@ namespace Sdx.Web
       return this.ParamCount.Any(kv => kv.Key == Uri.EscapeUriString(key));
     }
 
+    public bool HasParam(string key, string value)
+    {
+      if(!HasParam(key))
+      {
+        return false;
+      }
+
+      return GetParam(key) == Uri.EscapeUriString(value);
+    }
+
     /// <summary>
     /// ParamList の各キー毎の要素数を管理するプロパティ
     /// 同じ名前のキーがセットされたらカウントをアップし、
@@ -362,7 +372,7 @@ namespace Sdx.Web
       }
     }
 
-    public bool IsParamOnly(params string[] keys)
+    public bool HasParamOnly(params string[] keys)
     {
       if (ParamList.Count == 0 && keys.Length > 0)
       {
@@ -370,6 +380,12 @@ namespace Sdx.Web
       }
 
       return ParamList.All(tpl => keys.Contains(tpl.Item1));
+    }
+
+    [Obsolete("HasParamOnlyを利用してください。")]
+    public bool IsParamOnly(params string[] keys)
+    {
+      return HasParamOnly(keys);
     }
 
     public IEnumerable<KeyValuePair<string, string>> Queries
