@@ -193,7 +193,7 @@ namespace Sdx.Diagnostics
           ++count;
         }
         var result = GetDumpTitle(value, indent, needType, "(" + count + ")");
-        return AppendEnumerableDump(result, value as IEnumerable, indent, needType, dumpPublicMemberCount);
+        return AppendEnumerableDump(result, value as IEnumerable, indent + DumpIndent, needType, dumpPublicMemberCount);
       }
       else if (value is System.Data.Common.DbParameter)
       {

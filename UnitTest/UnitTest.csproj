@@ -60,6 +60,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
@@ -79,6 +80,7 @@
   <ItemGroup>
     <Compile Include="BaseDbTest.cs" />
     <Compile Include="Sdx\Collection\OrderedDictionary.cs" />
+    <Compile Include="Sdx\Collection\NameValueCollection.cs" />
     <Compile Include="Sdx\Context.cs" />
     <Compile Include="Sdx\Db\Adapter.cs" />
     <Compile Include="Sdx\Db\Connection.cs" />
@@ -100,7 +102,9 @@
     <Compile Include="BaseTest.cs" />
     <Compile Include="Sdx\Pager.cs" />
     <Compile Include="Sdx\Scaffold\Manager.cs" />
+    <Compile Include="Sdx\Validation\ImageValidator.cs" />
     <Compile Include="Sdx\Web\DeviceTable.cs" />
+    <Compile Include="Sdx\Web\DeviceUrl.cs" />
     <Compile Include="TestTemplate.cs" />
     <Compile Include="Test\Data\LargeArea.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
@@ -176,6 +180,21 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="setup.sqlserver.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="test_image\100x100.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="test_image\80x80.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="test_image\acrobat.gif">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="test_image\bitmap_test_image.bmp">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="test_image\preloader-2-128px-1.gif">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

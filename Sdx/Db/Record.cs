@@ -360,7 +360,7 @@ namespace Sdx.Db
       {
         if (connection == null)
         {
-          connection = Select.Connection;
+          connection = Connection;
         }
 
         if (OwnMeta.Relations.ContainsKey(contextName))
@@ -916,6 +916,66 @@ namespace Sdx.Db
 
         return OwnMeta.Pkeys.First().Name;
       }
+    }
+
+    public T GetEnum<T>(string key) where T : struct, IConvertible
+    {
+      if (!typeof(T).IsEnum)
+      {
+        throw new ArgumentException("T must be an enumerated type");
+      }
+
+      return (T)Enum.Parse(typeof(T), GetString(key));
+    }
+
+    public Dictionary<string, object> ToDictionary(params string[] columns)
+    {
+      var dic = new Dictionary<string, object>() { };
+
+      if (columns.Length == 0)
+      {
+        OwnMeta.Columns.ForEach(col =>
+        {
+          dic.Add(col.Name, this.GetValue(col.Name));
+        });
+      }
+      else
+      {
+        foreach (var column in columns)
+        {
+          if (this.CanGetValue(column))
+          {
+            dic.Add(column, this.GetValue(column));
+          }
+        }
+      }
+
+      return dic;
+    }
+
+    public Dictionary<string, T> ToDictionary<T>(params string[] columns)
+    {
+      var dic = new Dictionary<string, T>() { };
+
+      if (columns.Length == 0)
+      {
+        OwnMeta.Columns.ForEach(col =>
+        {
+          dic.Add(col.Name, (T)Convert.ChangeType(this.GetValue(col.Name), typeof(T)));
+        });
+      }
+      else
+      {
+        foreach (var column in columns)
+        {
+          if (this.CanGetValue(column))
+          {
+            dic.Add(column, (T)Convert.ChangeType(this.GetValue(column), typeof(T)));
+          }
+        }
+      }
+
+      return dic;
     }
   }
 }

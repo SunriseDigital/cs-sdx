@@ -62,7 +62,8 @@ namespace Sdx.Db
       Float,
       String,
       DateTime,
-      Date
+      Date,
+      Boolean
     }
 
     public class Column : Diagnostics.IDumpable
@@ -376,6 +377,11 @@ isPkey: {5}",
       select.Where.Add(OwnMeta.Pkeys.First((col) => true).Name, pkeyValue);
 
       return conn.FetchRecord(select);
+    }
+
+    public RecordSet FetchRecordSetByColumn(Db.Connection conn, string columnName, object value)
+    {
+      return FetchRecordSet(conn, select => this.Context.Where.Add(columnName, value));
     }
 
     public Record FetchRecordByColumn(Db.Connection conn, string columnName, object value)
