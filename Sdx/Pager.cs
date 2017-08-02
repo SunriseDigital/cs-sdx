@@ -200,7 +200,7 @@ namespace Sdx
       return new Dictionary<string, object>()
       {
         {"page", Page},
-        {"pageCount", TotalCount},
+        {"pageCount", LastPage},
         {"hasNext", HasNext},
         {"hasPrev", HasPrev},
         {"perPage", PerPage},
