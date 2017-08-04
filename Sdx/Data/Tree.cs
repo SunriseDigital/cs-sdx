@@ -12,6 +12,7 @@ namespace Sdx.Data
     private Dictionary<string, Tree> treeCache = new Dictionary<string, Tree>();
 
     public abstract void Load(TextReader input);
+    public abstract void Bind(string value);
 
     /// <summary>
     /// 値を返します。末端のノードでない場合は例外を投げてください。
