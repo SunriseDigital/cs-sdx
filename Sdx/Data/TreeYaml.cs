@@ -79,6 +79,13 @@ namespace Sdx.Data
       this.BaseNode = yaml.Documents[0].RootNode; ;
     }
 
+    public override void Bind(string value)
+    {
+      //Bind自体が後付けで今現在TreeYamlでは使用していない為、例外を返しています。
+      //用途が出てきたら、実装してください。
+      throw new NotImplementedException();
+    }
+
     public override string ToString()
     {
       return BaseNode.ToString();
