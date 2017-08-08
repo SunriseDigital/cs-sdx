@@ -17,8 +17,19 @@ namespace Sdx.Data
 
     public override void Load(TextReader input)
     {
+      Bind(input.ReadToEnd());
+    }
+
+    public override void Bind(string value)
+    {
       var serializer = new JavaScriptSerializer();
-      BaseJson = serializer.Deserialize<Dictionary<string, object>>(input.ReadToEnd());
+
+      if (value == "[]")
+      {
+        value = "{}";
+      }
+
+      BaseJson = serializer.Deserialize<Dictionary<string, object>>(value);
     }
 
     public override string ToValue()
