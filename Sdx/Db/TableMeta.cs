@@ -17,7 +17,7 @@ namespace Sdx.Db
       Type recordType,
       Type tableType
     ){
-      this.Name = name;
+      this.name = name;
       InitializeTableMeta(columns, relations, recordType, tableType);
     }
 
@@ -74,11 +74,6 @@ namespace Sdx.Db
         {
           return this.NameGetter();
         }
-      }
-
-      private set 
-      { 
-        this.name = value; 
       }
     }
     public List<Table.Column> Columns { get; private set; }
