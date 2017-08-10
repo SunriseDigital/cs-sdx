@@ -18,6 +18,27 @@ namespace Sdx.Db
       Type tableType
     ){
       this.Name = name;
+      InitializeTableMeta(columns, relations, recordType, tableType);
+    }
+
+    public TableMeta(
+      Func<string> nameGetter,
+      List<Table.Column> columns,
+      Dictionary<string, Sdx.Db.Table.Relation> relations,
+      Type recordType,
+      Type tableType
+    )
+    {
+      this.NameGetter = nameGetter;
+      InitializeTableMeta(columns, relations, recordType, tableType);
+    }
+
+    private void InitializeTableMeta(
+      List<Table.Column> columns,
+      Dictionary<string, Sdx.Db.Table.Relation> relations,
+      Type recordType,
+      Type tableType)
+    {
       this.Columns = columns;
       this.Relations = relations;
 
@@ -33,17 +54,38 @@ namespace Sdx.Db
       }
       this.TableType = tableType;
 
-      this.Columns.ForEach(column => {
+      this.Columns.ForEach(column =>
+      {
         this.columnsCache[column.Name] = column;
         column.Meta = this;
       });
     }
 
-    public string Name { get; private set; }
+    private string name;
+    public string Name
+    {
+      get
+      {
+        if (this.name != null)
+        {
+          return this.name;
+        }
+        else
+        {
+          return this.NameGetter();
+        }
+      }
+
+      private set 
+      { 
+        this.name = value; 
+      }
+    }
     public List<Table.Column> Columns { get; private set; }
     public Dictionary<string, Sdx.Db.Table.Relation> Relations { get; private set; }
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }
+    public Func<string> NameGetter { get; private set; }
 
     private Dictionary<string, Table.Column> columnsCache = new Dictionary<string, Table.Column>();
 
