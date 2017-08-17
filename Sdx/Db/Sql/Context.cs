@@ -22,19 +22,7 @@ namespace Sdx.Db.Sql
     /// 対象のテーブルまたはサブクエリー。型は
     /// <see cref="string"/>|<see cref="Expr"/>|<see cref="Sql.Select"/>です。
     /// </summary>
-    public object Target
-    {
-      get
-      {
-        return target;
-      }
-
-      set
-      {
-        target = value;
-        Sdx.Context.Current.Debug.Log(target);
-      }
-    }
+    public object Target { get; internal set; }
 
     public string Alias { get; internal set; }
 

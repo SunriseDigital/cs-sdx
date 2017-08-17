@@ -2592,7 +2592,6 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         );
       }
       #endregion
-
     }
   }
 }
