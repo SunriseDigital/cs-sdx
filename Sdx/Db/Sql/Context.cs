@@ -38,7 +38,14 @@ namespace Sdx.Db.Sql
           return this.Alias;
         }
 
-        return this.Target.ToString(); 
+        string name = this.Target.ToString();
+
+        if (typeof(String) == name.GetType())
+        {
+          name = name.Replace(".", "@");
+        }
+
+        return name;
       }
     }
 

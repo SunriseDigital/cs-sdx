@@ -275,7 +275,11 @@ namespace Sdx.Db
     private string GetRelationName<T>()
     {
       var recordType = typeof(T);
-      var relations = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == recordType);
+      var relations = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == recordType || kv.Value.TableMeta.RecordType.IsSubclassOf(recordType));
+      if (relations.Count() == 0)
+      {
+        relations = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == recordType);
+      }
       var count = relations.Count();
       if (count == 0)
       {
