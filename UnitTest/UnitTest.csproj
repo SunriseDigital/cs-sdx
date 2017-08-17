@@ -109,10 +109,14 @@
     <Compile Include="Test\Data\LargeArea.cs" />
     <Compile Include="Test\Db\Adapter.cs" />
     <Compile Include="Test\Db\Table.cs" />
+    <Compile Include="Test\Orm\MenuWithSchema.cs" />
     <Compile Include="Test\Orm\ShopImage.cs" />
     <Compile Include="Test\Orm\ShopImageType.cs" />
+    <Compile Include="Test\Orm\ShopWithSchema.cs" />
+    <Compile Include="Test\Orm\Table\MenuWithSchema.cs" />
     <Compile Include="Test\Orm\Table\ShopImage.cs" />
     <Compile Include="Test\Orm\Table\ShopImageType.cs" />
+    <Compile Include="Test\Orm\Table\ShopWithSchema.cs" />
     <Compile Include="Test\Route\LangRouteHandler.cs" />
     <Compile Include="Test\Scaffold\Area.cs" />
     <Compile Include="Test\Scaffold\LargeArea.cs" />
