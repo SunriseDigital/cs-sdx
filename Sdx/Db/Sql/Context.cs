@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 
 namespace Sdx.Db.Sql
 {
@@ -87,13 +88,13 @@ namespace Sdx.Db.Sql
     public Context InnerJoin(Table target, Condition condition = null, string alias = null)
     {
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Inner, condition, alias);
+      context.Table = target;
 
       if(condition == null)
       {
-        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(target.OwnMeta.Name, alias);
+        context.JoinCondition = CreateJoinCondition(context);
       }
 
-      context.Table = target;
       target.Context = context;
       target.AddAllColumnsFromMeta();
       return context;
@@ -182,16 +183,51 @@ namespace Sdx.Db.Sql
     public Context LeftJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
     {
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Left, condition, alias);
+      context.Table = target;
 
       if (condition == null)
       {
-        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(target.OwnMeta.Name, alias);
+        context.JoinCondition = CreateJoinCondition(context);
       }
 
-      context.Table = target;
       target.Context = context;
       target.AddAllColumnsFromMeta();
       return context;
+    }
+
+    private Condition CreateJoinCondition(Context targetContext)
+    {
+      var cond = new Sql.Condition();
+
+      Table.Relation relation = null;
+      if (Table.OwnMeta.Relations.ContainsKey(targetContext.Name))
+      {
+        relation = Table.OwnMeta.Relations[targetContext.Name];
+      }
+      else if (Table.OwnMeta.Relations.ContainsKey(targetContext.Target.ToString()))
+      {
+        relation = Table.OwnMeta.Relations[targetContext.Target.ToString()];
+      }
+      else if (targetContext.Table != null)
+      {
+        var candidates = Table.OwnMeta.Relations.Where(rel => rel.Value.TableType.IsAssignableFrom(targetContext.Table.GetType()));
+        if (candidates.Any())
+        {
+          relation = candidates.First().Value;
+        }
+      }
+
+      if (relation == null)
+      {
+        throw new KeyNotFoundException("Unable to uniquely identify the relation in " + this.Name + " for " + targetContext.Name);
+      }
+
+      cond.Add(
+        new Sql.Column(relation.ForeignKey, Name),
+        new Sql.Column(relation.ReferenceKey, targetContext.Name)
+      );
+
+      return cond;
     }
 
     public Context LeftJoin(Sdx.Db.Table target, string alias)

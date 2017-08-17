@@ -14,7 +14,7 @@ namespace Test.Orm.Table
     {
       var Relations = CreateRelations();
 
-      Relations["Menu"] = new Relation(
+      Relations["menu"] = new Relation(
         typeof(Test.Orm.Table.MenuWithSchema),
         "id",
         "shop_id"

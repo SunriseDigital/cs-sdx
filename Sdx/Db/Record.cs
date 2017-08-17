@@ -373,8 +373,10 @@ namespace Sdx.Db
 
           var sel = connection.Adapter.CreateSelect();
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
-          sel.AddFrom(relations.TableMeta.CreateTable())
-            .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
+          sel.AddFrom(relations.TableMeta.CreateTable(), contextName, context =>
+          {
+            context.Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
+          });
 
           if (selectHook != null)
           {

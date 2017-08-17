@@ -127,36 +127,5 @@ namespace Sdx.Db
       this.CheckColumn(columnName);
       return this.columnsCache[columnName];
     }
-
-    public Sql.Condition CreateJoinCondition(string tableName, string alias = null)
-    {
-      if(alias == null)
-      {
-        alias = tableName;
-      }
-
-      var cond = new Sql.Condition();
-
-      Table.Relation relation;
-      if (this.Relations.ContainsKey(alias))
-      {
-        relation = this.Relations[alias];
-      }
-      else if (this.Relations.ContainsKey(tableName))
-      {
-        relation = this.Relations[tableName];
-      }
-      else
-      {
-        throw new KeyNotFoundException("Missing " + alias + " relation in " + this.TableType);
-      }
-
-      cond.Add(
-        new Sql.Column(relation.ForeignKey, this.Name),
-        new Sql.Column(relation.ReferenceKey, alias)
-      );
-
-      return cond;
-    }
   }
 }

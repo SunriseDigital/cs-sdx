@@ -15,7 +15,7 @@ namespace Test.Orm.Table
       var Relations = CreateRelations();
 
       Meta = new Sdx.Db.TableMeta(
-        "dbo.shop",
+        "dbo.menu",
         CreateColumns(),
         Relations,
         typeof(Test.Orm.MenuWithSchema),

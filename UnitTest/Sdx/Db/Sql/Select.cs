@@ -2450,12 +2450,12 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
     {
       var db = testDb.Adapter;
       
-      #region JOINなし エイリアス指定
+      #region JOINなし エイリアスあり
       {
         var select = db.CreateSelect();
         select.AddFrom(new Test.Orm.Table.ShopWithSchema(), "Shop", cShop =>
         {
-          cShop.Where.Add("id", 1);
+          cShop.Where.Add("id", 3);
         });
 
         string sql;
@@ -2468,7 +2468,15 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
             conn.Open();
             var shops = conn.FetchRecordSet(select);
             Assert.Equal(1, shops.Count);
-            Assert.Equal(1, shops[0].GetInt32("id"));
+            Assert.Equal(3, shops[0].GetInt32("id"));
+
+            var menus = shops[0].GetRecordSet("menu");
+            Assert.Equal(3, menus.Count);
+            foreach (var menu in menus)
+            {
+              Assert.Equal(typeof(Test.Orm.MenuWithSchema), menu.GetType());
+              Assert.Equal(3, menu.GetInt32("shop_id"));
+            }
           }
 
           sql = Sdx.Context.Current.DbProfiler.Logs[1].CommandText;
@@ -2487,48 +2495,54 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       }
       #endregion
 
-      //#region JOINあり
-      //{
-      //  var select = db.CreateSelect();
-      //  select.AddFrom(new Test.Orm.Table.ShopWithSchema(), cShop =>
-      //  {
-      //    cShop.Where.Add("id", 1);
-      //    cShop.InnerJoin(new Test.Orm.Table.MenuWithSchema(), "Menu", cMenu => 
-      //    { 
-            
-      //    });
-      //  });
+      #region JOINあり エイリアスあり
+      {
+        var select = db.CreateSelect();
+        select.AddFrom(new Test.Orm.Table.ShopWithSchema(), "Shop", cShop =>
+        {
+          cShop.Where.Add("id", 3);
+          cShop.InnerJoin(new Test.Orm.Table.MenuWithSchema(), "Hoge", cMenu =>
+          {
 
-      //  Sdx.Context.Current.Debug.Log(select.Build().CommandText);
+          });
+        });
 
-      //  string sql;
+        string sql;
 
-      //  if (testDb.Adapter is Sdx.Db.Adapter.SqlServer)
-      //  {
-      //    Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
-      //    using (var conn = db.CreateConnection())
-      //    {
-      //      conn.Open();
-      //      var shops = conn.FetchRecordSet(select);
-      //      Assert.Equal(1, shops.Count);
-      //      Assert.Equal(1, shops[0].GetInt32("id"));
-      //    }
+        if (testDb.Adapter is Sdx.Db.Adapter.SqlServer)
+        {
+          Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
+          using (var conn = db.CreateConnection())
+          {
+            conn.Open();
+            var shops = conn.FetchRecordSet(select);
+            Assert.Equal(1, shops.Count);
+            Assert.Equal(3, shops[0].GetInt32("id"));
 
-      //    sql = Sdx.Context.Current.DbProfiler.Logs[1].CommandText;
-      //  }
-      //  else
-      //  {
-      //    sql = select.Build().CommandText;
-      //  }
+            var menus = shops[0].GetRecordSet("Hoge");
+            Assert.Equal(3, menus.Count);
+            foreach (var menu in menus)
+            {
+              Assert.Equal(typeof(Test.Orm.MenuWithSchema), menu.GetType());
+              Assert.Equal(3, menu.GetInt32("shop_id"));
+            }
+          }
 
-      //  //Assert.Equal(
-      //  //  testDb.Sql(
-      //  //    @"SELECT {0}dbo$shop{1}.{0}id{1} AS {0}id@dbo$shop{1}, {0}dbo$shop{1}.{0}name{1} AS {0}name@dbo$shop{1}, {0}dbo$shop{1}.{0}area_id{1} AS {0}area_id@dbo$shop{1}, {0}dbo$shop{1}.{0}main_image_id{1} AS {0}main_image_id@dbo$shop{1}, {0}dbo$shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@dbo$shop{1}, {0}dbo$shop{1}.{0}login_id{1} AS {0}login_id@dbo$shop{1}, {0}dbo$shop{1}.{0}password{1} AS {0}password@dbo$shop{1}, {0}dbo$shop{1}.{0}created_at{1} AS {0}created_at@dbo$shop{1} FROM {0}dbo{1}.{0}shop{1} AS {0}dbo$shop{1} WHERE {0}dbo$shop{1}.{0}id{1} = @0"
-      //  //  ),
-      //  //  sql
-      //  //);
-      //}
-      //#endregion
+          sql = Sdx.Context.Current.DbProfiler.Logs[1].CommandText;
+        }
+        else
+        {
+          sql = select.Build().CommandText;
+        }
+
+        Assert.Equal(
+          testDb.Sql(
+            @"SELECT {0}Shop{1}.{0}id{1} AS {0}id@Shop{1}, {0}Shop{1}.{0}name{1} AS {0}name@Shop{1}, {0}Shop{1}.{0}area_id{1} AS {0}area_id@Shop{1}, {0}Shop{1}.{0}main_image_id{1} AS {0}main_image_id@Shop{1}, {0}Shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@Shop{1}, {0}Shop{1}.{0}login_id{1} AS {0}login_id@Shop{1}, {0}Shop{1}.{0}password{1} AS {0}password@Shop{1}, {0}Shop{1}.{0}created_at{1} AS {0}created_at@Shop{1}, {0}Hoge{1}.{0}id{1} AS {0}id@Hoge{1}, {0}Hoge{1}.{0}name{1} AS {0}name@Hoge{1}, {0}Hoge{1}.{0}shop_id{1} AS {0}shop_id@Hoge{1} FROM {0}dbo{1}.{0}shop{1} AS {0}Shop{1} INNER JOIN {0}dbo{1}.{0}menu{1} AS {0}Hoge{1} ON {0}Shop{1}.{0}id{1} = {0}Hoge{1}.{0}shop_id{1} WHERE {0}Shop{1}.{0}id{1} = @0"
+          ),
+          sql
+        );
+      }
+      #endregion
 
     }
   }
