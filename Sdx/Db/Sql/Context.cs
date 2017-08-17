@@ -17,11 +17,24 @@ namespace Sdx.Db.Sql
       this.Select = select;
     }
 
+    private object target;
     /// <summary>
     /// 対象のテーブルまたはサブクエリー。型は
     /// <see cref="string"/>|<see cref="Expr"/>|<see cref="Sql.Select"/>です。
     /// </summary>
-    public object Target { get; internal set; }
+    public object Target
+    {
+      get
+      {
+        return target;
+      }
+
+      set
+      {
+        target = value;
+        Sdx.Context.Current.Debug.Log(target);
+      }
+    }
 
     public string Alias { get; internal set; }
 
@@ -87,6 +100,10 @@ namespace Sdx.Db.Sql
 
     public Context InnerJoin(Table target, Condition condition = null, string alias = null)
     {
+      if (alias == null)
+      {
+        alias = target.OwnMeta.DefaultAlias;
+      }
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Inner, condition, alias);
       context.Table = target;
 
@@ -180,8 +197,12 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Context LeftJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
+    public Context LeftJoin(Table target, Condition condition = null, string alias = null)
     {
+      if (alias == null)
+      {
+        alias = target.OwnMeta.DefaultAlias;
+      }
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Left, condition, alias);
       context.Table = target;
 

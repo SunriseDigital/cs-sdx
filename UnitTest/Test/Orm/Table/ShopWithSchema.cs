@@ -25,7 +25,8 @@ namespace Test.Orm.Table
         CreateColumns(),
         Relations,
         typeof(Test.Orm.ShopWithSchema),
-        typeof(Test.Orm.Table.ShopWithSchema)
+        typeof(Test.Orm.Table.ShopWithSchema),
+        "shop"
       );
     }
   }

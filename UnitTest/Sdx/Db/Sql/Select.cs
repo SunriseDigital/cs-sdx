@@ -2544,6 +2544,55 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       }
       #endregion
 
+      #region JOINあり エイリアスなし
+      {
+        var select = db.CreateSelect();
+        select.AddFrom(new Test.Orm.Table.ShopWithSchema(), cShop =>
+        {
+          cShop.Where.Add("id", 3);
+          cShop.InnerJoin(new Test.Orm.Table.MenuWithSchema(), cMenu =>
+          {
+
+          });
+        });
+
+        string sql;
+
+        if (testDb.Adapter is Sdx.Db.Adapter.SqlServer)
+        {
+          Sdx.Context.Current.DbProfiler = new Sdx.Db.Sql.Profiler();
+          using (var conn = db.CreateConnection())
+          {
+            conn.Open();
+            var shops = conn.FetchRecordSet(select);
+            Assert.Equal(1, shops.Count);
+            Assert.Equal(3, shops[0].GetInt32("id"));
+
+            var menus = shops[0].GetRecordSet("menu");
+            Assert.Equal(3, menus.Count);
+            foreach (var menu in menus)
+            {
+              Assert.Equal(typeof(Test.Orm.MenuWithSchema), menu.GetType());
+              Assert.Equal(3, menu.GetInt32("shop_id"));
+            }
+          }
+
+          sql = Sdx.Context.Current.DbProfiler.Logs[1].CommandText;
+        }
+        else
+        {
+          sql = select.Build().CommandText;
+        }
+
+        Assert.Equal(
+          testDb.Sql(
+            @"SELECT {0}shop{1}.{0}id{1} AS {0}id@shop{1}, {0}shop{1}.{0}name{1} AS {0}name@shop{1}, {0}shop{1}.{0}area_id{1} AS {0}area_id@shop{1}, {0}shop{1}.{0}main_image_id{1} AS {0}main_image_id@shop{1}, {0}shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@shop{1}, {0}shop{1}.{0}login_id{1} AS {0}login_id@shop{1}, {0}shop{1}.{0}password{1} AS {0}password@shop{1}, {0}shop{1}.{0}created_at{1} AS {0}created_at@shop{1}, {0}menu{1}.{0}id{1} AS {0}id@menu{1}, {0}menu{1}.{0}name{1} AS {0}name@menu{1}, {0}menu{1}.{0}shop_id{1} AS {0}shop_id@menu{1} FROM {0}dbo{1}.{0}shop{1} AS {0}shop{1} INNER JOIN {0}dbo{1}.{0}menu{1} AS {0}menu{1} ON {0}shop{1}.{0}id{1} = {0}menu{1}.{0}shop_id{1} WHERE {0}shop{1}.{0}id{1} = @0"
+          ),
+          sql
+        );
+      }
+      #endregion
+
     }
   }
 }

@@ -19,7 +19,8 @@ namespace Test.Orm.Table
         CreateColumns(),
         Relations,
         typeof(Test.Orm.MenuWithSchema),
-        typeof(Test.Orm.Table.MenuWithSchema)
+        typeof(Test.Orm.Table.MenuWithSchema),
+        "menu"
       );
     }
   }
