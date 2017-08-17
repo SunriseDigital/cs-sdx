@@ -2450,10 +2450,10 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
     {
       var db = testDb.Adapter;
       
-      #region JOINなし
+      #region JOINなし エイリアス指定
       {
         var select = db.CreateSelect();
-        select.AddFrom(new Test.Orm.Table.ShopWithSchema(), cShop =>
+        select.AddFrom(new Test.Orm.Table.ShopWithSchema(), "Shop", cShop =>
         {
           cShop.Where.Add("id", 1);
         });
@@ -2480,7 +2480,7 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
 
         Assert.Equal(
           testDb.Sql(
-            @"SELECT {0}dbo$shop{1}.{0}id{1} AS {0}id@dbo$shop{1}, {0}dbo$shop{1}.{0}name{1} AS {0}name@dbo$shop{1}, {0}dbo$shop{1}.{0}area_id{1} AS {0}area_id@dbo$shop{1}, {0}dbo$shop{1}.{0}main_image_id{1} AS {0}main_image_id@dbo$shop{1}, {0}dbo$shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@dbo$shop{1}, {0}dbo$shop{1}.{0}login_id{1} AS {0}login_id@dbo$shop{1}, {0}dbo$shop{1}.{0}password{1} AS {0}password@dbo$shop{1}, {0}dbo$shop{1}.{0}created_at{1} AS {0}created_at@dbo$shop{1} FROM {0}dbo{1}.{0}shop{1} AS {0}dbo$shop{1} WHERE {0}dbo$shop{1}.{0}id{1} = @0"
+            @"SELECT {0}Shop{1}.{0}id{1} AS {0}id@Shop{1}, {0}Shop{1}.{0}name{1} AS {0}name@Shop{1}, {0}Shop{1}.{0}area_id{1} AS {0}area_id@Shop{1}, {0}Shop{1}.{0}main_image_id{1} AS {0}main_image_id@Shop{1}, {0}Shop{1}.{0}sub_image_id{1} AS {0}sub_image_id@Shop{1}, {0}Shop{1}.{0}login_id{1} AS {0}login_id@Shop{1}, {0}Shop{1}.{0}password{1} AS {0}password@Shop{1}, {0}Shop{1}.{0}created_at{1} AS {0}created_at@Shop{1} FROM {0}dbo{1}.{0}shop{1} AS {0}Shop{1} WHERE {0}Shop{1}.{0}id{1} = @0"
           ),
           sql
         );

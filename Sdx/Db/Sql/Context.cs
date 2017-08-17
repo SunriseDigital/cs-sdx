@@ -16,31 +16,11 @@ namespace Sdx.Db.Sql
       this.Select = select;
     }
 
-    private object target;
     /// <summary>
     /// 対象のテーブルまたはサブクエリー。型は
     /// <see cref="string"/>|<see cref="Expr"/>|<see cref="Sql.Select"/>です。
     /// </summary>
-    public object Target
-    { 
-      get
-      {
-        return target;
-      }
-
-      internal set
-      {
-        target = value;
-        if (target is String && Alias == null)
-        {
-          var tableName = (String)target;
-          if (tableName.Contains("."))
-          {
-            Alias = tableName.Replace('.', '$');
-          }
-        }
-      }
-    }
+    public object Target { get; internal set; }
 
     public string Alias { get; internal set; }
 
