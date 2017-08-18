@@ -275,7 +275,7 @@ namespace Sdx.Db
     private string GetRelationName<T>()
     {
       var recordType = typeof(T);
-      var relations = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == recordType);
+      var relations = OwnMeta.Relations.Where(kv => recordType.IsAssignableFrom(kv.Value.TableMeta.RecordType));
       var count = relations.Count();
       if (count == 0)
       {
@@ -369,8 +369,10 @@ namespace Sdx.Db
 
           var sel = connection.Adapter.CreateSelect();
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
-          sel.AddFrom(relations.TableMeta.CreateTable())
-            .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
+          sel.AddFrom(relations.TableMeta.CreateTable(), contextName, context =>
+          {
+            context.Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
+          });
 
           if (selectHook != null)
           {

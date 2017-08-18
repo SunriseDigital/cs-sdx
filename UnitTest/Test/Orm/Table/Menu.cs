@@ -3,21 +3,23 @@ using System.Collections.Generic;
 
 namespace Test.Orm.Table
 {
-  class Menu : Test.Db.Table
+  public class Menu : Test.Db.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 
-    static Menu()
+    protected static List<Column> CreateColumns()
     {
-      Meta = new Sdx.Db.TableMeta(
-        "menu",
-        new List<Column>()
+      return new List<Column>()
         {
           new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("name"),
           new Column("shop_id"),
-        },
-        new Dictionary<string, Relation>()
+        };
+    }
+
+    protected static Dictionary<string, Relation> CreateRelations()
+    {
+      return new Dictionary<string, Relation>()
         {
           {
             "shop",
@@ -27,7 +29,15 @@ namespace Test.Orm.Table
               "id"
             )
           }
-        },
+        };
+    }
+
+    static Menu()
+    {
+      Meta = new Sdx.Db.TableMeta(
+        "menu",
+        CreateColumns(),
+        CreateRelations(),
         typeof(Test.Orm.Menu),
         typeof(Test.Orm.Table.Menu)
       );
