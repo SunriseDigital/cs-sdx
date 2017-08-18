@@ -1318,5 +1318,179 @@ namespace UnitTest
         Assert.NotEqual("", form["created_at"].Value.ToString());
       }
     }
+
+    [Fact]
+    public void TestPostSaveHook()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunPostSaveHook(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunPostSaveHook(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.LargeArea.Meta, db.Adapter);
+
+      //form
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("name"))
+          .Set("label", new Sdx.Scaffold.Config.Value("名称"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
+          .Set("label", new Sdx.Scaffold.Config.Value("コード"))
+      );
+
+      //仮想送信パラメータ
+      var postParams = new NameValueCollection()
+      {
+        {"name", "test_large_area"},
+        {"code", "test_code"}
+      };
+
+      //hook
+      //large_area を追加したら、その配下に属する area を追加する
+      scaffold.AddPostSaveHook((rec, post, con, isnew) =>
+      {
+        if(isnew)
+        {
+          var insert = con.Adapter.CreateInsert();
+
+          insert
+           .SetInto("area")
+           .AddColumnValue("name", "テスト小エリア")
+           .AddColumnValue("large_area_id", rec.GetInt32("id"))
+           .AddColumnValue("code", "test_area");
+
+          con.Execute(insert);
+        }
+      });
+
+      //hookその2(hookを複数持たせるテストも兼ねて)
+      scaffold.AddPostSaveHook((rec, post, con, isnew) =>
+      {
+        //別のフックで追加済みのテスト用小エリアidを取得
+        var selectArea = con.Adapter.CreateSelect();
+        selectArea.SetColumn("id");
+        selectArea.AddFrom(new Test.Orm.Table.Area(), cArea =>
+        {
+          cArea.Where.Add("large_area_id", rec.GetInt32("id"));
+        });
+        var areaId = con.FetchOne(selectArea);
+
+        if(isnew)
+        {
+          var insert = con.Adapter.CreateInsert();
+
+          insert
+            .SetInto("shop")
+            .AddColumnValue("name", "自動追加テスト店")
+            .AddColumnValue("area_id", areaId)
+            .AddColumnValue("created_at", DateTime.Now);
+
+          con.Execute(insert);
+        }
+        else if(isnew == false)
+        {
+          var delete = con.Adapter.CreateDelete();
+
+          delete
+            .SetFrom("shop")
+            .Where.Add("area_id", areaId);
+
+          con.Execute(delete);
+        }
+      });
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(new NameValueCollection(), conn);
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, postParams, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        var select = conn.Adapter.CreateSelect();
+        select.AddFrom(new Test.Orm.Table.LargeArea(), cLargeArea =>
+        {
+          cLargeArea.Where.Add("name", "test_large_area");
+          cLargeArea.Where.Add("code", "test_code");
+        });
+
+        var largeArea = conn.FetchRecord(select);
+        Assert.Equal("test_code", largeArea.GetString("code"));
+        Assert.Equal("test_large_area", largeArea.GetString("name"));
+
+        //共通 hook 確認
+        var tArea = new Test.Orm.Table.Area();
+        var area = tArea.FetchRecord(conn, (sArea =>
+        {
+          sArea.Where.Add("large_area_id", largeArea.GetInt32("id"));
+        }));
+        Assert.NotNull(area);
+
+        //新規登録用 hook 確認
+        var tShop = new Test.Orm.Table.Shop();
+        var shop = tShop.FetchRecord(conn, (sShop =>
+        {
+          sShop.Where.Add("area_id", area.GetInt32("id"));
+        }));
+        Assert.NotNull(shop);
+
+        //更新時確認
+        var updateParams = new NameValueCollection()
+        {
+          {"name", "test_large_area__update"},
+          {"code", "test_code__update"}
+        };
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(largeArea, updateParams, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        //更新用 hook が動いていれば
+        Assert.Null(tShop.FetchRecord(conn, (sShop =>
+        {
+          sShop.Where.Add("area_id", area.GetInt32("id"));
+        })));
+
+        //他のテストに支障が出る場合があるので
+        //このテストで追加した large_area と area のレコードを掃除
+        //shop は update 時のフックで削除済み
+        conn.BeginTransaction();
+        try
+        {
+          area.Delete(conn);
+          largeArea.Delete(conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+      }
+
+    }
   }
 }

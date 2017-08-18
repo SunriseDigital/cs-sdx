@@ -39,7 +39,7 @@ namespace Sdx.Data.TreeMapper.Record
         {
           if (recordKey == null)
           {
-            throw new ArgumentNullException("The argument 'recordKey' null is not allowed.");
+            throw new ArgumentNullException("The argument 'RecordKey' of HasRecordKey method is not allowed null.");
           }
 
           return this.GetType().GetFields()

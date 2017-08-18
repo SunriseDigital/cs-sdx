@@ -117,6 +117,14 @@ namespace Sdx.Web
       }
     }
 
+    public IEnumerable<KeyValuePair<String, String>> Params
+    {
+      get
+      {
+        return ParamList.Select(tpl => new KeyValuePair<String, String>(tpl.Item1, tpl.Item2));
+      }
+    }
+
     public string Build(NameValueCollection add)
     {
       if (add.Count == 0)
