@@ -15,10 +15,11 @@ namespace Sdx.Db
       List<Table.Column> columns,
       Dictionary<string, Sdx.Db.Table.Relation> relations,
       Type recordType,
-      Type tableType
+      Type tableType,
+      String defaultAlias = null
     ){
       this.name = name;
-      InitializeTableMeta(columns, relations, recordType, tableType);
+      InitializeTableMeta(columns, relations, recordType, tableType, defaultAlias);
     }
 
     public TableMeta(
@@ -26,21 +27,24 @@ namespace Sdx.Db
       List<Table.Column> columns,
       Dictionary<string, Sdx.Db.Table.Relation> relations,
       Type recordType,
-      Type tableType
+      Type tableType,
+      String defaultAlias = null
     )
     {
       this.NameGetter = nameGetter;
-      InitializeTableMeta(columns, relations, recordType, tableType);
+      InitializeTableMeta(columns, relations, recordType, tableType, defaultAlias);
     }
 
     private void InitializeTableMeta(
       List<Table.Column> columns,
       Dictionary<string, Sdx.Db.Table.Relation> relations,
       Type recordType,
-      Type tableType)
-    {
+      Type tableType,
+      string defaultAlias
+    ){
       this.Columns = columns;
       this.Relations = relations;
+      this.DefaultAlias = defaultAlias;
 
       if (!typeof(Sdx.Db.Record).IsAssignableFrom(recordType))
       {
@@ -81,6 +85,7 @@ namespace Sdx.Db
     public Type TableType { get; private set; }
     public Type RecordType { get; private set; }
     public Func<string> NameGetter { get; private set; }
+    public String DefaultAlias { get; private set; }
 
     private Dictionary<string, Table.Column> columnsCache = new Dictionary<string, Table.Column>();
 
@@ -126,37 +131,6 @@ namespace Sdx.Db
     {
       this.CheckColumn(columnName);
       return this.columnsCache[columnName];
-    }
-
-    public Sql.Condition CreateJoinCondition(string tableName, string alias = null)
-    {
-      if(alias == null)
-      {
-        alias = tableName;
-      }
-
-      var cond = new Sql.Condition();
-
-      Table.Relation relation;
-      if (this.Relations.ContainsKey(alias))
-      {
-        relation = this.Relations[alias];
-      }
-      else if (this.Relations.ContainsKey(tableName))
-      {
-        relation = this.Relations[tableName];
-      }
-      else
-      {
-        throw new KeyNotFoundException("Missing " + alias + " relation in " + this.TableType);
-      }
-
-      cond.Add(
-        new Sql.Column(relation.ForeignKey, this.Name),
-        new Sql.Column(relation.ReferenceKey, alias)
-      );
-
-      return cond;
     }
   }
 }

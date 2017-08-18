@@ -565,7 +565,10 @@ namespace UnitTest
 
       select.Context("shop").InnerJoin(
         "menu",
-        Test.Orm.Table.Shop.Meta.CreateJoinCondition("menu")
+        db.Adapter.CreateCondition().Add(
+          new Sdx.Db.Sql.Column("id", "shop"),
+          new Sdx.Db.Sql.Column("shop_id", "menu")
+        )
       );
 
       using (var conn = db.Adapter.CreateConnection())

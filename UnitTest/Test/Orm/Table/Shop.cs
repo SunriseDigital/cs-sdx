@@ -7,11 +7,9 @@ namespace Test.Orm.Table
   {
     public static Sdx.Db.TableMeta Meta { get; private set; }
 
-    static Shop()
+    protected static List<Column> CreateColumns()
     {
-      Meta =  new Sdx.Db.TableMeta(
-        "shop",
-        new List<Column>()
+      return new List<Column>()
         {
           new Column("id", isAutoIncrement: true, isPkey: true),
           new Column("name"),
@@ -21,8 +19,12 @@ namespace Test.Orm.Table
           new Column("login_id", isNotNull: false),
           new Column("password", isNotNull: false),
           new Column("created_at", type: ColumnType.DateTime),
-        },
-        new Dictionary<string, Relation>()
+        };
+    }
+
+    protected static Dictionary<string, Relation> CreateRelations()
+    {
+      return new Dictionary<string, Relation>()
         {
           {
             "area",
@@ -64,7 +66,17 @@ namespace Test.Orm.Table
               "shop_id"
             )
           }
-        },
+        };
+    }
+
+
+
+    static Shop()
+    {
+      Meta =  new Sdx.Db.TableMeta(
+        "shop",
+        CreateColumns(),
+        CreateRelations(),
         typeof(Test.Orm.Shop),
         typeof(Test.Orm.Table.Shop)
       );

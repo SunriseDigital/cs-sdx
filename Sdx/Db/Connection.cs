@@ -524,7 +524,11 @@ namespace Sdx.Db
     /// <returns></returns>
     public RecordSet FetchRecordSet(Sql.Select select)
     {
-      var firstFrom = select.ContextList.First((kv) => kv.Value.JoinType == JoinType.From).Value;
+      var firstFrom = select.ContextList.FirstOrDefault((kv) => kv.Value.JoinType == JoinType.From).Value;
+      if (firstFrom == null)
+      {
+        throw new InvalidOperationException("Missing from clause in table list [" + select.Contexts.Select(ctx => ctx.Name).Aggregate((prev, next) => prev + "," + next) + "]");
+      }
       return FetchRecordSet(select, firstFrom.Name);
     }
 
