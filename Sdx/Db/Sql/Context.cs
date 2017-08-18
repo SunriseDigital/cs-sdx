@@ -90,7 +90,7 @@ namespace Sdx.Db.Sql
     {
       if (alias == null)
       {
-        alias = target.OwnMeta.DefaultAlias;
+        alias = target.DefaultAlias;
       }
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Inner, condition, alias);
       context.Table = target;
@@ -189,7 +189,7 @@ namespace Sdx.Db.Sql
     {
       if (alias == null)
       {
-        alias = target.OwnMeta.DefaultAlias;
+        alias = target.DefaultAlias;
       }
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Left, condition, alias);
       context.Table = target;

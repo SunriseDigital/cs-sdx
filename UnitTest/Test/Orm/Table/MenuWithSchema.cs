@@ -10,6 +10,14 @@ namespace Test.Orm.Table
   {
     public static new Sdx.Db.TableMeta Meta { get; private set; }
 
+    public override string DefaultAlias
+    {
+      get
+      {
+        return "menu";
+      }
+    }
+
     static MenuWithSchema()
     {
       var Relations = CreateRelations();
@@ -19,8 +27,7 @@ namespace Test.Orm.Table
         CreateColumns(),
         Relations,
         typeof(Test.Orm.MenuWithSchema),
-        typeof(Test.Orm.Table.MenuWithSchema),
-        "menu"
+        typeof(Test.Orm.Table.MenuWithSchema)
       );
     }
   }

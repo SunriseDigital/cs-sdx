@@ -115,7 +115,7 @@ namespace Sdx.Db.Sql
     {
       if(alias == null)
       {
-        alias = target.OwnMeta.DefaultAlias;
+        alias = target.DefaultAlias;
       }
       var context = this.CreateContext(target.OwnMeta.Name, alias, JoinType.From);
       context.Table = target;

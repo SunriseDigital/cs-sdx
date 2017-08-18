@@ -10,6 +10,14 @@ namespace Test.Orm.Table
   {
     public static new Sdx.Db.TableMeta Meta { get; private set; }
 
+    public override string DefaultAlias
+    {
+      get
+      {
+        return "shop";
+      }
+    }
+
     static ShopWithSchema()
     {
       var Relations = CreateRelations();
@@ -25,8 +33,7 @@ namespace Test.Orm.Table
         CreateColumns(),
         Relations,
         typeof(Test.Orm.ShopWithSchema),
-        typeof(Test.Orm.Table.ShopWithSchema),
-        "shop"
+        typeof(Test.Orm.Table.ShopWithSchema)
       );
     }
   }

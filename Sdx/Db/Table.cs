@@ -414,5 +414,13 @@ isPkey: {5}",
 
       return conn.FetchRecordSet(select);
     }
+
+    public virtual string DefaultAlias
+    {
+      get
+      {
+        return null;
+      }
+    }
   }
 }
