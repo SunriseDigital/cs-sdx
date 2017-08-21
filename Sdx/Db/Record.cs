@@ -275,15 +275,15 @@ namespace Sdx.Db
     private string GetRelationName<T>()
     {
       var recordType = typeof(T);
-      var relations = OwnMeta.Relations.Where(kv => kv.Value.TableMeta.RecordType == recordType);
+      var relations = OwnMeta.Relations.Where(kv => recordType.IsAssignableFrom(kv.Value.TableMeta.RecordType));
+      //if(candidates.Any() && !candidates.Skip(1).Any())
+      //とも書けるが、3つ以上同じテーブルのリレーションを張る可能性が極めて低く、また、Countの方が直感的で読みやすい。
+      //ベンチもとってみた。
+      //https://github.com/SunriseDigital/cs-sdx/pull/134#issuecomment-323269774
       var count = relations.Count();
-      if (count == 0)
+      if (count != 1)
       {
-        throw new NotImplementedException("Missing relation setting for " + recordType + " in " + OwnMeta.TableType);
-      }
-      else if (count > 1)
-      {
-        throw new NotImplementedException("Too many match relations for " + recordType + " in " + OwnMeta.TableType);
+        throw new InvalidOperationException("Unable to uniquely identify the relation in " + OwnMeta.Name + " for " + recordType);
       }
 
       return relations.First().Key;
@@ -369,8 +369,10 @@ namespace Sdx.Db
 
           var sel = connection.Adapter.CreateSelect();
           sel.SetComment(this.GetType().Name + "::GetRecordSet(" + contextName  + ")");
-          sel.AddFrom(relations.TableMeta.CreateTable())
-            .Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
+          sel.AddFrom(relations.TableMeta.CreateTable(), contextName, context =>
+          {
+            context.Where.Add(relations.ReferenceKey, this.GetString(relations.ForeignKey));
+          });
 
           if (selectHook != null)
           {

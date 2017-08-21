@@ -113,6 +113,10 @@ namespace Sdx.Db.Sql
     /// </summary>
     public Context AddFrom(Sdx.Db.Table target, string alias = null)
     {
+      if(alias == null)
+      {
+        alias = target.OwnMeta.DefaultAlias;
+      }
       var context = this.CreateContext(target.OwnMeta.Name, alias, JoinType.From);
       context.Table = target;
       target.Context = context;
