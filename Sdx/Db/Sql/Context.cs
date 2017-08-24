@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.Linq;
 
 namespace Sdx.Db.Sql
 {
@@ -16,6 +17,7 @@ namespace Sdx.Db.Sql
       this.Select = select;
     }
 
+    private object target;
     /// <summary>
     /// 対象のテーブルまたはサブクエリー。型は
     /// <see cref="string"/>|<see cref="Expr"/>|<see cref="Sql.Select"/>です。
@@ -86,14 +88,18 @@ namespace Sdx.Db.Sql
 
     public Context InnerJoin(Table target, Condition condition = null, string alias = null)
     {
+      if (alias == null)
+      {
+        alias = target.OwnMeta.DefaultAlias;
+      }
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Inner, condition, alias);
+      context.Table = target;
 
       if(condition == null)
       {
-        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(target.OwnMeta.Name, alias);
+        context.JoinCondition = CreateJoinCondition(context);
       }
 
-      context.Table = target;
       target.Context = context;
       target.AddAllColumnsFromMeta();
       return context;
@@ -179,19 +185,63 @@ namespace Sdx.Db.Sql
       return this;
     }
 
-    public Context LeftJoin(Sdx.Db.Table target, Condition condition = null, string alias = null)
+    public Context LeftJoin(Table target, Condition condition = null, string alias = null)
     {
+      if (alias == null)
+      {
+        alias = target.OwnMeta.DefaultAlias;
+      }
       var context = this.AddJoin(target.OwnMeta.Name, JoinType.Left, condition, alias);
+      context.Table = target;
 
       if (condition == null)
       {
-        context.JoinCondition = this.Table.OwnMeta.CreateJoinCondition(target.OwnMeta.Name, alias);
+        context.JoinCondition = CreateJoinCondition(context);
       }
 
-      context.Table = target;
       target.Context = context;
       target.AddAllColumnsFromMeta();
       return context;
+    }
+
+    private Condition CreateJoinCondition(Context targetContext)
+    {
+      var cond = new Sql.Condition();
+
+      Table.Relation relation = null;
+      if (Table.OwnMeta.Relations.ContainsKey(targetContext.Name))
+      {
+        relation = Table.OwnMeta.Relations[targetContext.Name];
+      }
+      else if (Table.OwnMeta.Relations.ContainsKey(targetContext.Target.ToString()))
+      {
+        relation = Table.OwnMeta.Relations[targetContext.Target.ToString()];
+      }
+      else if (targetContext.Table != null)
+      {
+        var candidates = Table.OwnMeta.Relations.Where(rel => rel.Value.TableType.IsAssignableFrom(targetContext.Table.GetType()));
+        //if(candidates.Any() && !candidates.Skip(1).Any())
+        //とも書けるが、3つ以上同じテーブルのリレーションを張る可能性が極めて低く、また、Countの方が直感的で読みやすい。
+        //ベンチもとってみた。
+        //https://github.com/SunriseDigital/cs-sdx/pull/134#issuecomment-323269774
+        var count = candidates.Count();
+        if (count == 1)
+        {
+          relation = candidates.First().Value;
+        }
+      }
+
+      if (relation == null)
+      {
+        throw new InvalidOperationException("Unable to uniquely identify the relation in " + this.Name + " for " + targetContext.Name);
+      }
+
+      cond.Add(
+        new Sql.Column(relation.ForeignKey, Name),
+        new Sql.Column(relation.ReferenceKey, targetContext.Name)
+      );
+
+      return cond;
     }
 
     public Context LeftJoin(Sdx.Db.Table target, string alias)
