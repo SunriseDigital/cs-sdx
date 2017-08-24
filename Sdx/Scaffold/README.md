@@ -453,3 +453,27 @@ DB周りの例外でDBがロールバックする時に、既に保存してし�
     protected virtual void RecordWillDelete(Connection conn) { }
     protected virtual void RecordDidDelete(Connection conn) { }
 ```
+
+### Scaffold 専用フック
+Scaffold上での動作に限定したフックもあります。前項(削除時、画像差し替え時の古い画像の掃除)のように Record の保存時に必ず動くのではなく、Scaffoldでのレコード操作時だけに限定したい場合は下記のフックを使用できます。
+
+#### AddPostSaveHook
+Scaffold 上でレコードの保存が行われた後に実行されるフックです。
+保存後に何か処理を実行させたい場合に使用できます。
+scaffold
+```C#
+////
+// redord => 追加・更新されたレコード
+// post => 追加・更新の際にフォームで送信されたパラメータ(Request.Formなど)
+// conn => 追加・更新に使用された Sdx.Db.Connection 
+// isNew => 新規登録、更新の判別フラグ。true なら新規追加
+////
+scaffold.AddPostSaveHook((record, post, conn, isNew) =>
+{ 
+  //保存が行われたあとに行いたい処理を書く
+});
+```
+フックは複数追加することも可能です。実行は追加の早い順に行われます。
+なお、具体的な使用例は [ユニットテスト](https://github.com/SunriseDigital/cs-sdx/blob/0af0520c65e8901c2bafbf400876885a03ef37a8/UnitTest/Sdx/Scaffold/Manager.cs#L1353-L1405) をご覧ください。
+
+
