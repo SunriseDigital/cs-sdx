@@ -220,7 +220,12 @@ namespace Sdx.Db.Sql
       else if (targetContext.Table != null)
       {
         var candidates = Table.OwnMeta.Relations.Where(rel => rel.Value.TableType.IsAssignableFrom(targetContext.Table.GetType()));
-        if (candidates.Any())
+        //if(candidates.Any() && !candidates.Skip(1).Any())
+        //とも書けるが、3つ以上同じテーブルのリレーションを張る可能性が極めて低く、また、Countの方が直感的で読みやすい。
+        //ベンチもとってみた。
+        //https://github.com/SunriseDigital/cs-sdx/pull/134#issuecomment-323269774
+        var count = candidates.Count();
+        if (count == 1)
         {
           relation = candidates.First().Value;
         }
@@ -228,7 +233,7 @@ namespace Sdx.Db.Sql
 
       if (relation == null)
       {
-        throw new KeyNotFoundException("Unable to uniquely identify the relation in " + this.Name + " for " + targetContext.Name);
+        throw new InvalidOperationException("Unable to uniquely identify the relation in " + this.Name + " for " + targetContext.Name);
       }
 
       cond.Add(

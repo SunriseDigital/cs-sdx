@@ -25,6 +25,7 @@ namespace Sdx.Scaffold
       FormList = new Config.List();
       SortingOrder = new Config.Item();
       OutlineRank = 1;
+      postSaveHookList = new List<Action<Db.Record, NameValueCollection, Db.Connection, bool>>();
     }
 
     internal Db.TableMeta TableMeta { get; set; }
@@ -412,6 +413,7 @@ namespace Sdx.Scaffold
         }
       }
 
+      var isNew = record.IsNew;//フック内で使いたいので record.Save が呼ばれる前に控えておく
       record.Save(conn);
 
       foreach (var config in relationList)
@@ -438,6 +440,12 @@ namespace Sdx.Scaffold
 
         currentRecords.ForEach(crec => crec.Delete(conn));
       }
+
+      record.ClearRecordCache();
+      postSaveHookList.ForEach(action =>
+      {
+        action(record, values, conn, isNew);
+      });
     }
 
     /// <summary>
@@ -545,5 +553,16 @@ namespace Sdx.Scaffold
           .ToDictionary(kv => kv.Key, kv => kv.Value.ToString())
       );
     }
+
+    /// <summary>
+    /// Save() 後に何かさせたい場合は AddPostSaveHook でセットしてください
+    /// </summary>
+    private List<Action<Db.Record, NameValueCollection, Db.Connection, bool>> postSaveHookList;
+
+    public void AddPostSaveHook(Action<Db.Record, NameValueCollection, Db.Connection, bool> callback)
+    {
+      postSaveHookList.Add(callback);
+    }
+
   }
 }
