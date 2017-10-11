@@ -16,6 +16,18 @@ namespace Sdx.Util
       this.endDate = endDate;
     }
 
+    public DateTime StartDate
+    {
+      get;
+      protected set;
+    }
+
+    public DateTime EndDate
+    {
+      get;
+      protected set;
+    }
+
     public void EachDay(int day, Action<DateTime> action)
     {
       var current = startDate;
