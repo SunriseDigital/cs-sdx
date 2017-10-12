@@ -18,14 +18,18 @@ namespace Sdx.Util
 
     public DateTime StartDate
     {
-      get;
-      private set;
+      get
+      {
+        return startDate;
+      }
     }
 
     public DateTime EndDate
     {
-      get;
-      private set;
+      get
+      {
+        return endDate;
+      }
     }
 
     public void EachDay(int day, Action<DateTime> action)
