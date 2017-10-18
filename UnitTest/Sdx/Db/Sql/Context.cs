@@ -22,5 +22,40 @@ namespace UnitTest
     {
       BaseDbTest.InitilizeClass(context);
     }
+
+    [Fact]
+    public void TestGetJoinedContext()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGetJoinedContext(db);
+      }
+    }
+
+    private void RunGetJoinedContext(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      select.AddFrom(new Test.Orm.Table.Shop(), "shop1", cShop1 =>
+      {
+        cShop1.InnerJoin(new Test.Orm.Table.ShopCategory(), cShopCategory =>
+        {
+          cShopCategory.InnerJoin(new Test.Orm.Table.Shop(), "shop2");
+        });
+
+        cShop1.InnerJoin(new Test.Orm.Table.Menu(), cShopMenu =>
+        {
+          cShopMenu.InnerJoin(new Test.Orm.Table.Shop(), "shop3");
+        });
+      });
+
+      var cCategory = select.Context("shop_category");
+      var cMenu = select.Context("menu");
+
+      Assert("shop2", cCategory.GetJoinedContext<Test.Orm.Table.Shop>().Name);
+      Assert("shop3", cMenu.GetJoinedContext<Test.Orm.Table.Shop>().Name);
+
+    }
   }
 }
