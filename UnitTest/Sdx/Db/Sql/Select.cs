@@ -2618,7 +2618,8 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
         });
       });
 
-      Assert.Equal("shopFrom", select.GetFroms().Name);
+      var froms = select.Froms.Where(from => from.Table is Test.Orm.Table.Shop);
+      Assert.Equal("shopFrom", froms.First().Name);
     }
   }
 }
