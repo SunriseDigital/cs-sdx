@@ -790,5 +790,16 @@ namespace Sdx.Db.Sql
     {
       return new ContextActions(this);
     }
+
+    /// <summary>
+    /// AddFrom された Context を全て返します
+    /// </summary>
+    public IEnumerable<Context> Froms
+    {
+      get
+      {
+        return Contexts.Where(context => context.JoinType == JoinType.From);
+      }
+    }
   }
 }
