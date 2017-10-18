@@ -2593,5 +2593,32 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
       }
       #endregion
     }
+
+    [Fact]
+    public void TestGetFromContext()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunGetFromContext(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunGetFromContext(TestDb testDb)
+    {
+      var db = testDb.Adapter;
+      var select = db.CreateSelect();
+
+      //FROMとJOINどちらのshopかわかるようにエイリアスを付けておく
+      select.AddFrom(new Test.Orm.Table.Shop(), "shopFrom", cShoppp =>
+      {
+        cShoppp.InnerJoin(new Test.Orm.Table.ShopCategory(), cShopCategory =>
+        {
+          cShopCategory.InnerJoin(new Test.Orm.Table.Shop(), "shopJoin");
+        });
+      });
+
+      Assert.Equal("shopFrom", select.GetFroms().Name);
+    }
   }
 }
