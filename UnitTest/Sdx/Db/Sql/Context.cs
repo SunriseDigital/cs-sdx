@@ -53,8 +53,8 @@ namespace UnitTest
       var cCategory = select.Context("shop_category");
       var cMenu = select.Context("menu");
 
-      Assert("shop2", cCategory.GetJoinedContext<Test.Orm.Table.Shop>().Name);
-      Assert("shop3", cMenu.GetJoinedContext<Test.Orm.Table.Shop>().Name);
+      Assert.Equal("shop2", cCategory.GetJoinedContexts<Test.Orm.Table.Shop>().First.Name);
+      Assert.Equal("shop3", cMenu.GetJoinedContexts<Test.Orm.Table.Shop>().First.Name);
 
     }
   }
