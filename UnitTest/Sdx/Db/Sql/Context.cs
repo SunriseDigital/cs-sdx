@@ -2,6 +2,7 @@
 using UnitTest.DummyClasses;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Data.Common;
 
 #if ON_VISUAL_STUDIO
@@ -53,8 +54,8 @@ namespace UnitTest
       var cCategory = select.Context("shop_category");
       var cMenu = select.Context("menu");
 
-      Assert.Equal("shop2", cCategory.GetJoinedContexts<Test.Orm.Table.Shop>().First.Name);
-      Assert.Equal("shop3", cMenu.GetJoinedContexts<Test.Orm.Table.Shop>().First.Name);
+      Assert.Equal("shop2", cCategory.JoinedContexts<Test.Orm.Table.Shop>().First().Name);
+      Assert.Equal("shop3", cMenu.JoinedContexts<Test.Orm.Table.Shop>().First().Name);
 
     }
   }
