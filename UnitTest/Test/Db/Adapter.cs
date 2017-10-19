@@ -10,7 +10,7 @@ namespace Test.Db
   {
     public static String MySqlConnectionString
     {
-      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963;"; }
+      get { return "Server=localhost;Database=sdxtest;Uid=sdxuser;Pwd=sdx5963;CharSet=utf8;"; }
     }
 
     public static String SqlServerConnectionString
