@@ -2595,16 +2595,16 @@ SELECT `shop`.`id` AS `id@shop` FROM `shop`
     }
 
     [Fact]
-    public void TestGetFromContext()
+    public void TestGetFromContexts()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunGetFromContext(db);
+        RunGetFromContexts(db);
         ExecSql(db);
       }
     }
 
-    private void RunGetFromContext(TestDb testDb)
+    private void RunGetFromContexts(TestDb testDb)
     {
       var db = testDb.Adapter;
       var select = db.CreateSelect();

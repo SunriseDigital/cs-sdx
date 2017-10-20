@@ -25,15 +25,15 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestGetJoinedContext()
+    public void TestGetJoinedContexts()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunGetJoinedContext(db);
+        RunGetJoinedContexts(db);
       }
     }
 
-    private void RunGetJoinedContext(TestDb testDb)
+    private void RunGetJoinedContexts(TestDb testDb)
     {
       var db = testDb.Adapter;
       var select = db.CreateSelect();
