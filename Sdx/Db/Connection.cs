@@ -628,5 +628,10 @@ namespace Sdx.Db
         return DbConnection.DataSource;
       }
     }
+
+    public void UseTransaction(DbTransaction transaction)
+    {
+      DbTransaction = transaction;
+    }
   }
 }
