@@ -69,6 +69,24 @@ namespace Sdx.Scaffold.Config
       }
     }
 
+    internal PropertyInfo ToPropertyInfo(Type type)
+    {
+      if (value is PropertyInfo)
+      {
+        var property = (PropertyInfo)value;
+        if (property.DeclaringType != type)
+        {
+          throw new TypeAccessException("Not match type " + type + " and " + property.DeclaringType);
+        }
+        return property;
+      }
+      else
+      {
+        var property = type.GetProperty(value.ToString());
+        return property;
+      }
+    }
+
     internal object Invoke(Type type, object target, object[] args)
     {
       return ToMethodInfo(type).Invoke(target, args);
