@@ -367,13 +367,30 @@ namespace Sdx.Scaffold
                 args.Add(values[columnName]);
               }
 
-              var methodInfo = config["setter"].ToMethodInfo(record.GetType());
-              if (methodInfo.GetParameters().Count() == 2)
+              if (config["setter"].ToMethodInfo(record.GetType()) != null)
               {
-                args.Add(values);
-              }
+                var methodInfo = config["setter"].ToMethodInfo(record.GetType());
+             
+                if (methodInfo.GetParameters().Count() == 2)
+                {
+                  args.Add(values);
+                }
 
-              methodInfo.Invoke(record, args.ToArray());
+                methodInfo.Invoke(record, args.ToArray());
+              }
+              else if (config["setter"].ToPropertyInfo(record.GetType()) != null)
+              {
+                var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
+
+                args.Add(values);
+
+                propertyInfo.SetValue(record, args[0]);
+
+              }
+              else
+              {
+                throw new Exception("config[\"setter\"]");
+              }
             }
             else
             {

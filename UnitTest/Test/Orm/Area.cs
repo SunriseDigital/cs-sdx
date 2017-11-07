@@ -28,17 +28,12 @@ namespace Test.Orm
     }
 
 
-    private int couponTypes = 1;
-    public int CouponTypes
-    {
-      get
-      {
-        return couponTypes;
-      }
 
+    public string Types
+    {
       set
       {
-        couponTypes = value;
+        SetValue("name", value);
       }
     }
 

@@ -1508,15 +1508,19 @@ namespace UnitTest
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
       scaffold.FormList
         .Add(Sdx.Scaffold.Config.Item.Create()
-          .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
-          .Set("name", new Sdx.Scaffold.Config.Value("name_with_code"))
-          .Set("setter", new Sdx.Scaffold.Config.Value("CouponTypes"))
+          .Set("label", new Sdx.Scaffold.Config.Value("タイプ"))
+          .Set("name", new Sdx.Scaffold.Config.Value("type"))
+          .Set("setter", new Sdx.Scaffold.Config.Value("Types"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("コード"))
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
         )
         ;
 
       var query = new NameValueCollection();
       var post = new NameValueCollection();
-      post.Set("name_with_code", "名前,code");
+      post.Set("type", "名前,aaa");
+      post.Set("code", "test");
 
       using (var conn = scaffold.Db.CreateConnection())
       {
