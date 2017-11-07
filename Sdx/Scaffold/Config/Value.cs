@@ -65,11 +65,6 @@ namespace Sdx.Scaffold.Config
       else
       {
         var method = type.GetMethod(value.ToString());
-        if (method == null)
-        {
-          throw new NotImplementedException("Missing " + value.ToString() + " method in " + type);
-        }
-
         return method;
       }
     }
