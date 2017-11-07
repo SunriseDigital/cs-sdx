@@ -1492,5 +1492,54 @@ namespace UnitTest
       }
 
     }
+
+    [Fact]
+    public void TestPostSavePropInsteadMethod()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunPostSavePropInsteadMethod(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunPostSavePropInsteadMethod(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("名前とコード"))
+          .Set("name", new Sdx.Scaffold.Config.Value("name_with_code"))
+          .Set("setter", new Sdx.Scaffold.Config.Value("CouponTypes"))
+        )
+        ;
+
+      var query = new NameValueCollection();
+      var post = new NameValueCollection();
+      post.Set("name_with_code", "名前,code");
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, post, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+      }
+    }
+
+
   }
 }

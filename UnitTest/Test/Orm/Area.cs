@@ -26,5 +26,21 @@ namespace Test.Orm
     {
       return GetString("name") + "," + GetString("code");
     }
+
+
+    private int couponTypes = 1;
+    public int CouponTypes
+    {
+      get
+      {
+        return couponTypes;
+      }
+
+      set
+      {
+        couponTypes = value;
+      }
+    }
+
   }
 }
