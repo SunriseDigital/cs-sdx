@@ -110,6 +110,7 @@
     <Compile Include="Html\CheckBoxGroup.cs" />
     <Compile Include="Html\RadioGroup.cs" />
     <Compile Include="Image.cs" />
+    <Compile Include="Util\Bit.cs" />
     <Compile Include="Util\DateTimeSpan.cs" />
     <Compile Include="Util\Yaml.cs" />
     <Compile Include="Validation\Base.cs" />
