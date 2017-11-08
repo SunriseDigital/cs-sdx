@@ -787,7 +787,6 @@ namespace UnitTest
       var post = new NameValueCollection();
       post.Set("name_with_code", "名前,code");
 
-      string savedId;
       using (var conn = scaffold.Db.CreateConnection())
       {
         conn.Open();
@@ -808,8 +807,7 @@ namespace UnitTest
         }
 
         //確認する
-        savedId = record.GetString("id");
-        var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, savedId);
+        var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, record.GetString("id"));
         Assert.Equal("名前", savedRecord.GetString("name"));
         Assert.Equal("code", savedRecord.GetString("code"));
       }
@@ -1519,10 +1517,12 @@ namespace UnitTest
 
       var query = new NameValueCollection();
       var post = new NameValueCollection();
-      post.Set("type", "new");
+      post.Add("type", "foo");
+      post.Add("type", "bar");
+      post.Add("type", "baz");
       post.Set("code", "test");
+      
 
-      string savedId;
       using (var conn = scaffold.Db.CreateConnection())
       {
         conn.Open();
@@ -1543,9 +1543,8 @@ namespace UnitTest
         }
 
         //確認する
-        savedId = record.GetString("id");
-        var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, savedId);
-        Assert.Equal("new", savedRecord.GetString("name"));
+        var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, record.GetString("id"));
+        Assert.Equal("foo_bar_baz", savedRecord.GetString("name"));
         Assert.Equal("test", savedRecord.GetString("code"));
 
       }
