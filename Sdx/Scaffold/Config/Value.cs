@@ -64,8 +64,7 @@ namespace Sdx.Scaffold.Config
       }
       else
       {
-        var method = type.GetMethod(value.ToString());
-        return method;
+        return type.GetMethod(value.ToString());
       }
     }
 
@@ -82,8 +81,7 @@ namespace Sdx.Scaffold.Config
       }
       else
       {
-        var property = type.GetProperty(value.ToString());
-        return property;
+        return type.GetProperty(value.ToString());
       }
     }
 
