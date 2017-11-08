@@ -1494,16 +1494,16 @@ namespace UnitTest
     }
 
     [Fact]
-    public void TestPostSavePropInsteadMethod()
+    public void TestPostSavePropInsteadOfMethod()
     {
       foreach (TestDb db in this.CreateTestDbList())
       {
-        RunPostSavePropInsteadMethod(db);
+        RunPostSavePropInsteadOfMethod(db);
         ExecSql(db);
       }
     }
 
-    private void RunPostSavePropInsteadMethod(TestDb db)
+    private void RunPostSavePropInsteadOfMethod(TestDb db)
     {
       var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
       scaffold.FormList
