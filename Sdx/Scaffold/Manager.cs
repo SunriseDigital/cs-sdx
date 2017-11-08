@@ -389,7 +389,7 @@ namespace Sdx.Scaffold
               }
               else
               {
-                throw new NotImplementedException("Missing " + args.ToString() + " method or property in " + record.GetType());
+                throw new NotImplementedException("Missing " + config["setter"] + " method or property in " + record.GetType());
               }
             }
             else

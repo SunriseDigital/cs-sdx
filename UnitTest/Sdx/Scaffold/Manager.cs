@@ -1519,9 +1519,10 @@ namespace UnitTest
 
       var query = new NameValueCollection();
       var post = new NameValueCollection();
-      post.Set("type", "名前,aaa");
+      post.Set("type", "new");
       post.Set("code", "test");
 
+      string savedId;
       using (var conn = scaffold.Db.CreateConnection())
       {
         conn.Open();
@@ -1540,6 +1541,12 @@ namespace UnitTest
           conn.Rollback();
           throw;
         }
+
+        //確認する
+        savedId = record.GetString("id");
+        var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, savedId);
+        Assert.Equal("new", savedRecord.GetString("name"));
+        Assert.Equal("test", savedRecord.GetString("code"));
 
       }
     }
