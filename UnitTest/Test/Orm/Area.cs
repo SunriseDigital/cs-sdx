@@ -29,11 +29,12 @@ namespace Test.Orm
 
 
 
-    public string Types
+    public string[] Types
     {
       set
       {
-        SetValue("name", value);
+        string values = string.Join("_",value);
+        SetValue("name", values);
       }
     }
 

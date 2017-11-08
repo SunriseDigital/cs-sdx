@@ -366,7 +366,7 @@ namespace Sdx.Scaffold
               {
                 args.Add(values[columnName]);
               }
-
+              
               if (config["setter"].ToMethodInfo(record.GetType()) != null)
               {
                 var methodInfo = config["setter"].ToMethodInfo(record.GetType());
@@ -382,7 +382,7 @@ namespace Sdx.Scaffold
               {
                 var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
 
-                propertyInfo.SetValue(record, args[0]);
+                propertyInfo.SetValue(record, values.GetValues(columnName));
               }
               else
               {
