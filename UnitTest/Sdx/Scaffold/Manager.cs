@@ -1518,8 +1518,6 @@ namespace UnitTest
       var query = new NameValueCollection();
       var post = new NameValueCollection();
       post.Add("type", "foo");
-      post.Add("type", "bar");
-      post.Add("type", "baz");
       post.Set("code", "test");
       
 
@@ -1544,7 +1542,7 @@ namespace UnitTest
 
         //確認する
         var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, record.GetString("id"));
-        Assert.Equal("foo_bar_baz", savedRecord.GetString("name"));
+        Assert.Equal("foo", savedRecord.GetString("name"));
         Assert.Equal("test", savedRecord.GetString("code"));
 
       }
