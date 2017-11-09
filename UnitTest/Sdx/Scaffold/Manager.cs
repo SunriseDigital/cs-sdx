@@ -1551,5 +1551,64 @@ namespace UnitTest
     }
 
 
+    [Fact]
+    public void TestPostSaveArrayPropInsteadOfMethod()
+    {
+      foreach (TestDb db in this.CreateTestDbList())
+      {
+        RunPostArraySavePropInsteadOfMethod(db);
+        ExecSql(db);
+      }
+    }
+
+    private void RunPostArraySavePropInsteadOfMethod(TestDb db)
+    {
+      var scaffold = new Sdx.Scaffold.Manager(Test.Orm.Table.Area.Meta, db.Adapter);
+      scaffold.FormList
+        .Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("タイプ"))
+          .Set("name", new Sdx.Scaffold.Config.Value("type"))
+          .Set("setter", new Sdx.Scaffold.Config.Value("Types"))
+        ).Add(Sdx.Scaffold.Config.Item.Create()
+          .Set("label", new Sdx.Scaffold.Config.Value("コード"))
+          .Set("column", new Sdx.Scaffold.Config.Value("code"))
+        )
+        ;
+
+      var query = new NameValueCollection();
+      var post = new NameValueCollection();
+      post.Add("type", "foo");
+      post.Add("type", "bar");
+      post.Add("type", "baz");
+      post.Set("code", "test");
+
+
+      using (var conn = scaffold.Db.CreateConnection())
+      {
+        conn.Open();
+
+        var record = scaffold.LoadRecord(query, conn);
+        var form = scaffold.BuildForm(record, conn);
+
+        conn.BeginTransaction();
+        try
+        {
+          scaffold.Save(record, post, conn);
+          conn.Commit();
+        }
+        catch (Exception)
+        {
+          conn.Rollback();
+          throw;
+        }
+
+        //確認する
+        var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, record.GetString("id"));
+        Assert.Equal("foo_bar_baz", savedRecord.GetString("name"));
+        Assert.Equal("test", savedRecord.GetString("code"));
+
+      }
+    }
+
   }
 }
