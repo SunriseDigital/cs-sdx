@@ -23,7 +23,6 @@ namespace Sdx.Data
     public override void Bind(string value)
     {
       var serializer = new JavaScriptSerializer();
-
       if (value == "[]")
       {
         value = "{}";
