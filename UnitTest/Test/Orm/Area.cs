@@ -38,5 +38,13 @@ namespace Test.Orm
       }
     }
 
+    public string TypesForString
+    {
+      set
+      {
+        SetValue("name", value);
+      }
+    }
+
   }
 }
