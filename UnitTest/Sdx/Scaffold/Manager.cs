@@ -1579,7 +1579,7 @@ namespace UnitTest
       post.Add("type", "foo");
       post.Add("type", "bar");
       post.Add("type", "baz");
-      post.Set("code", "test");
+      post.Set("code", "test2");
 
 
       using (var conn = scaffold.Db.CreateConnection())
@@ -1604,7 +1604,7 @@ namespace UnitTest
         //確認する
         var savedRecord = (new Test.Orm.Table.Area()).FetchRecordByPkey(conn, record.GetString("id"));
         Assert.Equal("foo_bar_baz", savedRecord.GetString("name"));
-        Assert.Equal("test", savedRecord.GetString("code"));
+        Assert.Equal("test2", savedRecord.GetString("code"));
 
       }
     }
