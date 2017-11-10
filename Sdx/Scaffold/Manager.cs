@@ -382,14 +382,7 @@ namespace Sdx.Scaffold
               {
                 var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
 
-                if (propertyInfo.PropertyType.Name.Contains("[]"))
-                {
-                  propertyInfo.SetValue(record, values.GetValues(columnName));
-                }
-                else
-                {
-                  propertyInfo.SetValue(record, values[columnName]);
-                }
+                propertyInfo.SetValue(record, args[0]);
               }
               else
               {

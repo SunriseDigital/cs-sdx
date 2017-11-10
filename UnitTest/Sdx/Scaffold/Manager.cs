@@ -1566,6 +1566,7 @@ namespace UnitTest
         .Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("タイプ"))
           .Set("name", new Sdx.Scaffold.Config.Value("type"))
+          .Set("multiple", new Sdx.Scaffold.Config.Value("true"))
           .Set("setter", new Sdx.Scaffold.Config.Value("Types"))
         ).Add(Sdx.Scaffold.Config.Item.Create()
           .Set("label", new Sdx.Scaffold.Config.Value("コード"))
