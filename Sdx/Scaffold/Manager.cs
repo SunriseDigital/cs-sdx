@@ -403,7 +403,9 @@ namespace Sdx.Scaffold
           }
           else
           {
-            record.SetValue(columnName, values[columnName]);
+            if (values[columnName] != null) {
+              record.SetValue(columnName, values[columnName]);
+            }
           }
         }
       }
