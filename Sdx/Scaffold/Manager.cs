@@ -353,50 +353,57 @@ namespace Sdx.Scaffold
         }
         else
         {
-          if (values[columnName] != null)
+          List<object> args = new List<object>();
+          if (config.ContainsKey("setter"))
           {
-            List<object> args = new List<object>();
-            if (config.ContainsKey("setter"))
+            if (config.ContainsKey("multiple") && config["multiple"].ToBool())
             {
-              if (config.ContainsKey("multiple") && config["multiple"].ToBool())
+              args.Add(values.GetValues(columnName));
+            }
+            else
+            {
+              args.Add(values[columnName]);
+            }
+              
+            if (config["setter"].ToMethodInfo(record.GetType()) != null)
+            {
+              var methodInfo = config["setter"].ToMethodInfo(record.GetType());
+             
+              if (methodInfo.GetParameters().Count() == 2)
               {
-                args.Add(values.GetValues(columnName));
+                args.Add(values);
+              }
+
+              if (args != null)
+              {
+                methodInfo.Invoke(record, args.ToArray());
               }
               else
               {
-                args.Add(values[columnName]);
+                methodInfo.Invoke(record, null);
               }
-              
-              if (config["setter"].ToMethodInfo(record.GetType()) != null)
-              {
-                var methodInfo = config["setter"].ToMethodInfo(record.GetType());
-             
-                if (methodInfo.GetParameters().Count() == 2)
-                {
-                  args.Add(values);
-                }
+                
+            }
+            else if (config["setter"].ToPropertyInfo(record.GetType()) != null)
+            {
+              var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
 
-                methodInfo.Invoke(record, args.ToArray());
-              }
-              else if (config["setter"].ToPropertyInfo(record.GetType()) != null)
-              {
-                var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
-
+              if (args != null) { 
                 propertyInfo.SetValue(record, args[0]);
               }
               else
               {
-                throw new NotImplementedException("Missing " + config["setter"] + " method or property in " + record.GetType());
+                propertyInfo.SetValue(record, null);
               }
             }
             else
             {
-              record.SetValue(columnName, values[columnName]);
+              throw new NotImplementedException("Missing " + config["setter"] + " method or property in " + record.GetType());
             }
           }
-          else if (config.ContainsKey("allowNull") && config["allowNull"].ToBool())
+          else
           {
-            record.SetValue(columnName, DBNull.Value);
+            record.SetValue(columnName, values[columnName]);
           }
         }
       }
