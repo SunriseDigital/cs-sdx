@@ -394,6 +394,10 @@ namespace Sdx.Scaffold
               record.SetValue(columnName, values[columnName]);
             }
           }
+          else if (config.ContainsKey("allowNull") && config["allowNull"].ToBool())
+          {
+            record.SetValue(columnName, DBNull.Value);
+          }
         }
       }
 
