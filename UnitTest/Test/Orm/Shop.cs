@@ -17,7 +17,7 @@ namespace Test.Orm
 
     public void SetRawPassword(string rawPassword)
     {
-      if (rawPassword == null)
+      if (rawPassword == "")
       {
         return;
       }

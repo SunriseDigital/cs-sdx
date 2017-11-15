@@ -116,13 +116,6 @@ namespace Test.Orm.Table
       return elem;
     }
 
-    public static Sdx.Html.FormElement CreatePasswordElement()
-    {
-      var elem = new Sdx.Html.InputText("password");
-
-      return elem;
-    }
-
     //public static void CreateNameValidators(Sdx.Html.FormElement element, Sdx.Db.Record record, Sdx.Db.Connection conn)
     //{
     //  Meta.GetColumn("name").AppendValidators(element, record);
