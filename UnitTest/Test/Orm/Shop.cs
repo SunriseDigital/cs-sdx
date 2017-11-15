@@ -17,6 +17,10 @@ namespace Test.Orm
 
     public void SetRawPassword(string rawPassword)
     {
+      if (rawPassword == null)
+      {
+        return;
+      }
       //本当はhash化するが確認しやすいように文字列追加のみ。
       SetValue("password", "HASH@" + rawPassword);
     }

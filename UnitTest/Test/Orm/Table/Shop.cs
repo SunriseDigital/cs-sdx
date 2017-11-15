@@ -119,7 +119,6 @@ namespace Test.Orm.Table
     public static Sdx.Html.FormElement CreatePasswordElement()
     {
       var elem = new Sdx.Html.InputText("password");
-      elem.IsSecret = true;
 
       return elem;
     }
