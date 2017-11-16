@@ -374,27 +374,13 @@ namespace Sdx.Scaffold
                 args.Add(values);
               }
 
-              if (args != null)
-              {
-                methodInfo.Invoke(record, args.ToArray());
-              }
-              else
-              {
-                methodInfo.Invoke(record, null);
-              }
-                
+              methodInfo.Invoke(record, args.ToArray());
             }
             else if (config["setter"].ToPropertyInfo(record.GetType()) != null)
             {
               var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
-
-              if (args != null) { 
-                propertyInfo.SetValue(record, args[0]);
-              }
-              else
-              {
-                propertyInfo.SetValue(record, null);
-              }
+              propertyInfo.SetValue(record, args[0]);
+ 
             }
             else
             {
@@ -403,9 +389,9 @@ namespace Sdx.Scaffold
           }
           else
           {
-            if (values[columnName] != null) {
-              record.SetValue(columnName, values[columnName]);
-            }
+            // チェックボックスなどで`values[columnName]`がNULLの時、カラムをNULLに更新しようとします。
+            // TODO テーブルからカラムの設定を取り出してヌルを許容していない場合、型に応じて0か空文字などを入れる必要があります。
+            record.SetValue(columnName, values[columnName]);
           }
         }
       }
