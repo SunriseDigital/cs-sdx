@@ -380,7 +380,6 @@ namespace Sdx.Scaffold
             {
               var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
               propertyInfo.SetValue(record, args[0]);
- 
             }
             else
             {
