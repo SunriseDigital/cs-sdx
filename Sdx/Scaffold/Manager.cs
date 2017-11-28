@@ -353,21 +353,22 @@ namespace Sdx.Scaffold
         }
         else
         {
-          if (values[columnName] != null)
+          List<object> args = new List<object>();
+          if (config.ContainsKey("setter"))
           {
-            List<object> args = new List<object>();
-            if (config.ContainsKey("setter"))
+            if (config.ContainsKey("multiple") && config["multiple"].ToBool())
             {
-              if (config.ContainsKey("multiple") && config["multiple"].ToBool())
-              {
-                args.Add(values.GetValues(columnName));
-              }
-              else
-              {
-                args.Add(values[columnName]);
-              }
-
+              args.Add(values.GetValues(columnName));
+            }
+            else
+            {
+              args.Add(values[columnName]);
+            }
+              
+            if (config["setter"].ToMethodInfo(record.GetType()) != null)
+            {
               var methodInfo = config["setter"].ToMethodInfo(record.GetType());
+             
               if (methodInfo.GetParameters().Count() == 2)
               {
                 args.Add(values);
@@ -375,10 +376,21 @@ namespace Sdx.Scaffold
 
               methodInfo.Invoke(record, args.ToArray());
             }
+            else if (config["setter"].ToPropertyInfo(record.GetType()) != null)
+            {
+              var propertyInfo = config["setter"].ToPropertyInfo(record.GetType());
+              propertyInfo.SetValue(record, args[0]);
+            }
             else
             {
-              record.SetValue(columnName, values[columnName]);
+              throw new NotImplementedException("Missing " + config["setter"] + " method or property in " + record.GetType());
             }
+          }
+          else
+          {
+            // チェックボックスなどで`values[columnName]`がNULLの時、カラムをNULLに更新しようとします。
+            // TODO テーブルからカラムの設定を取り出してヌルを許容していない場合、型に応じて0か空文字などを入れる必要があります。
+            record.SetValue(columnName, values[columnName]);
           }
         }
       }

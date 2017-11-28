@@ -26,5 +26,25 @@ namespace Test.Orm
     {
       return GetString("name") + "," + GetString("code");
     }
+
+
+
+    public string[] Types
+    {
+      set
+      {
+        string values = string.Join("_",value);
+        SetValue("name", values);
+      }
+    }
+
+    public string TypesForString
+    {
+      set
+      {
+        SetValue("name", value);
+      }
+    }
+
   }
 }

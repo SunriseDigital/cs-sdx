@@ -64,13 +64,24 @@ namespace Sdx.Scaffold.Config
       }
       else
       {
-        var method = type.GetMethod(value.ToString());
-        if (method == null)
-        {
-          throw new NotImplementedException("Missing " + value.ToString() + " method in " + type);
-        }
+        return type.GetMethod(value.ToString());
+      }
+    }
 
-        return method;
+    internal PropertyInfo ToPropertyInfo(Type type)
+    {
+      if (value is PropertyInfo)
+      {
+        var property = (PropertyInfo)value;
+        if (property.DeclaringType != type)
+        {
+          throw new TypeAccessException("Not match type " + type + " and " + property.DeclaringType);
+        }
+        return property;
+      }
+      else
+      {
+        return type.GetProperty(value.ToString());
       }
     }
 
