@@ -85,6 +85,7 @@
     <Compile Include="Sdx\Db\Adapter.cs" />
     <Compile Include="Sdx\Db\Connection.cs" />
     <Compile Include="Sdx\Config.cs" />
+    <Compile Include="Sdx\Db\Sql\Context.cs" />
     <Compile Include="Sdx\Db\Sql\Delete.cs" />
     <Compile Include="Sdx\Db\Sql\Update.cs" />
     <Compile Include="Sdx\Db\Sql\Select.cs" />
