@@ -578,5 +578,17 @@ namespace Sdx.Db.Sql
     {
       return (T)Table;
     }
+
+    /// <summary>
+    /// JOINされた<see cref="Context"/>の中から指定のテーブルクラスに該当するものを全て返します
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <returns></returns>
+    public IEnumerable<Context> JoinedContexts<T>() where T : Sdx.Db.Table
+    {
+      return this.Select.Contexts
+        .Where(context => context.ParentContext == this)
+        .Where(context => context.Table is T);
+    }
   }
 }
