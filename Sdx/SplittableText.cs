@@ -17,7 +17,10 @@ namespace Sdx
     {
       RawText = targetText;
       Boundary = boundary;
-      Parts = RawText.Split(new string[] { Boundary }, StringSplitOptions.None);
+      Parts = RawText
+        .Split(new string[] { Boundary }, StringSplitOptions.None)
+        .Select(x => x.Trim()).ToArray<string>()
+      ;
       HasBoundaryString = (Parts.Any() && Parts.Skip(1).Any());
     }
 
