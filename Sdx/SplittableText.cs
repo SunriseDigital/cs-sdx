@@ -21,7 +21,6 @@ namespace Sdx
         .Split(new string[] { Boundary }, StringSplitOptions.None)
         .Select(x => x.Trim()).ToArray<string>()
       ;
-      HasBoundaryString = (parts.Any() && parts.Skip(1).Any());
     }
 
     /// <summary>
@@ -61,15 +60,6 @@ namespace Sdx
       {
         return PartCount > 1;
       }
-    }
-
-    /// <summary>
-    /// 元の文字列に Boundary と同じ文字列があるかのフラグ
-    /// </summary>
-    public bool HasBoundaryString
-    {
-      get;
-      private set;
     }
 
     public string First
