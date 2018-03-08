@@ -26,12 +26,12 @@ namespace UnitTest
       var target = "aaaaaaaaaa@Sdx.SplittableText.Boundary@bbbbbbbbbb@Sdx.SplittableText.Boundary@cccccccccc";
       var splittable = new Sdx.SplittableText(target);
 
-      Assert.Equal(3, splittable.Parts.Length);
+      Assert.Equal(3, splittable.PartCount);
       Assert.Equal("aaaaaaaaaa", splittable.First);
       Assert.Equal("cccccccccc", splittable.Last);
       Assert.Equal("bbbbbbbbbb", splittable.PartAt(2));
       Assert.Equal(target, splittable.RawText);
-      Assert.Equal(true, splittable.HasBoundaryString);
+      Assert.Equal(true, splittable.HasMultipleParts);
     }
 
     [Fact]
