@@ -17,11 +17,11 @@ namespace Sdx
     {
       RawText = targetText;
       Boundary = boundary;
-      Parts = RawText
+      parts = RawText
         .Split(new string[] { Boundary }, StringSplitOptions.None)
         .Select(x => x.Trim()).ToArray<string>()
       ;
-      HasBoundaryString = (Parts.Any() && Parts.Skip(1).Any());
+      HasBoundaryString = (parts.Any() && parts.Skip(1).Any());
     }
 
     /// <summary>
@@ -45,10 +45,22 @@ namespace Sdx
     /// <summary>
     /// RawText を Boundary で区切って配列にしたもの
     /// </summary>
-    public string[] Parts
+    private string[] parts;
+
+    public int PartCount
     {
-      get;
-      private set;
+      get
+      {
+        return parts.Length;
+      }
+    }
+
+    public bool HasMultipleParts
+    {
+      get
+      {
+        return PartCount > 1;
+      }
     }
 
     /// <summary>
@@ -64,7 +76,7 @@ namespace Sdx
     {
       get
       {
-        return Parts.FirstOrDefault();
+        return parts.FirstOrDefault();
       }
     }
 
@@ -72,7 +84,7 @@ namespace Sdx
     {
       get
       {
-        return Parts.LastOrDefault();
+        return parts.LastOrDefault();
       }
     }
 
@@ -84,12 +96,12 @@ namespace Sdx
     /// <returns></returns>
     public string PartAt(int nth)
     {
-      if (nth < 1 || nth > Parts.Length)
+      if (nth < 1 || nth > parts.Length)
       {
         return null;
       }
 
-      return Parts[nth - 1];
+      return parts[nth - 1];
     }
   }
 }
