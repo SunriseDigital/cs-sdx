@@ -13,7 +13,7 @@ namespace Sdx
     /// </summary>
     /// <param name="targetText">対象文字列</param>
     /// <param name="boundary">区切り文字</param>
-    public SplittableText(string targetText, string boundary = "@Sdx.SplittableString.Boundary@")
+    public SplittableText(string targetText, string boundary = "@Sdx.SplittableText.Boundary@")
     {
       RawText = targetText;
       Boundary = boundary;
