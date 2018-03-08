@@ -20,6 +20,7 @@ namespace UnitTest
       Assert.Equal("aaaaaaaaaa", splittable.First);
       Assert.Equal("cccccccccc", splittable.Last);
       Assert.Equal("bbbbbbbbbb", splittable.PartAt(2));
+      Assert.Equal(target, splittable.RawText);
       Assert.Equal(true, splittable.HasBoundaryString);
     }
 
