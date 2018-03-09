@@ -84,7 +84,7 @@ namespace Sdx.Db.Adapter
         throw new InvalidOperationException("Not match connection string " + conn.ConnectionString + " and " + ConnectionString);
       }
 
-      if (conn.State != ConnectionState.Open)
+      if (conn.State == ConnectionState.Closed)
       {
         conn.Open();
       }
